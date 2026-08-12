@@ -59,6 +59,8 @@ NSString * const VLCMediaSourceDataSourceLoadingEnded = @"VLCMediaSourceDataSour
 @property (readwrite, strong) NSMutableSet<NSValue *> *preparingInputItemIdentifiers;
 @property (readwrite, strong) NSMutableSet<NSValue *> *preparedInputItemIdentifiers;
 @property (readwrite, strong) NSMutableSet<NSValue *> *unavailableInputItemIdentifiers;
+@property (readwrite, strong) NSMutableDictionary<NSValue *, NSNumber *> *childCountsByInputItemIdentifier;
+@property (readwrite) dispatch_queue_t childCountQueue;
 
 @end
 
@@ -79,6 +81,11 @@ static NSValue * _Nullable inputItemIdentifier(VLCInputItem * _Nullable const in
         self.preparingInputItemIdentifiers = NSMutableSet.set;
         self.preparedInputItemIdentifiers = NSMutableSet.set;
         self.unavailableInputItemIdentifiers = NSMutableSet.set;
+        self.childCountsByInputItemIdentifier = NSMutableDictionary.dictionary;
+        dispatch_queue_attr_t const childCountQueueAttributes =
+            dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_UTILITY, 0);
+        self.childCountQueue = dispatch_queue_create("org.videolan.vlc.media-source-child-count",
+                                                     childCountQueueAttributes);
         NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
         [notificationCenter addObserver:self
                                selector:@selector(mediaSourceChildrenChanged:)
@@ -150,6 +157,29 @@ static NSValue * _Nullable inputItemIdentifier(VLCInputItem * _Nullable const in
         : VLCMediaSourceDataSourceLoadingEnded;
     [NSNotificationCenter.defaultCenter postNotificationName:loadingNotificationName
                                                       object:self];
+}
+
+- (void)reloadCountForInputItemIdentifier:(NSValue *)identifier
+{
+    NSArray<VLCInputNode *> * const children = self.nodeToDisplay.children;
+    const NSUInteger row = [children indexOfObjectPassingTest:^BOOL(VLCInputNode * const childNode,
+                                                                    NSUInteger __unused idx,
+                                                                    BOOL * const __unused stop) {
+        return [inputItemIdentifier(childNode.inputItem) isEqual:identifier];
+    }];
+    if (row == NSNotFound) {
+        return;
+    }
+
+    [children[row] clearChildrenCache];
+
+    const NSInteger countColumn = [self.tableView columnWithIdentifier:@"VLCMediaSourceTableCountColumn"];
+    if (self.tableView.hidden || countColumn == -1) {
+        return;
+    }
+
+    [self.tableView reloadDataForRowIndexes:[NSIndexSet indexSetWithIndex:row]
+                              columnIndexes:[NSIndexSet indexSetWithIndex:countColumn]];
 }
 
 - (void)clearDisplayedNodeChildrenCaches
@@ -349,17 +379,39 @@ static NSValue * _Nullable inputItemIdentifier(VLCInputItem * _Nullable const in
     if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableCountColumn"]) {
         NSValue * const identifier = inputItemIdentifier(inputNode.inputItem);
         const int numberOfChildren = inputNode.numberOfChildren;
+        NSNumber * const cachedChildCount = self.childCountsByInputItemIdentifier[identifier];
         if ([self.unavailableInputItemIdentifiers containsObject:identifier]) {
             cellView.textField.stringValue = NSTR("Unavailable");
         } else if (numberOfChildren > 0 || [self.preparedInputItemIdentifiers containsObject:identifier]) {
             cellView.textField.stringValue =
                 [NSString stringWithFormat:@"%i items", numberOfChildren];
+        } else if (cachedChildCount != nil) {
+            cellView.textField.stringValue =
+                [NSString stringWithFormat:@"%li items", cachedChildCount.integerValue];
         } else {
             cellView.textField.stringValue = NSTR("Loading…");
             if (![self.preparingInputItemIdentifiers containsObject:identifier]) {
                 [self.preparingInputItemIdentifiers addObject:identifier];
-                dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
-                    [self.displayedMediaSource preparseInputNodeWithinTree:inputNode];
+                VLCMediaSource * const mediaSource = self.displayedMediaSource;
+                dispatch_async(self.childCountQueue, ^{
+                    NSError *error = nil;
+                    NSNumber * const childCount = [mediaSource childCountForInputNode:inputNode
+                                                                                error:&error];
+                    if (childCount == nil && error == nil) {
+                        [mediaSource preparseInputNodeWithinTree:inputNode];
+                        return;
+                    }
+
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [self.preparingInputItemIdentifiers removeObject:identifier];
+                        if (error != nil) {
+                            [self.unavailableInputItemIdentifiers addObject:identifier];
+                        } else if (childCount != nil) {
+                            [self.unavailableInputItemIdentifiers removeObject:identifier];
+                            self.childCountsByInputItemIdentifier[identifier] = childCount;
+                        }
+                        [self reloadCountForInputItemIdentifier:identifier];
+                    });
                 });
             }
         }
