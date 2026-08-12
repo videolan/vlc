@@ -243,7 +243,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterSingletonInstance<NavigationHistory>(uri, versionMajor, versionMinor, "History", new NavigationHistory(this));
         qmlRegisterUncreatableType<QAbstractItemModel>(uri, versionMajor, versionMinor, "QtAbstractItemModel", "");
         qmlRegisterUncreatableType<QAbstractProxyModel>(uri, versionMajor, versionMinor, "QtAbstractProxyModel", "");
-        qmlRegisterUncreatableType<QWindow>(uri, versionMajor, versionMinor, "QtWindow", "");
+        qmlRegisterTypesAndRevisions<vlc::QWindowForeign>(uri, versionMajor);
         qmlRegisterUncreatableType<QScreen>(uri, versionMajor, versionMinor, "QtScreen", "");
         qmlRegisterType<VideoSurface>(uri, versionMajor, versionMinor, "VideoSurface");
         qmlRegisterUncreatableType<BaseModel>( uri, versionMajor, versionMinor, "BaseModel", "Base Model is uncreatable." );
@@ -253,7 +253,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterTypesAndRevisions<CSDMenu>( uri, versionMajor);
         qmlRegisterUncreatableType<NavigationAttached>( uri, versionMajor, versionMinor, "Navigation", "Navigation is only available via attached properties");
         qmlRegisterTypesAndRevisions<AboutModel>( uri, versionMajor );
-        qmlRegisterTypesAndRevisions<QSortFilterProxyModelForeign>( uri, versionMajor );
+        qmlRegisterTypesAndRevisions<vlc::QSortFilterProxyModelForeign>( uri, versionMajor );
         qmlRegisterUncreatableType<QMessageBox>( uri, versionMajor, versionMinor, "QtMessageBox", "QtMessageBox is uncreatable, use DialogsProvider instead." );
 #ifdef UPDATE_CHECK
         qmlRegisterSingletonInstance<UpdateModel>( uri, versionMajor, versionMinor, "UpdateModel", m_mainCtx->getUpdateModel() );

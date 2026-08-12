@@ -12,6 +12,7 @@
 #include <QQmlError>
 #include <QQuickItem>
 #include <QSortFilterProxyModel>
+#include <QWindow>
 
 class VLCVarChoiceModel;
 
@@ -44,11 +45,24 @@ private:
     QPointer<QQmlEngine> m_engineBound;
 };
 
+namespace vlc {
+
 struct QSortFilterProxyModelForeign
 {
     Q_GADGET
     QML_FOREIGN(QSortFilterProxyModel)
     QML_NAMED_ELEMENT(QtSortFilterProxyModel)
 };
+
+// Qt Declarative already has this, but it is registered anonymously:
+struct QWindowForeign
+{
+    Q_GADGET
+    QML_FOREIGN(QWindow)
+    QML_NAMED_ELEMENT(QtWindow)
+    QML_UNCREATABLE("")
+};
+
+}
 
 #endif // MAINUI_HPP
