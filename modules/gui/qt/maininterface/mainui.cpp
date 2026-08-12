@@ -92,7 +92,6 @@
 #endif
 #include "mainctx_submodels.hpp"
 
-#include <QScreen>
 #include <QAbstractProxyModel>
 #include <QMessageBox>
 
@@ -244,7 +243,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterUncreatableType<QAbstractItemModel>(uri, versionMajor, versionMinor, "QtAbstractItemModel", "");
         qmlRegisterUncreatableType<QAbstractProxyModel>(uri, versionMajor, versionMinor, "QtAbstractProxyModel", "");
         qmlRegisterTypesAndRevisions<vlc::QWindowForeign>(uri, versionMajor);
-        qmlRegisterUncreatableType<QScreen>(uri, versionMajor, versionMinor, "QtScreen", "");
+        qmlRegisterTypesAndRevisions<vlc::QScreenForeign>(uri, versionMajor);
         qmlRegisterType<VideoSurface>(uri, versionMajor, versionMinor, "VideoSurface");
         qmlRegisterUncreatableType<BaseModel>( uri, versionMajor, versionMinor, "BaseModel", "Base Model is uncreatable." );
         qmlRegisterUncreatableType<VLCVarChoiceModel>(uri, versionMajor, versionMinor, "VLCVarChoiceModel", "generic variable with choice model" );

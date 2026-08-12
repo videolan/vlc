@@ -13,6 +13,7 @@
 #include <QQuickItem>
 #include <QSortFilterProxyModel>
 #include <QWindow>
+#include <QScreen>
 
 class VLCVarChoiceModel;
 
@@ -60,6 +61,15 @@ struct QWindowForeign
     Q_GADGET
     QML_FOREIGN(QWindow)
     QML_NAMED_ELEMENT(QtWindow)
+    QML_UNCREATABLE("")
+};
+
+// Qt Declarative already has this, but it is registered anonymously:
+struct QScreenForeign
+{
+    Q_GADGET
+    QML_FOREIGN(QScreen)
+    QML_NAMED_ELEMENT(QtScreen)
     QML_UNCREATABLE("")
 };
 
