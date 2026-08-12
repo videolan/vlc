@@ -116,7 +116,7 @@ T.Control {
     // Functions
 
     function mappedIndex() {
-        if (delegate.view?.model instanceof QtAbstractProxyModel)
+        if (delegate.view?.model instanceof AbstractProxyModel)
             return delegate.view.model.mapToSource(delegate.view.model.index(delegate.index, 0))?.row
         else
             return delegate.index
@@ -369,7 +369,7 @@ T.Control {
                         let items
 
                         const selectedIndexes = view.selectionModel.selectedIndexesFlat
-                        if (view.model instanceof QtAbstractProxyModel) {
+                        if (view.model instanceof AbstractProxyModel) {
                             items = []
                             for (let i = 0; i < selectedIndexes.length; ++i) {
                                 const mappedIndex = view.model.mapToSource(view.model.index(selectedIndexes[i], 0))

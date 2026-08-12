@@ -168,7 +168,7 @@ ListView {
         }
 
         function mappedIndex() {
-            if (view?.model instanceof QtAbstractProxyModel)
+            if (view?.model instanceof AbstractProxyModel)
                 return view.model.mapToSource(view.model.index(index, 0)).row
             else
                 return index
@@ -307,7 +307,7 @@ ListView {
                     console.assert(!!root.acceptDropFunc)
                     dropOperationOngoing = true
                     let targetIndex
-                    if (root.model instanceof QtAbstractProxyModel)
+                    if (root.model instanceof AbstractProxyModel)
                         targetIndex = (root.model.mapToSource(root.model.index(root.count - 1, 0))?.row ?? 0) + 1
                     else
                         targetIndex = root.count

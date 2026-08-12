@@ -17,6 +17,7 @@
 #if QT_VERSION < QT_VERSION_CHECK(6, 5, 0)
 #include <QAbstractItemModel>
 #endif
+#include <QAbstractProxyModel>
 
 class VLCVarChoiceModel;
 
@@ -85,6 +86,14 @@ struct QAbstractItemModelForeign
     QML_UNCREATABLE("")
 };
 #endif
+
+struct QAbstractProxyModelForeign
+{
+    Q_GADGET
+    QML_FOREIGN(QAbstractProxyModel)
+    QML_NAMED_ELEMENT(AbstractProxyModel) // "Qt" prefix is not used to align with `AbstractItemModel`.
+    QML_UNCREATABLE("")
+};
 
 }
 

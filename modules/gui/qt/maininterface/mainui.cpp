@@ -92,7 +92,6 @@
 #endif
 #include "mainctx_submodels.hpp"
 
-#include <QAbstractProxyModel>
 #include <QMessageBox>
 
 static bool g_qmlTypesAreRegistered = false;
@@ -243,7 +242,7 @@ void MainUI::registerQMLTypes()
 #if QT_VERSION < QT_VERSION_CHECK(6, 5, 0)
         qmlRegisterTypesAndRevisions<vlc::QAbstractItemModelForeign>(uri, versionMajor);
 #endif
-        qmlRegisterUncreatableType<QAbstractProxyModel>(uri, versionMajor, versionMinor, "QtAbstractProxyModel", "");
+        qmlRegisterTypesAndRevisions<vlc::QAbstractProxyModelForeign>(uri, versionMajor);
         qmlRegisterTypesAndRevisions<vlc::QWindowForeign>(uri, versionMajor);
         qmlRegisterTypesAndRevisions<vlc::QScreenForeign>(uri, versionMajor);
         qmlRegisterType<VideoSurface>(uri, versionMajor, versionMinor, "VideoSurface");

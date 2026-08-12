@@ -96,7 +96,7 @@ T.Pane {
     PlaylistContextMenu {
         id: contextMenu
         model: root.model
-        proxyModel: (root.contentItem?.listView?.model instanceof QtAbstractProxyModel) ? root.contentItem.listView.model
+        proxyModel: (root.contentItem?.listView?.model instanceof AbstractProxyModel) ? root.contentItem.listView.model
                                                                                         : null
         selectionModel: root.selectionModel
         controler: MainPlaylistController
