@@ -18,6 +18,7 @@
 #include <QAbstractItemModel>
 #endif
 #include <QAbstractProxyModel>
+#include <QMessageBox>
 
 class VLCVarChoiceModel;
 
@@ -93,6 +94,14 @@ struct QAbstractProxyModelForeign
     QML_FOREIGN(QAbstractProxyModel)
     QML_NAMED_ELEMENT(AbstractProxyModel) // "Qt" prefix is not used to align with `AbstractItemModel`.
     QML_UNCREATABLE("")
+};
+
+struct QMessageBoxForeign
+{
+    Q_GADGET
+    QML_FOREIGN(QMessageBox)
+    QML_NAMED_ELEMENT(QtMessageBox)
+    QML_UNCREATABLE("QtMessageBox is uncreatable, use `DialogsProvider::messageDialog()` instead.")
 };
 
 }

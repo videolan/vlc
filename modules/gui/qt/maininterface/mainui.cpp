@@ -92,8 +92,6 @@
 #endif
 #include "mainctx_submodels.hpp"
 
-#include <QMessageBox>
-
 static bool g_qmlTypesAreRegistered = false;
 
 using  namespace vlc::playlist;
@@ -254,7 +252,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterUncreatableType<NavigationAttached>( uri, versionMajor, versionMinor, "Navigation", "Navigation is only available via attached properties");
         qmlRegisterTypesAndRevisions<AboutModel>( uri, versionMajor );
         qmlRegisterTypesAndRevisions<vlc::QSortFilterProxyModelForeign>( uri, versionMajor );
-        qmlRegisterUncreatableType<QMessageBox>( uri, versionMajor, versionMinor, "QtMessageBox", "QtMessageBox is uncreatable, use DialogsProvider instead." );
+        qmlRegisterTypesAndRevisions<vlc::QMessageBoxForeign>( uri, versionMajor );
 #ifdef UPDATE_CHECK
         qmlRegisterSingletonInstance<UpdateModel>( uri, versionMajor, versionMinor, "UpdateModel", m_mainCtx->getUpdateModel() );
 #endif
