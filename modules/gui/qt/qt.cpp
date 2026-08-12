@@ -250,7 +250,7 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define VOLUME_MAX_TEXT N_( "Maximum Volume displayed" )
 
 #define AUTORAISE_ON_PLAYBACK_TEXT N_( "When to raise the interface" )
-#define AUTORAISE_ON_PLAYBACK_LONGTEXT N_( "This option allows the interface to be raised automatically " \
+#define AUTORAISE_ON_PLAYBACK_LONGTEXT N_( "This option allows the interface to be shown and raised automatically " \
     "when a video/audio playback starts, or never." )
 
 #define QT_CLIENT_SIDE_DECORATION_TEXT N_( "Enable window titlebar" )

@@ -401,6 +401,21 @@ void InterfaceWindowHandler::setInterfaceFullScreen( bool fs )
 
 void InterfaceWindowHandler::setRaise()
 {
+    assert(m_window);
+
+    switch ( m_window->visibility() )
+    {
+    case QWindow::Hidden:
+        /* If hidden, show it */
+        setInterfaceShown();
+        break;
+    case QWindow::Minimized:
+        setInterfaceNormal();
+        break;
+    default:
+        break;
+    }
+
     requestActivate();
     m_window->raise();
 }
