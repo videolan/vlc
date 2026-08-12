@@ -28,6 +28,35 @@
 
 @implementation VLCLocalMediaSource
 
+- (nullable NSNumber *)childCountForInputNode:(VLCInputNode *)inputNode
+                                        error:(NSError * _Nullable * _Nullable)error
+{
+    NSURL * const nodeURL = [NSURL URLWithString:inputNode.inputItem.MRL];
+    if (!nodeURL.isFileURL) {
+        return [super childCountForInputNode:inputNode error:error];
+    }
+
+    NSArray<NSURL *> * const children =
+        [NSFileManager.defaultManager contentsOfDirectoryAtURL:nodeURL
+                                    includingPropertiesForKeys:@[NSURLIsDirectoryKey]
+                                                       options:NSDirectoryEnumerationSkipsHiddenFiles |
+                                                               NSDirectoryEnumerationSkipsSubdirectoryDescendants
+                                                         error:error];
+    if (children == nil) {
+        return nil;
+    }
+
+    NSUInteger childCount = 0;
+    for (NSURL * const childURL in children) {
+        NSNumber *isDirectory = nil;
+        [childURL getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:nil];
+        if (isDirectory.boolValue || input_item_Playable(childURL.absoluteString.UTF8String)) {
+            ++childCount;
+        }
+    }
+    return @(childCount);
+}
+
 - (nullable id<VLCMediaSourceNodeObservation>)observeInputNode:(VLCInputNode *)inputNode
                                                       onChange:(void (^)(VLCMediaSourceNodeChange change))changeHandler
 {

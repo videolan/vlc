@@ -51,6 +51,9 @@ extern NSString * const VLCMediaSourcePreparseStatusKey;
                      andPreparser:(vlc_preparser_t *)p_preparser;
 
 - (nullable NSError *)preparseInputNodeWithinTree:(VLCInputNode *)inputNode;
+/// Returns nil without an error when this media source cannot count children directly.
+- (nullable NSNumber *)childCountForInputNode:(VLCInputNode *)inputNode
+                                        error:(NSError * _Nullable * _Nullable)error;
 - (void)clearChildNodesForNode:(input_item_node_t*)inputNode;
 - (nullable NSError *)generateChildNodesForDirectoryNode:(VLCInputNode *)directoryInputNode
                                                  withUrl:(NSURL *)directoryUrl;

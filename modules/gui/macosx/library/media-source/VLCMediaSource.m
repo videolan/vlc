@@ -369,6 +369,15 @@ static const char *const remoteBrowseDescription = "Remote Browse";
     return nil;
 }
 
+- (nullable NSNumber *)childCountForInputNode:(VLCInputNode * const __unused)inputNode
+                                        error:(NSError * _Nullable * _Nullable)error
+{
+    if (error != NULL) {
+        *error = nil;
+    }
+    return nil;
+}
+
 - (nullable id<VLCMediaSourceNodeObservation>)observeInputNode:(VLCInputNode *const __unused)inputNode
                                                       onChange:(void (^const __unused)(VLCMediaSourceNodeChange change))changeHandler
 {
