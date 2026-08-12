@@ -419,6 +419,45 @@ CLEAN_PKG += flex
 DISTCLEAN_PKG += flex-$(FLEX_VERSION).tar.gz
 CLEAN_FILE += .buildflex
 
+
+
+#
+# GNU gettext
+#
+
+GETTEXT_CONF = \
+	--disable-relocatable \
+	--disable-java \
+	--disable-native-java \
+	--disable-csharp \
+	--disable-d \
+	--disable-go \
+	--disable-modula2 \
+	--disable-openmp \
+	--without-emacs \
+	--without-included-libxml \
+	--without-git \
+	--without-cvs
+
+gettext-$(GETTEXT_VERSION).tar.gz:
+	$(call download_pkg,$(GETTEXT_URL),gettext)
+
+.getgettext: gettext-$(GETTEXT_VERSION).tar.gz
+gettext: gettext-$(GETTEXT_VERSION).tar.gz
+	$(UNPACK)
+	$(APPLY) $(TOOLS)/gettext-no-iconv.patch
+	$(MOVE)
+
+.buildgettext: gettext
+	cd $<; ./configure --prefix=$(PREFIX) $(GETTEXT_CONF)
+	+$(MAKE) -C $< EXAMPLESFILES= EXAMPLESDIRS= TESTS=
+	+$(MAKE) -C $< EXAMPLESFILES= EXAMPLESDIRS= TESTS= install
+	touch $@
+
+CLEAN_PKG += gettext
+DISTCLEAN_PKG += gettext-$(GETTEXT_VERSION).tar.gz
+CLEAN_FILE += .buildgettext
+
 #
 # meson build
 #
@@ -464,45 +503,6 @@ ninja: ninja-$(NINJA_VERSION).tar.gz
 CLEAN_PKG += ninja
 DISTCLEAN_PKG += ninja-$(NINJA_VERSION).tar.gz
 CLEAN_FILE += .buildninja
-
-
-#
-# GNU gettext
-#
-
-GETTEXT_CONF = \
-	--disable-relocatable \
-	--disable-java \
-	--disable-native-java \
-	--disable-csharp \
-	--disable-d \
-	--disable-go \
-	--disable-modula2 \
-	--disable-openmp \
-	--without-emacs \
-	--without-included-libxml \
-	--without-git \
-	--without-cvs
-
-gettext-$(GETTEXT_VERSION).tar.gz:
-	$(call download_pkg,$(GETTEXT_URL),gettext)
-
-.getgettext: gettext-$(GETTEXT_VERSION).tar.gz
-gettext: gettext-$(GETTEXT_VERSION).tar.gz
-	$(UNPACK)
-	$(APPLY) $(TOOLS)/gettext-no-iconv.patch
-	$(MOVE)
-
-.buildgettext: gettext
-	cd $<; ./configure --prefix=$(PREFIX) $(GETTEXT_CONF)
-	+$(MAKE) -C $< EXAMPLESFILES= EXAMPLESDIRS= TESTS=
-	+$(MAKE) -C $< EXAMPLESFILES= EXAMPLESDIRS= TESTS= install
-	touch $@
-
-CLEAN_PKG += gettext
-DISTCLEAN_PKG += gettext-$(GETTEXT_VERSION).tar.gz
-CLEAN_FILE += .buildgettext
-
 
 #
 #
