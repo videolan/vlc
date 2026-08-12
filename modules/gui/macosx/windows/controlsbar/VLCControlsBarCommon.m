@@ -28,6 +28,7 @@
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCInputItem.h"
+#import "library/VLCLibraryImageCache.h"
 
 #import "main/VLCMain.h"
 
@@ -552,12 +553,27 @@
         [mediaItem.primaryDetailString isEqualToString:mediaItem.durationString];
     self.detailLabel.stringValue = mediaItem.primaryDetailString ?: @"";
 
-    NSURL * const artworkURL = inputItem.artworkURL;
     NSImage * const placeholderImage = NSImage.VLCNoArtImage;
-    if (artworkURL) {
-        [self.artworkImageView setImageURL:inputItem.artworkURL placeholderImage:placeholderImage];
+    self.artworkImageView.image = placeholderImage;
+    if (inputItem == nil) {
+        return;
+    }
+
+    __weak typeof(self) weakSelf = self;
+    void (^completionHandler)(NSImage * const) = ^(NSImage * const thumbnail) {
+        VLCControlsBarCommon * const strongSelf = weakSelf;
+        if (!strongSelf || inputItem != strongSelf->_playerController.currentMedia) {
+            return;
+        }
+        strongSelf.artworkImageView.image = thumbnail ?: placeholderImage;
+    };
+
+    if (mediaItem.smallArtworkGenerated && mediaItem.smallArtworkMRL.length > 0) {
+        [VLCLibraryImageCache thumbnailForLibraryItem:mediaItem
+                                       withCompletion:completionHandler];
     } else {
-        self.artworkImageView.image = placeholderImage;
+        [VLCLibraryImageCache thumbnailForInputItem:inputItem
+                                     withCompletion:completionHandler];
     }
 }
 

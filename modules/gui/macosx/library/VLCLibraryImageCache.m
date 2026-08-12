@@ -617,8 +617,14 @@ static NSString *thumbnailHashForString(NSString *string)
 + (void)thumbnailForPlayQueueItem:(VLCPlayQueueItem *)playQueueItem
                    withCompletion:(nonnull void (^)(const NSImage * _Nonnull))completionHandler
 {
-    return [VLCLibraryImageCache.sharedImageCache imageForInputItem:playQueueItem.inputItem
-                                                     withCompletion:completionHandler];
+    VLCMediaLibraryMediaItem * const mediaItem = playQueueItem.mediaLibraryItem;
+    if (mediaItem.smallArtworkGenerated && mediaItem.smallArtworkMRL.length > 0) {
+        return [VLCLibraryImageCache thumbnailForLibraryItem:mediaItem
+                                              withCompletion:completionHandler];
+    }
+
+    return [VLCLibraryImageCache thumbnailForInputItem:playQueueItem.inputItem
+                                        withCompletion:completionHandler];
 }
 
 + (void)thumbnailForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem

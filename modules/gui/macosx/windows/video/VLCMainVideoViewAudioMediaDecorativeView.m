@@ -98,15 +98,25 @@
     VLCPlayerController * const controller =
         VLCMain.sharedInstance.playQueueController.playerController;
     VLCInputItem * const currentInputItem = controller.currentMedia;
-    if (controller.currentMedia) {
-        __weak typeof(self) weakSelf = self;
+    if (!currentInputItem) {
+        return;
+    }
+
+    VLCMediaLibraryMediaItem * const mediaItem = controller.currentMediaLibraryItem;
+    __weak typeof(self) weakSelf = self;
+    void (^completionHandler)(NSImage * const) = ^(NSImage * const thumbnail) {
+        if (currentInputItem != controller.currentMedia) {
+            return;
+        }
+        [weakSelf setCoverArt:thumbnail];
+    };
+
+    if (mediaItem.smallArtworkGenerated && mediaItem.smallArtworkMRL.length > 0) {
+        [VLCLibraryImageCache thumbnailForLibraryItem:mediaItem
+                                       withCompletion:completionHandler];
+    } else {
         [VLCLibraryImageCache thumbnailForInputItem:currentInputItem
-                                     withCompletion:^(NSImage * const thumbnail) {
-            if (currentInputItem != controller.currentMedia) {
-                return;
-            }
-            [weakSelf setCoverArt:thumbnail];
-        }];
+                                     withCompletion:completionHandler];
     }
 }
 
