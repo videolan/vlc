@@ -289,6 +289,13 @@ static int Mouse( filter_t *p_filter,
                                     "in the Phosphor framerate doubler. "\
                                     "Default: Low.")
 
+static void Probe(void *data)
+{
+    struct deinterlace_functions *const funcs = data;
+    funcs->merges[0] = Merge8BitGeneric;
+    funcs->merges[1] = Merge16BitGeneric;
+}
+
 vlc_module_begin ()
     set_description( N_("Deinterlacing video filter") )
     set_shortname( N_("Deinterlace" ))
@@ -307,6 +314,8 @@ vlc_module_begin ()
         change_integer_list( phosphor_dimmer_list, phosphor_dimmer_list_text )
         change_safe ()
     set_deinterlace_callback( Open )
+    add_submodule()
+        set_cpu_funcs("deinterlace functions", Probe, 1)
 vlc_module_end ()
 
 /*****************************************************************************
@@ -490,9 +499,7 @@ static const struct vlc_filter_operations filter_ops = {
     .close = Close,
 };
 
-static struct deinterlace_functions funcs = {
-    { Merge8BitGeneric, Merge16BitGeneric, },
-};
+static struct deinterlace_functions funcs ;
 
 /*****************************************************************************
  * Open
