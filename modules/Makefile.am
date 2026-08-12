@@ -82,6 +82,7 @@ include hw/vdpau/Makefile.am
 include hw/mmal/Makefile.am
 include isa/aarch64/Makefile.am
 include isa/arm/Makefile.am
+include isa/ppc/Makefile.am
 include isa/riscv/Makefile.am
 include isa/x86/Makefile.am
 include keystore/Makefile.am

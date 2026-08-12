@@ -554,11 +554,6 @@ notsupp:
 
     IVTCClearState( p_filter );
 
-#if defined(CAN_COMPILE_C_ALTIVEC)
-    if( pixel_size == 1 && vlc_CPU_ALTIVEC() )
-        p_sys->pf_merge = MergeAltivec;
-    else
-#endif
     {
         vlc_CPU_functions_init_once("deinterlace functions", &funcs);
         p_sys->pf_merge = funcs.merges[stdc_trailing_zeros(pixel_size)];

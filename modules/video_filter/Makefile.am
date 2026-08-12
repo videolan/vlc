@@ -175,9 +175,7 @@ libdeinterlace_plugin_la_CFLAGS = $(AM_CFLAGS)
 if HAVE_X86ASM
 libdeinterlace_plugin_la_SOURCES += video_filter/deinterlace/yadif_x86.asm
 endif
-if HAVE_ALTIVEC
-libdeinterlace_plugin_la_CPPFLAGS += -DCAN_COMPILE_C_ALTIVEC
-endif
+
 libdeinterlace_plugin_la_LIBADD = libdeinterlace_common.la
 video_filter_PLUGINS += libdeinterlace_plugin.la
 
