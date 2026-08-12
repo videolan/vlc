@@ -32,6 +32,7 @@
 #import "extensions/NSView+VLCAdditions.h"
 
 #import "library/VLCInputItem.h"
+#import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryWindow.h"
 
 #import "main/VLCMain.h"
@@ -210,7 +211,9 @@
     NSFont * const boldSystemFont = [NSFont boldSystemFontOfSize:12.];
     NSDictionary<NSString *, id> * const boldAttribute = @{NSFontAttributeName: boldSystemFont};
 
-    NSMutableAttributedString * const displayString = [[NSMutableAttributedString alloc] initWithString:inputItem.name attributes:boldAttribute];
+    VLCMediaLibraryMediaItem * const mediaItem = _playerController.currentMediaLibraryItem;
+    NSString * const displayTitle = mediaItem.title.length > 0 ? mediaItem.title : inputItem.name;
+    NSMutableAttributedString * const displayString = [[NSMutableAttributedString alloc] initWithString:displayTitle attributes:boldAttribute];
 
     if (inputItem.artist.length != 0) {
         NSAttributedString * const separator = [[NSAttributedString alloc] initWithString:@" · " attributes:boldAttribute];

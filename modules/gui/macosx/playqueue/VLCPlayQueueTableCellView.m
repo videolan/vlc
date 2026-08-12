@@ -29,6 +29,7 @@
 
 #import "library/VLCLibraryImageCache.h"
 #import "library/VLCInputItem.h"
+#import "library/VLCLibraryDataTypes.h"
 
 #import "main/VLCMain.h"
 
@@ -120,15 +121,17 @@ NSString * const VLCDisplayTrackNumberPlayQueueSettingChanged = @"VLCDisplayTrac
 
     const BOOL validArtistString = item.artistName && item.artistName.length > 0;
     const BOOL validAlbumString = item.albumName && item.albumName.length > 0;
-    const BOOL validTitleString = item.inputItem && item.inputItem.title && (item.inputItem.title.length > 0);
+    VLCInputItem * const inputItem = item.inputItem;
+    VLCMediaLibraryMediaItem * const mediaItem = item.mediaLibraryItem;
+    NSString * const libraryTitle = mediaItem.title;
+    NSString * const inputTitle = inputItem.title;
+    const BOOL validTitleString = libraryTitle.length > 0 || inputTitle.length > 0;
 
-    NSString *playTitle = item.title;
+    NSString *playTitle = libraryTitle.length > 0 ? libraryTitle : inputTitle ?: item.title;
     if (validTitleString) {
-        NSString * const trackNumberString = item.inputItem.trackNumber;
+        NSString * const trackNumberString = inputItem.trackNumber;
         if ([NSUserDefaults.standardUserDefaults boolForKey:VLCDisplayTrackNumberPlayQueueKey] && trackNumberString && trackNumberString.length > 0 && ![trackNumberString isEqualToString:@"0"]) {
-            playTitle = [NSString stringWithFormat:@"%@ · %@", trackNumberString, item.inputItem.title];
-        } else {
-            playTitle = item.inputItem.title;
+            playTitle = [NSString stringWithFormat:@"%@ · %@", trackNumberString, playTitle];
         }
     }
 
