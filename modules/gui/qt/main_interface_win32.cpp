@@ -328,7 +328,7 @@ void MainInterfaceWin32::setVideoFullScreen( bool fs )
         changeThumbbarButtons( THEMIM->getIM()->playingStatus() );
 }
 
-void MainInterfaceWin32::toggleUpdateSystrayMenuWhenVisible()
+void MainInterfaceWin32::toggleUpdateSystrayMenuWhenVisible(bool requestActivate)
 {
     /* check if any visible window is above vlc in the z-order,
      * but ignore the ones always on top
@@ -348,7 +348,7 @@ void MainInterfaceWin32::toggleUpdateSystrayMenuWhenVisible()
     }
     if( !hwnd || !GetWindowInfo( hwnd, &wi ) || (wi.dwExStyle&WS_EX_TOPMOST) )
         hide();
-    else
+    else if( requestActivate )
         activateWindow();
 }
 

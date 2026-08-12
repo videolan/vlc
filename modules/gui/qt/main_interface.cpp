@@ -1344,7 +1344,7 @@ void MainInterface::createSystray()
              this, &MainInterface::updateSystrayTooltipStatus );
 }
 
-void MainInterface::toggleUpdateSystrayMenuWhenVisible()
+void MainInterface::toggleUpdateSystrayMenuWhenVisible(bool)
 {
     hide();
 }
@@ -1378,24 +1378,26 @@ void MainInterface::resizeWindow(int w, int h)
 /**
  * Updates the Systray Icon's menu and toggle the main interface
  */
-void MainInterface::toggleUpdateSystrayMenu()
+void MainInterface::toggleUpdateSystrayMenu(bool requestActivate)
 {
     /* If hidden, show it */
     if( isHidden() )
     {
         show();
-        activateWindow();
+        if (requestActivate)
+            activateWindow();
     }
     else if( isMinimized() )
     {
         /* Minimized */
         showNormal();
-        activateWindow();
+        if (requestActivate)
+            activateWindow();
     }
     else
     {
         /* Visible (possibly under other windows) */
-        toggleUpdateSystrayMenuWhenVisible();
+        toggleUpdateSystrayMenuWhenVisible(requestActivate);
     }
     if( sysTray )
         VLCMenuBar::updateSystrayMenu( this, p_intf );
@@ -1431,7 +1433,7 @@ void MainInterface::handleSystrayClick(
 #ifdef Q_OS_MAC
             VLCMenuBar::updateSystrayMenu( this, p_intf );
 #else
-            toggleUpdateSystrayMenu();
+            toggleUpdateSystrayMenu(true);
 #endif
             break;
         case QSystemTrayIcon::MiddleClick:

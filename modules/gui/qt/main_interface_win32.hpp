@@ -43,7 +43,7 @@ private:
 #else
     bool nativeEventFilter(const QByteArray &eventType, void *message, long *result) override;
 #endif
-    virtual void toggleUpdateSystrayMenuWhenVisible() Q_DECL_OVERRIDE;
+    virtual void toggleUpdateSystrayMenuWhenVisible(bool requestActivate = false) Q_DECL_OVERRIDE;
 
 protected:
     virtual void resizeEvent( QResizeEvent *event ) Q_DECL_OVERRIDE;

@@ -111,7 +111,7 @@ protected:
     void keyPressEvent( QKeyEvent *) Q_DECL_OVERRIDE;
     void wheelEvent( QWheelEvent * ) Q_DECL_OVERRIDE;
     bool eventFilter(QObject *, QEvent *) Q_DECL_OVERRIDE;
-    virtual void toggleUpdateSystrayMenuWhenVisible();
+    virtual void toggleUpdateSystrayMenuWhenVisible(bool requestActivate = false);
     void resizeWindow(int width, int height);
 
 protected:
@@ -200,7 +200,7 @@ public slots:
     void dockPlaylist( bool b_docked = true );
     void toggleMinimalView( bool );
     void togglePlaylist();
-    void toggleUpdateSystrayMenu();
+    void toggleUpdateSystrayMenu(bool requestActivate = false);
     void showUpdateSystrayMenu();
     void hideUpdateSystrayMenu();
     void toggleAdvancedButtons();
