@@ -142,14 +142,19 @@ static NSValue * _Nullable inputItemIdentifier(VLCInputItem * _Nullable const in
             [self.unavailableInputItemIdentifiers addObject:identifier];
             [self.preparedInputItemIdentifiers removeObject:identifier];
         }
-
-        [self clearDisplayedNodeChildrenCaches];
-        [self reloadData];
     }
 
     NSValue * const displayedNodeIdentifier = inputItemIdentifier(self.nodeToDisplay.inputItem);
     if (![identifier isEqual:displayedNodeIdentifier]) {
+        if (!preparseStarted) {
+            [self reloadCountForInputItemIdentifier:identifier];
+        }
         return;
+    }
+
+    if (!preparseStarted) {
+        [self.nodeToDisplay clearChildrenCache];
+        [self reloadData];
     }
 
     NSString * const loadingNotificationName = preparseStarted
