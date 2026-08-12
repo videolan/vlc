@@ -1381,20 +1381,18 @@ void MainInterface::resizeWindow(int w, int h)
 void MainInterface::toggleUpdateSystrayMenu(bool requestActivate)
 {
     /* If hidden, show it */
-    if( isHidden() )
+    if( requestActivate && isHidden() )
     {
         show();
-        if (requestActivate)
-            activateWindow();
+        activateWindow();
     }
-    else if( isMinimized() )
+    else if( requestActivate && isMinimized() )
     {
         /* Minimized */
         showNormal();
-        if (requestActivate)
-            activateWindow();
+        activateWindow();
     }
-    else
+    else if ( !isHidden() && !isMinimized() )
     {
         /* Visible (possibly under other windows) */
         toggleUpdateSystrayMenuWhenVisible(requestActivate);
@@ -1754,6 +1752,17 @@ void MainInterface::emitRaise()
 }
 void MainInterface::setRaise()
 {
+    /* If hidden, show it */
+    if( isHidden() )
+    {
+        show();
+    }
+    else if( isMinimized() )
+    {
+        /* Minimized */
+        showNormal();
+    }
+
     activateWindow();
     raise();
 }
