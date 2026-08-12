@@ -14,6 +14,9 @@
 #include <QSortFilterProxyModel>
 #include <QWindow>
 #include <QScreen>
+#if QT_VERSION < QT_VERSION_CHECK(6, 5, 0)
+#include <QAbstractItemModel>
+#endif
 
 class VLCVarChoiceModel;
 
@@ -72,6 +75,16 @@ struct QScreenForeign
     QML_NAMED_ELEMENT(QtScreen)
     QML_UNCREATABLE("")
 };
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 5, 0)
+struct QAbstractItemModelForeign
+{
+    Q_GADGET
+    QML_FOREIGN(QAbstractItemModel)
+    QML_NAMED_ELEMENT(AbstractItemModel) // Qt Qml registers it without "Qt" prefix
+    QML_UNCREATABLE("")
+};
+#endif
 
 }
 

@@ -240,7 +240,9 @@ void MainUI::registerQMLTypes()
         qmlRegisterUncreatableType<UINotifier>(uri, versionMajor, versionMinor, "UINotifier", "");
         qmlRegisterSingletonInstance<UINotifier>(uri, versionMajor, versionMinor, "UINotifier", new UINotifier(m_mainCtx, m_mainCtx));
         qmlRegisterSingletonInstance<NavigationHistory>(uri, versionMajor, versionMinor, "History", new NavigationHistory(this));
-        qmlRegisterUncreatableType<QAbstractItemModel>(uri, versionMajor, versionMinor, "QtAbstractItemModel", "");
+#if QT_VERSION < QT_VERSION_CHECK(6, 5, 0)
+        qmlRegisterTypesAndRevisions<vlc::QAbstractItemModelForeign>(uri, versionMajor);
+#endif
         qmlRegisterUncreatableType<QAbstractProxyModel>(uri, versionMajor, versionMinor, "QtAbstractProxyModel", "");
         qmlRegisterTypesAndRevisions<vlc::QWindowForeign>(uri, versionMajor);
         qmlRegisterTypesAndRevisions<vlc::QScreenForeign>(uri, versionMajor);

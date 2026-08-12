@@ -74,7 +74,7 @@ FocusScope {
         model: root.model
     }
 
-    property QtAbstractItemModel model
+    property AbstractItemModel model
 
     property int currentIndex: 0
 
