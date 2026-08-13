@@ -33,6 +33,8 @@
 
 #include "qt.hpp"
 
+#include "dialogs/dialogs_provider.hpp"
+
 class ModelRecoveryAgent
 {
     const QPointer<QSettings> m_settings;
@@ -67,13 +69,11 @@ public:
                 const QFileInfo fileInfo(m_recoveryFileName);
                 if (fileInfo.size() > 0)
                 {
-                    QMessageBox msgBox;
-                    msgBox.setText(qtr("The application closed abruptly."));
-                    msgBox.setInformativeText(qtr("Do you want to restore the %1 model from %2?").arg(modelIdentifier.toLower(),
-                                                                                                      fileInfo.lastModified().toString()));
-                    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-                    msgBox.setDefaultButton(QMessageBox::Yes);
-                    if (msgBox.exec() == QMessageBox::Yes)
+                    if (DialogsProvider::getInstance()->messageDialog(qtr("Do you want to restore the %1 model from %2?").arg(modelIdentifier.toLower(),
+                                                                                                                              fileInfo.lastModified().toString()),
+                                                                      qtr("The application closed abruptly."),
+                                                                      (QMessageBox::Yes | QMessageBox::No),
+                                                                      QMessageBox::Yes) == QMessageBox::Yes)
                     {
                         model->append(m_recoveryFileName);
                         m_conditionDismissInitialDirtiness = true;
