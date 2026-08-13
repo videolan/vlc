@@ -332,30 +332,24 @@ audio_output_t *aout_New (vlc_object_t *parent)
     var_Change(aout, "visual", VLC_VAR_ADDCHOICE, val, _("Spectrum"));
     val.psz_string = (char *)"vuMeter";
     var_Change(aout, "visual", VLC_VAR_ADDCHOICE, val, _("VU meter"));
-    /* Look for goom plugin */
-    if (module_exists ("goom"))
+    /* Same list the preferences use; "visual" is covered by its effects. */
+    char **vis_vals, **vis_texts;
+    ssize_t vis_count = config_GetPszChoices ("audio-visual", &vis_vals,
+                                              &vis_texts);
+    for (ssize_t i = 0; i < vis_count; i++)
     {
-        val.psz_string = (char *)"goom";
-        var_Change(aout, "visual", VLC_VAR_ADDCHOICE, val, "Goom");
+        if (strcmp (vis_vals[i], "any") && strcmp (vis_vals[i], "none")
+         && strcmp (vis_vals[i], "visual"))
+        {
+            val.psz_string = vis_vals[i];
+            var_Change(aout, "visual", VLC_VAR_ADDCHOICE, val, vis_texts[i]);
+        }
+        free (vis_vals[i]);
+        free (vis_texts[i]);
     }
-    /* Look for libprojectM plugin */
-    if (module_exists ("projectm"))
-    {
-        val.psz_string = (char *)"projectm";
-        var_Change(aout, "visual", VLC_VAR_ADDCHOICE, val, "projectM");
-    }
-    /* Look for VSXu plugin */
-    if (module_exists ("vsxu"))
-    {
-        val.psz_string = (char *)"vsxu";
-        var_Change(aout, "visual", VLC_VAR_ADDCHOICE, val, "Vovoid VSXU");
-    }
-    /* Look for glspectrum plugin */
-    if (module_exists ("glspectrum"))
-    {
-        val.psz_string = (char *)"glspectrum";
-        var_Change(aout, "visual", VLC_VAR_ADDCHOICE, val, "3D spectrum");
-    }
+    free (vis_vals);
+    free (vis_texts);
+
     /* Show the configured visualization as the selected one. */
     str = var_GetNonEmptyString (aout, "audio-visual");
     if (str != NULL && strcasecmp (str, "none") && strcasecmp (str, "any"))
