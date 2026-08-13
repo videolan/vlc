@@ -243,6 +243,7 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
     /* Main Interface statusbar */
     /* and title of the Main Interface*/
     connect( THEMIM, &PlayerController::inputChanged, this, &MainCtx::onInputChanged );
+    connect( THEMIM, &PlayerController::hasVideoOutputChanged, this, &MainCtx::onVOutChanged );
 
     /* END CONNECTS ON IM */
 
@@ -527,6 +528,13 @@ void MainCtx::onInputChanged( bool hasInput )
     else if ( ( autoRaise & MainCtx::RAISE_AUDIO ) == 0 )
         return;
     emit askRaise();
+}
+
+void MainCtx::onVOutChanged( bool video )
+{
+    int autoRaise = var_InheritInteger( p_intf, "qt-auto-raise" );
+    if ( video && ( autoRaise & MainCtx::RAISE_VIDEO ) )
+        emit askRaise();
 }
 
 #ifdef KeyPress

@@ -551,6 +551,7 @@ public slots:
 
 protected slots:
     void onInputChanged( bool );
+    void onVOutChanged( bool );
 
 signals:
     void fullscreenInterfaceToggled( bool );
