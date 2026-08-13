@@ -47,6 +47,8 @@ vulkan-loader: Vulkan-Loader-$(VULKAN_LOADER_VERSION).tar.gz .sum-vulkan-loader
 ifeq ($(HOST),i686-w64-mingw32)
 	cp -v $(SRC)/vulkan-loader/libvulkan-32.def $(UNPACK_DIR)/loader/vulkan-1.def
 endif
+	# avoid unnecessary dependency on CMake 3.22
+	sed -i.orig 's,VERSION 3.22.1, VERSION 3.21,' $(UNPACK_DIR)/CMakeLists.txt
 	$(call pkg_static,"loader/vulkan.pc.in")
 	$(MOVE)
 
