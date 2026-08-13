@@ -379,7 +379,7 @@ void PrefsDialog::save()
     if( p_intf->preferencesResetPending )
     {
         int restart = QMessageBox::question(
-                          nullptr,
+                          this,
                           qtr( "Restart Required" ),
                           qtr( "VLC needs to be restarted for the reset to take full effect.\n\nRestart now?" ),
                           QMessageBox::Yes | QMessageBox::No,
