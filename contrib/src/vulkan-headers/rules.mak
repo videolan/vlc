@@ -40,6 +40,7 @@ vulkan-headers: Vulkan-Headers-$(VULKAN_HEADERS_VERSION).tar.gz .sum-vulkan-head
 	$(MOVE)
 
 .vulkan-headers: vulkan-headers toolchain.cmake
+	rm -rf $(PREFIX)/include/vulkan
 	$(CMAKECLEAN)
 	$(HOSTVARS_CMAKE) $(CMAKE)
 	+$(CMAKEBUILD)
