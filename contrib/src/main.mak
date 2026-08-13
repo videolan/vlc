@@ -763,7 +763,7 @@ package: install
 ifneq ($(notdir $(PREFIX)),$(HOST))
 	(cd tmp && mv $(notdir $(PREFIX)) $(HOST))
 endif
-	tar -c -C tmp $(HOST)/ | zstd --quiet --force --threads=0 -12 -o ../vlc-contrib-$(HOST)-$(DATE).tar.zst
+	tar -c -C tmp $(HOST)/ | zstd --quiet --force --threads=0 -12 -c > ../vlc-contrib-$(HOST)-$(DATE).tar.zst
 
 list:
 	@echo All packages:
