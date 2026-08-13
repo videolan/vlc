@@ -197,6 +197,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
                  this, &MainInterface::setVLCWindowsTitle );
     }
     connect( THEMIM, &MainInputManager::inputChanged, this, &MainInterface::onInputChanged );
+    connect( THEMIM->getIM(), &InputManager::voutChanged, this, &MainInterface::onVOutChanged );
 
     /* END CONNECTS ON IM */
 
@@ -449,6 +450,13 @@ void MainInterface::onInputChanged( bool hasInput )
     else if ( ( autoRaise & MainInterface::RAISE_AUDIO ) == 0 )
         return;
     emit askRaise();
+}
+
+void MainInterface::onVOutChanged( bool video )
+{
+    int autoRaise = var_InheritInteger( p_intf, "qt-auto-raise" );
+    if ( video && ( autoRaise & MainInterface::RAISE_VIDEO ) )
+        emit askRaise();
 }
 
 void MainInterface::createMainWidget( QSettings *creationSettings )

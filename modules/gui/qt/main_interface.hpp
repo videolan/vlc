@@ -261,6 +261,7 @@ protected slots:
     void hideResumePanel();
     void resumePlayback();
     void onInputChanged( bool );
+    void onVOutChanged( bool );
 
 signals:
     void askGetVideo( struct vout_window_t *, unsigned, unsigned, bool,
