@@ -387,14 +387,17 @@ static int VisualizationCallback (vlc_object_t *obj, const char *var,
     /* FIXME: This ugly hack enforced by visual effect-list, as is the need for
      * separate "visual" (external) and "audio-visual" (internal) variables...
      * The visual plugin should have one submodule per effect instead. */
-    if (strcasecmp (mode, "none") && strcasecmp (mode, "goom")
-     && strcasecmp (mode, "projectm") && strcasecmp (mode, "vsxu")
-     && strcasecmp (mode, "glspectrum"))
-    {
-        var_Create (obj, "effect-list", VLC_VAR_STRING);
-        var_SetString (obj, "effect-list", mode);
-        mode = "visual";
-    }
+    static const char *const effects[] = {
+        "dummy", "scope", "spectrometer", "spectrum", "vuMeter",
+    };
+    for (size_t i = 0; i < ARRAY_SIZE(effects); i++)
+        if (!strcasecmp (mode, effects[i]))
+        {
+            var_Create (obj, "effect-list", VLC_VAR_STRING);
+            var_SetString (obj, "effect-list", mode);
+            mode = "visual";
+            break;
+        }
 
     var_SetString (obj, "audio-visual", mode);
     aout_InputRequestRestart ((audio_output_t *)obj);
