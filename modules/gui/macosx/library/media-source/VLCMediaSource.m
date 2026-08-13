@@ -344,7 +344,8 @@ static const char *const remoteBrowseDescription = "Remote Browse";
                                                         userInfo:preparseUserInfo];
     });
 
-    if (inputNode.inputItem.inputType == ITEM_TYPE_DIRECTORY &&
+    const enum input_item_type_e inputType = inputNode.inputItem.inputType;
+    if ((inputType == ITEM_TYPE_DIRECTORY || inputType == ITEM_TYPE_DISC) &&
         [inputNode.inputItem.MRL hasPrefix:@"file://"]) {
         NSURL *dirUrl = [NSURL URLWithString:inputNode.inputItem.MRL];
         return [self generateChildNodesForDirectoryNode:inputNode withUrl:dirUrl];
