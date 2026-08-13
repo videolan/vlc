@@ -73,7 +73,8 @@ public:
                                                                                                                               fileInfo.lastModified().toString()),
                                                                       qtr("The application closed abruptly."),
                                                                       (QMessageBox::Yes | QMessageBox::No),
-                                                                      QMessageBox::Yes) == QMessageBox::Yes)
+                                                                      QMessageBox::Yes,
+                                                                      QMessageBox::Question) == QMessageBox::Yes)
                     {
                         model->append(m_recoveryFileName);
                         m_conditionDismissInitialDirtiness = true;
