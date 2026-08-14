@@ -1048,7 +1048,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     vlc_tick_t length = _playerController.length;
     [_timeSelectionPanel setMaxTime:(int)SEC_FROM_VLC_TICK(length)];
     vlc_tick_t time = _playerController.time;
-    [_timeSelectionPanel setPosition:(int)SEC_FROM_VLC_TICK(time)];
+    [_timeSelectionPanel setJumpTotalSecs:(int)SEC_FROM_VLC_TICK(time)];
     [_timeSelectionPanel runModalForWindow:[NSApp mainWindow]
                          completionHandler:^(NSInteger returnCode, int64_t returnTime) {
                              if (returnCode != NSModalResponseOK)

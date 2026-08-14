@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="24765" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="24765"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -10,13 +10,14 @@
             <connections>
                 <outlet property="cancelButton" destination="C7h-06-Udn" id="vms-H9-Fs6"/>
                 <outlet property="goToLabel" destination="bB6-Le-Ilg" id="Psy-fF-eTf"/>
-                <outlet property="hoursLabel" destination="nrO-yt-AnE" id="twB-pr-AtL"/>
+                <outlet property="hoursLabel" destination="hoj-E1-zWh" id="NZs-Ub-M2t"/>
                 <outlet property="hoursValueField" destination="KFt-K5-ogc" id="0sD-O9-3lm"/>
                 <outlet property="minsLabel" destination="jTf-bH-u7w" id="e6b-gc-MHz"/>
                 <outlet property="minsValueField" destination="Smg-Kh-Pjv" id="SzV-8C-Zwx"/>
                 <outlet property="okButton" destination="zrN-B3-Ede" id="TzS-HN-YE3"/>
                 <outlet property="secsLabel" destination="oMI-0n-rej" id="Heh-nH-7Dv"/>
                 <outlet property="secsValueField" destination="ovY-qj-fWV" id="nRq-T4-9hF"/>
+                <outlet property="slider" destination="RNE-aM-lcf" id="qDJ-Ku-Pl4"/>
                 <outlet property="window" destination="Fqe-af-Tt9" id="u4H-rX-p0W"/>
             </connections>
         </customObject>
@@ -25,16 +26,16 @@
         <window title="GoTo Specific Time" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="Fqe-af-Tt9" userLabel="GoToTime">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="429" y="553" width="280" height="110"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1470" height="923"/>
-            <value key="minSize" type="size" width="280" height="110"/>
+            <rect key="contentRect" x="429" y="553" width="265" height="165"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="3008" height="1662"/>
+            <value key="minSize" type="size" width="280" height="165"/>
             <value key="minFullScreenContentSize" type="size" width="280" height="110"/>
-            <view key="contentView" misplaced="YES" id="NrR-3A-NOR">
-                <rect key="frame" x="0.0" y="0.0" width="280" height="110"/>
+            <view key="contentView" id="NrR-3A-NOR">
+                <rect key="frame" x="0.0" y="0.0" width="221" height="165"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="bB6-Le-Ilg" userLabel="Testlabel">
-                        <rect key="frame" x="64" y="91" width="153" height="16"/>
+                        <rect key="frame" x="34" y="141" width="153" height="16"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Go to specific position" id="vXn-nw-Nrc">
                             <font key="font" metaFont="systemBold"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -42,13 +43,21 @@
                         </textFieldCell>
                     </textField>
                     <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ovY-qj-fWV" userLabel="Secs Text Field">
-                        <rect key="frame" x="188" y="51" width="33" height="22"/>
+                        <rect key="frame" x="153" y="81" width="33" height="22"/>
                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="0" drawsBackground="YES" id="qZx-Li-5O2">
+                            <numberFormatter key="formatter" formatterBehavior="default10_4" numberStyle="decimal" formatWidth="-1" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" maximumFractionDigits="3" id="RGX-Wz-N76">
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="minimumIntegerDigits">
+                                        <integer key="value" value="2"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </numberFormatter>
                             <font key="font" metaFont="smallSystem"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                         <connections>
+                            <action selector="textFieldChanged:" target="-2" id="cY1-BD-0t2"/>
                             <binding destination="-2" name="value" keyPath="self.jumpSecsValue" id="Vrp-5K-RQW">
                                 <dictionary key="options">
                                     <bool key="NSContinuouslyUpdatesValue" value="YES"/>
@@ -59,8 +68,15 @@
                         </connections>
                     </textField>
                     <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Smg-Kh-Pjv" userLabel="Mins Text Field">
-                        <rect key="frame" x="100" y="51" width="33" height="22"/>
+                        <rect key="frame" x="94" y="81" width="33" height="22"/>
                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="0" drawsBackground="YES" id="2wj-p0-8uH">
+                            <numberFormatter key="formatter" formatterBehavior="default10_4" numberStyle="decimal" formatWidth="-1" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" maximumFractionDigits="3" id="zMe-2c-Xjf">
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="minimumIntegerDigits">
+                                        <integer key="value" value="2"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </numberFormatter>
                             <font key="font" metaFont="smallSystem"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -76,11 +92,18 @@
                         </connections>
                     </textField>
                     <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="KFt-K5-ogc" userLabel="Hours Text Field">
-                        <rect key="frame" x="20" y="51" width="33" height="22"/>
+                        <rect key="frame" x="35" y="81" width="33" height="22"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="33" id="xwZ-sK-Qq8"/>
                         </constraints>
-                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="0" drawsBackground="YES" id="UWz-WZ-unY">
+                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="UWz-WZ-unY">
+                            <numberFormatter key="formatter" formatterBehavior="default10_4" numberStyle="decimal" formatWidth="-1" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" maximumFractionDigits="3" id="Eyv-5c-GVV">
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="minimumIntegerDigits">
+                                        <integer key="value" value="2"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </numberFormatter>
                             <font key="font" metaFont="smallSystem"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -95,56 +118,57 @@
                             <outlet property="nextKeyView" destination="Smg-Kh-Pjv" id="aPL-uL-qxZ"/>
                         </connections>
                     </textField>
-                    <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zsp-zD-QHr" userLabel="Secs Stepper">
-                        <rect key="frame" x="223" y="51" width="17" height="22"/>
-                        <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="30000" id="8Ok-J5-Vfx"/>
-                        <connections>
-                            <binding destination="-2" name="value" keyPath="self.jumpSecsValue" previousBinding="G0w-1a-j9i" id="Dbd-qx-86s"/>
-                            <binding destination="-2" name="maxValue" keyPath="self.secsMax" id="G0w-1a-j9i"/>
-                        </connections>
-                    </stepper>
-                    <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xMh-Kx-bRX">
-                        <rect key="frame" x="135" y="51" width="17" height="22"/>
-                        <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="30000" id="WNB-18-kN2"/>
-                        <connections>
-                            <binding destination="-2" name="value" keyPath="self.jumpMinsValue" previousBinding="s1m-Vn-LGE" id="S3p-kD-BS5"/>
-                            <binding destination="-2" name="maxValue" keyPath="self.minsMax" id="s1m-Vn-LGE"/>
-                        </connections>
-                    </stepper>
-                    <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Un1-2R-ijf">
-                        <rect key="frame" x="55" y="51" width="17" height="22"/>
-                        <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="30000" id="c5h-G9-LlU"/>
-                        <connections>
-                            <binding destination="-2" name="maxValue" keyPath="self.hoursMax" id="ubF-Xt-qiY"/>
-                            <binding destination="-2" name="value" keyPath="self.jumpHoursValue" previousBinding="ubF-Xt-qiY" id="fTw-EH-qRY"/>
-                        </connections>
-                    </stepper>
-                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="oMI-0n-rej">
-                        <rect key="frame" x="222" y="53" width="25" height="16"/>
-                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="ss" id="74c-xI-3AS">
+                    <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="oMI-0n-rej">
+                        <rect key="frame" x="156" y="111" width="28" height="15"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="24" id="uRC-ZJ-3jK"/>
+                        </constraints>
+                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="sec" id="74c-xI-3AS">
                             <font key="font" metaFont="cellTitle"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
                     <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jTf-bH-u7w">
-                        <rect key="frame" x="153" y="55" width="25" height="15"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="mm" id="8HU-gm-EEa">
+                        <rect key="frame" x="97" y="111" width="28" height="15"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="24" id="tTC-3x-Mv4"/>
+                        </constraints>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="min" id="8HU-gm-EEa">
                             <font key="font" metaFont="cellTitle"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
                     <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nrO-yt-AnE">
-                        <rect key="frame" x="72" y="55" width="19" height="15"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="hh" id="24d-8K-jxZ">
+                        <rect key="frame" x="77" y="85" width="8" height="15"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title=":" id="24d-8K-jxZ">
+                            <font key="font" metaFont="cellTitle"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="FW5-ak-aXx">
+                        <rect key="frame" x="136" y="85" width="8" height="15"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title=":" id="vDA-II-xKN">
+                            <font key="font" metaFont="cellTitle"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="hoj-E1-zWh">
+                        <rect key="frame" x="38" y="111" width="28" height="15"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="24" id="nXi-AL-LAz"/>
+                        </constraints>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="hr" id="PS9-yO-b2B">
                             <font key="font" metaFont="cellTitle"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zrN-B3-Ede">
-                        <rect key="frame" x="224" y="21" width="36" height="20"/>
+                        <rect key="frame" x="150" y="21" width="36" height="20"/>
                         <buttonCell key="cell" type="push" title="OK" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="icy-jS-WFH">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="smallSystem"/>
@@ -156,8 +180,21 @@ DQ
                             <action selector="buttonPressed:" target="-2" id="0qF-5H-5Fz"/>
                         </connections>
                     </button>
+                    <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RNE-aM-lcf">
+                        <rect key="frame" x="36" y="53" width="147" height="16"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="147" id="B9t-2o-3oh"/>
+                        </constraints>
+                        <sliderCell key="cell" continuous="YES" state="on" alignment="left" maxValue="1" tickMarkPosition="above" sliderType="linear" id="Mp3-h7-xpy">
+                            <font key="font" size="12" name="Helvetica"/>
+                        </sliderCell>
+                        <connections>
+                            <binding destination="-2" name="maxValue" keyPath="self.maxTime" id="ele-YJ-xSk"/>
+                            <binding destination="-2" name="value" keyPath="self.jumpTotalSecs" previousBinding="ele-YJ-xSk" id="mmy-a5-0Y9"/>
+                        </connections>
+                    </slider>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="C7h-06-Udn">
-                        <rect key="frame" x="160" y="21" width="56" height="20"/>
+                        <rect key="frame" x="82" y="21" width="56" height="20"/>
                         <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" borderStyle="border" inset="2" id="fXt-nh-exA">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="smallSystem"/>
@@ -171,85 +208,70 @@ Gw
                     </button>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="nrO-yt-AnE" firstAttribute="baseline" secondItem="KFt-K5-ogc" secondAttribute="baseline" id="08O-Hq-yaf"/>
-                    <constraint firstItem="ovY-qj-fWV" firstAttribute="leading" secondItem="jTf-bH-u7w" secondAttribute="trailing" constant="12" id="0WE-Bg-ZGS"/>
+                    <constraint firstItem="bB6-Le-Ilg" firstAttribute="top" secondItem="NrR-3A-NOR" secondAttribute="top" constant="8" id="0VG-Bm-H6f"/>
                     <constraint firstItem="KFt-K5-ogc" firstAttribute="width" secondItem="Smg-Kh-Pjv" secondAttribute="width" id="24N-1L-5Qx"/>
-                    <constraint firstItem="C7h-06-Udn" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="NrR-3A-NOR" secondAttribute="leading" constant="16" symbolic="YES" id="8C2-n0-ddd" customClass="VLCSpacingConstraint">
+                    <constraint firstItem="C7h-06-Udn" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="NrR-3A-NOR" secondAttribute="leading" constant="20" symbolic="YES" id="8C2-n0-ddd" customClass="VLCSpacingConstraint">
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
-                                <integer value="3"/>
+                                <integer key="value" value="0"/>
                             </userDefinedRuntimeAttribute>
                         </userDefinedRuntimeAttributes>
                     </constraint>
-                    <constraint firstItem="bB6-Le-Ilg" firstAttribute="top" secondItem="NrR-3A-NOR" secondAttribute="top" constant="6" id="AmG-Sh-CJP"/>
-                    <constraint firstItem="xMh-Kx-bRX" firstAttribute="leading" secondItem="Smg-Kh-Pjv" secondAttribute="trailing" constant="2" id="CyX-lL-1I2"/>
+                    <constraint firstItem="ovY-qj-fWV" firstAttribute="leading" secondItem="FW5-ak-aXx" secondAttribute="trailing" constant="11" id="8Rz-EK-CzS"/>
+                    <constraint firstItem="hoj-E1-zWh" firstAttribute="top" secondItem="bB6-Le-Ilg" secondAttribute="bottom" constant="15" id="An4-L4-3Qd"/>
+                    <constraint firstItem="hoj-E1-zWh" firstAttribute="centerX" secondItem="KFt-K5-ogc" secondAttribute="centerX" id="CQn-31-E6x"/>
+                    <constraint firstItem="oMI-0n-rej" firstAttribute="leading" secondItem="jTf-bH-u7w" secondAttribute="trailing" constant="35" id="GCa-N0-IKB"/>
                     <constraint firstItem="ovY-qj-fWV" firstAttribute="baseline" secondItem="KFt-K5-ogc" secondAttribute="baseline" id="Hee-6R-Kdn"/>
-                    <constraint firstItem="jTf-bH-u7w" firstAttribute="leading" secondItem="xMh-Kx-bRX" secondAttribute="trailing" constant="3" id="Hm4-N4-hNM" userLabel="Mins Label.leading = Mins Stepper.trailing + 2"/>
-                    <constraint firstAttribute="trailing" secondItem="oMI-0n-rej" secondAttribute="trailing" constant="16" symbolic="YES" id="JlG-tA-T1w" customClass="VLCSpacingConstraint">
-                        <userDefinedRuntimeAttributes>
-                            <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
-                                <integer value="3"/>
-                            </userDefinedRuntimeAttribute>
-                        </userDefinedRuntimeAttributes>
-                    </constraint>
-                    <constraint firstItem="jTf-bH-u7w" firstAttribute="baseline" secondItem="KFt-K5-ogc" secondAttribute="baseline" id="JxE-ZG-eSY"/>
+                    <constraint firstItem="FW5-ak-aXx" firstAttribute="leading" secondItem="Smg-Kh-Pjv" secondAttribute="trailing" constant="11" id="Hfl-vg-I8F"/>
+                    <constraint firstItem="KFt-K5-ogc" firstAttribute="leading" relation="lessThanOrEqual" secondItem="NrR-3A-NOR" secondAttribute="leading" constant="35" id="Kxf-pd-936"/>
                     <constraint firstItem="C7h-06-Udn" firstAttribute="baseline" secondItem="zrN-B3-Ede" secondAttribute="baseline" id="PVu-B9-CmM"/>
-                    <constraint firstItem="KFt-K5-ogc" firstAttribute="leading" secondItem="NrR-3A-NOR" secondAttribute="leading" constant="16" symbolic="YES" id="PfD-38-yip" customClass="VLCSpacingConstraint">
+                    <constraint firstItem="jTf-bH-u7w" firstAttribute="centerX" secondItem="Smg-Kh-Pjv" secondAttribute="centerX" id="RYV-JZ-UBS"/>
+                    <constraint firstItem="zrN-B3-Ede" firstAttribute="top" secondItem="RNE-aM-lcf" secondAttribute="bottom" constant="12" id="SiP-hv-2S0"/>
+                    <constraint firstItem="nrO-yt-AnE" firstAttribute="centerY" secondItem="KFt-K5-ogc" secondAttribute="centerY" constant="-0.5" id="T2g-U9-OAh"/>
+                    <constraint firstItem="zrN-B3-Ede" firstAttribute="leading" secondItem="C7h-06-Udn" secondAttribute="trailing" constant="12" id="XLd-j6-TX5" customClass="VLCSpacingConstraint">
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
-                                <integer value="3"/>
+                                <integer key="value" value="0"/>
                             </userDefinedRuntimeAttribute>
                         </userDefinedRuntimeAttributes>
                     </constraint>
-                    <constraint firstItem="Un1-2R-ijf" firstAttribute="leading" secondItem="KFt-K5-ogc" secondAttribute="trailing" constant="2" id="Rhe-9Q-woZ"/>
-                    <constraint firstItem="zsp-zD-QHr" firstAttribute="leading" secondItem="ovY-qj-fWV" secondAttribute="trailing" constant="2" id="SZW-yH-BM4"/>
-                    <constraint firstItem="zrN-B3-Ede" firstAttribute="top" secondItem="oMI-0n-rej" secondAttribute="bottom" constant="14" id="SiP-hv-2S0"/>
-                    <constraint firstItem="KFt-K5-ogc" firstAttribute="centerY" secondItem="Un1-2R-ijf" secondAttribute="centerY" id="WUd-ZI-Bol"/>
-                    <constraint firstItem="Smg-Kh-Pjv" firstAttribute="centerY" secondItem="xMh-Kx-bRX" secondAttribute="centerY" id="X15-o0-6ZP"/>
-                    <constraint firstItem="zrN-B3-Ede" firstAttribute="leading" secondItem="C7h-06-Udn" secondAttribute="trailing" constant="8" id="XLd-j6-TX5" customClass="VLCSpacingConstraint">
+                    <constraint firstItem="nrO-yt-AnE" firstAttribute="leading" secondItem="KFt-K5-ogc" secondAttribute="trailing" constant="11" id="Xny-Za-GWV"/>
+                    <constraint firstAttribute="trailing" relation="lessThanOrEqual" secondItem="ovY-qj-fWV" secondAttribute="trailing" constant="35" id="agW-tb-8WG"/>
+                    <constraint firstItem="jTf-bH-u7w" firstAttribute="leading" secondItem="hoj-E1-zWh" secondAttribute="trailing" constant="35" id="dxq-Lf-enG"/>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="bB6-Le-Ilg" secondAttribute="trailing" constant="20" symbolic="YES" id="epj-mp-Lnm" customClass="VLCSpacingConstraint">
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
-                                <integer value="2"/>
+                                <integer key="value" value="0"/>
                             </userDefinedRuntimeAttribute>
                         </userDefinedRuntimeAttributes>
                     </constraint>
-                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="bB6-Le-Ilg" secondAttribute="trailing" constant="16" symbolic="YES" id="epj-mp-Lnm" customClass="VLCSpacingConstraint">
+                    <constraint firstItem="FW5-ak-aXx" firstAttribute="centerY" secondItem="KFt-K5-ogc" secondAttribute="centerY" constant="-0.5" id="hqm-TU-kPZ"/>
+                    <constraint firstItem="RNE-aM-lcf" firstAttribute="centerX" secondItem="NrR-3A-NOR" secondAttribute="centerX" constant="-1" id="ipf-3f-Ndw"/>
+                    <constraint firstItem="bB6-Le-Ilg" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="NrR-3A-NOR" secondAttribute="leading" constant="20" symbolic="YES" id="j6a-V4-oje" customClass="VLCSpacingConstraint">
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
-                                <integer value="3"/>
+                                <integer key="value" value="0"/>
                             </userDefinedRuntimeAttribute>
                         </userDefinedRuntimeAttributes>
                     </constraint>
-                    <constraint firstItem="oMI-0n-rej" firstAttribute="leading" secondItem="zsp-zD-QHr" secondAttribute="trailing" constant="2" id="g1Z-YD-UJw"/>
-                    <constraint firstAttribute="trailing" secondItem="zrN-B3-Ede" secondAttribute="trailing" constant="16" id="gCl-V6-Bjt" customClass="VLCSpacingConstraint">
-                        <userDefinedRuntimeAttributes>
-                            <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
-                                <integer value="3"/>
-                            </userDefinedRuntimeAttribute>
-                        </userDefinedRuntimeAttributes>
-                    </constraint>
-                    <constraint firstItem="ovY-qj-fWV" firstAttribute="centerY" secondItem="zsp-zD-QHr" secondAttribute="centerY" id="iXo-b7-Mh2"/>
-                    <constraint firstItem="bB6-Le-Ilg" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="NrR-3A-NOR" secondAttribute="leading" constant="16" symbolic="YES" id="j6a-V4-oje" customClass="VLCSpacingConstraint">
-                        <userDefinedRuntimeAttributes>
-                            <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
-                                <integer value="3"/>
-                            </userDefinedRuntimeAttribute>
-                        </userDefinedRuntimeAttributes>
-                    </constraint>
+                    <constraint firstItem="ovY-qj-fWV" firstAttribute="top" secondItem="oMI-0n-rej" secondAttribute="bottom" constant="8" id="jEX-dY-A5l"/>
                     <constraint firstItem="Smg-Kh-Pjv" firstAttribute="width" secondItem="ovY-qj-fWV" secondAttribute="width" id="jHZ-4g-K0X"/>
-                    <constraint firstItem="nrO-yt-AnE" firstAttribute="leading" secondItem="Un1-2R-ijf" secondAttribute="trailing" constant="2" id="kjd-h3-aEZ"/>
-                    <constraint firstItem="oMI-0n-rej" firstAttribute="baseline" secondItem="KFt-K5-ogc" secondAttribute="baseline" id="lyY-Ad-caz"/>
+                    <constraint firstAttribute="trailing" secondItem="zrN-B3-Ede" secondAttribute="trailing" constant="35" id="kTd-zX-Fbp"/>
+                    <constraint firstItem="oMI-0n-rej" firstAttribute="centerX" secondItem="ovY-qj-fWV" secondAttribute="centerX" id="kjp-dh-svN"/>
                     <constraint firstItem="Smg-Kh-Pjv" firstAttribute="baseline" secondItem="KFt-K5-ogc" secondAttribute="baseline" id="mOE-Qf-1wF"/>
                     <constraint firstAttribute="bottom" secondItem="zrN-B3-Ede" secondAttribute="bottom" constant="21" id="nIx-yc-atT"/>
-                    <constraint firstItem="KFt-K5-ogc" firstAttribute="top" secondItem="bB6-Le-Ilg" secondAttribute="bottom" constant="18" id="oqx-8I-mgW"/>
+                    <constraint firstItem="KFt-K5-ogc" firstAttribute="top" secondItem="hoj-E1-zWh" secondAttribute="bottom" constant="8" id="oqx-8I-mgW"/>
                     <constraint firstItem="Smg-Kh-Pjv" firstAttribute="leading" secondItem="nrO-yt-AnE" secondAttribute="trailing" constant="11" id="rnE-ZZ-e08"/>
+                    <constraint firstItem="Smg-Kh-Pjv" firstAttribute="top" secondItem="jTf-bH-u7w" secondAttribute="bottom" constant="8" id="sWo-wx-seG"/>
                     <constraint firstItem="bB6-Le-Ilg" firstAttribute="centerX" secondItem="NrR-3A-NOR" secondAttribute="centerX" id="uga-pS-4jS"/>
+                    <constraint firstItem="RNE-aM-lcf" firstAttribute="top" secondItem="KFt-K5-ogc" secondAttribute="bottom" constant="12" id="yQf-S8-ASR"/>
                 </constraints>
             </view>
             <connections>
                 <outlet property="initialFirstResponder" destination="KFt-K5-ogc" id="RUn-tc-Qvg"/>
             </connections>
-            <point key="canvasLocation" x="146.5" y="157"/>
+            <point key="canvasLocation" x="145.5" y="156.5"/>
         </window>
+        <userDefaultsController representsSharedInstance="YES" id="0Fs-zF-K5X"/>
     </objects>
 </document>

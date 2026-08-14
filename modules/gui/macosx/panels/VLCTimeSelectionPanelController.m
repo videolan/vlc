@@ -46,9 +46,9 @@
 {
     [_cancelButton setTitle:_NS("Cancel")];
     [_okButton setTitle:_NS("OK")];
-    [_secsLabel setStringValue:_NS("ss")];
-    [_minsLabel setStringValue:_NS("mm")];
-    [_hoursLabel setStringValue:_NS("hh")];
+    [_secsLabel setStringValue:_NS("sec")];
+    [_minsLabel setStringValue:_NS("min")];
+    [_hoursLabel setStringValue:_NS("hr")];
     [_goToLabel setStringValue:_NS("Jump to Time")];
 }
 
@@ -59,36 +59,18 @@
 
     if ([stringValue containsString:@":"]) {
         [self applyColonSeparatedDimensions:stringValue startingAtField:sender];
-        [self setPosition:[self getTimeInSecs]];
+        [self setJumpTotalSecs:[self jumpTotalSecs]];
         return;
     }
 
-    [self setPosition:[self getTimeInSecs]];
+    [self setJumpTotalSecs:[self jumpTotalSecs]];
 }
 
-- (void)setMaxTime:(NSInteger)secsMax
+- (void)setJumpTotalSecs:(NSInteger)secsPos
 {
-    [self setTimeMax:secsMax];
-
-    [self setHoursMax:(int)secsMax / 3600];
-
-    if (secsMax >= 3600) {
-        [self setMinsMax:59];
-        [self setSecsMax:59];
-    } else if (secsMax >= 60) {
-        [self setMinsMax:(int)secsMax / 60];
-        [self setSecsMax:59];
-    } else {
-        [self setSecsMax:secsMax];
-        [self setMinsMax:0];
+    if (self.maxTime != VLC_TICK_INVALID) {
+        secsPos = MAX(MIN(secsPos, self.maxTime), 0);
     }
-}
-
-- (void)setPosition:(NSInteger)secsPos
-{
-    const NSInteger maxTime = [self timeMax];
-
-    secsPos = MAX(MIN(secsPos, maxTime), 0);
 
     NSInteger minsPos = secsPos / 60;
     secsPos = secsPos % 60;
@@ -100,7 +82,7 @@
     [self setJumpHoursValue:hoursPos];
 }
 
-- (NSInteger)getTimeInSecs
+- (NSInteger)jumpTotalSecs
 {
     NSInteger timeInSec = self.jumpSecsValue;
     timeInSec += self.jumpMinsValue * 60;
@@ -112,7 +94,7 @@
 {
     [self.window orderOut:sender];
     [NSApp endSheet:self.window];
-    int64_t timeInSec = [self getTimeInSecs];
+    int64_t timeInSec = [self jumpTotalSecs];
 
     if (_completionHandler)
         _completionHandler(sender == _okButton ? NSModalResponseOK : NSModalResponseCancel,
@@ -124,18 +106,17 @@
 {
     __weak typeof(self) weakSelf = self;
 
-    _keyMonitor =
-        [NSEvent addLocalMonitorForEventsMatchingMask:NSEventMaskKeyDown
-                                              handler:^NSEvent *(NSEvent *event) {
-                                                  return [weakSelf handleKeyEvent:event];
-                                              }];
+    _keyMonitor = [NSEvent addLocalMonitorForEventsMatchingMask:NSEventMaskKeyDown
+                                                        handler:^NSEvent *(NSEvent *event) {
+                                                            return [weakSelf handleKeyEvent:event];
+                                                        }];
 
     _completionHandler = handler;
 
     [window beginSheet:self.window
         completionHandler:^(NSModalResponse returnCode) {
-        if (self->_keyMonitor) {
-            [NSEvent removeMonitor:self->_keyMonitor];
+            if (self->_keyMonitor) {
+                [NSEvent removeMonitor:self->_keyMonitor];
             }
         }];
 }
@@ -173,9 +154,9 @@
     }
 
     if (key == NSUpArrowFunctionKey) {
-        [self setPosition:[self getTimeInSecs] + timeDifference];
+        [self setJumpTotalSecs:[self jumpTotalSecs] + timeDifference];
     } else if (key == NSDownArrowFunctionKey) {
-        [self setPosition:[self getTimeInSecs] - timeDifference];
+        [self setJumpTotalSecs:[self jumpTotalSecs] - timeDifference];
     }
     return nil;
 }
@@ -221,13 +202,13 @@
     NSArray<NSString *> *parts = [text componentsSeparatedByString:@":"];
 
     NSInteger startingField = 0;
-    NSInteger timeDifference = [self getTimeDifference:field];
+    NSInteger currentFieldSecs = [self getTimeDifference:field];
 
-    if (timeDifference == 3600) {
+    if (currentFieldSecs == 3600) {
         startingField = 0;
-    } else if (timeDifference == 60) {
+    } else if (currentFieldSecs == 60) {
         startingField = 1;
-    } else if (timeDifference == 1) {
+    } else if (currentFieldSecs == 1) {
         startingField = 2;
     } else {
         return;
@@ -236,6 +217,7 @@
     NSInteger count = MIN(parts.count, 3 - startingField);
 
     NSInteger newPosition = 0;
+    NSInteger timeDifference = currentFieldSecs;
     for (NSInteger i = 0; i < count; i++) {
         NSString *part = [parts[i]
             stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
@@ -243,7 +225,9 @@
         timeDifference /= 60;
     }
 
-    [self setPosition:newPosition];
+    [self setJumpTotalSecs:newPosition];
+    NSInteger currentFieldValue = (self.jumpTotalSecs / currentFieldSecs);
+    [field setStringValue:@(currentFieldValue).stringValue];
 }
 
 @end

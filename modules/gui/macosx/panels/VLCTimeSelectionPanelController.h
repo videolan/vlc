@@ -32,20 +32,17 @@
 @property (readwrite, weak) IBOutlet NSTextField *secsValueField;
 @property (readwrite, weak) IBOutlet NSTextField *minsValueField;
 @property (readwrite, weak) IBOutlet NSTextField *hoursValueField;
+@property (readwrite, weak) IBOutlet NSSlider *slider;
 
 @property (nonatomic) NSInteger jumpSecsValue;
 @property (nonatomic) NSInteger jumpMinsValue;
 @property (nonatomic) NSInteger jumpHoursValue;
-@property (nonatomic) NSInteger secsMax;
-@property (nonatomic) NSInteger minsMax;
-@property (nonatomic) NSInteger hoursMax;
-@property (nonatomic) NSInteger timeMax;
+@property (nonatomic) NSInteger maxTime;
 
 - (IBAction)buttonPressed:(id)sender;
 
-- (NSInteger)getTimeInSecs;
-- (void)setMaxTime:(NSInteger)secsMax;
-- (void)setPosition:(NSInteger)secsPos;
+- (NSInteger)jumpTotalSecs;
+- (void)setJumpTotalSecs:(NSInteger)secsPos;
 
 /**
  * Completion handler for textfield panel
