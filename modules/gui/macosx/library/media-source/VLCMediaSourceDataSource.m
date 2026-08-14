@@ -26,6 +26,7 @@
 #import "VLCMediaSource.h"
 #import "VLCMediaSourceBaseDataSource.h"
 
+#import "extensions/NSPasteboardItem+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSTableCellView+VLCAdditions.h"
 
@@ -42,6 +43,7 @@
 
 #import "playqueue/VLCPlayQueueController.h"
 
+#import "views/VLCFileDragRecognisingView.h"
 #import "views/VLCImageView.h"
 #import "views/VLCUIUnits.h"
 
@@ -249,6 +251,9 @@ static NSValue * _Nullable inputItemIdentifier(VLCInputItem * _Nullable const in
 {
     [self.tableView setDoubleAction:@selector(tableViewAction:)];
     [self.tableView setTarget:self];
+    [self.tableView registerForDraggedTypes:@[NSFilenamesPboardType]];
+    [self.tableView setDraggingSourceOperationMask:NSDragOperationCopy forLocal:NO];
+    [self.tableView setDraggingSourceOperationMask:NSDragOperationCopy forLocal:YES];
 }
 
 - (nullable VLCInputNode *)inputNodeForIndexPath:(NSIndexPath *)indexPath
@@ -514,6 +519,35 @@ static NSValue * _Nullable inputItemIdentifier(VLCInputItem * _Nullable const in
     if (childNode) {
         [self performActionForNode:childNode allowPlayback:YES];
     }
+}
+
+- (id<NSPasteboardWriting>)tableView:(NSTableView *)tableView pasteboardWriterForRow:(NSInteger)row
+{
+    VLCInputItem * const inputItem = [self mediaSourceInputItemAtRow:row];
+    return [self.parentBaseDataSource pasteboardWriterForInputItem:inputItem];
+}
+
+- (NSDragOperation)tableView:(NSTableView *)tableView
+                validateDrop:(id<NSDraggingInfo>)info
+                 proposedRow:(NSInteger)row
+       proposedDropOperation:(NSTableViewDropOperation)dropOperation
+{
+    const id propertyList = [info.draggingPasteboard propertyListForType:NSFilenamesPboardType];
+    if (propertyList == nil) {
+        return NSDragOperationNone;
+    }
+
+    [tableView setDropRow:-1 dropOperation:NSTableViewDropOn];
+    return NSDragOperationCopy;
+}
+
+- (BOOL)tableView:(NSTableView *)tableView
+       acceptDrop:(id<NSDraggingInfo>)info
+              row:(NSInteger)row
+    dropOperation:(NSTableViewDropOperation)dropOperation
+{
+    return [VLCFileDragRecognisingView
+        handlePasteboardFromDragSessionAsPlayQueueItems:info.draggingPasteboard];
 }
 
 - (nullable VLCInputNode *)mediaSourceInputNodeAtRow:(NSInteger)tableViewRow

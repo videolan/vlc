@@ -30,6 +30,7 @@
 #import "VLCMediaSourceProvider.h"
 
 #import "extensions/NSImage+VLCAdditions.h"
+#import "extensions/NSPasteboardItem+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSTableCellView+VLCAdditions.h"
 #import "extensions/NSWindow+VLCAdditions.h"
@@ -47,6 +48,7 @@
 
 #import "main/VLCMain.h"
 
+#import "views/VLCFileDragRecognisingView.h"
 #import "views/VLCImageView.h"
 #import "views/VLCUIUnits.h"
 
@@ -154,6 +156,9 @@ NSString * const VLCMediaSourceTableTagsColumnIdentifier = @"VLCMediaSourceTable
 
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
+    [self.tableView registerForDraggedTypes:@[NSFilenamesPboardType]];
+    [self.tableView setDraggingSourceOperationMask:NSDragOperationCopy forLocal:NO];
+    [self.tableView setDraggingSourceOperationMask:NSDragOperationCopy forLocal:YES];
 
     NSNib * const tableCellViewNib = [[NSNib alloc] initWithNibNamed:NSStringFromClass(VLCLibraryTableCellView.class) bundle:nil];
     [self.tableView registerNib:tableCellViewNib forIdentifier:VLCLibraryTableCellViewIdentifier];
@@ -535,6 +540,46 @@ referenceSizeForHeaderInSection:(NSInteger)section
 
     [self configureChildDataSourceWithNode:childNode andMediaSource:mediaSource];
     [self reloadData];
+}
+
+- (id<NSPasteboardWriting>)tableView:(NSTableView *)tableView pasteboardWriterForRow:(NSInteger)row
+{
+    VLCInputItem * const inputItem = _mediaSourceMode == VLCMediaSourceModeLAN
+        ? _lanDeviceSnapshot[row].inputNode.inputItem
+        : _mediaSources[row].rootNode.inputItem;
+    return [self pasteboardWriterForInputItem:inputItem];
+}
+
+- (NSDragOperation)tableView:(NSTableView *)tableView
+                validateDrop:(id<NSDraggingInfo>)info
+                 proposedRow:(NSInteger)row
+       proposedDropOperation:(NSTableViewDropOperation)dropOperation
+{
+    const id propertyList = [info.draggingPasteboard propertyListForType:NSFilenamesPboardType];
+    if (propertyList == nil) {
+        return NSDragOperationNone;
+    }
+
+    [tableView setDropRow:-1 dropOperation:NSTableViewDropOn];
+    return NSDragOperationCopy;
+}
+
+- (BOOL)tableView:(NSTableView *)tableView
+       acceptDrop:(id<NSDraggingInfo>)info
+              row:(NSInteger)row
+    dropOperation:(NSTableViewDropOperation)dropOperation
+{
+    return [VLCFileDragRecognisingView
+        handlePasteboardFromDragSessionAsPlayQueueItems:info.draggingPasteboard];
+}
+
+- (nullable id<NSPasteboardWriting>)pasteboardWriterForInputItem:(nullable VLCInputItem *)inputItem
+{
+    if (inputItem == nil || inputItem.inputType == ITEM_TYPE_DIRECTORY) {
+        return nil;
+    }
+
+    return [NSPasteboardItem pasteboardItemWithInputItem:inputItem];
 }
 
 #pragma mark - LAN device snapshot

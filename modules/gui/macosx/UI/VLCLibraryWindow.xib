@@ -1028,7 +1028,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="528" height="394"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="firstColumnOnly" columnReordering="NO" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="4cS-pi-5KZ" viewBased="YES" id="vpJ-Oz-Ebz" customClass="VLCLibraryTableView">
+                            <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="firstColumnOnly" columnReordering="NO" columnSelection="YES" multipleSelection="YES" autosaveColumns="NO" headerView="4cS-pi-5KZ" viewBased="YES" id="vpJ-Oz-Ebz" customClass="VLCLibraryTableView">
                                 <rect key="frame" x="0.0" y="0.0" width="718" height="366"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <size key="intercellSpacing" width="3" height="2"/>

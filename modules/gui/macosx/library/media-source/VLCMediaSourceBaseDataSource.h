@@ -32,6 +32,7 @@ typedef NS_ENUM(NSInteger, VLCMediaSourceMode) {
 };
 
 @class VLCInputNodePathControl;
+@class VLCInputItem;
 @class VLCLibraryMediaSourceViewNavigationStack;
 @class VLCMediaSourceDataSource;
 
@@ -64,6 +65,7 @@ extern NSString * const VLCMediaSourceBaseDataSourceNodeChanged;
 - (void)pathControlAction:(id)sender;
 
 - (void)browseFolderByMrl:(NSString *)mrl;
+- (nullable id<NSPasteboardWriting>)pasteboardWriterForInputItem:(nullable VLCInputItem *)inputItem;
 
 @end
 

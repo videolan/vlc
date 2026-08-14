@@ -25,10 +25,12 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol VLCMediaLibraryItemProtocol;
+@class VLCInputItem;
 
 @interface NSPasteboardItem (VLCAdditions)
 
 + (instancetype)pasteboardItemWithLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem;
++ (nullable instancetype)pasteboardItemWithInputItem:(VLCInputItem *)inputItem;
 
 @end
 

@@ -22,6 +22,7 @@
 
 #import "NSPasteboardItem+VLCAdditions.h"
 
+#import "library/VLCInputItem.h"
 #import "library/VLCLibraryDataTypes.h"
 
 @implementation NSPasteboardItem (VLCAdditions)
@@ -44,6 +45,32 @@
         return nil;
     }
     [pboardItem setData:data forType:VLCMediaLibraryMediaItemUTI];
+    return pboardItem;
+}
+
++ (nullable instancetype)pasteboardItemWithInputItem:(VLCInputItem *)inputItem
+{
+    if (inputItem == nil || inputItem.MRL.length == 0) {
+        return nil;
+    }
+
+    NSURL * const itemURL = [NSURL URLWithString:inputItem.MRL];
+    if (itemURL == nil) {
+        return nil;
+    }
+
+    NSPasteboardItem * const pboardItem = [[NSPasteboardItem alloc] init];
+    [pboardItem setString:itemURL.absoluteString forType:NSPasteboardTypeString];
+    [pboardItem setString:itemURL.absoluteString
+                  forType:itemURL.isFileURL ? NSPasteboardTypeFileURL : NSPasteboardTypeURL];
+
+    if (itemURL.isFileURL) {
+        NSString * const localPath = itemURL.path;
+        if (localPath.length > 0) {
+            [pboardItem setPropertyList:@[localPath] forType:NSFilenamesPboardType];
+        }
+    }
+
     return pboardItem;
 }
 
