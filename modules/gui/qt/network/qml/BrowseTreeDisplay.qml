@@ -310,7 +310,7 @@ Widgets.PageExt {
                     titleCover_width: VLCStyle.listAlbumCover_width
                     titleCover_height: VLCStyle.listAlbumCover_height
 
-                    showTitleText: false
+                    showTitleText: tableView.sortModel === tableView._modelSmall
                 }
             }
         }

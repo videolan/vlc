@@ -313,7 +313,7 @@ FocusScope {
                 titleCover_width: VLCStyle.listAlbumCover_width
                 titleCover_height: VLCStyle.listAlbumCover_height
 
-                showTitleText: false
+                showTitleText: listView.sortModel === listView._modelSmall
             }
 
             Component {
