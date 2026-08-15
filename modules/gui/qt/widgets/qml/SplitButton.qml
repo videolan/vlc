@@ -52,6 +52,8 @@ ButtonExt {
 
     colorContext {
         colorSet: ColorContext.ButtonAccent
+        focused: root.visualFocus
+        hovered: root.hovered && !_menu.visible && !root.contentItem?.menuIndicatorButton?.hovered
     }
 
     Keys.onMenuPressed: root.clickMenuIndicator()
@@ -125,6 +127,12 @@ ButtonExt {
 
             padding: VLCStyle.margin_xsmall
 
+            topInset: (background.border.width > 0 && background.border.color.a > 0) ? 0
+                                                                                     : (root.background?.border.width ?? 0)
+            bottomInset: topInset
+            leftInset: 0
+            rightInset: topInset
+
             Accessible.name: qsTr("More options")
 
             Navigation.parentItem: root
@@ -158,9 +166,23 @@ ButtonExt {
                 implicitHeight: VLCStyle.icon_small
 
                 enabled: menuTheme.initialized
-                border.color: menuIndicator.visualFocus ? root.colorContext.visualFocus
-                                                        : Qt.alpha(root.colorContext.visualFocus, 0.0)
-                radius: root.radius
+                color: (menuTheme.hovered || menuTheme.pressed) ? menuTheme.bg.primary
+                                                                : Qt.alpha(menuTheme.bg.primary, 0.0)
+                border.width: root.background?.border.width ?? 0
+                border.color: menuIndicator.visualFocus ? menuTheme.visualFocus
+                                                        : Qt.alpha(menuTheme.visualFocus, 0.0)
+                radius: root.radius - menuIndicator.topInset
+            }
+
+            ColorContext {
+                id: menuTheme
+
+                colorSet: ColorContext.ButtonAccent
+
+                enabled: root.enabled
+                focused: menuIndicator.visualFocus
+                hovered: _menu.visible || menuIndicator.hovered
+                pressed: menuIndicator.down
             }
         }
     }
