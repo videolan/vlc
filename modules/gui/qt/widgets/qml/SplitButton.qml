@@ -23,6 +23,7 @@ import VLC.MainInterface
 import VLC.Menus
 import VLC.Widgets as Widgets
 import VLC.Style
+import VLC.Util
 
 ButtonExt {
     id: root
@@ -39,9 +40,21 @@ ButtonExt {
 
     spacing: VLCStyle.margin_xxsmall
 
+    onKeyPressedFunc: function(event) {
+        if (KeyHelper.matchRight(event) && contentItem?.menuIndicatorButton) {
+            contentItem.menuIndicatorButton.forceActiveFocus(Qt.TabFocusReason)
+            event.accepted = true
+            return
+        }
+
+        Navigation.defaultKeyAction(event)
+    }
+
     colorContext {
         colorSet: ColorContext.ButtonAccent
     }
+
+    Keys.onMenuPressed: root.clickMenuIndicator()
 
     contentItem: RowLayout {
         property alias menuIndicatorButton: menuIndicator
@@ -113,6 +126,19 @@ ButtonExt {
             padding: VLCStyle.margin_xsmall
 
             Accessible.name: qsTr("More options")
+
+            Navigation.parentItem: root
+
+            Keys.priority: Keys.AfterItem
+            Keys.onPressed: (event) => {
+                if (KeyHelper.matchLeft(event)) {
+                    root.forceActiveFocus(Qt.BacktabFocusReason)
+                    event.accepted = true
+                    return
+                }
+
+                Navigation.defaultKeyAction(event)
+            }
 
             onClicked: {
                 root.popupMenu()

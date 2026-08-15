@@ -53,6 +53,10 @@ T.Button {
     // Aliases
     property real iconRotation
 
+    property var onKeyPressedFunc: function (event) {
+        Navigation.defaultKeyAction(event)
+    }
+
     // Settings
 
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
@@ -69,7 +73,7 @@ T.Button {
 
     Keys.priority: Keys.AfterItem
 
-    Keys.onPressed: (event) => Navigation.defaultKeyAction(event)
+    Keys.onPressed: (event) => { root.onKeyPressedFunc(event) }
 
 
     // Accessible
