@@ -109,7 +109,7 @@ ButtonExt {
 
             width: MainCtx.dp(1, VLCStyle.scale)
 
-            color: Qt.alpha(root.colorContext.fg.primary, 0.4)
+            color: menuIndicator.visualFocus ? "transparent" : Qt.alpha(root.colorContext.fg.primary, 0.4)
         }
 
         T.AbstractButton {
@@ -153,9 +153,14 @@ ButtonExt {
                 verticalAlignment: Text.AlignVCenter
             }
 
-            background: Item {
+            background: Widgets.AnimatedBackground {
                 implicitWidth: VLCStyle.icon_small
                 implicitHeight: VLCStyle.icon_small
+
+                enabled: menuTheme.initialized
+                border.color: menuIndicator.visualFocus ? root.colorContext.visualFocus
+                                                        : Qt.alpha(root.colorContext.visualFocus, 0.0)
+                radius: root.radius
             }
         }
     }
