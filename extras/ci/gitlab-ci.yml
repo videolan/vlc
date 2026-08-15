@@ -510,6 +510,7 @@ raspbian-arm:
         ./extras/package/macosx/build.sh $EXTRA_BUILD_FLAGS $NIGHTLY_EXTRA_BUILD_FLAGS -a $HOST_ARCH -x
         # At least compile every targets
         make check TESTS=
+        make -C modules check-macosx
     after_script:
       - export PATH="${CI_PROJECT_DIR}/extras/tools/build/bin:$PATH"
       - !reference [.ccache-common-apple, after_script]
