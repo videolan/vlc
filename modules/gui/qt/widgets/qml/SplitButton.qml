@@ -57,8 +57,12 @@ ButtonExt {
 
             control: root
 
+            topPadding: -VLCStyle.margin_xxsmall
+            bottomPadding: topPadding
+
             Layout.fillWidth: !label.visible
             Layout.fillHeight: true
+            Layout.rightMargin: label.visible ? root.spacing : 0
         }
 
         ButtonExt.DefaultContentLabel {
