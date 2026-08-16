@@ -70,7 +70,7 @@
     [self reloadData];
 }
 
-- (NSArray<VLCMediaLibraryGroup *> *)backingArray
+- (NSArray<VLCMediaLibraryGroup *> *)sourceBackingArray
 {
     return self.libraryModel.listOfGroups;
 }
@@ -83,45 +83,13 @@
 - (void)libraryModelGroupUpdated:(NSNotification *)notification
 {
     VLCMediaLibraryGroup * const group = notification.object;
-    NSIndexPath * const indexPath = [self indexPathForLibraryItem:group];
-
-    if (indexPath != nil) {
-        [self.collectionView reloadItemsAtIndexPaths:[NSSet setWithObject:indexPath]];
-    }
-
-    const NSInteger rowIndex = [self rowForLibraryItem:group];
-    if (rowIndex != NSNotFound) {
-        const NSInteger selectedMasterRow = self.masterTableView.selectedRow;
-        [self.masterTableView reloadDataForRowIndexes:[NSIndexSet indexSetWithIndex:rowIndex]
-                                        columnIndexes:[NSIndexSet indexSetWithIndex:0]];
-
-        // Check, if the selected row was for the group that has been reloaded, if the selection in
-        // the master table view has changed after reloading the target index. In this case, we want
-        // to reselect. If the selection has been maintained then we need to reload the detail table
-        // view.
-        if (rowIndex == selectedMasterRow && self.masterTableView.selectedRow != selectedMasterRow) {
-            [self.masterTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:selectedMasterRow]
-                              byExtendingSelection:NO];
-        } else {
-            [self.detailTableView reloadData];
-        }
-    }
+    [self applySnapshotForChangedItemID:group.libraryID isDeletion:NO];
 }
 
 - (void)libraryModelGroupDeleted:(NSNotification *)notification
 {
     VLCMediaLibraryGroup * const group = notification.object;
-    NSIndexPath * const indexPath = [self indexPathForLibraryItem:group];
-
-    if (indexPath != nil) {
-        [self.collectionView deleteItemsAtIndexPaths:[NSSet setWithObject:indexPath]];
-    }
-
-    const NSInteger rowIndex = [self rowForLibraryItem:group];
-    if (rowIndex != NSNotFound) {
-        [self.masterTableView removeRowsAtIndexes:[NSIndexSet indexSetWithIndex:rowIndex]
-                                    withAnimation:NSTableViewAnimationEffectFade];
-    }
+    [self applySnapshotForChangedItemID:group.libraryID isDeletion:YES];
 }
 
 - (NSString *)dataSourceTypeDisplayString

@@ -28,11 +28,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCLibraryModel;
 @protocol VLCMediaLibraryItemProtocol;
 
 @interface VLCLibraryAbstractGroupingDataSource : NSObject<VLCLibraryMasterDetailViewTableViewDataSource, VLCLibraryCollectionViewDataSource>
 
-@property (readonly) NSArray<id<VLCMediaLibraryItemProtocol>> *backingArray;
+@property (readwrite, weak) VLCLibraryModel *libraryModel;
 
 @property (readwrite, weak) NSCollectionView *collectionView;
 @property (readwrite, weak) NSTableView *masterTableView;
@@ -40,9 +41,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak, nullable) id<VLCLibraryGroupHeaderDelegate> headerDelegate;
 
 // Required!
+@property (readonly) NSArray<id<VLCMediaLibraryItemProtocol>> *backingArray;
 @property (readonly, nullable) NSString *dataSourceTypeDisplayString;
 
+- (NSArray<id<VLCMediaLibraryItemProtocol>> *)sourceBackingArray;
 - (void)reloadData;
+- (void)applySnapshotForChangedItemID:(int64_t)libraryID isDeletion:(BOOL)isDeletion;
 
 @end
 
