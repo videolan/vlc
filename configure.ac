@@ -4729,6 +4729,25 @@ then
   ])
 
   dnl
+  dnl If possible, use xcrun to find the right xctest tool
+  dnl
+
+  AS_IF([test ! "${XCRUN}" = "no"], [
+    AC_MSG_CHECKING([for xctest (using xcrun)])
+    XCTEST="$(eval $XCRUN -f xctest 2>/dev/null || echo no)"
+    AC_MSG_RESULT([${XCTEST}])
+  ], [
+    AC_MSG_WARN([Looking for tools without using xcrun])
+  ])
+
+  AS_IF([test "${XCTEST}" = "no"], [
+    AC_PATH_PROG(XCTEST, [xctest], [no])
+    AS_IF([test "${XCTEST}" = "no"], [
+      AC_MSG_WARN([xctest was not found, XCTest-based tests will not be run])
+    ])
+  ])
+
+  dnl
   dnl  MacOS X gui module metal shaders
   dnl
   _enable_macosx_ui_shaders_default="yes"
