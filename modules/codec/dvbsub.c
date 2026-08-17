@@ -1011,8 +1011,7 @@ static void decode_region_composition( decoder_t *p_dec, bs_t *s, uint16_t i_seg
     else
         max_object_defs = (i_segment_length - i_processed_length) / 6;
     p_region->i_object_defs = 0;
-    p_region->p_object_defs = realloc_or_free( p_region->p_object_defs,
-                                               max_object_defs * sizeof(dvbsub_objectdef_t) );
+    p_region->p_object_defs = malloc( max_object_defs * sizeof(dvbsub_objectdef_t) );
     if( !p_region->p_object_defs )
         return;
 
