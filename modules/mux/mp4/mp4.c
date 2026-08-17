@@ -513,6 +513,8 @@ static int AddStream(sout_mux_t *p_mux, sout_input_t *p_input)
                       p_sys->i_nb_streams );
             trackfmt.audio.i_rate = 48000;
         }
+        if(trackfmt.i_codec == VLC_CODEC_OPUS)
+            mp4mux_AddExtraBrand(p_sys->muxh, BRAND_iso2);
         i_track_timescale = trackfmt.audio.i_rate;
         break;
     case VIDEO_ES:

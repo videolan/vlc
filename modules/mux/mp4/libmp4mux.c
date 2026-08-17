@@ -748,6 +748,62 @@ static bo_t *GetDamrTag(es_format_t *p_fmt)
     return damr;
 }
 
+/* OpusHead identification header, mapping table excluded:
+ *   magic(8) version(1) channels(1) preskip(2le) rate(4le) gain(2le) family(1) */
+#define OPUS_HEAD_SIZE 19
+#define XIPH_LACING_SIZE 2
+
+/* Opus in ISOBMFF (Opus-in-MP4 spec, ch. 4.3.2): the 'dOps' box carries the
+ * same fields as the Ogg "OpusHead" identification header, minus the magic
+ * number. */
+static bo_t *GetDOpsTag(const uint8_t *p_extra, size_t i_extra)
+{
+    if(i_extra > XIPH_LACING_SIZE + OPUS_HEAD_SIZE &&
+       !memcmp(&p_extra[XIPH_LACING_SIZE], "OpusHead", 8))
+    {
+        const size_t i_header_size = p_extra[1];
+        if(i_header_size > i_extra - XIPH_LACING_SIZE)
+            return NULL;
+        p_extra += XIPH_LACING_SIZE;
+        i_extra = i_header_size;
+    }
+    else if(i_extra < OPUS_HEAD_SIZE || memcmp(p_extra, "OpusHead", 8))
+        return NULL;
+
+    const uint8_t i_channels = p_extra[9];
+    const uint8_t i_mapping_family = p_extra[18];
+    if(i_channels == 0)
+        return NULL;
+    size_t i_maptable_size = 0;
+    /* Family 0 carries no mapping table. */
+    if(i_mapping_family != 0)
+    {
+        /* Family 1, 2 and 255 carry the stream counts followed by a table of
+         * i_channels entries. Family 3 replaces the table with a demixing
+         * matrix which the spec doesn't support. */
+        if(i_mapping_family > 2 && i_mapping_family != 255)
+            return NULL;
+        i_maptable_size = 2 + i_channels; /* streams(1) coupled(1) map(channels) */
+        if(i_extra < OPUS_HEAD_SIZE + i_maptable_size)
+            return NULL;
+    }
+
+    bo_t *dops = box_new("dOps");
+    if(!dops)
+        return NULL;
+
+    bo_add_8(dops, 0); /* Version 0 */
+    bo_add_8(dops, i_channels);
+    bo_add_16be(dops, GetWLE(&p_extra[10]));  /* PreSkip */
+    bo_add_32be(dops, GetDWLE(&p_extra[12])); /* InputSampleRate */
+    bo_add_16be(dops, GetWLE(&p_extra[16]));  /* OutputGain */
+    bo_add_8(dops, i_mapping_family);
+    if(i_maptable_size)
+        bo_add_mem(dops, i_maptable_size, &p_extra[OPUS_HEAD_SIZE]);
+
+    return dops;
+}
+
 #define FLAC_MAGIC_SIZE 4
 #define FLAC_BLOCK_HEADER_SIZE 4
 #define FLAC_STREAMINFO_SIZE 34
@@ -1268,6 +1324,12 @@ static bo_t *GetSounBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
                 extraboxes[1] = GetESDS(p_track);
                 specificbox = GetWaveTag("mp4a", extraboxes, 2);
             } else b_descr = true;
+            break;
+        case VLC_CODEC_OPUS:
+            memcpy(fcc, "Opus", 4);
+            specificbox = GetDOpsTag(p_extradata, i_extradata);
+            i_qt_version = 0;
+            i_rate = 48000;
             break;
         case VLC_CODEC_FLAC:
         {
@@ -2446,6 +2508,7 @@ bool mp4mux_CanMux(vlc_object_t *p_obj, const es_format_t *p_fmt,
     case VLC_CODEC_WMAP:
     case VLC_CODEC_AV1:
         break;
+    case VLC_CODEC_OPUS:
     case VLC_CODEC_FLAC:
     {
         if(i_brand == BRAND_qt__)
@@ -2455,7 +2518,9 @@ bool mp4mux_CanMux(vlc_object_t *p_obj, const es_format_t *p_fmt,
                         (const char *)&p_fmt->i_codec);
             return false;
         }
-        bo_t *config = GetDfLaTag(p_fmt->p_extra, p_fmt->i_extra);
+        bo_t *config = (p_fmt->i_codec == VLC_CODEC_OPUS)
+                     ? GetDOpsTag(p_fmt->p_extra, p_fmt->i_extra)
+                     : GetDfLaTag(p_fmt->p_extra, p_fmt->i_extra);
         if(!config)
         {
             if(p_obj)
