@@ -965,7 +965,7 @@ static void decode_region_composition( decoder_t *p_dec, bs_t *s, uint16_t i_seg
         }
 
         size_t i_alloc;
-        if( ckd_mul( &i_alloc, i_width, i_height ) )
+        if( ckd_mul( &i_alloc, i_width, i_height ) || i_alloc == 0 )
         {
             free( p_region->p_pixbuf );
             p_region->p_pixbuf = NULL;
