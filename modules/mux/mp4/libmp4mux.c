@@ -1335,7 +1335,13 @@ static bo_t *GetSounBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     }
     else
     {
-        bo_add_16be(soun, p_track->fmt.audio.i_rate); // sampleratehi
+        uint32_t i_rate = p_track->fmt.audio.i_rate;
+        /* Halve the rate until it fits in the 16 bits constraint of the default sound box,
+         * it's a well known workaround implemented by ffmpeg and mandated by the flac spec.
+         * Decoders are expected to take the real rate from the codec configuration. */
+        while(i_rate >= (1<<16))
+            i_rate /= 2;
+        bo_add_16be(soun, i_rate);                    // sampleratehi
         bo_add_16be(soun, 0);                         // sampleratelo
     }
 
