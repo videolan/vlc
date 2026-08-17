@@ -748,6 +748,47 @@ static bo_t *GetDamrTag(es_format_t *p_fmt)
     return damr;
 }
 
+#define FLAC_MAGIC_SIZE 4
+#define FLAC_BLOCK_HEADER_SIZE 4
+#define FLAC_STREAMINFO_SIZE 34
+
+static const uint8_t *FlacStreamInfo(const uint8_t *p_extra, size_t i_extra)
+{
+    if(i_extra >= FLAC_MAGIC_SIZE && !memcmp(p_extra, "fLaC", FLAC_MAGIC_SIZE))
+    {
+        p_extra += FLAC_MAGIC_SIZE;
+        i_extra -= FLAC_MAGIC_SIZE;
+        /* The first block has to be a complete STREAMINFO. */
+        if(i_extra < FLAC_BLOCK_HEADER_SIZE + FLAC_STREAMINFO_SIZE ||
+           (p_extra[0] & 0x7F) != 0 || /* BLOCK_TYPE 0 */
+           (GetDWBE(p_extra) & 0x00FFFFFF) != FLAC_STREAMINFO_SIZE)
+            return NULL;
+        return &p_extra[FLAC_BLOCK_HEADER_SIZE];
+    }
+
+    return (i_extra >= FLAC_STREAMINFO_SIZE) ? p_extra : NULL;
+}
+
+/* FLAC in ISOBMFF (isoflac.txt, ch. 3.3.2): the 'dfLa' box holds the FLAC
+ * metadata blocks, of which only STREAMINFO is required. */
+static bo_t *GetDfLaTag(const uint8_t *p_extra, size_t i_extra)
+{
+    const uint8_t *p_streaminfo = FlacStreamInfo(p_extra, i_extra);
+    if(!p_streaminfo)
+        return NULL;
+
+    bo_t *dfla = box_new("dfLa");
+    if(!dfla)
+        return NULL;
+
+    bo_add_32be(dfla, 0); /* FullBox: version 0, flags 0 */
+    bo_add_8(dfla, 0x80); /* last-metadata-block=1, BLOCK_TYPE=0 */
+    bo_add_24be(dfla, FLAC_STREAMINFO_SIZE);
+    bo_add_mem(dfla, FLAC_STREAMINFO_SIZE, p_streaminfo);
+
+    return dfla;
+}
+
 static bo_t *GetD263Tag(void)
 {
     bo_t *d263 = box_new("d263");
@@ -1168,6 +1209,8 @@ static bo_t *GetSounBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     uint16_t i_qt_version = 1;
     uint16_t i_compression_id = 0xFFFE;
     uint32_t i_uncompressed_bps = 0;
+    uint32_t i_rate = afmt->i_rate;
+    uint16_t i_samplesize = 16;
     bo_t *srat = NULL;
 
     /* codec specific extradata */
@@ -1226,6 +1269,16 @@ static bo_t *GetSounBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
                 specificbox = GetWaveTag("mp4a", extraboxes, 2);
             } else b_descr = true;
             break;
+        case VLC_CODEC_FLAC:
+        {
+            memcpy(fcc, "fLaC", 4);
+            specificbox = GetDfLaTag(p_extradata, i_extradata);
+            i_qt_version = 0;
+            const uint8_t *p_si = FlacStreamInfo(p_extradata, i_extradata);
+            if(p_si) /* bits per sample: 5 bits at offset 100 of STREAMINFO */
+                i_samplesize = (((p_si[12] & 0x01) << 4) | (p_si[13] >> 4)) + 1;
+            break;
+        }
         case VLC_CODEC_MPGA:
         case VLC_CODEC_MP2:
         case VLC_CODEC_MP3:
@@ -1319,7 +1372,7 @@ static bo_t *GetSounBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     if(i_qt_version == 0 && i_uncompressed_bps == 8)
         bo_add_16be(soun, 8);
     else
-        bo_add_16be(soun, 16);
+        bo_add_16be(soun, i_samplesize);
     // compression id
     if(!b_mov)
         bo_add_16be(soun, 0);
@@ -1327,15 +1380,13 @@ static bo_t *GetSounBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
         bo_add_16be(soun, i_compression_id);
     bo_add_16be(soun, 0);         // packet size (0)
 
-    if(!b_mov && i_qt_version > 0 &&
-       p_track->fmt.audio.i_rate >= (1<<16))
+    if(!b_mov && i_qt_version > 0 && i_rate >= (1<<16))
     {
         bo_add_32be(soun, 1<<16);
-        srat = GetSratBox(p_track->fmt.audio.i_rate);
+        srat = GetSratBox(i_rate);
     }
     else
     {
-        uint32_t i_rate = p_track->fmt.audio.i_rate;
         /* Halve the rate until it fits in the 16 bits constraint of the default sound box,
          * it's a well known workaround implemented by ffmpeg and mandated by the flac spec.
          * Decoders are expected to take the real rate from the codec configuration. */
@@ -2395,6 +2446,26 @@ bool mp4mux_CanMux(vlc_object_t *p_obj, const es_format_t *p_fmt,
     case VLC_CODEC_WMAP:
     case VLC_CODEC_AV1:
         break;
+    case VLC_CODEC_FLAC:
+    {
+        if(i_brand == BRAND_qt__)
+        {
+            if(p_obj)
+                msg_Err(p_obj, "%4.4s has no QuickTime mapping",
+                        (const char *)&p_fmt->i_codec);
+            return false;
+        }
+        bo_t *config = GetDfLaTag(p_fmt->p_extra, p_fmt->i_extra);
+        if(!config)
+        {
+            if(p_obj)
+                msg_Err(p_obj, "Missing or invalid extradata for %4.4s",
+                        (const char *)&p_fmt->i_codec);
+            return false;
+        }
+        bo_free(config);
+        break;
+    }
     case VLC_CODEC_MP4A:
         if(!p_fmt->i_extra)
         {
