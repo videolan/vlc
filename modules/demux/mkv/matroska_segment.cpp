@@ -1190,6 +1190,9 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
     *pb_discardable_picture = false;
     *pi_duration = 0;
 
+    uint64_t duration = 0;
+    int64_t duration_padding = 0;
+
     struct BlockPayload {
         matroska_segment_c * const obj;
         EbmlParser         * const ep;
@@ -1198,14 +1201,15 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
         KaxSimpleBlock    *& simpleblock;
         KaxBlockAdditions *& additions;
 
-        int64_t            & i_duration;
+        uint64_t           & i_duration;
+        int64_t            & duration_padding;
         bool               & b_key_picture;
         bool               & b_discardable_picture;
         bool                 b_cluster_timecode;
 
     } payload = {
         this, &ep, &sys.demuxer, pp_block, pp_simpleblock, pp_additions,
-        *pi_duration, *pb_key_picture, *pb_discardable_picture, true
+        duration, duration_padding, *pb_key_picture, *pb_discardable_picture, true
     };
 
     MKV_SWITCH_CREATE( EbmlTypeDispatcher, BlockGetHandler_l1, BlockPayload )
@@ -1341,12 +1345,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
         E_CASE( KaxDiscardPadding, kdiscardp )
         {
             kdiscardp.ReadData( vars.obj->es.I_O() );
-            int64 i_duration = static_cast<int64>( kdiscardp );
-
-            if( vars.i_duration < i_duration )
-                vars.i_duration = 0;
-            else
-                vars.i_duration -= i_duration;
+            vars.duration_padding = static_cast<int64>( kdiscardp );
         }
 #endif
         E_CASE_DEFAULT( element )
@@ -1403,6 +1402,11 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
                         *pb_key_picture = false;
                 }
             }
+
+            if( duration < duration_padding )
+                *pi_duration = 0;
+            else
+                *pi_duration = duration - duration_padding;
 
             return VLC_SUCCESS;
         }
