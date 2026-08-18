@@ -22,6 +22,7 @@
 
 #import "VLCPlayQueueDataSource.h"
 
+#import "extensions/NSPasteboardItem+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSView+VLCAdditions.h"
 #import "main/VLCMain.h"
@@ -29,8 +30,10 @@
 #import "playqueue/VLCPlayQueueTableCellView.h"
 #import "playqueue/VLCPlayQueueItem.h"
 #import "playqueue/VLCPlayQueueModel.h"
+#import "library/VLCInputItem.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "views/VLCDragDropView.h"
+#import "views/VLCFileDragRecognisingView.h"
 
 static NSString *VLCPlayQueueCellIdentifier = @"VLCPlayQueueCellIdentifier";
 
@@ -146,6 +149,54 @@ static NSString *VLCPlayQueueCellIdentifier = @"VLCPlayQueueCellIdentifier";
         [_playQueueController moveItemWithID:uniqueID toPosition:row];
         return YES;
     }
+
+    /* Collect library media items from all pasteboard items.
+     * Table view drags create one NSPasteboardItem per selected row, so we
+     * must iterate all of them to capture every dragged item. */
+    NSMutableArray<VLCMediaLibraryMediaItem *> * const allMediaItems = [NSMutableArray array];
+
+    for (NSPasteboardItem * const pboardItem in info.draggingPasteboard.pasteboardItems) {
+        NSData *itemData = [pboardItem dataForType:VLCMediaLibraryMediaItemPasteboardType];
+        if (!itemData) {
+            itemData = [pboardItem dataForType:VLCMediaLibraryMediaItemUTI];
+        }
+        if (!itemData) {
+            continue;
+        }
+
+        NSArray<VLCMediaLibraryMediaItem *> * const items = [VLCMediaLibraryMediaItem mediaItemsFromPasteboardData:itemData];
+        if (items) {
+            [allMediaItems addObjectsFromArray:items];
+        }
+    }
+
+    /* Collection view drags write a single aggregated payload directly on the
+     * dragging pasteboard instead of creating one NSPasteboardItem per item. */
+    if (allMediaItems.count == 0) {
+        NSData *itemData = [info.draggingPasteboard dataForType:VLCMediaLibraryMediaItemPasteboardType];
+        if (!itemData) {
+            itemData = [info.draggingPasteboard dataForType:VLCMediaLibraryMediaItemUTI];
+        }
+
+        if (itemData) {
+            NSArray<VLCMediaLibraryMediaItem *> * const items = [VLCMediaLibraryMediaItem mediaItemsFromPasteboardData:itemData];
+            if (items) {
+                [allMediaItems addObjectsFromArray:items];
+            }
+        }
+    }
+
+    if (allMediaItems.count > 0) {
+        NSInteger insertionIndex = (NSInteger)row;
+        for (VLCMediaLibraryMediaItem * const mediaItem in allMediaItems) {
+            [_playQueueController addInputItem:mediaItem.inputItem.vlcInputItem
+                                    atPosition:insertionIndex
+                                 startPlayback:NO];
+            insertionIndex++;
+        }
+        return YES;
+    }
+
     return [VLCFileDragRecognisingView
         handlePasteboardFromDragSessionAsPlayQueueItems:info.draggingPasteboard];
 }

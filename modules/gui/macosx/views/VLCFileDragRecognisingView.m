@@ -42,17 +42,7 @@
             continue;
         }
 
-        NSError *unarchiveError = nil;
-        NSArray<VLCMediaLibraryMediaItem *> * const items =
-            [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObjects:[NSArray class], [VLCMediaLibraryMediaItem class], nil]
-                                                fromData:itemData
-                                                   error:&unarchiveError];
-        if (unarchiveError != nil) {
-            msg_Err(getIntf(), "Failed to unarchive MediaLibrary Item: %s",
-                    unarchiveError.localizedDescription.UTF8String);
-            continue;
-        }
-
+        NSArray<VLCMediaLibraryMediaItem *> * const items = [VLCMediaLibraryMediaItem mediaItemsFromPasteboardData:itemData];
         if (items) {
             [allMediaItems addObjectsFromArray:items];
         }

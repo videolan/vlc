@@ -1271,6 +1271,26 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 @synthesize favorited = _favorited;
 @synthesize isFileBacked = _isFileBacked;
 
++ (nullable NSArray<VLCMediaLibraryMediaItem *> *)mediaItemsFromPasteboardData:(NSData *)data
+{
+    NSParameterAssert(data != nil);
+    if (data == nil) {
+        return nil;
+    }
+
+    NSError *unarchiveError = nil;
+    NSArray<VLCMediaLibraryMediaItem *> * const items =
+        [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObjects:[NSArray class], [VLCMediaLibraryMediaItem class], nil]
+                                            fromData:data
+                                               error:&unarchiveError];
+    if (unarchiveError != nil) {
+        NSLog(@"Failed to unarchive MediaLibrary Item drag payload: %@", unarchiveError);
+        return nil;
+    }
+
+    return items;
+}
+
 + (BOOL)supportsSecureCoding
 {
     return YES;
