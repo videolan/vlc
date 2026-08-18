@@ -77,6 +77,7 @@ static NSArray<id<VLCMediaLibraryItemProtocol>> *name(const vlc_ml_query_params_
 FETCH_TYPED_LIST(fetchAlbums, album, Album, vlc_ml_list_albums(p_ml, params))
 FETCH_TYPED_LIST(fetchArtists, artist, Artist, vlc_ml_list_artists(p_ml, params, false))
 FETCH_TYPED_LIST(fetchGenres, genre, Genre, vlc_ml_list_genres(p_ml, params))
+FETCH_TYPED_LIST(fetchGroups, group, Group, vlc_ml_list_groups(p_ml, params))
 FETCH_TYPED_LIST(fetchPlaylists, playlist, Playlist, vlc_ml_list_playlists(p_ml, params, VLC_ML_PLAYLIST_TYPE_ALL))
 
 @implementation VLCLibrarySearchProvider
@@ -146,6 +147,13 @@ FETCH_TYPED_LIST(fetchPlaylists, playlist, Playlist, vlc_ml_list_playlists(p_ml,
                                              fallbackImage:NSImage.VLCSidebarMusicImage]
                       fetchBlock:^(const vlc_ml_query_params_t *params) {
                           return fetchGenres(params);
+                      }],
+        [[VLCLibrarySearchProvider alloc]
+            initWithDisplayTitle:_NS("Groups")
+                    displayImage:[self imageWithSymbolName:@"rectangle.3.group"
+                                             fallbackImage:[NSImage imageNamed:NSImageNameTouchBarTagIconTemplate]]
+                      fetchBlock:^(const vlc_ml_query_params_t *params) {
+                          return fetchGroups(params);
                       }],
         [[VLCLibrarySearchProvider alloc]
             initWithDisplayTitle:_NS("Playlists")
