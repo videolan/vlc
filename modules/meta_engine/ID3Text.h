@@ -44,7 +44,7 @@ static const char * ID3TextConv( const uint8_t *p_buf, size_t i_buf,
                 psz = p_alloc = FromCharset( "ISO_8859-1", p_buf, i_buf );
                 break;
             case ID3_ENCODING_UTF16:
-                psz = p_alloc = FromCharset( "UTF-16LE", p_buf, i_buf );
+                psz = p_alloc = FromCharset( "UTF-16", p_buf, i_buf );
                 break;
             case ID3_ENCODING_UTF16BE:
                 psz = p_alloc = FromCharset( "UTF-16BE", p_buf, i_buf );
