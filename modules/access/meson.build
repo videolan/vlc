@@ -227,6 +227,15 @@ vlc_modules += {
     'dependencies' : [m_lib]
 }
 
+# libnoidea
+libnoidea_dep = dependency('libnoidea', required: get_option('ndi'))
+vlc_modules += {
+    'name' : 'noidea',
+    'sources' : files('ndi.c'),
+    'dependencies' : [libnoidea_dep, socket_libs],
+    'enabled' : libnoidea_dep.found(),
+}
+
 
 ## Screen grab plugins
 

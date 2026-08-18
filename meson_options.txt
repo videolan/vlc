@@ -799,6 +799,11 @@ option('sam3',
        value: 'auto',
        description: 'sam3.cpp inference library')
 
+option('ndi',
+       type: 'feature',
+       value: 'auto',
+       description: 'Build with NDI module (requires libnoidea)')
+
 # TODO: Missing v4l2
 # TODO: Missing rpi-omxil
 # TODO: Missing gst-decode
