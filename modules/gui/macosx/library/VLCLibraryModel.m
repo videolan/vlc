@@ -951,7 +951,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 - (void)resetCachedListOfGroups
 {
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
-        vlc_ml_group_list_t * const p_group_list = vlc_ml_list_groups(self->_p_mediaLibrary, NULL);
+        const vlc_ml_query_params_t queryParams = [self queryParams];
+        vlc_ml_group_list_t * const p_group_list =
+            vlc_ml_list_groups(self->_p_mediaLibrary, &queryParams);
         if (p_group_list == NULL) {
             return;
         }
