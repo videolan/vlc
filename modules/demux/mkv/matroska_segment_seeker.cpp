@@ -368,7 +368,7 @@ SegmentSeeker::index_unsearched_range( matroska_segment_c& ms, Range search_area
 
         bool     b_key_picture;
         bool     b_discardable_picture;
-        int64_t  i_block_duration;
+        uint64_t  i_block_duration;
         track_id_t track_id;
 
         if( ms.BlockGet( block, simpleblock, additions,

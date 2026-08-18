@@ -426,7 +426,7 @@ int UpdatePCR( demux_t * p_demux )
     return VLC_SUCCESS;
 }
 
-void send_Block( demux_t * p_demux, mkv_track_t * p_tk, block_t * p_block, unsigned int i_number_frames, int64_t i_duration )
+void send_Block( demux_t * p_demux, mkv_track_t * p_tk, block_t * p_block, unsigned int i_number_frames, uint64_t i_duration )
 {
     demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
     matroska_segment_c *p_segment = p_sys->GetCurrentVSegment()->CurrentSegment();
