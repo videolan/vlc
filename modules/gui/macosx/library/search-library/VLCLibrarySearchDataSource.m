@@ -484,7 +484,8 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 
     const id<VLCMediaLibraryItemProtocol> item =
         [self libraryItemAtIndexPath:selectedIndexPath forCollectionView:self.collectionView];
-    if ([item isKindOfClass:VLCMediaLibraryAlbum.class]) {
+    if ([item isKindOfClass:VLCMediaLibraryAlbum.class] ||
+        [item isKindOfClass:VLCMediaLibraryGroup.class]) {
         return VLCLibraryCollectionViewMediaItemListSupplementaryDetailViewKind;
     } else if ([item conformsToProtocol:@protocol(VLCMediaLibraryAudioGroupProtocol)]) {
         return VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind;
