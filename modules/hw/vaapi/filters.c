@@ -646,7 +646,7 @@ OpenBasicFilter_InitFilterParams(filter_t * filter, void * p_data,
 
     if (vlc_vaapi_QueryVideoProcFilterCaps(VLC_OBJECT(filter),
                                            filter_sys->va.dpy,
-                                           filter_sys->va.buf,
+                                           filter_sys->va.ctx,
                                            p_basic_filter_data->filter_type,
                                            &caps, &num_caps)
         || !num_caps)
@@ -993,7 +993,7 @@ OpenDeinterlace_InitFilterParams(filter_t * filter, void * p_data,
 
     if (vlc_vaapi_QueryVideoProcFilterCaps(VLC_OBJECT(filter),
                                            filter_sys->va.dpy,
-                                           filter_sys->va.buf,
+                                           filter_sys->va.ctx,
                                            VAProcFilterDeinterlacing,
                                            &caps, &num_caps))
         return VLC_EGENERIC;
