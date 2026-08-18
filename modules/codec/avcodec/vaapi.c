@@ -290,8 +290,10 @@ static void DeleteDRM(vlc_va_t *va, void **hwctx)
 
     (void) hwctx;
     picture_pool_Release(sys->pool);
-    vlc_vaapi_DestroyContext(o, sys->hw_ctx.display, sys->hw_ctx.context_id);
-    vlc_vaapi_DestroyConfig(o, sys->hw_ctx.display, sys->hw_ctx.config_id);
+    if (sys->hw_ctx.context_id != VA_INVALID_ID)
+        vlc_vaapi_DestroyContext(o, sys->hw_ctx.display, sys->hw_ctx.context_id);
+    if (sys->hw_ctx.config_id != VA_INVALID_ID)
+        vlc_vaapi_DestroyConfig(o, sys->hw_ctx.display, sys->hw_ctx.config_id);
     vlc_vaapi_ReleaseInstance(sys->va_inst);
     free(sys);
 }
@@ -357,6 +359,7 @@ static int CreateDRM(vlc_va_t *va, AVCodecContext *ctx,
     if (!sys->pool)
         goto error;
 
+#if FF_API_STRUCT_VAAPI_CONTEXT
     /* Create a context */
     sys->hw_ctx.context_id =
         vlc_vaapi_CreateContext(o, sys->hw_ctx.display, sys->hw_ctx.config_id,
@@ -366,6 +369,27 @@ static int CreateDRM(vlc_va_t *va, AVCodecContext *ctx,
         goto error;
 
     ctx->hwaccel_context = &sys->hw_ctx;
+#else
+    /* libavcodec creates its own VA config and context and ignores
+     * hwaccel_context; it only needs the VA display. */
+    (void) surfaces;
+
+    AVBufferRef *hwdev_ref = av_hwdevice_ctx_alloc(AV_HWDEVICE_TYPE_VAAPI);
+    if (hwdev_ref == NULL)
+        goto error;
+
+    AVHWDeviceContext *hwdev_ctx = (void *) hwdev_ref->data;
+    AVVAAPIDeviceContext *vadev_ctx = hwdev_ctx->hwctx;
+    vadev_ctx->display = sys->hw_ctx.display;
+
+    if (av_hwdevice_ctx_init(hwdev_ref) < 0)
+    {
+        av_buffer_unref(&hwdev_ref);
+        goto error;
+    }
+
+    ctx->hw_device_ctx = hwdev_ref;
+#endif
     va->sys = sys;
     va->description = vaQueryVendorString(sys->hw_ctx.display);
     va->get = GetDRM;

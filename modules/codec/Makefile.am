@@ -411,7 +411,7 @@ libvaapi_drm_plugin_la_SOURCES = \
 libvaapi_drm_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DVLC_VA_BACKEND_DRM
 libvaapi_drm_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(LIBVA_DRM_CFLAGS) $(AVCODEC_CFLAGS)
-libvaapi_drm_plugin_la_LIBADD = $(LIBVA_DRM_LIBS)
+libvaapi_drm_plugin_la_LIBADD = $(LIBVA_DRM_LIBS) $(AVCODEC_LIBS)
 libvaapi_plugin_la_SOURCES = \
 	codec/avcodec/vaapi.c hw/vaapi/vlc_vaapi.c hw/vaapi/vlc_vaapi.h
 libvaapi_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
