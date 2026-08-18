@@ -1387,7 +1387,16 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
                 }
             }
 
-            if( duration < duration_padding )
+            /* A negative DiscardPadding designates padding at the start of
+             * the block, which we don't handle; some files in the wild also
+             * carry bogus negative values due to encoder bugs. Never let it
+             * extend the block duration. */
+            if ( duration_padding < 0)
+            {
+                msg_Warn( &sys.demuxer, "ignoring negative DiscardPadding (%" PRId64 ")", duration_padding );
+                *pi_duration = duration;
+            }
+            else if( duration < (uint64_t)duration_padding )
                 *pi_duration = 0;
             else
                 *pi_duration = duration - duration_padding;
