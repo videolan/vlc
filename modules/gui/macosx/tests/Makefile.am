@@ -1,5 +1,7 @@
 if ENABLE_MACOSX_UI
 
+if ENABLE_MACOSX_XCTESTS
+
 macosx_gui_xctest_frameworks_dir = $(shell $(XCRUN) --sdk macosx --show-sdk-platform-path)/Developer/Library/Frameworks
 macosx_gui_xctest_bundles = VLCMacOSXTests.xctest
 
@@ -47,6 +49,13 @@ mostlyclean-local-macosx-xctest:
 
 check-macosx: VLCMacOSXTests.xctest
 	$(XCTEST_LOG_COMPILER) $<
+
+else
+
+check-macosx:
+	@echo "XCTest-based macOS GUI tests require a native macOS build; skipping."
+
+endif
 
 .PHONY: check-macosx mostlyclean-local-macosx-xctest
 

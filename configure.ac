@@ -4648,6 +4648,7 @@ dnl  MacOS X gui module
 dnl
 AC_ARG_ENABLE([macosx],
   AS_HELP_STRING([--enable-macosx], [Mac OS X gui support (default enabled on Mac OS X)]))
+enable_macosx_xctests="no"
 if test "${enable_macosx}" != "no" -a "${SYS}" = "darwin"
 then
 
@@ -4746,6 +4747,13 @@ then
       AC_MSG_WARN([xctest was not found, XCTest-based tests will not be run])
     ])
   ])
+  AS_IF([test "${cross_compiling}" = "yes"], [
+    AC_MSG_NOTICE([XCTest-based tests will not be run while cross-compiling])
+  ], [
+    AS_IF([test "${XCTEST}" != "no"], [
+      enable_macosx_xctests="yes"
+    ])
+  ])
 
   dnl
   dnl  MacOS X gui module metal shaders
@@ -4766,6 +4774,7 @@ then
 fi
 AM_CONDITIONAL([ENABLE_MACOSX_UI_SHADERS], [test "${enable_macosx_ui_shaders}" != "no" -a "${enable_macosx}" != "no" -a "${SYS}" = "darwin"])
 AM_CONDITIONAL([ENABLE_MACOSX_UI], [test "$enable_macosx" != "no" -a "${SYS}" = "darwin"])
+AM_CONDITIONAL([ENABLE_MACOSX_XCTESTS], [test "${enable_macosx_xctests}" = "yes"])
 
 dnl
 dnl  MacOS X sparkle update support
