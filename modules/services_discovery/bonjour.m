@@ -225,6 +225,12 @@ static NSString * ipAddressAsStringForData(NSData * data)
                                        VLCBonjourRendererFlags      : @(VLC_RENDERER_CAN_AUDIO),
                                        VLCBonjourRendererDemux      : @"cc_demux"
                                        };
+    NSDictionary *VLCNdiProtocol = @{ VLCBonjourProtocolName        : @"ndi",
+                                      VLCBonjourProtocolServiceName : @"_ndi._tcp.",
+                                      VLCBonjourIsRenderer          : @(NO),
+                                      VLCBonjourInputType           : @(ITEM_TYPE_STREAM),
+                                      VLCBonjourProtocolModules     : @[@"noidea"]
+                                      };
 
     NSArray *VLCSupportedProtocols = @[VLCFtpProtocol,
                                       VLCSmbProtocol,
@@ -232,7 +238,8 @@ static NSString * ipAddressAsStringForData(NSData * data)
                                       VLCSftpProtocol,
                                       VLCWebDavProtocol,
                                       VLCWebDavsProtocol,
-                                      VLCCastProtocol];
+                                      VLCCastProtocol,
+                                      VLCNdiProtocol];
 
     _rawNetServices = [[NSMutableArray alloc] init];
     _resolvedNetServices = [[NSMutableArray alloc] init];
