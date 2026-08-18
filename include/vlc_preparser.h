@@ -80,10 +80,10 @@ struct vlc_preparser_cbs
      *
      * @note This callback is mandatory.
      *
-     * @param req request handle returned by vlc_preparser_Push()
+     * @param req request handle returned by vlc_preparser_req_NewParse()
      * @param status VLC_SUCCESS in case of success, VLC_ETIMEOUT in case of
      * timeout, -EINTR if cancelled, an error otherwise
-     * @param data opaque pointer passed by vlc_preparser_Push()
+     * @param data opaque pointer passed by vlc_preparser_req_NewParse()
      */
     void (*on_ended)(vlc_preparser_req *req, int status, void *data);
 
@@ -92,9 +92,9 @@ struct vlc_preparser_cbs
      *
      * @note This callback is optional.
      *
-     * @param req request handle returned by vlc_preparser_Push()
+     * @param req request handle returned by vlc_preparser_req_NewParse()
      * @param subtree sub items of the current item (the listener gets the ownership)
-     * @param data opaque pointer passed by vlc_preparser_Push()
+     * @param data opaque pointer passed by vlc_preparser_req_NewParse()
      */
     void (*on_subtree_added)(vlc_preparser_req *req, input_item_node_t *subtree,
                              void *data);
@@ -105,12 +105,12 @@ struct vlc_preparser_cbs
      * @note This callback is optional. It can be called several times for one
      * parse request. The array contains only new elements after a second call.
      *
-     * @param req request handle returned by vlc_preparser_Push()
+     * @param req request handle returned by vlc_preparser_req_NewParse()
      * @param array valid array containing new elements, should only be used
      * within the callback. One and all elements can be held and stored on a
      * new variable or new array.
      * @param count number of elements in the array
-     * @param data opaque pointer passed by vlc_preparser_Push()
+     * @param data opaque pointer passed by vlc_preparser_req_NewParse()
      */
     void (*on_attachments_added)(vlc_preparser_req *req,
                                  input_attachment_t *const *array,
@@ -120,7 +120,7 @@ struct vlc_preparser_cbs
 /**
  * Preparser thumbnailer callbacks
  *
- * Used by vlc_preparser_GenerateThumbnail()
+ * Used by vlc_preparser_req_NewThumbnail()
  */
 struct vlc_thumbnailer_cbs
 {
@@ -128,24 +128,24 @@ struct vlc_thumbnailer_cbs
      * Event received on thumbnailing completion or error
      *
      * This callback will always be called, provided
-     * vlc_preparser_GenerateThumbnail() returned a valid request, and provided
+     * vlc_preparser_req_NewThumbnail() returned a valid request, and provided
      * the request is not cancelled before its completion.
      *
      * @note This callback is mandatory if calling
-     * vlc_preparser_GenerateThumbnail()
+     * vlc_preparser_req_NewThumbnail()
      *
      * In case of failure, timeout or cancellation, p_thumbnail will be NULL.
      * The picture, if any, is owned by the thumbnailer, and must be acquired
      * by using \link picture_Hold \endlink to use it pass the callback's
      * scope.
      *
-     * @param req request handle returned by vlc_preparser_GenerateThumbnail()
+     * @param req request handle returned by vlc_preparser_req_NewThumbnail()
      * @param status VLC_SUCCESS in case of success, VLC_ETIMEOUT in case of
      * timeout, -EINTR if cancelled, an error otherwise
      * @param thumbnail The generated thumbnail, or NULL in case of failure or
      * timeout
      * @param data opaque pointer passed by
-     * vlc_preparser_GenerateThumbnail()
+     * vlc_preparser_req_NewThumbnail()
      *
      */
     void (*on_ended)(vlc_preparser_req *req, int status, picture_t* thumbnail, void *data);
@@ -154,7 +154,7 @@ struct vlc_thumbnailer_cbs
 /**
  * Preparser thumbnailer to file callbacks
  *
- * Used by vlc_preparser_GenerateThumbnailToFiles()
+ * Used by vlc_preparser_req_NewThumbnailToFiles()
  */
 struct vlc_thumbnailer_to_files_cbs
 {
@@ -163,23 +163,23 @@ struct vlc_thumbnailer_to_files_cbs
      *
      * This callback will always be called, provided
      *
-     * vlc_preparser_GenerateThumbnailToFiles() returned a valid request, and
+     * vlc_preparser_req_NewThumbnailToFiles() returned a valid request, and
      * provided the request is not cancelled before its completion.
      *
      * @note This callback is mandatory if calling
-     * vlc_preparser_GenerateThumbnailToFiles()
+     * vlc_preparser_req_NewThumbnailToFiles()
      *
-     * @param req request handle returned by vlc_preparser_GenerateThumbnailToFiles()
+     * @param req request handle returned by vlc_preparser_req_NewThumbnailToFiles()
      * @param status VLC_SUCCESS in case of success, VLC_ETIMEOUT in case of
      * timeout, -EINTR if cancelled, an error otherwise. A success mean that an
      * image was generated but it is still possible that the export failed,
      * check result_array to assure export were successful.
      * @param array of results, if result_array[i] is true, the outputs[i] from
-     * vlc_preparser_GenerateThumbnailToFiles() succeeded.
+     * vlc_preparser_req_NewThumbnailToFiles() succeeded.
      * @param result_count size of the array, same than the output_count arg
-     * from vlc_preparser_GenerateThumbnailToFiles()
+     * from vlc_preparser_req_NewThumbnailToFiles()
      * @param data opaque pointer passed by
-     * vlc_preparser_GenerateThumbnailToFiles()
+     * vlc_preparser_req_NewThumbnailToFiles()
      */
     void (*on_ended)(vlc_preparser_req *req, int status,
                      const bool *result_array, size_t result_count, void *data);
@@ -188,8 +188,8 @@ struct vlc_thumbnailer_to_files_cbs
 /**
  * Thumbnailer argument
  *
- * Used by vlc_preparser_GenerateThumbnail() and
- * vlc_preparser_GenerateThumbnailToFiles()
+ * Used by vlc_preparser_req_NewThumbnail() and
+ * vlc_preparser_req_NewThumbnailToFiles()
  */
 struct vlc_thumbnailer_arg
 {
@@ -240,7 +240,7 @@ enum vlc_thumbnailer_format
 /**
  * Thumbnailer output argument
  *
- * Used by vlc_preparser_GenerateThumbnailToFiles()
+ * Used by vlc_preparser_req_NewThumbnailToFiles()
  */
 struct vlc_thumbnailer_output
 {
@@ -322,48 +322,6 @@ VLC_API vlc_preparser_t *vlc_preparser_New( vlc_object_t *obj,
                                             const struct vlc_preparser_cfg *cfg );
 
 /**
- * This function enqueues the provided item to be preparsed or fetched.
- *
- * The input item is retained until the preparsing is done or until the
- * preparser object is deleted.
- *
- * @param preparser the preparser object
- * @param item a valid item to preparse
- * @param type_option a combination of VLC_PREPARSER_TYPE_* and
- * VLC_PREPARSER_OPTION_* flags. The type must be in the set specified in
- * vlc_preparser_New() (it is possible to select less types).
- * @param cbs callback to listen to events (can't be NULL)
- * @param cbs_userdata opaque pointer used by the callbacks
- * @return NULL in case of error, or a valid request handle if the
- * item was scheduled for preparsing. If this returns an
- * error, the on_preparse_ended will *not* be invoked
- */
-VLC_API vlc_preparser_req *
-vlc_preparser_Push( vlc_preparser_t *preparser, input_item_t *item, int type_option,
-                    const struct vlc_preparser_cbs *cbs, void *cbs_userdata );
-
-/**
- * This function enqueues the provided item for generating a thumbnail
- *
- * @param preparser the preparser object
- * @param item a valid item to generate the thumbnail for
- * @param arg pointer to the arg struct, NULL for default options
- * @param cbs callback to listen to events (can't be NULL)
- * @param cbs_userdata opaque pointer used by the callbacks
- * @return NULL in case of error, or a valid request handle if the
- * item was scheduled for thumbnailing. If this returns an
- * error, the thumbnailer.on_ended callback will *not* be invoked
- *
- * The provided input_item will be held by the thumbnailer and can safely be
- * released safely after calling this function.
- */
-VLC_API vlc_preparser_req *
-vlc_preparser_GenerateThumbnail( vlc_preparser_t *preparser, input_item_t *item,
-                                 const struct vlc_thumbnailer_arg *arg,
-                                 const struct vlc_thumbnailer_cbs *cbs,
-                                 void *cbs_userdata );
-
-/**
  * Get the best possible format
  *
  * @param[out] format pointer to the best format
@@ -384,32 +342,6 @@ vlc_preparser_GetBestThumbnailerFormat(enum vlc_thumbnailer_format *format,
  */
 VLC_API int
 vlc_preparser_CheckThumbnailerFormat(enum vlc_thumbnailer_format format);
-
-/**
- * This function generates a thumbnail to one or several files
- *
- * @param preparser the preparser object
- * @param item a valid item to generate the thumbnail for
- * @param arg pointer to the arg struct, NULL for default options
- * @param outputs array of outputs, one file will be generated per output for a
- * single thumbnail
- * @param output_count outputs array size, must be > 1
- * @param cbs callback to listen to events (can't be NULL)
- * @param cbs_userdata opaque pointer used by the callbacks
- * @return NULL in case of error, or a valid request handle if the
- * item was scheduled for thumbnailing. If this returns an
- * error, the thumbnailer.on_ended callback will *not* be invoked
- *
- * The provided input_item will be held by the thumbnailer and can safely be
- * released safely after calling this function.
- */
-VLC_API vlc_preparser_req *
-vlc_preparser_GenerateThumbnailToFiles( vlc_preparser_t *preparser, input_item_t *item,
-                                        const struct vlc_thumbnailer_arg *arg,
-                                        const struct vlc_thumbnailer_output *outputs,
-                                        size_t output_count,
-                                        const struct vlc_thumbnailer_to_files_cbs *cbs,
-                                        void *cbs_userdata );
 
 /**
  * Create a parse/fetch request.

@@ -34,17 +34,17 @@
  */
 enum vlc_preparser_msg_req_type {
     /** 
-     * Type of the request emitted by a `vlc_preparser_Push` call.
+     * Type of the request emitted by a `vlc_preparser_req_NewParse` call.
      */
     VLC_PREPARSER_MSG_REQ_TYPE_PARSE,
     /**
-     * Type of the request emitted by a `vlc_preparser_GenerateThumbnail`
+     * Type of the request emitted by a `vlc_preparser_req_NewThumbnail`
      * call.
      */
     VLC_PREPARSER_MSG_REQ_TYPE_THUMBNAIL,
     /**
      * Type of the request emitted by a
-     * `vlc_preparser_GenerateThumbnailToFiles` call.
+     * `vlc_preparser_req_NewThumbnailToFiles` call.
      */
     VLC_PREPARSER_MSG_REQ_TYPE_THUMBNAIL_TO_FILES,
 };

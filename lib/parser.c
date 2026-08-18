@@ -241,7 +241,7 @@ static const struct vlc_thumbnailer_cbs thumbnailer_callbacks = {
 };
 
 /* Calculate a combination of VLC_PREPARSER_TYPE_* and VLC_PREPARSER_OPTION_* flags
-   (to be passed to vlc_preparser_Push) from libvlc_media_parse_flag_t. Return -1 to skip parsing */
+   (to be passed to vlc_preparser_req_NewParse) from libvlc_media_parse_flag_t. Return -1 to skip parsing */
 static int get_parser_type_options(libvlc_media_parse_flag_t parse_flag)
 {
     int parse_scope = 0;
