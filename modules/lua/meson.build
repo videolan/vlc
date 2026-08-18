@@ -12,8 +12,7 @@ if not get_option('lua').disabled() and not lua_dep.found()
   error('Could not find lua. Lua is needed for some interfaces (rc, telnet, http) as well as many other custom scripts. Use -Dlua=disabled to ignore this error.')
 endif
 
-if lua_dep.found() and get_option('lua').enabled()
-  lua_sources = files(
+lua_sources = files(
     'extension.c',
     'extension.h',
     'extension_thread.c',
@@ -53,15 +52,15 @@ if lua_dep.found() and get_option('lua').enabled()
     'libs/rand.c',
     'libs/renderers.c',
     'libs/medialibrary.c',
-  )
+)
 
-  if host_system == 'windows'
-    lua_sources += files('libs/win.c')
-  endif
-
-  vlc_modules += {
-    'name' : 'lua',
-    'sources' : lua_sources,
-    'dependencies' : [lua_dep, socket_libs]
-  }
+if host_system == 'windows'
+  lua_sources += files('libs/win.c')
 endif
+
+vlc_modules += {
+  'name' : 'lua',
+  'sources' : lua_sources,
+  'dependencies' : [lua_dep, socket_libs],
+  'enabled' : lua_dep.found() and get_option('lua').enabled(),
+}
