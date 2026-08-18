@@ -24,6 +24,7 @@ SPATIALAUDIO_CONF := -DMYSOFA_ROOT_DIR=$(PREFIX) -DHAVE_MIT_HRTF=OFF \
 	-DCMAKE_POLICY_VERSION_MINIMUM=3.5
 
 .spatialaudio: spatialaudio toolchain.cmake
+	$(RM) -Rf $(PREFIX)/include/spatialaudio
 	$(CMAKECLEAN)
 	$(HOSTVARS_CMAKE) $(CMAKE) $(SPATIALAUDIO_CONF)
 	+$(CMAKEBUILD)
