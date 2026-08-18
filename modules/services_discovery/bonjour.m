@@ -1,7 +1,7 @@
 /*****************************************************************************
  * bonjour.m: mDNS services discovery module based on Bonjour
  *****************************************************************************
- * Copyright (C) 2016 VLC authors, VideoLAN and VideoLabs
+ * Copyright (C) 2016-2026 VLC authors, VideoLAN and VideoLabs
  *
  * Authors: Felix Paul Kühne <fkuehne@videolan.org>
  *          Marvin Scholz <epirat07@gmail.com>
@@ -79,6 +79,7 @@ vlc_module_end()
 NSString *const VLCBonjourProtocolName          = @"VLCBonjourProtocolName";
 NSString *const VLCBonjourProtocolServiceName   = @"VLCBonjourProtocolServiceName";
 NSString *const VLCBonjourProtocolModules       = @"VLCBonjourProtocolModules";
+NSString *const VLCBonjourInputType             = @"VLCBonjourInputType";
 NSString *const VLCBonjourIsRenderer            = @"VLCBonjourIsRenderer";
 NSString *const VLCBonjourRendererFlags         = @"VLCBonjourRendererFlags";
 NSString *const VLCBonjourRendererDemux         = @"VLCBonjourRendererDemux";
@@ -184,36 +185,43 @@ static NSString * ipAddressAsStringForData(NSData * data)
     NSDictionary *VLCFtpProtocol = @{ VLCBonjourProtocolName        : @"ftp",
                                       VLCBonjourProtocolServiceName : @"_ftp._tcp.",
                                       VLCBonjourIsRenderer          : @(NO),
+                                      VLCBonjourInputType           : @(ITEM_TYPE_DIRECTORY),
                                       VLCBonjourProtocolModules     : @[@"ftp"]
                                       };
     NSDictionary *VLCSmbProtocol = @{ VLCBonjourProtocolName        : @"smb",
                                       VLCBonjourProtocolServiceName : @"_smb._tcp.",
                                       VLCBonjourIsRenderer          : @(NO),
+                                      VLCBonjourInputType           : @(ITEM_TYPE_DIRECTORY),
                                       VLCBonjourProtocolModules     : @[@"dsm", @"smb2"]
                                       };
     NSDictionary *VLCNfsProtocol = @{ VLCBonjourProtocolName        : @"nfs",
                                       VLCBonjourProtocolServiceName : @"_nfs._tcp.",
                                       VLCBonjourIsRenderer          : @(NO),
+                                      VLCBonjourInputType           : @(ITEM_TYPE_DIRECTORY),
                                       VLCBonjourProtocolModules     : @[@"nfs"]
                                       };
     NSDictionary *VLCSftpProtocol = @{ VLCBonjourProtocolName       : @"sftp",
                                        VLCBonjourProtocolServiceName: @"_sftp-ssh._tcp.",
                                        VLCBonjourIsRenderer         : @(NO),
+                                       VLCBonjourInputType          : @(ITEM_TYPE_DIRECTORY),
                                        VLCBonjourProtocolModules     : @[@"sftp"]
                                        };
     NSDictionary *VLCWebDavProtocol = @{ VLCBonjourProtocolName       : @"webdav",
                                          VLCBonjourProtocolServiceName: @"_webdav._tcp.",
                                          VLCBonjourIsRenderer         : @(NO),
+                                         VLCBonjourInputType          : @(ITEM_TYPE_DIRECTORY),
                                          VLCBonjourProtocolModules    : @[@"webdav"]
                                          };
     NSDictionary *VLCWebDavsProtocol = @{ VLCBonjourProtocolName       : @"webdavs",
                                           VLCBonjourProtocolServiceName: @"_webdavs._tcp.",
                                           VLCBonjourIsRenderer         : @(NO),
+                                          VLCBonjourInputType          : @(ITEM_TYPE_DIRECTORY),
                                           VLCBonjourProtocolModules    : @[@"webdavs"]
                                           };
     NSDictionary *VLCCastProtocol = @{ VLCBonjourProtocolName       : @"chromecast",
                                        VLCBonjourProtocolServiceName: @"_googlecast._tcp.",
                                        VLCBonjourIsRenderer         : @(YES),
+                                       VLCBonjourInputType          : @(ITEM_TYPE_DIRECTORY),
                                        VLCBonjourRendererFlags      : @(VLC_RENDERER_CAN_AUDIO),
                                        VLCBonjourRendererDemux      : @"cc_demux"
                                        };
@@ -334,16 +342,18 @@ static NSString * ipAddressAsStringForData(NSData * data)
     if (![_resolvedNetServices containsObject:aNetService]) {
         NSString *serviceType = aNetService.type;
         NSString *protocol = nil;
+        enum input_item_type_e inputType = ITEM_TYPE_DIRECTORY;
         for (NSDictionary *protocolDefinition in _activeProtocols) {
             if ([serviceType isEqualToString:[protocolDefinition objectForKey:VLCBonjourProtocolServiceName]]) {
                 protocol = [protocolDefinition objectForKey:VLCBonjourProtocolName];
+                inputType = [[protocolDefinition objectForKey:VLCBonjourInputType] intValue];
             }
         }
 
         if (_isRendererDiscovery) {
             [self addResolvedRendererItem:aNetService withProtocol:protocol];
         } else {
-            [self addResolvedInputItem:aNetService withProtocol:protocol];
+            [self addResolvedInputItem:aNetService withProtocol:protocol inputType:inputType];
         }
     }
 
@@ -422,7 +432,7 @@ static NSString * ipAddressAsStringForData(NSData * data)
     }
 }
 
-- (void)addResolvedInputItem:(NSNetService *)netService withProtocol:(NSString *)protocol
+- (void)addResolvedInputItem:(NSNetService *)netService withProtocol:(NSString *)protocol inputType:(enum input_item_type_e)inputType
 {
     services_discovery_t *p_sd = (services_discovery_t *)_p_this;
     NSString *host = netService.hostName;
@@ -436,7 +446,11 @@ static NSString * ipAddressAsStringForData(NSData * data)
     components.port = @(netService.port);
     NSString *uri = components.URL.absoluteString;
 
-    input_item_t *p_input_item = input_item_NewDirectory([uri UTF8String], [netService.name UTF8String], ITEM_NET );
+    input_item_t *p_input_item;
+    if (inputType == ITEM_TYPE_STREAM)
+        p_input_item = input_item_NewStream([uri UTF8String], [netService.name UTF8String], INPUT_DURATION_UNSET );
+    else
+        p_input_item = input_item_NewDirectory([uri UTF8String], [netService.name UTF8String], ITEM_NET );
     if (p_input_item != NULL) {
         services_discovery_AddItem(p_sd, p_input_item);
         [_inputItemsForNetServices addObject:[NSValue valueWithPointer:p_input_item]];
