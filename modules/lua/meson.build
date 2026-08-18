@@ -8,7 +8,7 @@ lua_dep = dependency(
   ],
   version: '>=5.1', required: false)
 
-if not get_option('lua').disabled() and not lua_dep.found()
+if get_option('lua').enabled() and not lua_dep.found()
   error('Could not find lua. Lua is needed for some interfaces (rc, telnet, http) as well as many other custom scripts. Use -Dlua=disabled to ignore this error.')
 endif
 
@@ -62,5 +62,5 @@ vlc_modules += {
   'name' : 'lua',
   'sources' : lua_sources,
   'dependencies' : [lua_dep, socket_libs],
-  'enabled' : lua_dep.found() and get_option('lua').enabled(),
+  'enabled' : lua_dep.found() and get_option('lua').allowed(),
 }
