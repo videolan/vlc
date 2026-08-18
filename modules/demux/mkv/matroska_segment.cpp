@@ -1180,7 +1180,7 @@ void matroska_segment_c::ESDestroy( )
 int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_simpleblock,
                                   KaxBlockAdditions * & pp_additions,
                                   bool *pb_key_picture, bool *pb_discardable_picture,
-                                  int64_t *pi_duration )
+                                  uint64_t *pi_duration )
 {
     pp_simpleblock = NULL;
     pp_block = NULL;

@@ -145,7 +145,7 @@ public:
     bool Seek( demux_t &, vlc_tick_t i_mk_date, vlc_tick_t i_mk_time_offset, bool b_accurate );
 
     int BlockGet( KaxBlock * &, KaxSimpleBlock * &, KaxBlockAdditions * &,
-                  bool *, bool *, int64_t *);
+                  bool *, bool *, uint64_t *);
 
     mkv_track_t * FindTrackByBlock(const KaxBlock *, const KaxSimpleBlock * );
 
