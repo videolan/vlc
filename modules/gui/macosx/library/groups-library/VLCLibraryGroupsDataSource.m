@@ -45,6 +45,10 @@
                                name:VLCLibraryModelListOfGroupsReset
                              object:nil];
     [notificationCenter addObserver:self
+                           selector:@selector(libraryModelGroupsListReset:)
+                               name:VLCLibraryModelAllCachesDropped
+                             object:nil];
+    [notificationCenter addObserver:self
                            selector:@selector(libraryModelGroupDeleted:)
                                name:VLCLibraryModelGroupDeleted
                              object:nil];
