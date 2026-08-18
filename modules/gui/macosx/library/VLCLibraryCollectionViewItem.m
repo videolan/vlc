@@ -135,8 +135,8 @@ NSString *VLCLibraryCollectionViewItemIdentifier = @"VLCLibraryCollectionViewIte
     }
     id<VLCMediaLibraryItemProtocol> const actualItem = libraryItem.item;
 
-    self.mediaTitleTextField.stringValue = actualItem.displayString;
-    self.secondaryInfoTextField.stringValue = actualItem.primaryDetailString;
+    self.mediaTitleTextField.stringValue = actualItem.displayString ?: @"";
+    self.secondaryInfoTextField.stringValue = actualItem.primaryDetailString ?: @"";
     self.secondaryInfoTextField.hidden = NO;
 
     __weak typeof(self) weakSelf = self;
