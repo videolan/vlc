@@ -34,13 +34,6 @@
 #include <vlc_picture.h>
 #include <vlc_picture_pool.h>
 
-#ifdef VLC_VA_BACKEND_DRM
-# include <sys/types.h>
-# include <sys/stat.h>
-# include <fcntl.h>
-# include <vlc_fs.h>
-# include <va/va_drm.h>
-#endif
 #include <libavcodec/avcodec.h>
 #include <libavutil/hwcontext_vaapi.h>
 
