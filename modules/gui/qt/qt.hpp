@@ -132,11 +132,11 @@ public:
 
 #define qfu( i ) QString::fromUtf8( i )
 #define qfue( i ) QString::fromUtf8( i ).replace( "&", "&&" ) /* for actions/buttons */
-#define qfut( i ) QString::fromUtf8( vlc_gettext(i) )
+#define qfut( ... ) QObject::tr( __VA_ARGS__ )
 #define qtu( i ) ((i).toUtf8().constData())
 
 /* For marking translatable static strings (like `_()`) */
-#define qtr( i ) qfut( i )
+#define qtr( ... ) qfut( __VA_ARGS__ )
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
 #define QtCheckboxChanged  QCheckBox::checkStateChanged
