@@ -493,6 +493,7 @@ raspbian-arm:
         - .base-template
         - .ccache-common-apple
     script: |
+        export NCPU=$(getconf NPROCESSORS_ONLN)
         if [ -n "$BUILD_NIGHTLY" ]; then
             NIGHTLY_EXTRA_BUILD_FLAGS="-i n"
         else
@@ -507,7 +508,7 @@ raspbian-arm:
             EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} -p"
         fi
         export PATH="${VLC_PATH}:$PATH"
-        ./extras/package/macosx/build.sh $EXTRA_BUILD_FLAGS $NIGHTLY_EXTRA_BUILD_FLAGS -a $HOST_ARCH -x
+        ./extras/package/macosx/build.sh $EXTRA_BUILD_FLAGS $NIGHTLY_EXTRA_BUILD_FLAGS -a $HOST_ARCH -x -j $NCPU
         # At least compile every targets
         make check TESTS=
         make -C modules check-macosx
