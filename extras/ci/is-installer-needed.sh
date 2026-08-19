@@ -32,7 +32,7 @@ VLC_SRC_ROOT_DIR=$(git rev-parse --show-toplevel)
 [ -f "${VLC_SRC_ROOT_DIR}/src/libvlc.h" ] || abort_err "This script must be run in the VLC Git repository"
 
 case $1 in
-    nightly-*)
+    nightly-*|release-*)
         echo "yes"
         exit 0
         ;;
