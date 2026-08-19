@@ -30,6 +30,7 @@
 #import "library/VLCLibraryAddToPlaylistMenuController.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
+#import "library/VLCInputItem.h"
 #import "main/VLCMain.h"
 #import "playqueue/VLCPlayQueueController.h"
 #import "playqueue/VLCPlayQueueModel.h"
@@ -187,14 +188,35 @@
     _addToPlaylistMenuItem.enabled = mediaItems.count > 0;
 }
 
+- (void)updateStreamSpecificMenuItems
+{
+    NSIndexSet * const selectedIndexes = self.playQueueTableView.selectedRowIndexes;
+    __block BOOL hasStream = NO;
+
+    [selectedIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+        VLCPlayQueueItem * const item =
+            [self->_playQueueController.playQueueModel playQueueItemAtIndex:idx];
+        if (item.inputItem.isStream) {
+            hasStream = YES;
+            *stop = YES;
+        }
+    }];
+
+    _informationMenuItem.hidden = hasStream;
+    _revealInFinderMenuItem.hidden = hasStream;
+}
+
 - (void)prepareForContextMenuTarget:(VLCPlayQueueContextMenuTarget)target
 {
     if (target == VLCPlayQueueContextMenuTargetRow) {
         [self updateAddToPlaylistMenuItem];
+        [self updateStreamSpecificMenuItems];
         const BOOL multipleSelection = self.playQueueTableView.selectedRowIndexes.count > 1;
         self.playQueueMenu.itemArray = multipleSelection ? self.multipleSelectionItems : self.items;
     } else {
         _addToPlaylistMenuController.representedMediaItems = nil;
+        _informationMenuItem.hidden = NO;
+        _revealInFinderMenuItem.hidden = NO;
         self.playQueueMenu.itemArray = self.backgroundItems;
     }
 }
@@ -313,6 +335,7 @@
         self.playQueueMenu.itemArray = self.items;
     }
     [self updateAddToPlaylistMenuItem];
+    [self updateStreamSpecificMenuItems];
 }
 
 @end
