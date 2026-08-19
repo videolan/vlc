@@ -447,11 +447,17 @@ FocusScope {
                 focus: true
 
                 anchors.fill: parent
-                anchors.leftMargin: sidebar.width
+                anchors.leftMargin: (sidebar.visible && (VLCStyle.isScreenSmall ? (sidebar.state === "") : true)) ? sidebar.width : 0.0
                 anchors.rightMargin: (playlistLoader.shown && !VLCStyle.isScreenSmall)
                                      ? playlistLoader.width
                                      : 0
                 anchors.bottomMargin: g_mainDisplay.displayMargin
+
+                // Prevent animating x on collapse with overlayed side navigation bar:
+                Binding on anchors.leftMargin {
+                    when: (VLCStyle.isScreenSmall && sidebar.state === "" && sidebarTransition.running)
+                    value: 0.0
+                }
 
                 pageModel: g_mainDisplay.pageModel
 
@@ -526,7 +532,7 @@ FocusScope {
 
             anchors.fill: parent
 
-            visible: VLCStyle.isScreenSmall && playlistLoader.shown
+            visible: VLCStyle.isScreenSmall && (playlistLoader.shown || (sidebar.visible && (sidebar.state === "expanded")))
             color: "black"
             opacity: 0.4
 
@@ -571,7 +577,7 @@ FocusScope {
 
             safeAreaLeftMargin: VLCStyle.applicationHorizontalMargin
 
-            useAcrylic: !VLCStyle.isScreenSmall
+            useAcrylic: (VLCStyle.isScreenSmall ? (sidebar.state === "") : true) // See `694d51a7` for the reasoning.
 
             NavigationBarContextMenu {
                 id: navigationBarContextMenu
@@ -663,7 +669,7 @@ FocusScope {
                 panelObject: MainCtx.navigationPanel
                 atRight: true
 
-                resizeHandle.visible: (sidebar.state === "expanded")
+                resizeHandle.visible: (sidebar.state === "expanded") && !VLCStyle.isScreenSmall
                 visualBorder.visible: !topLeftCornerBackground.visible
 
                 minimumWidth: sidebar.minimumWidth

@@ -38,7 +38,7 @@ T.Pane {
     property int safeAreaLeftMargin: 0
     property int safeAreaRightMargin: 0
 
-    property bool useAcrylic: false
+    property bool useAcrylic: true
 
     property bool delegateShowText: true
 
