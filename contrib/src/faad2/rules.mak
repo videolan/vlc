@@ -1,6 +1,6 @@
 # faad2
 
-FAAD2_VERSION := 2.11.2
+FAAD2_VERSION := 2.11.3
 FAAD2_URL := $(GITHUB)/knik0/faad2/archive/refs/tags/$(FAAD2_VERSION).tar.gz
 
 ifeq ($(findstring $(ARCH),arm),)
@@ -20,8 +20,6 @@ faad2: faad2-$(FAAD2_VERSION).tar.gz .sum-faad2
 ifndef HAVE_FPU
 	$(APPLY) $(SRC)/faad2/faad2-fixed.patch
 endif
-	$(APPLY) $(SRC)/faad2/0001-specrec-check-the-last-swb_offset-value-is-valid.patch
-	$(APPLY) $(SRC)/faad2/0001-decoder-return-early-when-the-object-type-can-t-be-s.patch
 	$(call pkg_static,"libfaad/faad2.pc.in")
 	$(MOVE)
 
