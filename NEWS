@@ -60,6 +60,7 @@ Misc:
  * Fix Audio EQ filter High Frequency parameter
  * Fix artwork preparser crash when artwork title is null
  * Fix LibVLC media list player race
+ * Remove NPAPI browser plugin
 
 Lua:
  * Remove broken youtube.lua plugin
