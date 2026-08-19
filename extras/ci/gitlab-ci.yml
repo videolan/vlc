@@ -510,7 +510,7 @@ raspbian-arm:
         export PATH="${VLC_PATH}:$PATH"
         ./extras/package/macosx/build.sh $EXTRA_BUILD_FLAGS $NIGHTLY_EXTRA_BUILD_FLAGS -a $HOST_ARCH -x -j $NCPU
         # At least compile every targets
-        make check TESTS=
+        make -j $NCPU check TESTS=
         make -C modules check-macosx
     after_script:
       - export PATH="${CI_PROJECT_DIR}/extras/tools/build/bin:$PATH"
