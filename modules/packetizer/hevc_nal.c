@@ -561,7 +561,7 @@ static bool hevc_parse_inner_profile_tier_level_rbsp( bs_t *p_bs,
     }
     else
     {
-        bs_read( p_bs, 43 );
+        bs_skip( p_bs, 43 );
     }
 
     if( ( p_in->profile_idc >= 1 && p_in->profile_idc <= 5 ) ||
@@ -601,7 +601,7 @@ static bool hevc_parse_profile_tier_level_rbsp( bs_t *p_bs, bool profile_present
                     p_ptl->sublayer_level_present_flag |= (0x80 >> i);
             }
             else
-                bs_read( p_bs, 2 );
+                bs_skip( p_bs, 2 );
         }
 
         for( uint8_t i=0; i < max_num_sub_layers_minus1; i++ )
