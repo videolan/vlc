@@ -24,6 +24,7 @@ variables:
     VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android-3.0:20260701183656
     VLC_ANDROID4_IMAGE: registry.videolan.org/vlc-debian-android:20260611225331
     VLC_FLATPAK_IMAGE: registry.videolan.org/vlc-flatpak:20260516184439
+    VLC_SNAP_IMAGE: registry.videolan.org/vlc-ubuntu-snap:20260715210239
 
 .variables-debian: &variables-debian
         HOST_ARCH: x86_64
@@ -79,6 +80,10 @@ variables:
 .variables-android-x86_64: &variables-android-x86_64
         ANDROID_ARCH: x86_64
         TRIPLET: x86_64-linux-android
+
+.variables-snap: &variables-snap
+        HOST_ARCH: x86_64
+        TRIPLET: $HOST_ARCH-linux-gnu
 
 # Common rules
 .base-template:
@@ -440,6 +445,58 @@ flatpak-repo:
             - repo.tar.gz
     dependencies:
       - release-flatpak-x86_64
+
+#
+# Snap builds
+#
+.snap-common:
+    extends: .docker-template
+    image:
+        name: $VLC_SNAP_IMAGE
+        entrypoint: [""]
+    script:
+        - git config --global --add safe.directory ${CI_PROJECT_DIR}/.git
+        # snapcraft need to have an up to date apt cache to be able to download its dependencies
+        - apt update
+        - extras/package/snap/build.sh -p
+    allow_failure: true
+    variables: *variables-snap
+
+snap:
+  extends: .snap-common
+  when: manual # disabled
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - extras/package/snap/*
+
+nightly-snap:
+    extends: .snap-common
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "schedule"'
+    after_script:
+        - if [ "$CI_PROJECT_NAMESPACE" = "videolan" ]; then /bin/true; else exit 0; fi
+        - mkdir nightlies
+        - mv vlc_*.snap nightlies/
+        - snapcraft upload --release beta nightlies/vlc_*.snap
+        - cd nightlies && find . -maxdepth 1 -type f -not -name SHA512SUM | xargs shasum -a 512 | tee SHA512SUM
+    artifacts:
+        paths:
+           - nightlies/*
+
+release-snap:
+    extends: .snap-common
+    rules:
+        - if: '$CI_COMMIT_TAG'
+    after_script:
+        - if [ "$CI_PROJECT_NAMESPACE" = "videolan" ]; then /bin/true; else exit 0; fi
+        - mkdir release
+        - mv vlc_*.snap release/
+        - snapcraft upload --release candidate release/vlc_*.snap
+        - cd release && find . -maxdepth 1 -type f -not -name SHA512SUM | xargs shasum -a 512 | tee SHA512SUM
+    artifacts:
+        paths:
+           - release/*
 
 #
 # macOS
