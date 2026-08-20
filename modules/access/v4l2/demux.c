@@ -90,7 +90,15 @@ static void *MmapThread(void *data)
            continue;
         }
 
-        if (ufd[0].revents)
+        if (ufd[0].revents & (POLLERR | POLLHUP | POLLNVAL))
+        {
+            /* The device is gone, and poll will always return the same
+             * answer now . */
+            msg_Err(demux, "device unavailable");
+            break;
+        }
+
+        if (ufd[0].revents & POLLIN)
         {
             int canc = vlc_savecancel();
             block_t *block = GrabVideo(VLC_OBJECT(demux), sys->pool);
@@ -103,12 +111,21 @@ static void *MmapThread(void *data)
             vlc_restorecancel(canc);
         }
 #ifdef ZVBI_COMPILED
-        if (sys->vbi != NULL && ufd[1].revents)
-            GrabVBI(demux, sys->vbi);
+        if (sys->vbi != NULL)
+        {
+            if (ufd[1].revents & (POLLERR | POLLHUP | POLLNVAL))
+            {
+                msg_Err(demux, "VBI device unavailable");
+                break;
+            }
+
+            if (ufd[1].revents & POLLIN)
+                GrabVBI(demux, sys->vbi);
+        }
 #endif
     }
 
-    vlc_assert_unreachable();
+    return NULL;
 }
 
 static void *ReadThread(void *data)
@@ -143,7 +160,15 @@ static void *ReadThread(void *data)
            continue;
         }
 
-        if (ufd[0].revents)
+        if (ufd[0].revents & (POLLERR | POLLHUP | POLLNVAL))
+        {
+            /* The device is gone, and poll will always return the same
+             * answer now . */
+            msg_Err(demux, "device unavailable");
+            break;
+        }
+
+        if (ufd[0].revents & POLLIN)
         {
             block_t *block = block_Alloc(sys->blocksize);
             if (unlikely(block == NULL))
@@ -168,11 +193,21 @@ static void *ReadThread(void *data)
             vlc_restorecancel(canc);
         }
 #ifdef ZVBI_COMPILED
-        if (sys->vbi != NULL && ufd[1].revents)
-            GrabVBI(demux, sys->vbi);
+        if (sys->vbi != NULL)
+        {
+            if (ufd[1].revents & (POLLERR | POLLHUP | POLLNVAL))
+            {
+                msg_Err(demux, "VBI device error");
+                break;
+            }
+
+            if (ufd[1].revents & POLLIN)
+                GrabVBI(demux, sys->vbi);
+        }
 #endif
     }
-    vlc_assert_unreachable();
+
+    return NULL;
 }
 
 static int DemuxControl( demux_t *demux, int query, va_list args )
