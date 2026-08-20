@@ -308,8 +308,9 @@ static int Callback(Upnp_EventType event_type, UpnpEventPtr event, void *cookie)
 // UPNP Callbacks
 
 static int
-getinfo_cb(const char *url, UpnpFileInfo *info, intf_thread_t *intf, FileHandler **fhandler)
+getinfo_cb(const char *url, UpnpFileInfo *info, const void *void_intf, const void **fhandler)
 {
+    intf_thread_t *intf = (intf_thread_t *)(void_intf);
     const char *user_agent = UpnpFileInfo_get_Os_cstr(info);
     if (user_agent == nullptr)
         return UPNP_E_BAD_REQUEST;
@@ -335,17 +336,18 @@ getinfo_cb(const char *url, UpnpFileInfo *info, intf_thread_t *intf, FileHandler
     file_handler->get_info(*info);
 
     // Pass the filehandler ownership to the open callback to avoid reparsing the url
-    *fhandler = file_handler.release();
+    *fhandler = static_cast<void*>(file_handler.release());
 
     return UPNP_E_SUCCESS;
 }
 
 static UpnpWebFileHandle
-open_cb(const char *url, enum UpnpOpenFileMode, intf_thread_t *intf, FileHandler *file_handler)
+open_cb(const char *url, enum UpnpOpenFileMode, const void *void_intf, const void *file_handler)
 {
+    intf_thread_t *intf = (intf_thread_t *)(void_intf);
     msg_Dbg(intf, "Opening: %s", url);
 
-    FileHandler *ret = file_handler;
+    FileHandler *ret = (FileHandler *)(file_handler);
     if (!ret)
     {
         try
@@ -371,12 +373,13 @@ open_cb(const char *url, enum UpnpOpenFileMode, intf_thread_t *intf, FileHandler
 }
 
 static int
-read_cb(UpnpWebFileHandle fileHnd, uint8_t buf[], size_t buflen, intf_thread_t *intf, const void *)
+read_cb(UpnpWebFileHandle fileHnd, char *buf, size_t buflen, const void *void_intf, const void *)
 {
+    intf_thread_t *intf = (intf_thread_t *)(void_intf);
     assert(fileHnd);
 
     auto *impl = static_cast<FileHandler *>(fileHnd);
-    const size_t bytes_read = impl->read(buf, buflen);
+    const size_t bytes_read = impl->read((uint8_t*)buf, buflen);
 
     msg_Dbg(intf, "http read callback, %zub requested %zub returned", buflen, bytes_read);
 
@@ -384,8 +387,9 @@ read_cb(UpnpWebFileHandle fileHnd, uint8_t buf[], size_t buflen, intf_thread_t *
 }
 
 static int
-seek_cb(UpnpWebFileHandle fileHnd, off_t offset, int origin, intf_thread_t *intf, const void *)
+seek_cb(UpnpWebFileHandle fileHnd, off_t offset, int origin, const void *void_intf, const void *)
 {
+    intf_thread_t *intf = (intf_thread_t *)(void_intf);
     assert(fileHnd);
     msg_Dbg(
         intf, "http seek callback offset: %jd origin: %d", static_cast<intmax_t>(offset), origin);
@@ -397,8 +401,9 @@ seek_cb(UpnpWebFileHandle fileHnd, off_t offset, int origin, intf_thread_t *intf
     return success == true ? 0 : -1;
 }
 
-static int close_cb(UpnpWebFileHandle fileHnd, intf_thread_t *intf, const void *)
+static int close_cb(UpnpWebFileHandle fileHnd, const void *void_intf, const void *)
 {
+    intf_thread_t *intf = (intf_thread_t *)(void_intf);
     assert(fileHnd);
     msg_Dbg(intf, "http close callback");
     delete static_cast<FileHandler *>(fileHnd);
