@@ -429,6 +429,14 @@ vlc_modules += {
     'enabled' : libdsm_dep.found(),
 }
 
+smbclient_dep = dependency('smbclient',  required: get_option('smbclient'))
+vlc_modules += {
+    'name' : 'smbc',
+    'sources' : files('samba.c', 'smb_common.h'),
+    'dependencies' : [smbclient_dep],
+    'enabled' : smbclient_dep.found(),
+}
+
 # FTP
 vlc_modules += {
     'name' : 'ftp',

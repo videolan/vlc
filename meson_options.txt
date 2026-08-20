@@ -662,7 +662,12 @@ option('udev',
 option('dsm',
     type: 'feature',
     value: 'auto',
-    description: 'SMB/CIFS access/sd support')
+    description: 'libdsm SMB/CIFS access/sd support')
+
+option('smbclient',
+    type: 'feature',
+    value: 'auto',
+    description: 'smbclient SMB/CIFS access/sd support')
 
 option('live555',
     type: 'feature',
