@@ -47,7 +47,12 @@ typedef struct
     vlc_v4l2_ctrl_t *controls;
 } access_sys_t;
 
-/* Wait for data */
+/**
+ * Wait for data
+ *
+ * \retval  1 when a frame is ready
+ * \retval -1 when the wait was cancelled or failed
+ */
 static int AccessPoll(stream_t *access)
 {
     access_sys_t *sys = access->p_sys;
@@ -63,7 +68,7 @@ static block_t *MMapBlock(stream_t *access, bool *restrict eof)
 {
     access_sys_t *sys = access->p_sys;
 
-    if (AccessPoll(access))
+    if (AccessPoll(access) < 0)
         return NULL;
 
     block_t *block = GrabVideo(VLC_OBJECT(access), sys->pool);
@@ -80,7 +85,7 @@ static block_t *ReadBlock(stream_t *access, bool *restrict eof)
 {
     access_sys_t *sys = access->p_sys;
 
-    if (AccessPoll(access))
+    if (AccessPoll(access) < 0)
         return NULL;
 
     block_t *block = block_Alloc(sys->blocksize);
