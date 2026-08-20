@@ -5126,7 +5126,10 @@ fi
 soliddatadir=""
 AS_IF([test "${with_kde_solid}" != "no"], [
   AS_IF([test "${with_kde_solid}" = "yes"], [
-    kde4datadir="`${KDE4_CONFIG} --install data`"
+    dnl automatic detection of the path via KDE4_CONFIG
+    AS_IF([test -x "${KDE4_CONFIG}"], [
+      kde4datadir="`${KDE4_CONFIG} --install data`"
+    ])
     AS_IF([test "x$kde4datadir" = "x"], [kde4datadir='${datadir}/kde4/apps'])
     soliddatadir="${kde4datadir}/solid/actions"
   ], [
