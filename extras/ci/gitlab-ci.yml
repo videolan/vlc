@@ -511,7 +511,7 @@ raspbian-arm:
         ./extras/package/macosx/build.sh $EXTRA_BUILD_FLAGS $NIGHTLY_EXTRA_BUILD_FLAGS -a $HOST_ARCH -x -j $NCPU
         # At least compile every targets
         make -j $NCPU check TESTS=
-        make -C modules check-macosx
+        make -C modules -j $NCPU check-macosx
     after_script:
       - export PATH="${CI_PROJECT_DIR}/extras/tools/build/bin:$PATH"
       - !reference [.ccache-common-apple, after_script]
