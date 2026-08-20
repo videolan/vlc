@@ -51,8 +51,6 @@ static bool h266_parse_general_constraint_info(bs_t *p_bs, h266_profile_tier_lev
         if(gci_num_additional_bits > 5)
         {
             bs_read(p_bs, 6);
-            if(gci_num_additional_bits < 6)
-                return false;
             gci_num_additional_bits -= 6;
         }
         bs_skip(p_bs, gci_num_additional_bits);
