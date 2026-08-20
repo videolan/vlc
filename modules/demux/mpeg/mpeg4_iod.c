@@ -580,20 +580,20 @@ sl_header_data DecodeSLHeader( unsigned i_data, const uint8_t *p_data,
             vlc_tick_t *p_t;
         } const timestamps[2] = { { &b_has_dts, &ret.i_dts }, { &b_has_cts, &ret.i_pts } };
 
-        bs_read( &s, sl->i_packet_seqnum_length );
+        bs_skip( &s, sl->i_packet_seqnum_length );
 
         if( sl->i_degradation_priority_length && bs_read1( &s ) )
-            bs_read( &s, sl->i_degradation_priority_length );
+            bs_skip( &s, sl->i_degradation_priority_length );
 
         if( b_has_ocr )
-            bs_read( &s, sl->i_OCR_length );
+            bs_skip( &s, sl->i_OCR_length );
 
         if ( ret.b_au_start )
         {
             if( sl->i_flags & USE_RANDOM_ACCESS_POINT_FLAG )
                 bs_read1( &s );
 
-            bs_read( &s, sl->i_AU_seqnum_length );
+            bs_skip( &s, sl->i_AU_seqnum_length );
 
             if ( sl->i_flags & USE_TIMESTAMPS_FLAG )
             {
@@ -620,10 +620,10 @@ sl_header_data DecodeSLHeader( unsigned i_data, const uint8_t *p_data,
                         vlc_tick_from_samples(i_read, sl->i_timestamp_resolution);
             }
 
-            bs_read( &s, sl->i_AU_length );
+            bs_skip( &s, sl->i_AU_length );
 
             if( b_has_instant_bitrate )
-                bs_read( &s, sl->i_instant_bitrate_length );
+                bs_skip( &s, sl->i_instant_bitrate_length );
         }
 
         /* more to read if ExtSLConfigDescrTag */
