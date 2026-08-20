@@ -177,7 +177,8 @@ static void *ReadThread(void *data)
             block_t *block = block_Alloc(sys->blocksize);
             if (unlikely(block == NULL))
             {
-                msg_Err(demux, "read error: %s", vlc_strerror_c(errno));
+                msg_Err(demux, "read error: cannot allocate a %"PRIu32" byte block",
+                        sys->blocksize);
                 v4l2_read(fd, NULL, 0); /* discard frame */
                 continue;
             }
