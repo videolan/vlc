@@ -643,7 +643,7 @@ else
 endif
 QT_HOST_PATH := -DQT_HOST_PATH=$(QT_HOST_PREFIX) -DQT_HOST_PATH_CMAKE_DIR=$(QT_HOST_LIBS)/cmake
 endif
-QT_CMAKE_CONFIG := -DCMAKE_TOOLCHAIN_FILE=$(PREFIX)/lib/cmake/Qt6/qt.toolchain.cmake $(QT_HOST_PATH)
+QT_CMAKE_CONFIG := -DCMAKE_TOOLCHAIN_FILE=$(PREFIX)/lib/cmake/Qt6/qt.toolchain.cmake $(QT_HOST_PATH) --log-level=STATUS
 ifdef QT_USES_SYSTEM_TOOLS
 # We checked the versions match, assume we know what we're going
 QT_CMAKE_CONFIG += -DQT_NO_PACKAGE_VERSION_CHECK=TRUE
