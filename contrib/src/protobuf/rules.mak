@@ -23,7 +23,8 @@ protobuf: protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz .sum-protobuf
 	mv protobuf-$(PROTOBUF_VERSION) protobuf-$(PROTOBUF_VERSION)-cpp
 	$(APPLY) $(SRC)/protobuf/0001-don-t-build-and-install-protoc-libprotoc.patch
 	$(APPLY) $(SRC)/protobuf/missing-includes.patch
-	# don't build libprotoc
+	$(APPLY) $(SRC)/protobuf/0001-prioritize-internal-include-path-over-zlib-include-d.patch
+    # don't build libprotoc
 	sed -i.orig -e 's,include(libprotoc,#include(libprotoc,' $(UNPACK_DIR)/cmake/CMakeLists.txt
 	# don't build protoc
 	sed -i.orig -e 's,include(protoc,#include(protoc,' $(UNPACK_DIR)/cmake/CMakeLists.txt
