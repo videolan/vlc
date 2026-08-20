@@ -437,6 +437,22 @@ vlc_modules += {
     'enabled' : smbclient_dep.found(),
 }
 
+libsmb2_dep = dependency('libsmb2', version: '>= 3.0.0', required: get_option('smb2'))
+smb2_dependencies = [libsmb2_dep]
+smb2_flags = []
+if (libdsm_dep.found())
+    smb2_dependencies += [libdsm_dep]
+    smb2_flags += '-DHAVE_DSM"'
+endif
+vlc_modules += {
+    'name' : 'smb2',
+    'sources' : files('smb2.c', 'smb_common.h'),
+    'c_args' :  smb2_flags,
+    'dependencies' : smb2_dependencies,
+    'link_with' : [vlc_access_cache_lib],
+    'enabled' : libsmb2_dep.found(),
+}
+
 # FTP
 vlc_modules += {
     'name' : 'ftp',

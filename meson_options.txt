@@ -669,6 +669,12 @@ option('smbclient',
     value: 'auto',
     description: 'smbclient SMB/CIFS access/sd support')
 
+option('smb2',
+    type: 'feature',
+    value: 'auto',
+    description: 'support smb2 protocol via libsmb2')
+
+
 option('live555',
     type: 'feature',
     value: 'auto',
