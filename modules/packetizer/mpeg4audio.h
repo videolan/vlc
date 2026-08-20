@@ -233,13 +233,13 @@ static inline int MPEG4_read_ELDSpecificConfig(MPEG4_asc_t *p_cfg, bs_t *s)
         for( ; numSbrHeader; numSbrHeader-- )
         {
             /* sbr_header() Table 4.63 */
-            bs_read(s, 14);
+            bs_skip(s, 14);
             bool header_extra_1 = bs_read1(s);
             bool header_extra_2 = bs_read1(s);
             if(header_extra_1)
-                bs_read(s, 5);
+                bs_skip(s, 5);
             if(header_extra_2)
-                bs_read(s, 6);
+                bs_skip(s, 6);
         }
     }
 

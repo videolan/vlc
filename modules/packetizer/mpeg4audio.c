@@ -580,7 +580,7 @@ static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
                 } else if ((st->i_frame_length_type == 3) ||
                          (st->i_frame_length_type == 5) ||
                          (st->i_frame_length_type == 7)) {
-                    bs_read(&s, 2); // muxSlotLengthCoded
+                    bs_skip(&s, 2); // muxSlotLengthCoded
                 }
             }
 #if 0
