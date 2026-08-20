@@ -85,9 +85,11 @@ static void *MmapThread(void *data)
         /* Wait for data */
         if (poll(ufd, numfds, -1) == -1)
         {
-           if (errno != EINTR)
-               msg_Err(demux, "poll error: %s", vlc_strerror_c(errno));
-           continue;
+            if (errno == EINTR)
+                continue;
+
+            msg_Err(demux, "poll error: %s", vlc_strerror_c(errno));
+            break;
         }
 
         if (ufd[0].revents & (POLLERR | POLLHUP | POLLNVAL))
@@ -155,9 +157,11 @@ static void *ReadThread(void *data)
         /* Wait for data */
         if (poll(ufd, numfds, -1) == -1)
         {
-           if (errno != EINTR)
-               msg_Err(demux, "poll error: %s", vlc_strerror_c(errno));
-           continue;
+            if (errno == EINTR)
+                continue;
+
+            msg_Err(demux, "poll error: %s", vlc_strerror_c(errno));
+            break;
         }
 
         if (ufd[0].revents & (POLLERR | POLLHUP | POLLNVAL))
