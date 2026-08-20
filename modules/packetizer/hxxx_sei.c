@@ -155,7 +155,7 @@ void HxxxParseSEI(const uint8_t *p_buf, size_t i_buf,
                 if ( !bs_read1( &s ) )
                 {
                     sei_data.frame_packing.type = bs_read( &s, 7 );
-                    bs_read( &s, 1 );
+                    bs_skip( &s, 1 );
                     if( bs_read( &s, 6 ) == 2 ) /*intpr type*/
                         sei_data.frame_packing.b_left_first = false;
                     else
