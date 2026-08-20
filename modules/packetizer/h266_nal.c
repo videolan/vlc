@@ -50,7 +50,7 @@ static bool h266_parse_general_constraint_info(bs_t *p_bs, h266_profile_tier_lev
         nal_u8_t gci_num_additional_bits = bs_read(p_bs, 8);
         if(gci_num_additional_bits > 5)
         {
-            bs_read(p_bs, 6);
+            bs_skip(p_bs, 6);
             gci_num_additional_bits -= 6;
         }
         bs_skip(p_bs, gci_num_additional_bits);
@@ -602,15 +602,15 @@ static bool h266_parse_sequence_parameter_set_rbsp(bs_t *p_bs,
                 uint8_t readsizeW = ceil(vlc_log2(tmpWidthVal));
                 uint8_t readsizeH = ceil(vlc_log2(tmpHeightVal));
                 if(i > 0 && p_sps->pic_width_max_in_luma_samples > CtbSizeY)
-                    bs_read(p_bs, readsizeW);
+                    bs_skip(p_bs, readsizeW);
                 if(i > 0 && p_sps->pic_height_max_in_luma_samples > CtbSizeY)
-                    bs_read(p_bs, readsizeH);
+                    bs_skip(p_bs, readsizeH);
                 if(i < sps_num_subpics_minus1 &&
                     p_sps->pic_width_max_in_luma_samples > CtbSizeY)
-                    bs_read(p_bs, readsizeW);
+                    bs_skip(p_bs, readsizeW);
                 if(i < sps_num_subpics_minus1 &&
                     p_sps->pic_height_max_in_luma_samples > CtbSizeY)
-                    bs_read(p_bs, readsizeH);
+                    bs_skip(p_bs, readsizeH);
             }
             if(!sps_independent_subpics_flag)
             {
@@ -993,7 +993,7 @@ static bool h266_parse_picture_header_rbsp(bs_t *p_bs,
     ph->ph_pic_order_cnt_lsb = bs_read(p_bs, p_sps->sps_log2_max_pic_order_cnt_lsb_minus4 + 4);
     if(ph->ph_gdr_pic_flag)
         ph->ph_recovery_poc_cnt = bs_read_ue(p_bs);
-    bs_read(p_bs, p_sps->sps_num_extra_ph_bits);
+    bs_skip(p_bs, p_sps->sps_num_extra_ph_bits);
     if(p_sps->sps_poc_msb_cycle_flag)
     {
         ph->ph_poc_msb_cycle_present_flag = bs_read(p_bs, 1);
