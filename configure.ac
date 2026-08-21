@@ -5119,7 +5119,7 @@ AC_ARG_WITH(kde-solid,
   AS_HELP_STRING([--with-kde-solid=PATH],
                  [KDE Solid actions directory (auto)]),, [
 
-if test "${SYS}" != "mingw32" -a "${SYS}" != "darwin" -a "${VENDOR}" != "android" ; then
+if test "${SYS}" != "mingw32" -a "${SYS}" != "darwin" -a "${VENDOR}" != "android" -a "${SYS}" != "emscripten" ; then
   with_kde_solid="yes"
 else
   with_kde_solid="no"
