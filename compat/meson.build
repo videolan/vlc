@@ -7,7 +7,7 @@ if libcompat_sources.length() > 0
         include_directories: [vlc_include_dirs],
         dependencies: [m_lib],
         pic: true,
-        install: true,
+        install: host_system != 'windows',
         install_dir: get_option('libdir') / 'vlc'
     )
 endif
