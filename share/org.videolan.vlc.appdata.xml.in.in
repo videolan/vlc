@@ -21,7 +21,7 @@
         <release version="@VERSION@" date="@VERSION_DATE@" />
     </releases>
     <provides>
-        <library>libvlc.so.5</library>
+        <library>libvlc.so.@LIBVLC_ABI_MAJOR@</library>
     </provides>
     <project_group>VideoLAN</project_group>
     <project_license>GPL-2.0+</project_license>
