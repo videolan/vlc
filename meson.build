@@ -1038,6 +1038,7 @@ if host_system == 'windows'
     bindir_path = prefix_path
     libexecdir_path = prefix_path
     pkglibexecdir_path = prefix_path
+    vlccore_lib_path = prefix_path / 'sdk/lib'
 else
     libdir_path = prefix_path / get_option('libdir')
     pkglibdir_path = libdir_path / vlc_pkg_suffix
@@ -1047,6 +1048,7 @@ else
     bindir_path = prefix_path / 'bin'
     libexecdir_path = prefix_path / get_option('libexecdir')
     pkglibexecdir_path = libexecdir_path / vlc_pkg_suffix
+    vlccore_lib_path = prefix_path / 'lib' / vlc_pkg_suffix
 endif
 
 cdata.set_quoted('LIBDIR', libdir_path)
