@@ -55,12 +55,10 @@ LUA_MODULES_PKGDATA = \
 	$(NULL)
 
 desktopdir = $(datadir)/applications
-if !HAVE_WIN32
-if !HAVE_DARWIN
+if KDE_SOLID
 desktop_DATA = vlc.desktop vlc-openbd.desktop vlc-opendvd.desktop vlc-openvcd.desktop vlc-opencda.desktop
 appdatadir = $(datarootdir)/metainfo
 appdata_DATA = org.videolan.vlc.appdata.xml
-endif
 endif
 
 EXTRA_DIST += vlc.desktop.in vlc.desktop.mimetypes
