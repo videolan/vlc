@@ -9,8 +9,10 @@ check_PROGRAMS += VLCMacOSXTests
 TESTS += $(macosx_gui_xctest_bundles)
 
 VLCMacOSXTests_SOURCES = \
+	gui/macosx/tests/VLCHexNumberFormatterTest.m \
 	gui/macosx/tests/VLCPositionFormatterTest.m \
-	gui/macosx/extensions/VLCPositionFormatter.m
+	gui/macosx/extensions/VLCHexNumberFormatter.m \
+	gui/macosx/extensions/VLCPositionFormatter.m \
 
 VLCMacOSXTests_CPPFLAGS = \
 	$(AM_CPPFLAGS) \
