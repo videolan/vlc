@@ -224,6 +224,9 @@
 /* Define to 1 if you have the <linux/magic.h> header file. */
 #mesondefine HAVE_LINUX_MAGIC_H
 
+/* Define to 1 if you have the <linux/videodev2.h> header file. */
+#mesondefine HAVE_LINUX_VIDEODEV2_H
+
 /* Define to 1 if you have the `lldiv' function. */
 #mesondefine HAVE_LLDIV
 
@@ -399,6 +402,9 @@
 
 /* Define to 1 if you have the <sys/uio.h> header file. */
 #mesondefine HAVE_SYS_UIO_H
+
+/* Define to 1 if you have the <sys/videoio.h> header file. */
+#mesondefine HAVE_SYS_VIDEOIO_H
 
 /* Define to 1 if you have the `tdestroy' function. */
 #mesondefine HAVE_TDESTROY

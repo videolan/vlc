@@ -263,6 +263,7 @@ check_c_headers = [
     ['getopt.h'],
     ['linux/dccp.h'],
     ['linux/magic.h'],
+    ['linux/videodev2.h'],
     ['pthread.h'],
     ['poll.h'],
     ['sys/auxv.h'],
@@ -272,6 +273,7 @@ check_c_headers = [
     # Bionic >= 26 source code also says it's not useful because of SELinux.
     ['sys/shm.h', { 'exclude_host': ['android'] }],
     ['sys/soundcard.h'],
+    ['sys/videoio.h', { 'prefix' : ['#include <sys/ioccom.h>'] }],
     ['valgrind/valgrind.h'],
     ['X11/Xlib.h'],
     ['xlocale.h'],

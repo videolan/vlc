@@ -189,6 +189,37 @@ if libraw1394_dep.found() and libavc1394_dep.found()
     }
 endif
 
+# Video4Linux2
+if use_zvbi
+    v4l2_zvbi_dep = declare_dependency(dependencies: zvbi_dep,
+                                       compile_args: '-DZVBI_COMPILED=1')
+else
+    v4l2_zvbi_dep = declare_dependency()
+endif
+vlc_modules += {
+    'name' : 'v4l2',
+    'sources' : files('v4l2/v4l2.c',
+                      'v4l2/buffers.c',
+                      'v4l2/video.c',
+                      'v4l2/vbi.c',
+                      'v4l2/demux.c',
+                      'v4l2/access.c',
+                      'v4l2/radio.c',
+                      'v4l2/controls.c',
+                      'v4l2/lib.c',
+                      'v4l2/v4l2.h',
+                      'v4l2/linux/videodev2.h',
+                      'v4l2/linux/v4l2-common.h',
+                      'v4l2/linux/v4l2-controls.h'),
+    'include_directories' : include_directories('v4l2'),
+    'dependencies' : [dl_lib, m_lib, v4l2_zvbi_dep],
+    'enabled' : get_option('v4l2')
+        .require(cdata.has('HAVE_LINUX_VIDEODEV2_H') or cdata.has('HAVE_SYS_VIDEOIO_H'),
+                 error_message: 'Video4Linux2 headers not found')
+        .allowed()
+
+}
+
 # Linsys
 if (get_option('linsys')
     .require(host_system == 'linux', error_message: 'Linsys requires Linux')

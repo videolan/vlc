@@ -815,7 +815,11 @@ option('ndi',
        value: 'auto',
        description: 'Build with NDI module (requires libnoidea)')
 
-# TODO: Missing v4l2
+option('v4l2',
+       type: 'feature',
+       value: 'auto',
+       description: 'Video4Linux2 support')
+
 # TODO: Missing rpi-omxil
 # TODO: Missing gst-decode
 # TODO: Missing libva
