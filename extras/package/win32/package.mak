@@ -83,7 +83,7 @@ if HAVE_NLS
 endif
 
 # BD-J JAR
-	-cp $(CONTRIB_DIR)/share/java/*.jar $(win32_destdir)/plugins/access/
+	-cp $(CONTRIB_DIR)/share/java/libbluray*.jar $(win32_destdir)/plugins/access/
 
 if BUILD_LUA
 	mkdir -p $(win32_destdir)/lua/
