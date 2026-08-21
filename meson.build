@@ -43,16 +43,6 @@ vlc_build_root = meson.current_build_dir()
 
 cdata = configuration_data()
 
-gen_vlc_about = find_program('buildsystem/gen-vlc-about.py')
-vlc_about = custom_target('vlc_about.h',
-                        input:   ['COPYING', 'THANKS', 'AUTHORS'],
-                        output:  ['vlc_about.h'],
-                        command: [gen_vlc_about,
-                                   '@INPUT0@',
-                                   '@INPUT1@',
-                                   '@INPUT2@',
-                                   '@OUTPUT@'])
-
 cargo_rustc_static_libs = find_program('buildsystem/cargo-rustc-static-libs.py')
 cargo_output = find_program('buildsystem/cargo-output.py')
 
@@ -1060,6 +1050,18 @@ cdata.set_quoted('PKGLIBEXECDIR', pkglibexecdir_path)
 cdata.set_quoted('SYSDATADIR', sysdatadir_path)
 cdata.set_quoted('PKGDATADIR', pkgdatadir_path)
 cdata.set_quoted('LOCALEDIR', localedir_path)
+
+gen_vlc_about = find_program('buildsystem/gen-vlc-about.py')
+vlc_about = custom_target('vlc_about.h',
+                        input:   ['COPYING', 'THANKS', 'AUTHORS'],
+                        output:  ['vlc_about.h'],
+                        install: true,
+                        install_dir: plugins_header_path,
+                        command: [gen_vlc_about,
+                                   '@INPUT0@',
+                                   '@INPUT1@',
+                                   '@INPUT2@',
+                                   '@OUTPUT@'])
 
 # Enable stream outputs
 if get_option('stream_outputs')
