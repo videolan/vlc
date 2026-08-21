@@ -193,6 +193,11 @@ if spatial_dep.found()
     if (spatial_dep.version().version_compare('>= 0.4.0'))
         spatial_extra_cppflags += ['-DHAVE_SPATIALAUDIOVERSION_H=1']
     endif
+
+    if host_system == 'windows'
+        # HRTFS
+        install_subdir('../../share/hrtfs', install_dir : prefix_path )
+    endif
 endif
 
 vlc_modules += {
