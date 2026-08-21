@@ -573,9 +573,6 @@
 /* Define to 1 if the X Window System is missing or not being used. */
 #mesondefine X_DISPLAY_MISSING
 
-/* Define if the zvbi module is built */
-// #undef ZVBI_COMPILED
-
 /* Define to 64 for large files support. */
 #define _FILE_OFFSET_BITS 64
 
