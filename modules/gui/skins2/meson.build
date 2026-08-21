@@ -185,3 +185,19 @@ if host_system == 'darwin' and skins2_enabled
         ],
     }
 endif
+
+if skins2_enabled
+    if host_system == 'windows'
+        skinsdatadir_path = prefix_path / 'skins'
+    else
+        skinsdatadir_path = prefix_path / get_option('datadir')
+    endif
+
+    install_data('../../../share/skins2/fonts/FreeSans.ttf',     install_dir: skinsdatadir_path / 'fonts')
+    install_data('../../../share/skins2/fonts/FreeSansBold.ttf', install_dir: skinsdatadir_path / 'fonts')
+    install_data('../../../share/skins2/skin.catalog',           install_dir: skinsdatadir_path)
+    install_data('../../../share/skins2/skin.dtd',               install_dir: skinsdatadir_path)
+    install_data('../../../share/skins2/winamp2.xml',            install_dir: skinsdatadir_path)
+
+    # TODO default.vlt which is a gzip/tarball of the skins2/default folder
+endif
