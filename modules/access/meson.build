@@ -348,6 +348,15 @@ if libbluray_dep.found()
         'sources' : files('bluray.c'),
         'dependencies' : [libbluray_dep]
     }
+
+    if host_system == 'windows'
+        # BD-J JAR
+        # install_subdir(libbluray_dep.get_variable(pkgconfig: 'prefix') / 'share/java', install_dir : plugins_path)
+        install_data(libbluray_dep.get_variable(pkgconfig: 'prefix') / 'share/java/libbluray-j2se-' + libbluray_dep.version() + '.jar',
+                    install_dir : plugins_path )
+        install_data(libbluray_dep.get_variable(pkgconfig: 'prefix') / 'share/java/libbluray-awt-j2se-' + libbluray_dep.version() + '.jar',
+                    install_dir : plugins_path )
+    endif
 endif
 
 
