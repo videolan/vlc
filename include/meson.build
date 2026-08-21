@@ -14,7 +14,7 @@ install_headers(
     'vlc/libvlc_renderer_discoverer.h',
     'vlc/libvlc_version.h',
     'vlc/libvlc_video.h',
-    subdir: vlc_pkg_suffix)
+    install_dir: libvlc_header_path)
 
 # Install VLC plugin headers
 install_headers(
@@ -126,4 +126,4 @@ install_headers(
     'vlc_window.h',
     'vlc_xlib.h',
     'vlc_xml.h',
-    subdir: vlc_pkg_suffix / 'plugins')
+    install_dir: plugins_header_path)

@@ -1045,8 +1045,12 @@ pkgdatadir_path = sysdatadir_path / vlc_pkg_suffix
 localedir_path = prefix_path / get_option('localedir')
 if host_system == 'windows'
     plugins_path = prefix_path / 'plugins'
+    libvlc_header_path = prefix_path / 'sdk/include/vlc'
+    plugins_header_path = prefix_path / 'sdk/include/vlc/plugins'
 else
     plugins_path = pkglibdir_path / 'plugins'
+    libvlc_header_path = prefix_path / 'include' / vlc_pkg_suffix
+    plugins_header_path = prefix_path / 'include' / vlc_pkg_suffix / 'plugins'
 endif
 
 cdata.set_quoted('LIBDIR', libdir_path)
