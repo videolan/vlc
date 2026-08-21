@@ -5121,6 +5121,8 @@ AC_ARG_WITH(kde-solid,
 
 if test "${SYS}" != "mingw32" -a "${SYS}" != "darwin" -a "${VENDOR}" != "android" ; then
   with_kde_solid="yes"
+else
+  with_kde_solid="no"
 fi
 ])
 soliddatadir=""
