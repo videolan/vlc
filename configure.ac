@@ -5295,7 +5295,12 @@ AC_CONFIG_FILES([
   lib/Makefile
   bin/Makefile
   test/Makefile
-  share/org.videolan.vlc.appdata.xml.in
+])
+
+AM_COND_IF([KDE_SOLID], [
+  AC_CONFIG_FILES([
+    share/org.videolan.vlc.appdata.xml.in
+  ])
 ])
 
 AM_COND_IF([HAVE_WIN32], [
