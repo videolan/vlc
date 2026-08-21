@@ -1028,8 +1028,6 @@ vlc_pkg_suffix = meson.project_name().to_lower()
 
 libdir_path = prefix_path / get_option('libdir')
 pkglibdir_path = libdir_path / vlc_pkg_suffix
-libexecdir_path = prefix_path / get_option('libexecdir')
-pkglibexecdir_path = libexecdir_path / vlc_pkg_suffix
 sysdatadir_path = prefix_path / get_option('datadir')
 pkgdatadir_path = sysdatadir_path / vlc_pkg_suffix
 localedir_path = prefix_path / get_option('localedir')
@@ -1037,10 +1035,14 @@ if host_system == 'windows'
     plugins_path = prefix_path / 'plugins'
     libvlc_header_path = prefix_path / 'sdk/include/vlc'
     plugins_header_path = prefix_path / 'sdk/include/vlc/plugins'
+    libexecdir_path = prefix_path
+    pkglibexecdir_path = prefix_path
 else
     plugins_path = pkglibdir_path / 'plugins'
     libvlc_header_path = prefix_path / 'include' / vlc_pkg_suffix
     plugins_header_path = prefix_path / 'include' / vlc_pkg_suffix / 'plugins'
+    libexecdir_path = prefix_path / get_option('libexecdir')
+    pkglibexecdir_path = libexecdir_path / vlc_pkg_suffix
 endif
 
 cdata.set_quoted('LIBDIR', libdir_path)
