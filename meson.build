@@ -1043,6 +1043,11 @@ pkglibexecdir_path = libexecdir_path / vlc_pkg_suffix
 sysdatadir_path = prefix_path / get_option('datadir')
 pkgdatadir_path = sysdatadir_path / vlc_pkg_suffix
 localedir_path = prefix_path / get_option('localedir')
+if host_system == 'windows'
+    plugins_path = prefix_path / 'plugins'
+else
+    plugins_path = pkglibdir_path / 'plugins'
+endif
 
 cdata.set_quoted('LIBDIR', libdir_path)
 cdata.set_quoted('PKGLIBDIR', pkglibdir_path)
