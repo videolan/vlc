@@ -489,7 +489,8 @@ libvlccore = library(
     link_args: libvlccore_link_args,
     link_with: [vlc_libcompat],
     dependencies: libvlccore_deps,
-    install: true
+    install: true,
+    install_dir: libdir_path,
 )
 
 libvlccore_dep = declare_dependency(link_with: libvlccore, sources: vlc_about)

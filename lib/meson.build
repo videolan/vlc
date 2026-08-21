@@ -28,7 +28,8 @@ libvlc = library('vlc',
     c_args: libvlc_cargs,
     link_with: [vlc_libcompat],
     dependencies: [libvlccore_dep, m_lib, threads_dep],
-    install: true
+    install: true,
+    install_dir: libdir_path,
 )
 
 # Publicly exported dependency object. Used when libvlc is wrapped in a meson

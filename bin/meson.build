@@ -28,6 +28,7 @@ if build_vlc and (host_system != 'darwin' or have_osx) and not have_win_store an
         include_directories: [vlc_include_dirs],
         dependencies: vlc_deps,
         install: true,
+        install_dir: bindir_path,
         win_subsystem: 'windows'
     )
 
