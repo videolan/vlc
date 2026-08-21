@@ -1153,6 +1153,11 @@ subdir('modules')
 # VLC binaries
 subdir('bin')
 
+# OS specific packaging
+if host_system == 'windows'
+    subdir('extras/package/win32')
+endif
+
 # Generate config.h
 configure_file(input: 'config.h.meson',
   output: 'config.h',
