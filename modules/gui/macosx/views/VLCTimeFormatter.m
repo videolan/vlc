@@ -39,22 +39,22 @@
 {
     NSArray<NSString *> * const components = [string componentsSeparatedByString:@":"];
     const NSUInteger componentCount = components.count;
-    if (componentCount <= 1 || componentCount > 3) {
+    if (string.length == 0 || componentCount > 3) {
         *error = @"Cannot get bookmark time as invalid string format for time was received";
         return NO;
     }
 
-    size_t time = 0;
+    int64_t time = 0;
 
     if (componentCount == 1) {
         time = components.firstObject.longLongValue * 1000;
     } else if (componentCount == 2) {
-        time = components.firstObject.longLongValue * 60 +
-               [components objectAtIndex:1].longLongValue * 1000;
+        time = (components.firstObject.longLongValue * 60 +
+                [components objectAtIndex:1].longLongValue) * 1000;
     } else if (componentCount == 3) {
-        time = components.firstObject.longLongValue * 3600 +
-               [components objectAtIndex:1].longLongValue * 60 +
-               [components objectAtIndex:2].longLongValue * 1000;
+        time = (components.firstObject.longLongValue * 3600 +
+                [components objectAtIndex:1].longLongValue * 60 +
+                [components objectAtIndex:2].longLongValue) * 1000;
     }
 
     *obj = [NSNumber numberWithLongLong:time];
