@@ -25,6 +25,7 @@
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCInputItem.h"
+#import "library/VLCInputNode.h"
 #import "library/VLCInputNodePathControl.h"
 #import "library/VLCInputNodePathControlItem.h"
 #import "library/VLCLibraryWindow.h"

@@ -23,6 +23,7 @@
 #import "VLCInputNodePathControlItem.h"
 
 #import "VLCInputItem.h"
+#import "VLCInputNode.h"
 #import "VLCLibraryImageCache.h"
 
 #import "extensions/NSString+Helpers.h"

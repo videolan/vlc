@@ -14,6 +14,7 @@
 #import <XCTest/XCTest.h>
 
 #import "library/VLCInputItem.h"
+#import "library/VLCInputNode.h"
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wnonnull"

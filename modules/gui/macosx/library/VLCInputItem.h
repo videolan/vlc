@@ -95,17 +95,4 @@ extern NSString * const VLCInputItemCommonDataDifferingFlagString;
 
 NSDictionary<NSString *, id> *commonInputItemData(NSArray<VLCInputItem*> * const inputItems);
 
-@interface VLCInputNode : NSObject
-
-- (instancetype)initWithInputNode:(struct input_item_node_t *)p_inputNode;
-
-@property (readonly) struct input_item_node_t *vlcInputItemNode;
-@property (readonly, nullable) VLCInputItem *inputItem;
-@property (readonly) int numberOfChildren;
-@property (readonly, nullable) NSArray <VLCInputNode *> *children;
-
-- (void)clearChildrenCache;
-
-@end
-
 NS_ASSUME_NONNULL_END

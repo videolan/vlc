@@ -31,6 +31,7 @@
 #import "extensions/NSTableCellView+VLCAdditions.h"
 
 #import "library/VLCInputItem.h"
+#import "library/VLCInputNode.h"
 #import "library/VLCInputNodePathControl.h"
 #import "library/VLCInputNodePathControlItem.h"
 #import "library/VLCLibraryImageCache.h"

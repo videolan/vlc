@@ -23,6 +23,7 @@
 #import "VLCLocalMediaSource.h"
 
 #import "library/VLCInputItem.h"
+#import "library/VLCInputNode.h"
 
 #import "VLCLocalMediaSourceNodeObservation.h"
 

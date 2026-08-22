@@ -28,6 +28,7 @@
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCInputItem.h"
+#import "library/VLCInputNode.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryModel.h"

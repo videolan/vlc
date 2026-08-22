@@ -25,6 +25,7 @@
 
 #import "extensions/NSString+Helpers.h"
 #import "library/VLCInputItem.h"
+#import "library/VLCInputNode.h"
 
 @interface VLCMediaSource ()
 {

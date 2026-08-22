@@ -21,6 +21,7 @@ VLCMacOSXTests_SOURCES = \
 	gui/macosx/extensions/VLCPositionFormatter.m \
 	gui/macosx/extensions/NSString+Helpers.m \
 	gui/macosx/library/VLCInputItem.m \
+	gui/macosx/library/VLCInputNode.m \
 	gui/macosx/windows/logging/VLCLogMessage.m \
 	gui/macosx/views/VLCTimeFormatter.m
 
