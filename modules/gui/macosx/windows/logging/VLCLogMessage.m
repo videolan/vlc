@@ -33,7 +33,7 @@
 {
     self = [super init];
     if (self) {
-        if (!message || !info->psz_module)
+        if (!message || !info || !info->psz_module)
             return nil;
         
         _type = type;
