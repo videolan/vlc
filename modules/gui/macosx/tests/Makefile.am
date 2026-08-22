@@ -11,8 +11,11 @@ TESTS += $(macosx_gui_xctest_bundles)
 VLCMacOSXTests_SOURCES = \
 	gui/macosx/tests/VLCHexNumberFormatterTest.m \
 	gui/macosx/tests/VLCPositionFormatterTest.m \
+	gui/macosx/tests/VLCTimeFormatterTest.m \
 	gui/macosx/extensions/VLCHexNumberFormatter.m \
 	gui/macosx/extensions/VLCPositionFormatter.m \
+	gui/macosx/extensions/NSString+Helpers.m \
+	gui/macosx/views/VLCTimeFormatter.m
 
 VLCMacOSXTests_CPPFLAGS = \
 	$(AM_CPPFLAGS) \
@@ -30,10 +33,18 @@ VLCMacOSXTests_LDFLAGS = \
 	-bundle \
 	-F"$(macosx_gui_xctest_frameworks_dir)" \
 	-Wl,-rpath,"$(macosx_gui_xctest_frameworks_dir)" \
+	-Wl,-rpath,"$(abs_top_builddir)/src/.libs" \
 	-Wl,-framework,XCTest \
-	-Wl,-framework,Foundation
+	-Wl,-framework,Foundation \
+	-Wl,-framework,Cocoa \
+	-Wl,-framework,IOKit
 
-VLCMacOSXTests_LDADD =
+VLCMacOSXTests_LDADD = $(top_builddir)/src/libvlccore.la
+
+VLCMacOSXTests_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(OBJCLD) \
+	$(VLCMacOSXTests_OBJCFLAGS) $(OBJCFLAGS) \
+	$(VLCMacOSXTests_LDFLAGS) $(LDFLAGS) -o $@
 
 VLCMacOSXTests.xctest: VLCMacOSXTests$(EXEEXT) $(srcdir)/gui/macosx/tests/VLCMacOSXTests-Info.plist
 	$(AM_V_GEN)rm -rf $@
