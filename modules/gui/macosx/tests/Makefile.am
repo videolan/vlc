@@ -13,6 +13,7 @@ VLCMacOSXTests_SOURCES = \
 	gui/macosx/tests/NSStringHelpersTest.m \
 	gui/macosx/tests/VLCInputItemTest.m \
 	gui/macosx/tests/VLCInputItemTestSupport.m \
+	gui/macosx/tests/VLCInputNodeTest.m \
 	gui/macosx/tests/VLCLogMessageTest.m \
 	gui/macosx/tests/VLCPositionFormatterTest.m \
 	gui/macosx/tests/VLCTimeFormatterTest.m \
