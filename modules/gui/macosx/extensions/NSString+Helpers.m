@@ -115,7 +115,7 @@ NSString * flagEmojiStringForCountryCode(NSString *countryCode)
 + (instancetype)stringWithTime:(long long int)time
 {
     if (time > 0) {
-        if (time > 3600)
+        if (time >= 3600)
             return [NSString stringWithFormat:@"%s%01ld:%02ld:%02ld",
                     time < 0 ? "-" : "",
                     (long) (time / 3600),
