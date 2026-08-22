@@ -24,6 +24,15 @@
 
 @implementation NSStringHelpersTest
 
+- (void)testNilSafeStringComparison
+{
+    XCTAssertTrue([NSString equalOrBothNil:nil to:nil]);
+    XCTAssertFalse([NSString equalOrBothNil:nil to:@"value"]);
+    XCTAssertFalse([NSString equalOrBothNil:@"value" to:nil]);
+    XCTAssertTrue([NSString equalOrBothNil:@"value" to:@"value"]);
+    XCTAssertFalse([NSString equalOrBothNil:@"value" to:@"other"]);
+}
+
 - (void)assertVLCKey:(const char *)key equalsFunctionKey:(unichar)functionKey
 {
     NSString * const expected = [NSString stringWithFormat:@"%C", functionKey];

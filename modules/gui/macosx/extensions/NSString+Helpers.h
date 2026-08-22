@@ -75,6 +75,12 @@ bool fixIntfSettings(void);
 @interface NSString (Helpers)
 
 /**
+ Compares two strings by value, treating two nil strings as equal.
+ */
++ (BOOL)equalOrBothNil:(nullable NSString *)firstString
+                    to:(nullable NSString *)secondString;
+
+/**
  Creates an NSString with the current time of the \c input_item_t
 
  This method allocates and initializes an NSString with the current
