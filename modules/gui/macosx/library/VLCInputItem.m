@@ -596,7 +596,8 @@ BOOL differing_##prop = NO;
 NSString * const firstItem_##prop = firstInputItem.prop;
 
 #define UPDATE_IF_DIFFERING_BOOL(prop)                                                          \
-differing_##prop = differing_##prop || ![inputItem.prop isEqualToString:firstItem_##prop];
+differing_##prop = differing_##prop || ![NSString equalOrBothNil:inputItem.prop                \
+                                                                   to:firstItem_##prop];
 
 #define ADD_PROP_TO_DICT(prop)                                                              \
 NSString * firstItemValue_##prop = firstItem_##prop == nil ? @"" : firstItem_##prop;        \
@@ -615,7 +616,8 @@ NSString * const value_##prop =                                                 
 
         PERFORM_ACTION_PER_INPUTITEM_NSSTRING_PROP(UPDATE_IF_DIFFERING_BOOL);
         NSString * const inputItem_artworkURL = inputItem.artworkURL.absoluteString;
-        differing_artworkURL |= ![inputItem_artworkURL isEqualToString:firstItem_artworkURL];
+        differing_artworkURL |= ![NSString equalOrBothNil:inputItem_artworkURL
+                                                          to:firstItem_artworkURL];
     }
 
     PERFORM_ACTION_PER_INPUTITEM_PROP(ADD_PROP_TO_DICT);
