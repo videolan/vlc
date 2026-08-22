@@ -11,12 +11,15 @@ TESTS += $(macosx_gui_xctest_bundles)
 VLCMacOSXTests_SOURCES = \
 	gui/macosx/tests/VLCHexNumberFormatterTest.m \
 	gui/macosx/tests/NSStringHelpersTest.m \
+	gui/macosx/tests/VLCInputItemTest.m \
+	gui/macosx/tests/VLCInputItemTestSupport.m \
 	gui/macosx/tests/VLCLogMessageTest.m \
 	gui/macosx/tests/VLCPositionFormatterTest.m \
 	gui/macosx/tests/VLCTimeFormatterTest.m \
 	gui/macosx/extensions/VLCHexNumberFormatter.m \
 	gui/macosx/extensions/VLCPositionFormatter.m \
 	gui/macosx/extensions/NSString+Helpers.m \
+	gui/macosx/library/VLCInputItem.m \
 	gui/macosx/windows/logging/VLCLogMessage.m \
 	gui/macosx/views/VLCTimeFormatter.m
 
