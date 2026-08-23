@@ -25,6 +25,8 @@ VLCMacOSXTests_SOURCES = \
 	gui/macosx/windows/logging/VLCLogMessage.m \
 	gui/macosx/views/VLCTimeFormatter.m
 
+noinst_HEADERS += gui/macosx/tests/VLCInputItemTestSupport.h
+
 VLCMacOSXTests_CPPFLAGS = \
 	$(AM_CPPFLAGS) \
 	-F"$(macosx_gui_xctest_frameworks_dir)" \
