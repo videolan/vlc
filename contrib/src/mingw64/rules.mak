@@ -197,11 +197,15 @@ endif
 	install $</mingw-w64-headers/include/d3d12shader.h       "$(PREFIX)/include"
 
 	# Trick mingw-w64 into just building libd3d12.a
-	$(MAKEBUILDDIR)
-	$(MAKECONFIGURE) $(MINGW64_MINIMALCRT_CONF)
-	mkdir -p $(BUILD_DIR)/mingw-w64-crt/$(MINGW64_BUILDDIR)
-	+$(MAKEBUILD) -C mingw-w64-crt LIBRARIES=$(MINGW64_BUILDDIR)/libd3d12.a DATA= HEADERS=
-	+$(MAKEBUILD) -C mingw-w64-crt $(MINGW64_BUILDDIR)_LIBRARIES=$(MINGW64_BUILDDIR)/libd3d12.a install-$(MINGW64_BUILDDIR)LIBRARIES
+	# Since we depend on Windows 7, the symbols are resolved at runtime and
+	# until the minimum Windows version is bumped, these should be commented
+	# out. Not providing the libs also causes build failure, in case the
+	# symbols are mistakenly directly used rather than dynamic resolving.
+	# $(MAKEBUILDDIR)
+	# $(MAKECONFIGURE) $(MINGW64_MINIMALCRT_CONF)
+	# mkdir -p $(BUILD_DIR)/mingw-w64-crt/$(MINGW64_BUILDDIR)
+	# +$(MAKEBUILD) -C mingw-w64-crt LIBRARIES=$(MINGW64_BUILDDIR)/libd3d12.a DATA= HEADERS=
+	# +$(MAKEBUILD) -C mingw-w64-crt $(MINGW64_BUILDDIR)_LIBRARIES=$(MINGW64_BUILDDIR)/libd3d12.a install-$(MINGW64_BUILDDIR)LIBRARIES
 	touch $@
 
 .sum-uiautomationcore: .sum-mingw64
