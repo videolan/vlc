@@ -100,7 +100,7 @@ static int cb_stats(void *arg, const struct rist_stats *stats_container)
 static uint64_t i_dts_to_ntp64( uint64_t i_dts )
 {
     lldiv_t d = lldiv (i_dts, CLOCK_FREQ);
-    struct timespec ts = { d.quot, INT64_C(1000) * d.rem };
+    struct timespec ts = { d.quot, VLC_TICK_FROM_MS(d.rem) };
     // Convert nanoseconds to 32-bits fraction (232 picosecond units)
     uint64_t t = (uint64_t)(ts.tv_nsec) << 32;
     t /= 1000000000;
