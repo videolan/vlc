@@ -58,3 +58,11 @@ void SidePanelCtx::setWidth(double value)
     m_width = unscaledValue;
     emit widthChanged(width());
 }
+
+void SidePanelCtx::setBadge(BadgeType badge)
+{
+    if (m_badge == badge)
+        return;
+    m_badge = badge;
+    emit badgeChanged(badge);
+}

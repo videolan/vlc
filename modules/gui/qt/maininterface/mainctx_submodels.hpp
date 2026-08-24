@@ -114,28 +114,42 @@ class SidePanelCtx: public QObject
     Q_OBJECT
     Q_PROPERTY(bool visible READ isVisible WRITE setVisible NOTIFY visibleChanged FINAL)
     Q_PROPERTY(bool docked READ isDocked WRITE setDocked NOTIFY dockedChanged FINAL)
+    Q_PROPERTY(BadgeType badge READ badge WRITE setBadge NOTIFY badgeChanged FINAL)
     Q_PROPERTY(double width READ width WRITE setWidth NOTIFY widthChanged FINAL)
 
 public:
+    enum BadgeType
+    {
+        BadgeNone,
+        BadgeNeutral,
+        BadgePositive,
+        BadgeNegative
+    };
+    Q_ENUM(BadgeType)
+
     SidePanelCtx(MainCtx* ctx, QObject* parent = nullptr);
 
     inline bool isDocked() const { return m_docked; }
     inline bool isVisible() const { return m_visible; }
+    inline BadgeType badge() const { return m_badge; }
     double width() const;
 
     void setDocked(bool value);
     void setVisible(bool value);
     void setWidth(double value);
+    void setBadge(BadgeType badge);
 
 signals:
     void visibleChanged(bool visible);
     void dockedChanged(bool);
     void widthChanged(double);
+    void badgeChanged(SidePanelCtx::BadgeType);
 
 private:
     MainCtx* m_ctx = nullptr;
     bool m_visible = true;
     bool m_docked = false;
+    BadgeType m_badge = BadgeNone;
     // size in dp
     double  m_width = 120;
 
