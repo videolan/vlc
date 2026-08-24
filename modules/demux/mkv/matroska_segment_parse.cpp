@@ -1978,9 +1978,12 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
                     if( p_tk->fmt.audio.i_channels > 2 &&
                         ( p_tk->fmt.i_codec != VLC_CODEC_UNKNOWN ) )
                     {
+                        unsigned i_channel_mask = 0;
                         uint32_t wfextcm = GetDWLE( p_tk->p_extra_data + offsetof(WAVEFORMATEXTENSIBLE, dwChannelMask) );
+                        if (wfextcm)
+                        {
                         int match;
-                        unsigned i_channel_mask = getChannelMask( &wfextcm,
+                        i_channel_mask = getChannelMask( &wfextcm,
                                                                   p_tk->fmt.audio.i_channels,
                                                                   &match );
 
@@ -2016,6 +2019,7 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
                             }
 
                             match = p_fmt->audio.i_channels - i_missing;
+                        }
                         }
 
                         p_tk->fmt.i_codec = vlc_fourcc_GetCodecAudio( p_tk->fmt.i_codec,
