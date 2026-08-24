@@ -366,9 +366,55 @@ tc_va_check_derive_image(const struct vlc_gl_interop *interop)
     if (!pool)
         return VLC_EGENERIC;
 
+    int ret;
+
+#if VA_CHECK_VERSION(1, 1, 0)
+    VADRMPRIMESurfaceDescriptor desc;
+
+    ret = vlc_vaapi_ExportSurfaceHandle(o, priv->vadpy, va_surface_ids[0],
+                                        VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME_2,
+                                        VA_EXPORT_SURFACE_READ_ONLY |
+                                        VA_EXPORT_SURFACE_SEPARATE_LAYERS,
+                                        &desc);
+    if (ret != VLC_SUCCESS)
+        goto done;
+
+    for (unsigned i = 0; i < desc.num_layers; ++i)
+    {
+        unsigned obj_idx = desc.layers[i].object_index[0];
+
+        if (desc.layers[i].num_planes > 1)
+        {
+            ret = VLC_EGENERIC;
+            goto done_desc;
+        }
+
+        EGLint w = (desc.width * interop->texs[i].w.num) / interop->texs[i].w.den;
+        EGLint h = (desc.height * interop->texs[i].h.num) / interop->texs[i].h.den;
+        EGLImageKHR egl_image =
+            vaegl_image_create(interop, w, h, priv->drm_fourccs[i],
+                               desc.objects[obj_idx].fd,
+                               desc.layers[i].offset[0], desc.layers[i].pitch[0],
+                               desc.objects[obj_idx].drm_format_modifier);
+        if (egl_image == NULL)
+        {
+            msg_Warn(o, "Can't create Image KHR: kernel too old ?");
+            ret = VLC_EGENERIC;
+            goto done_desc;
+        }
+        vaegl_image_destroy(interop, egl_image);
+    }
+
+    ret = VLC_SUCCESS;
+
+done_desc:
+    for (unsigned i = 0; i < desc.num_objects; ++i)
+        close(desc.objects[i].fd);
+    goto done;
+#else
     VAImage va_image = { .image_id = VA_INVALID_ID };
-    int ret = vlc_vaapi_DeriveImage(o, priv->vadpy, va_surface_ids[0],
-                                    &va_image);
+    ret = vlc_vaapi_DeriveImage(o, priv->vadpy, va_surface_ids[0],
+                                &va_image);
     if (ret != VLC_SUCCESS)
         goto done;
     assert(va_image.format.fourcc == priv->fourcc);
@@ -376,10 +422,10 @@ tc_va_check_derive_image(const struct vlc_gl_interop *interop)
     VABufferInfo va_buffer_info = (VABufferInfo) {
         .mem_type = VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME
     };
-    ret = vlc_vaapi_AcquireBufferHandle(o ,priv->vadpy, va_image.buf,
+    ret = vlc_vaapi_AcquireBufferHandle(o, priv->vadpy, va_image.buf,
                                         &va_buffer_info);
     if (ret != VLC_SUCCESS)
-        goto done;
+        goto done_derive;
 
     for (unsigned i = 0; i < interop->tex_count; ++i)
     {
@@ -393,19 +439,23 @@ tc_va_check_derive_image(const struct vlc_gl_interop *interop)
         {
             msg_Warn(o, "Can't create Image KHR: kernel too old ?");
             ret = VLC_EGENERIC;
-            goto done;
+            goto done_derive;
         }
         vaegl_image_destroy(interop, egl_image);
     }
 
-done:
+    ret = VLC_SUCCESS;
+
+done_derive:
     if (va_image.image_id != VA_INVALID_ID)
     {
         if (va_image.buf != VA_INVALID_ID)
             vlc_vaapi_ReleaseBufferHandle(o, priv->vadpy, va_image.buf);
         vlc_vaapi_DestroyImage(o, priv->vadpy, va_image.image_id);
     }
+#endif
 
+done:
     picture_pool_Release(pool);
 
     return ret;
