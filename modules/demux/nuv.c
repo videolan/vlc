@@ -665,7 +665,20 @@ static int HeaderLoad( demux_t *p_demux, header_t *h )
              h->i_keyframe_distance );
 #endif
 
-    return (h->d_fps) ? VLC_SUCCESS : VLC_EGENERIC;
+    if( !isfinite(h->d_fps) || h->d_fps <= 0.0 ||
+        h->i_video_blocks < -1 || h->i_audio_blocks < -1 || h->i_text_blocks < -1 ||
+        h->i_keyframe_distance < 0 )
+        return VLC_EGENERIC;
+
+    if( h->i_video_blocks != 0 )
+    {
+        if( h->i_width <= 0 || h->i_height <= 0 ||
+            !isfinite(h->d_aspect) || h->d_aspect <= 0.0 ||
+            h->d_aspect >= (double)UINT_MAX / h->i_height )
+            return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
 }
 
 /* FrameHeaderLoad:
