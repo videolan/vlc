@@ -117,6 +117,53 @@ T.ToolBar {
 
                     onClicked: root.toggleNavigationVisibility()
 
+                    Rectangle {
+                        id: badgeIndicator
+
+                        parent: navigationVisibilty
+                        z: 99
+
+                        anchors.top: parent.top
+                        anchors.right: parent.right
+                        anchors.topMargin: VLCStyle.margin_xxxsmall
+                        anchors.rightMargin: VLCStyle.margin_xxxsmall
+
+                        color: "transparent"
+
+                        readonly property int badgeType: MainCtx.navigationPanel.badge
+
+                        onBadgeTypeChanged: {
+                            switch (badgeType) {
+                            case SidePanelCtx.BadgePositive:
+                                badgeIndicator.color = Qt.binding(() => theme.fg.positive)
+                                break
+                            case SidePanelCtx.BadgeNegative:
+                                badgeIndicator.color = Qt.binding(() => theme.fg.negative)
+                                break
+                            case SidePanelCtx.BadgeNeutral:
+                                badgeIndicator.color = Qt.binding(() => theme.fg.neutral)
+                                break
+                            default:
+                                break
+                            }
+                        }
+
+                        radius: (width / 2)
+
+                        height: width
+                        width: VLCStyle.dp(8, VLCStyle.scale)
+
+                        visible: (opacity > 0.0)
+
+                        opacity: (MainCtx.navigationPanel.badge !== SidePanelCtx.BadgeNone) ? 1.0 : 0.0
+
+                        Behavior on opacity {
+                            OpacityAnimator {
+                                duration: VLCStyle.duration_short
+                            }
+                        }
+                    }
+
                     Navigation.parentItem: navigationButtons
                     Navigation.rightItem: historyBack
                 }

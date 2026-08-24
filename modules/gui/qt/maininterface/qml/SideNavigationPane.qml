@@ -287,6 +287,27 @@ T.Pane {
 
                 active: updateModelIsAvailable && (shouldShow || opacity > 0.0)
 
+                Binding {
+                    target: MainCtx.navigationPanel
+                    property: "badge"
+                    when: loaderUpdateButton.shouldShow &&
+                          !loaderUpdateButton.visible &&
+                          !loaderUpdateButton.suppressed
+                    value: {
+                       if (!loaderUpdateButton.updateModelIsAvailable)
+                           return SidePanelCtx.BadgeNone
+
+                        switch (UpdateModel.updateStatus) {
+                        case UpdateModel.NeedUpdate:
+                            return SidePanelCtx.BadgePositive
+                        case UpdateModel.CheckFailed:
+                            return SidePanelCtx.BadgeNegative
+                        default:
+                            return SidePanelCtx.BadgeNeutral
+                        }
+                    }
+                }
+
                 readonly property bool shouldShow: {
                     if (!updateModelIsAvailable)
                         return false
