@@ -1982,44 +1982,44 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
                         uint32_t wfextcm = GetDWLE( p_tk->p_extra_data + offsetof(WAVEFORMATEXTENSIBLE, dwChannelMask) );
                         if (wfextcm)
                         {
-                        int match;
-                        i_channel_mask = getChannelMask( &wfextcm,
-                                                                  p_tk->fmt.audio.i_channels,
-                                                                  &match );
+                            int match;
+                            i_channel_mask = getChannelMask( &wfextcm,
+                                                             p_tk->fmt.audio.i_channels,
+                                                             &match );
 
-                        if( match < p_fmt->audio.i_channels )
-                        {
-                            int i_missing = p_fmt->audio.i_channels - match;
-                            msg_Warn( vars.p_demuxer, "Trying to fill up unspecified position for %d channels", p_fmt->audio.i_channels - match );
-
-                            static const uint32_t pi_pair[] = { AOUT_CHAN_REARLEFT|AOUT_CHAN_REARRIGHT,
-                                                                AOUT_CHAN_MIDDLELEFT|AOUT_CHAN_MIDDLERIGHT,
-                                                                AOUT_CHAN_LEFT|AOUT_CHAN_RIGHT };
-
-                            /* Try to complete with pair */
-                            for( unsigned i = 0; i < ARRAY_SIZE(pi_pair); i++ )
+                            if( match < p_fmt->audio.i_channels )
                             {
-                                if( i_missing >= 2 && !(i_channel_mask & pi_pair[i] ) )
-                                {
-                                    i_missing -= 2;
-                                    i_channel_mask |= pi_pair[i];
-                                }
-                            }
-                            /* Well fill up with what we can */
-                            for( unsigned i = 0; i < ARRAY_SIZE(pi_channels_aout) && i_missing > 0; i++ )
-                            {
-                                if( !( i_channel_mask & pi_channels_aout[i] ) )
-                                {
-                                    i_channel_mask |= pi_channels_aout[i];
-                                    i_missing--;
+                                int i_missing = p_fmt->audio.i_channels - match;
+                                msg_Warn( vars.p_demuxer, "Trying to fill up unspecified position for %d channels", p_fmt->audio.i_channels - match );
 
-                                    if( i_missing <= 0 )
-                                        break;
-                                }
-                            }
+                                static const uint32_t pi_pair[] = { AOUT_CHAN_REARLEFT|AOUT_CHAN_REARRIGHT,
+                                                                    AOUT_CHAN_MIDDLELEFT|AOUT_CHAN_MIDDLERIGHT,
+                                                                    AOUT_CHAN_LEFT|AOUT_CHAN_RIGHT };
 
-                            match = p_fmt->audio.i_channels - i_missing;
-                        }
+                                /* Try to complete with pair */
+                                for( unsigned i = 0; i < ARRAY_SIZE(pi_pair); i++ )
+                                {
+                                    if( i_missing >= 2 && !(i_channel_mask & pi_pair[i] ) )
+                                    {
+                                        i_missing -= 2;
+                                        i_channel_mask |= pi_pair[i];
+                                    }
+                                }
+                                /* Well fill up with what we can */
+                                for( unsigned i = 0; i < ARRAY_SIZE(pi_channels_aout) && i_missing > 0; i++ )
+                                {
+                                    if( !( i_channel_mask & pi_channels_aout[i] ) )
+                                    {
+                                        i_channel_mask |= pi_channels_aout[i];
+                                        i_missing--;
+
+                                        if( i_missing <= 0 )
+                                            break;
+                                    }
+                                }
+
+                                match = p_fmt->audio.i_channels - i_missing;
+                            }
                         }
 
                         p_tk->fmt.i_codec = vlc_fourcc_GetCodecAudio( p_tk->fmt.i_codec,
