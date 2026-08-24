@@ -338,6 +338,13 @@ static int updatePalette(vlc_qt_theme_provider_t* obj)
 
         //always no border
         setQtColor(obj, CS, VQTC_SECTION_DECORATION, VQTC_NAME_BORDER, VQTC_STATE_NORMAL, Qt::transparent);
+
+        setQtColor(obj, CS, VQTC_SECTION_BG, VQTC_NAME_POSITIVE, VQTC_STATE_NORMAL, positive);
+        setQtColor(obj, CS, VQTC_SECTION_FG, VQTC_NAME_POSITIVE, VQTC_STATE_NORMAL, textOnPositive);
+        setQtColor(obj, CS, VQTC_SECTION_BG, VQTC_NAME_NEGATIVE, VQTC_STATE_NORMAL, negative);
+        setQtColor(obj, CS, VQTC_SECTION_FG, VQTC_NAME_NEGATIVE, VQTC_STATE_NORMAL, textOnNegative);
+        setQtColor(obj, CS, VQTC_SECTION_BG, VQTC_NAME_NEUTRAL, VQTC_STATE_NORMAL, neutral);
+        setQtColor(obj, CS, VQTC_SECTION_FG, VQTC_NAME_NEUTRAL, VQTC_STATE_NORMAL, textOnNeutral);
     }
 
     //Tooltip
