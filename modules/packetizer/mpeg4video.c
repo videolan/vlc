@@ -543,14 +543,17 @@ static int ParseVOP( decoder_t *p_dec, block_t *p_vop )
             (i_modulo_time_base * p_sys->i_fps_num);
     }
 
-    int64_t i_time_diff = (i_time_ref + i_time_increment) - (p_sys->i_last_time + p_sys->i_last_timeincr);
-    if( p_sys->i_fps_num && i_modulo_time_base == 0 && i_time_diff < 0 && -i_time_diff > p_sys->i_fps_num )
+    if( p_sys->i_fps_num )
     {
-        msg_Warn(p_dec, "missing modulo_time_base update");
-        i_modulo_time_base += -i_time_diff / p_sys->i_fps_num;
-        p_sys->i_time_ref += (i_modulo_time_base * p_sys->i_fps_num);
-        p_sys->i_time_ref += p_sys->i_last_timeincr % p_sys->i_fps_num;
-        i_time_ref = p_sys->i_time_ref;
+        int64_t i_time_diff = (i_time_ref + i_time_increment) - (p_sys->i_last_time + p_sys->i_last_timeincr);
+        if( i_modulo_time_base == 0 && i_time_diff < 0 && -i_time_diff > p_sys->i_fps_num )
+        {
+            msg_Warn(p_dec, "missing modulo_time_base update");
+            i_modulo_time_base += -i_time_diff / p_sys->i_fps_num;
+            p_sys->i_time_ref += (i_modulo_time_base * p_sys->i_fps_num);
+            p_sys->i_time_ref += p_sys->i_last_timeincr % p_sys->i_fps_num;
+            i_time_ref = p_sys->i_time_ref;
+        }
     }
 
     if( p_sys->i_fps_num < 5 && /* Work-around buggy streams */
@@ -563,7 +566,7 @@ static int ParseVOP( decoder_t *p_dec, block_t *p_vop )
     }
     else if( p_sys->i_fps_num )
     {
-        i_time_diff = (i_time_ref + i_time_increment) - (p_sys->i_last_time + p_sys->i_last_timeincr);
+        int64_t i_time_diff = (i_time_ref + i_time_increment) - (p_sys->i_last_time + p_sys->i_last_timeincr);
         p_sys->i_interpolated_pts += vlc_tick_from_samples( i_time_diff, p_sys->i_fps_num );
     }
 
@@ -605,4 +608,3 @@ static int ParseVOP( decoder_t *p_dec, block_t *p_vop )
 
     return VLC_SUCCESS;
 }
-
