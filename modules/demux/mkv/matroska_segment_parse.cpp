@@ -1796,6 +1796,27 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
                             }
                         }
 
+                        if( i_channel_mask == 0 && p_fmt->audio.i_channels <= AOUT_CHAN_MAX )
+                        {
+                            /* A dwChannelMask of 0 tells the audio device to render the first
+                             * channel to the first port on the device, the second channel to the
+                             * second port on the device, and so on. pi_default_channels is
+                             * different than pi_channels_aout. Indeed FLC/FRC must be treated a
+                             * SL/SR in that case. See "Default Channel Ordering" and "Details
+                             * about dwChannelMask" from msdn */
+
+                            static const uint32_t pi_default_channels[] = {
+                                AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT, AOUT_CHAN_CENTER,
+                                AOUT_CHAN_LFE, AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,
+                                AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT, AOUT_CHAN_REARCENTER };
+
+                            for( unsigned i = 0; i < p_fmt->audio.i_channels &&
+                                 i < ARRAY_SIZE(pi_default_channels);
+                                 i++ )
+                                i_channel_mask |= pi_default_channels[i];
+                        }
+
+
                         p_tk->fmt.i_codec = vlc_fourcc_GetCodecAudio( p_tk->fmt.i_codec,
                                                                       p_tk->fmt.audio.i_bitspersample );
                         if( i_channel_mask )
