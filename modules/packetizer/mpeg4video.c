@@ -504,7 +504,7 @@ static int ParseVOP( decoder_t *p_dec, block_t *p_vop )
         p_sys->i_flags = BLOCK_FLAG_TYPE_B;
         p_sys->b_frame = true;
         break;
-    case 3: /* gni ? */
+    case 3: /* Sprite : ISO 14496-2 § 6.3.5 */
         p_sys->i_flags = BLOCK_FLAG_TYPE_PB;
         break;
     }
