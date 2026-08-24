@@ -246,7 +246,11 @@ T.Pane {
                 source: "qrc:///qt/qml/VLC/MediaLibrary/ScanProgressBar.qml"
 
                 onLoaded: {
-                    item.background.visible = false
+                    if (item.background) {
+                        item.background.opacity = 0.6
+                        item.background.radius = Qt.binding(() => VLCStyle.dp(4, VLCStyle.scale))
+                    }
+
                     item.leftPadding = Qt.binding(function() { return root.safeAreaLeftMargin + VLCStyle.margin_small })
                     item.rightPadding = Qt.binding(function() { return root.safeAreaRightMargin + VLCStyle.margin_small })
 
