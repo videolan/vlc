@@ -128,9 +128,9 @@ else
     CONFIGFLAGS="$CONFIGFLAGS --disable-mmal"
 fi
 
-export CFLAGS="$CFLAGS -g $ARCHFLAGS -isystem=/usr/lib/$TRIPLET $VC_CPPFLAGS"
-export CXXFLAGS="$CXXFLAGS -g $ARCHFLAGS -isystem=/usr/lib/$TRIPLET $VC_CPPFLAGS"
-export CPPFLAGS="$CPPFLAGS -g $ARCHFLAGS -isystem=/usr/lib/$TRIPLET $VC_CPPFLAGS"
+export CFLAGS="$CFLAGS -g $ARCHFLAGS $VC_CPPFLAGS"
+export CXXFLAGS="$CXXFLAGS -g $ARCHFLAGS $VC_CPPFLAGS"
+export CPPFLAGS="$CPPFLAGS -g $ARCHFLAGS $VC_CPPFLAGS"
 export LDFLAGS="$LDFLAGS -L/usr/$TRIPLET/lib $VC_LDFLAGS"
 
 # Rebuild the contribs or use the prebuilt ones
