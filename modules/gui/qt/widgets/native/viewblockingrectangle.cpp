@@ -108,8 +108,25 @@ ViewBlockingRectangle::ViewBlockingRectangle(QQuickItem *parent)
 
 QSGNode *ViewBlockingRectangle::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 {
-    auto rectangleNode = dynamic_cast<QSGRectangleNode*>(oldNode);
-    auto softwareRenderNode = dynamic_cast<SoftwareRenderNode*>(oldNode);
+    QSGRectangleNode *rectangleNode = nullptr;
+    SoftwareRenderNode *softwareRenderNode = nullptr;
+
+    if (oldNode)
+    {
+        switch (oldNode->type())
+        {
+        case QSGNode::GeometryNodeType:
+            assert(dynamic_cast<QSGRectangleNode*>(oldNode));
+            rectangleNode = static_cast<QSGRectangleNode*>(oldNode);
+            break;
+        case QSGNode::RenderNodeType:
+            // Can be `SoftwareRenderNode` or `MatrixChangeObserverNode`:
+            softwareRenderNode = dynamic_cast<SoftwareRenderNode*>(oldNode);
+            break;
+        default:
+            break;
+        }
+    }
 
     assert(window());
     const bool softwareMode = (window()->rendererInterface()->graphicsApi() == QSGRendererInterface::GraphicsApi::Software);
