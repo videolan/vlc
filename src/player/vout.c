@@ -172,6 +172,8 @@ vlc_player_vout_TriggerOption(vlc_player_t *player, const char *option)
     /* Don't use vlc_player_vout_Hold() since there is nothing to trigger if it
      * returns a dummy vout */
     vout_thread_t *vout = input_resource_HoldVout(player->resource);
+    if (vout == NULL)
+        return;
     var_TriggerCallback(vout, option);
     vout_Release(vout);
 }
