@@ -818,7 +818,7 @@ static vlc_tls_t *st_ServerSessionOpen (vlc_tls_server_t *crd, vlc_tls_t *sock,
 
     vlc_tls_t *tls = st_SessionOpenCommon(VLC_OBJECT(crd), crd->sys, sock,
                                           true);
-    if (tls != NULL)
+    if (tls == NULL)
         return NULL;
 
     vlc_tls_st_t *sys = (vlc_tls_st_t *)tls;
