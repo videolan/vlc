@@ -153,7 +153,7 @@ static int initialize_audio_format(struct vlc_pw_stream *s, es_format_t *fmt, vl
         return -1;
     }
 
-    uint32_t chans_in[AOUT_CHAN_MAX];
+    uint32_t chans_in[AOUT_CHAN_MAX + 1] = {0};
     for (uint32_t i = 0; i < channels; i++)
     {
         uint16_t vlc_chan = 0;
