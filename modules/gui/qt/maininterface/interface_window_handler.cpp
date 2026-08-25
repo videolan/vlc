@@ -452,7 +452,7 @@ void InterfaceWindowHandler::setInterfaceHiden()
         // type() == WaylandCompositor is not used because any video embedding methodology may
         // depend on window resources:
         const bool ret = qGuiApp->platformName().startsWith(QLatin1String("wayland")) &&
-                         dynamic_cast<vlc::CompositorVideo*>(intf->p_compositor.get());
+                         (intf->p_compositor && (intf->p_compositor->type() != vlc::Compositor::DummyCompositor));
         if (ret)
             msg_Warn(intf, "In this configuration, the interface window can not get hidden.");
         return ret;
