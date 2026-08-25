@@ -523,7 +523,7 @@ release-snap:
 macos-x86_64:
     extends: .macos-common
     tags:
-        - old-macmini
+        - monterey
     variables: *variables-macos-x86_64
 
 macos-arm64:
