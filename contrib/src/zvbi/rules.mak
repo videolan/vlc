@@ -1,6 +1,6 @@
 # zvbi
 
-ZVBI_VERSION := 0.2.44
+ZVBI_VERSION := 0.2.45
 ZVBI_URL := $(GITHUB)/zapping-vbi/zvbi/archive/refs/tags/v$(ZVBI_VERSION).tar.gz
 
 PKGS += zvbi
