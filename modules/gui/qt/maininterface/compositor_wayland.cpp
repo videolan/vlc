@@ -119,7 +119,7 @@ bool CompositorWayland::makeMainInterface(MainCtx* mainCtx, std::function<void(Q
         connect(quickViewPtr, &QWindow::widthChanged, this, &CompositorWayland::adjustQuickWindowMask, Qt::UniqueConnection);
         connect(quickViewPtr, &QWindow::heightChanged, this, &CompositorWayland::adjustQuickWindowMask, Qt::UniqueConnection);
 
-        const auto waylandWindow = dynamic_cast<QNativeInterface::Private::QWaylandWindow *>(quickViewPtr->handle());
+        const auto waylandWindow = quickViewPtr->nativeInterface<QNativeInterface::Private::QWaylandWindow>();
         assert(waylandWindow);
         const QMargins margins(margin, margin, margin, margin);
         waylandWindow->setCustomMargins(margins);
