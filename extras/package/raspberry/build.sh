@@ -25,6 +25,11 @@ OPTIONS:
    -l            Enable translations (can be slow)
    -s            Interactive shell (get correct environment variables for build)
    -x            Add extra checks when compiling
+
+ENVIRONMENT:
+   VC_PREFIX     Path to the VideoCore firmware librares, providing MMAL and OMX
+                 (default: /opt/vc on arm, unset on aarch64). Set it to an empty
+                 value to build without mmal support.
 EOF
 }
 
@@ -75,6 +80,7 @@ case $ARCH in
         SHORTARCH="linuxarm"
         EABI="gnueabihf"
         ARCHFLAGS="-mfpu=neon"
+        : "${VC_PREFIX=/opt/vc}"
         ;;
     *)
         usage
@@ -115,11 +121,17 @@ CONTRIBFLAGS="$CONTRIBFLAGS --disable-x265 --disable-xcb --disable-libaribcaptio
 
 ${SCRIPT_PATH}/../../../contrib/bootstrap --host=$TRIPLET $CONTRIBFLAGS
 
-# use the system headers for the OS and firmware
-export CFLAGS="$CFLAGS -g $ARCHFLAGS -isystem=/usr/lib/$TRIPLET -isystem=/opt/vc/include"
-export CXXFLAGS="$CXXFLAGS -g $ARCHFLAGS -isystem=/usr/lib/$TRIPLET -isystem=/opt/vc/include"
-export CPPFLAGS="$CPPFLAGS -g $ARCHFLAGS -isystem=/usr/lib/$TRIPLET -isystem=/opt/vc/include"
-export LDFLAGS="$LDFLAGS -L/usr/$TRIPLET/lib -L/opt/vc/lib"
+if [ -n "$VC_PREFIX" ]; then
+    VC_CPPFLAGS="-isystem=$VC_PREFIX/include"
+    VC_LDFLAGS="-L$VC_PREFIX/lib"
+else
+    CONFIGFLAGS="$CONFIGFLAGS --disable-mmal"
+fi
+
+export CFLAGS="$CFLAGS -g $ARCHFLAGS -isystem=/usr/lib/$TRIPLET $VC_CPPFLAGS"
+export CXXFLAGS="$CXXFLAGS -g $ARCHFLAGS -isystem=/usr/lib/$TRIPLET $VC_CPPFLAGS"
+export CPPFLAGS="$CPPFLAGS -g $ARCHFLAGS -isystem=/usr/lib/$TRIPLET $VC_CPPFLAGS"
+export LDFLAGS="$LDFLAGS -L/usr/$TRIPLET/lib $VC_LDFLAGS"
 
 # Rebuild the contribs or use the prebuilt ones
 if [ "$PREBUILT" = "yes" ]; then
