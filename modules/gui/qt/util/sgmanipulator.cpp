@@ -68,22 +68,31 @@ QSGNode *SGManipulator::updatePaintNode(QSGNode *, UpdatePaintNodeData *data)
 
     QSGNode *targetNode = nullptr;
     QSGGeometryNode *targetGeometryNode = nullptr;
-    QSGRenderNode *targetRenderNode = nullptr;
 
     QSGNode *i = transformNode;
     while (i)
     {
         // NOTE: The target node must not be a transform node.
         // NOTE: The transform nodes parent sibling item's rendering nodes.
-        if (dynamic_cast<QSGTransformNode*>(i))
+        const auto type = i->type();
+        if (type == QSGNode::TransformNodeType)
         {
             i = i->previousSibling();
             continue;
         }
 
         targetNode = i;
-        targetGeometryNode = dynamic_cast<QSGGeometryNode*>(i);
-        targetRenderNode = dynamic_cast<QSGRenderNode*>(i);
+
+        switch (type)
+        {
+        case QSGNode::GeometryNodeType:
+            assert(dynamic_cast<QSGGeometryNode*>(i));
+            targetGeometryNode = static_cast<QSGGeometryNode*>(i);
+            break;
+        default:
+            targetGeometryNode = nullptr;
+            break;
+        }
 
         break;
     }
