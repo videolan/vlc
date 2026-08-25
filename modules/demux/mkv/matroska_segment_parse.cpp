@@ -1826,10 +1826,14 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
                                                                       p_tk->fmt.audio.i_bitspersample );
                         if( i_channel_mask )
                         {
-                            p_tk->i_chans_to_reorder = aout_CheckChannelReorder(
-                                pi_channels_aout, NULL,
-                                i_channel_mask,
-                                p_tk->pi_chan_table );
+                            if ( p_tk->fmt.i_codec == VLC_FOURCC('a','r','a','w') ||
+                                 p_tk->fmt.i_codec == VLC_FOURCC('a','f','l','t') )
+                            {
+                                p_tk->i_chans_to_reorder = aout_CheckChannelReorder(
+                                    pi_channels_aout, NULL,
+                                    i_channel_mask,
+                                    p_tk->pi_chan_table );
+                            }
 
                             p_tk->fmt.audio.i_physical_channels = i_channel_mask;
                         }
