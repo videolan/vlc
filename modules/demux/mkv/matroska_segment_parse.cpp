@@ -1794,6 +1794,11 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
 
                                 match = p_fmt->audio.i_channels - i_missing;
                             }
+                            if( match < p_fmt->audio.i_channels )
+                            {
+                                msg_Err( vars.p_demuxer, "Invalid/unsupported channel mask" );
+                                i_channel_mask = 0;
+                            }
                         }
 
                         if( i_channel_mask == 0 && p_fmt->audio.i_channels <= AOUT_CHAN_MAX )
