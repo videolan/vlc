@@ -635,6 +635,18 @@ static inline void GetDoubleLE( double *pd, void *src )
 #endif
 }
 
+static bool FrameToTime( int64_t frame, double fps, vlc_tick_t *time )
+{
+    double value = (double)frame * (double)CLOCK_FREQ / fps;
+
+    if( !isfinite(value) || value < 0.0 || value >= (double)VLC_TICK_MAX ||
+        ( frame > 0 && value < 1.0 ) )
+        return false;
+
+    *time = (vlc_tick_t)value;
+    return true;
+}
+
 /* HeaderLoad:
  */
 static int HeaderLoad( demux_t *p_demux, header_t *h )
@@ -914,7 +926,13 @@ static int SeekTableLoad( demux_t *p_demux, demux_sys_t *p_sys )
             msg_Dbg( p_demux, "invalid file offset %"PRIi32" %"PRIi64, keyframe, i_offset );
         else
         {
-            vlc_tick_t i_time = (double)( (vlc_tick_t)frame * CLOCK_FREQ ) / p_sys->hdr.d_fps;
+            vlc_tick_t i_time;
+            if( !FrameToTime( frame, p_sys->hdr.d_fps, &i_time ) )
+            {
+                msg_Warn( p_demux, "index timestamp is out of range" );
+                ret = VLC_EGENERIC;
+                goto cleanup;
+            }
             demux_IndexAppend( &p_sys->idx, i_time , i_offset );
 #if 0
             msg_Dbg( p_demux, "adding entry position %"PRIi32" %"PRIi64 " file offset %"PRIi64, keyframe, i_time, i_offset );
@@ -926,7 +944,12 @@ static int SeekTableLoad( demux_t *p_demux, demux_sys_t *p_sys )
 
     p_sys->b_index = p_sys->idx.i_idx > 0;
 
-    p_sys->i_total_length = (frame + INT64_C(1)) * CLOCK_FREQ / p_sys->hdr.d_fps;
+    if( !FrameToTime( frame + INT64_C(1), p_sys->hdr.d_fps, &p_sys->i_total_length ) )
+    {
+        p_sys->i_total_length = -1;
+        msg_Warn( p_demux, "total time is out of range" );
+        goto cleanup;
+    }
 
     msg_Dbg( p_demux, "index table loaded (%"PRIi32" elements)", i_seek_elements );
 
