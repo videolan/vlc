@@ -2006,7 +2006,7 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
                                     }
                                 }
                                 /* Well fill up with what we can */
-                                for( unsigned i = 0; i < ARRAY_SIZE(pi_channels_aout) && i_missing > 0; i++ )
+                                for( unsigned i = 0; pi_channels_aout[i] && i_missing > 0; i++ )
                                 {
                                     if( !( i_channel_mask & pi_channels_aout[i] ) )
                                     {
