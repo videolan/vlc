@@ -464,13 +464,13 @@ CLEAN_FILE += .buildmeson
 # ninja build
 #
 
-ninja-$(NINJA_VERSION).tar.gz:
+ninja-$(NINJA_BUILD_NAME).tar.gz:
 	$(call download_pkg,$(NINJA_URL),ninja)
 
 ninja: .cmake
 ninja: UNPACK_DIR=ninja-$(NINJA_BUILD_NAME)
-.getninja: ninja-$(NINJA_VERSION).tar.gz
-ninja: ninja-$(NINJA_VERSION).tar.gz
+.getninja: ninja-$(NINJA_BUILD_NAME).tar.gz
+ninja: ninja-$(NINJA_BUILD_NAME).tar.gz
 	$(UNPACK)
 	$(MOVE)
 
@@ -481,7 +481,7 @@ ninja: ninja-$(NINJA_VERSION).tar.gz
 	touch $@
 
 CLEAN_PKG += ninja
-DISTCLEAN_PKG += ninja-$(NINJA_VERSION).tar.gz
+DISTCLEAN_PKG += ninja-$(NINJA_BUILD_NAME).tar.gz
 CLEAN_FILE += .buildninja
 
 # gperf
