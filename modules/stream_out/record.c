@@ -265,7 +265,7 @@ typedef struct
  * Do not do non native and non standard association !
  * Muxer will be probe if no entry found */
 static const muxer_properties_t p_muxers[] = {
-    M( "raw", "mp3", 1,         VLC_CODEC_MPGA ),
+    M( "raw", "mp3", 1,         VLC_CODEC_MPGA, VLC_CODEC_MP2, VLC_CODEC_MP3 ),
     M( "raw", "a52", 1,         VLC_CODEC_A52 ),
     M( "raw", "dts", 1,         VLC_CODEC_DTS ),
     M( "raw", "mpc", 1,         VLC_CODEC_MUSEPACK7, VLC_CODEC_MUSEPACK8 ),
@@ -287,7 +287,7 @@ static const muxer_properties_t p_muxers[] = {
                                 VLC_CODEC_SUBT ),
 
     M( "ps", "mpg", 16/* FIXME*/,VLC_CODEC_MPGV,
-                                VLC_CODEC_MPGA, VLC_CODEC_DVD_LPCM, VLC_CODEC_A52,
+                                VLC_CODEC_MPGA, VLC_CODEC_MP2, VLC_CODEC_MP3, VLC_CODEC_DVD_LPCM, VLC_CODEC_A52,
                                 VLC_CODEC_DTS,
                                 VLC_CODEC_SPU ),
 
@@ -298,7 +298,7 @@ static const muxer_properties_t p_muxers[] = {
 
     M( "ts", "ts", 8000,        VLC_CODEC_MPGV,
                                 VLC_CODEC_H264, VLC_CODEC_HEVC,
-                                VLC_CODEC_MPGA, VLC_CODEC_DVD_LPCM, VLC_CODEC_A52,
+                                VLC_CODEC_MPGA, VLC_CODEC_MP2, VLC_CODEC_MP3, VLC_CODEC_DVD_LPCM, VLC_CODEC_A52,
                                 VLC_CODEC_DTS,  VLC_CODEC_MP4A,
                                 VLC_CODEC_DVBS, VLC_CODEC_TELETEXT ),
 
