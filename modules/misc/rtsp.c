@@ -517,6 +517,8 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, const es_format_t *p_
             p_es->i_channels = p_fmt->audio.i_channels;
             break;
         case VLC_CODEC_MPGA:
+        case VLC_CODEC_MP2:
+        case VLC_CODEC_MP3:
             p_es->i_payload_type = 14;
             p_es->psz_ptname = "MPA";
             break;
