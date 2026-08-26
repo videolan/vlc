@@ -1,5 +1,5 @@
 # aom
-AOM_VERSION := 3.14.1
+AOM_VERSION := 3.15.0
 AOM_URL := https://storage.googleapis.com/aom-releases/libaom-$(AOM_VERSION).tar.gz
 
 PKGS += aom
@@ -32,6 +32,7 @@ AOM_CONF := \
 	-DCONFIG_RUNTIME_CPU_DETECT=1 \
 	-DCONFIG_MULTITHREAD=1 \
 	-DENABLE_DOCS=OFF \
+	-DENABLE_APPS=OFF \
 	-DENABLE_EXAMPLES=OFF \
 	-DENABLE_TOOLS=OFF \
 	-DENABLE_TESTS=OFF
