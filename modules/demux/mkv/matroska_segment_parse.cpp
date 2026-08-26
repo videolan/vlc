@@ -2044,8 +2044,6 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
                         }
 
 
-                        p_tk->fmt.i_codec = vlc_fourcc_GetCodecAudio( p_tk->fmt.i_codec,
-                                                                      p_tk->fmt.audio.i_bitspersample );
                         if( i_channel_mask )
                         {
                             if ( p_tk->fmt.i_codec == VLC_FOURCC('a','r','a','w') ||
@@ -2059,6 +2057,9 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
 
                             p_tk->fmt.audio.i_physical_channels = i_channel_mask;
                         }
+
+                        p_tk->fmt.i_codec = vlc_fourcc_GetCodecAudio( p_tk->fmt.i_codec,
+                                                                      p_tk->fmt.audio.i_bitspersample );
                     }
                 }
                 else
