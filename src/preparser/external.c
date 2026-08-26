@@ -659,7 +659,7 @@ preparser_pool_Run(void *data)
         vlc_interrupt_set(old);
 
         vlc_list_remove(&task->node);
-        preparser_task_Delete(task);
+        preparser_task_req_Release(&task->req);
         thread->task = NULL;
 
         assert(thread->owner->unfinished > 0);
@@ -854,7 +854,7 @@ preparser_pool_Cancel(struct preparser_process_pool *pool,
             --pool->unfinished;
             vlc_list_remove(&task->node);
             preparser_task_ExecCallback(task, -EINTR);
-            preparser_task_Delete(task);
+            preparser_task_req_Release(&task->req);
 
             if (req != NULL) {
                 vlc_mutex_unlock(&pool->lock);
