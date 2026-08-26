@@ -95,7 +95,7 @@
                                                                            forTableView:tableView];
 
     if ([libraryItem isKindOfClass:VLCMediaLibraryAlbum.class]) {
-        return VLCLibraryAlbumTableCellView.defaultHeight;
+        return [VLCLibraryAlbumTableCellView heightForAlbum:(VLCMediaLibraryAlbum *)libraryItem];
     }
     return tableView.rowHeight;
 }
