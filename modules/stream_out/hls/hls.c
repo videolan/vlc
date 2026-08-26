@@ -1352,7 +1352,10 @@ static void Del(sout_stream_t *stream, void *id)
 
         sout_MuxDelete(track->playlist_ref->mux);
         track->playlist_ref->mux = NULL;
-        ExtractAndAddSegment(track->playlist_ref, sys);
+
+        while (track->playlist_ref->muxed_output.begin != NULL &&
+               ExtractAndAddSegment(track->playlist_ref, sys) == VLC_SUCCESS)
+          ;
         UpdatePlaylistManifest(track->playlist_ref);
     }
 
