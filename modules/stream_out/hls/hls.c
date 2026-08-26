@@ -759,6 +759,17 @@ static hls_block_chain_t ExtractSegment(hls_playlist_t *playlist)
             return ExtractSubtitleSegment(&playlist->muxed_output, min_length);
         case HLS_PLAYLIST_TYPE_MP4:
         case HLS_PLAYLIST_TYPE_TS:
+            /* Draining: the last segment does not need to take care of the
+             * next one being IFrame padded. */
+            if (playlist->ended && playlist->muxed_output.length <= max_length)
+            {
+                hls_block_chain_t seg = {
+                    .begin = playlist->muxed_output.begin,
+                    .length = playlist->muxed_output.length,
+                };
+                hls_block_chain_Reset(&playlist->muxed_output);
+                return seg;
+            }
             return ExtractAVSegment(
                 playlist, &playlist->muxed_output, min_length, max_length);
     }
