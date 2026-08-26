@@ -1184,7 +1184,8 @@ access_err:
 
 static void DeletePlaylist(hls_playlist_t *playlist)
 {
-    sout_MuxDelete(playlist->mux);
+    if (playlist->mux != NULL)
+        sout_MuxDelete(playlist->mux);
 
     sout_AccessOutDelete(playlist->access);
 
@@ -1332,6 +1333,8 @@ static void Del(sout_stream_t *stream, void *id)
             map->playlist_ref = NULL;
 
         track->playlist_ref->ended = true;
+        sout_MuxDelete(track->playlist_ref->mux);
+        track->playlist_ref->mux = NULL;
         ExtractAndAddSegment(track->playlist_ref, sys);
         UpdatePlaylistManifest(track->playlist_ref);
 
@@ -1363,7 +1366,7 @@ static void SetPCR(sout_stream_t *stream, vlc_tick_t pcr)
     const hls_playlist_t *playlist;
     vlc_list_foreach_const (playlist, &sys->media_playlists, node)
     {
-        if (playlist->type != HLS_PLAYLIST_TYPE_WEBVTT)
+        if (playlist->type != HLS_PLAYLIST_TYPE_WEBVTT || playlist->mux == NULL)
             continue;
 
         hls_sub_segmenter_SignalStreamUpdate(playlist->mux,
