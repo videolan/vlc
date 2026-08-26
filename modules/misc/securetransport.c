@@ -634,9 +634,9 @@ static const struct vlc_tls_operations st_ops =
  * Initializes a client-side TLS session.
  */
 
-static vlc_tls_t *st_SessionOpenCommon(vlc_object_t *obj,
-                                       vlc_tls_creds_sys_t *crd,
-                                       vlc_tls_t *sock, bool b_server)
+static vlc_tls_st_t *st_SessionOpenCommon(vlc_object_t *obj,
+                                          vlc_tls_creds_sys_t *crd,
+                                          vlc_tls_t *sock, bool b_server)
 {
     vlc_tls_st_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
@@ -677,7 +677,7 @@ static vlc_tls_t *st_SessionOpenCommon(vlc_object_t *obj,
         goto error;
     }
 
-    return tls;
+    return sys;
 
 error:
     st_SessionClose(tls);
@@ -689,12 +689,10 @@ static vlc_tls_t *st_ClientSessionOpen(vlc_tls_client_t *crd, vlc_tls_t *sock,
 {
     msg_Dbg(crd, "open TLS session for %s", hostname);
 
-    vlc_tls_t *tls = st_SessionOpenCommon(VLC_OBJECT(crd), crd->sys, sock,
-                                          false);
-    if (tls == NULL)
+    vlc_tls_st_t *sys = st_SessionOpenCommon(VLC_OBJECT(crd), crd->sys, sock,
+                                             false);
+    if (sys == NULL)
         return NULL;
-
-    vlc_tls_st_t *sys = (vlc_tls_st_t *)tls;
 
     OSStatus ret = SSLSetPeerDomainName(sys->p_context, hostname, strlen(hostname));
     if (ret != noErr) {
@@ -759,11 +757,11 @@ static vlc_tls_t *st_ClientSessionOpen(vlc_tls_client_t *crd, vlc_tls_t *sock,
     }
 #endif
 
-    return tls;
+    return &sys->tls;
 
 error:
-    st_SessionShutdown(tls, true);
-    st_SessionClose(tls);
+    st_SessionShutdown(&sys->tls, true);
+    st_SessionClose(&sys->tls);
     return NULL;
 }
 
@@ -816,12 +814,11 @@ static vlc_tls_t *st_ServerSessionOpen (vlc_tls_server_t *crd, vlc_tls_t *sock,
     VLC_UNUSED(alpn);
     msg_Dbg(crd, "open TLS server session");
 
-    vlc_tls_t *tls = st_SessionOpenCommon(VLC_OBJECT(crd), crd->sys, sock,
-                                          true);
-    if (tls == NULL)
+    vlc_tls_st_t *sys = st_SessionOpenCommon(VLC_OBJECT(crd), crd->sys, sock,
+                                             true);
+    if (sys == NULL)
         return NULL;
 
-    vlc_tls_st_t *sys = (vlc_tls_st_t *)tls;
     vlc_tls_creds_sys_t *p_cred_sys = crd->sys;
 
     OSStatus ret = SSLSetCertificate(sys->p_context, p_cred_sys->server_cert_chain);
@@ -830,11 +827,11 @@ static vlc_tls_t *st_ServerSessionOpen (vlc_tls_server_t *crd, vlc_tls_t *sock,
         goto error;
     }
 
-    return tls;
+    return &sys->tls;
 
 error:
-    st_SessionShutdown(tls, true);
-    st_SessionClose(tls);
+    st_SessionShutdown(&sys->tls, true);
+    st_SessionClose(&sys->tls);
     return NULL;
 }
 
