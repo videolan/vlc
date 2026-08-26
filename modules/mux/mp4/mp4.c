@@ -570,19 +570,24 @@ static void DelStream(sout_mux_t *p_mux, sout_input_t *p_input)
     sout_mux_sys_t *p_sys = p_mux->p_sys;
     mp4_stream_t *p_stream = (mp4_stream_t*)p_input->p_sys;
 
-    if(!mp4mux_Is(p_sys->muxh, FRAGMENTED))
-    {
-        vlc_fifo_Lock( p_input->p_fifo );
-        block_t *p_data = vlc_fifo_DequeueAllUnlocked( p_input->p_fifo );
-        vlc_fifo_Unlock( p_input->p_fifo );
-        while( p_data != NULL )
-        {
-              block_t *p_next = p_data->p_next;
-              p_data->p_next = NULL;
-              MuxStream(p_mux, p_input, p_stream, p_data);
-              p_data = p_next;
-        }
+    vlc_fifo_Lock( p_input->p_fifo );
+    block_t *p_data = vlc_fifo_DequeueAllUnlocked( p_input->p_fifo );
+    vlc_fifo_Unlock( p_input->p_fifo );
 
+    const bool fragmented = mp4mux_Is(p_sys->muxh, FRAGMENTED);
+    while (p_data != NULL)
+    {
+        block_t *p_next = p_data->p_next;
+        p_data->p_next = NULL;
+        if (fragmented)
+            MuxFragBlock(p_mux, p_stream, p_data);
+        else
+            MuxStream(p_mux, p_input, p_stream, p_data);
+        p_data = p_next;
+    }
+
+    if (!fragmented)
+    {
         if(CreateCurrentEdit(p_stream, p_sys->i_start_dts, false))
             mp4mux_track_DebugEdits(VLC_OBJECT(p_mux), p_stream->tinfo);
     }
