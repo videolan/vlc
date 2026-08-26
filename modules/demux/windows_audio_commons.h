@@ -46,7 +46,7 @@ static inline unsigned getChannelMask( uint32_t * wvfextChannelMask, int i_chann
     unsigned i_channel_mask = 0;
     *i_match = 0;
     for( unsigned i = 0;
-         i < sizeof(pi_channels_src)/sizeof(*pi_channels_src) &&
+         pi_channels_src[i] &&
          *i_match < i_channels; i++ )
     {
         if( *wvfextChannelMask & pi_channels_src[i] )
