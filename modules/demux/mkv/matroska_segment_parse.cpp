@@ -2012,9 +2012,6 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
                                     {
                                         i_channel_mask |= pi_channels_aout[i];
                                         i_missing--;
-
-                                        if( i_missing <= 0 )
-                                            break;
                                     }
                                 }
 

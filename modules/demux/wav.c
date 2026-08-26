@@ -455,9 +455,6 @@ static int ChunkParseFmt( demux_t *p_demux, uint32_t i_size )
                     {
                         p_sys->i_channel_mask |= pi_channels_aout[i];
                         i_missing--;
-
-                        if( i_missing <= 0 )
-                            break;
                     }
                 }
 
