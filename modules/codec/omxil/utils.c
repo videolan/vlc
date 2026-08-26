@@ -742,14 +742,18 @@ int GetVlcChromaSizes( vlc_fourcc_t i_fourcc,
         return 0;
 
     /* Align on macroblock boundary */
-    width = (width + 15) & ~0xF;
-    height = (height + 15) & ~0xF;
+    if( ckd_add( &width, width, 15 ) ||
+        ckd_add( &height, height, 15 ) )
+        return 0;
+    width &= ~0xF;
+    height &= ~0xF;
 
     if( size )
     {
         if( ckd_mul( size, width, height ) ||
-            ckd_mul( size, *size, chroma_format_table[i].i_size_mul / 2 ) )
+            ckd_mul( size, *size, chroma_format_table[i].i_size_mul ) )
             return 0;
+        *size /= 2;
     }
     if( pitch )
     {
