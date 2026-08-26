@@ -307,6 +307,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                 0xbd00 | StreamIdGet( p_sys->stream_id_a52, 0x80, 0x87 );
             break;
         case VLC_CODEC_MPGA:
+        case VLC_CODEC_MP2:
+        case VLC_CODEC_MP3:
             p_stream->i_stream_id =
                 StreamIdGet( p_sys->stream_id_mpga, 0xc0, 0xcf );
             p_stream->i_stream_type = 0x03; /* ISO/IEC 11172 Audio */
@@ -413,6 +415,8 @@ static void DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
                              p_stream->i_stream_id&0xff );
             break;
         case VLC_CODEC_MPGA:
+        case VLC_CODEC_MP2:
+        case VLC_CODEC_MP3:
             StreamIdRelease( p_sys->stream_id_mpga, 0xc0,
                              p_stream->i_stream_id  );
             break;
