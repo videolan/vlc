@@ -108,6 +108,8 @@ typedef struct hls_playlist
     block_t *init_buff;
 
     bool ended;
+    /** Wall-clock time the playlist was finalized. */
+    vlc_tick_t ended_at;
 
     /**
      * Total duration of the muxed data.
@@ -1115,6 +1117,7 @@ static hls_playlist_t *CreatePlaylist(sout_stream_t *stream,
     playlist->type = type;
     playlist->config = &sys->config;
     playlist->ended = false;
+    playlist->ended_at = VLC_TICK_INVALID;
     playlist->muxed_duration = 0;
     playlist->video_track_count = 0;
 
@@ -1345,12 +1348,12 @@ static void Del(sout_stream_t *stream, void *id)
             map->playlist_ref = NULL;
 
         track->playlist_ref->ended = true;
+        track->playlist_ref->ended_at = vlc_tick_now();
+
         sout_MuxDelete(track->playlist_ref->mux);
         track->playlist_ref->mux = NULL;
         ExtractAndAddSegment(track->playlist_ref, sys);
         UpdatePlaylistManifest(track->playlist_ref);
-
-        DeletePlaylist(track->playlist_ref);
     }
 
     free(track);
@@ -1383,6 +1386,28 @@ static void SetPCR(sout_stream_t *stream, vlc_tick_t pcr)
 
         hls_sub_segmenter_SignalStreamUpdate(playlist->mux,
                                              sys->elapsed_stream_time);
+    }
+
+    /* Prune finalized playlists once the wall-clock time exceeds the window a
+     * client could still be playing them for. */
+    if (sys->config.max_segments != 0)
+    {
+        const vlc_tick_t now = vlc_tick_now();
+        const vlc_tick_t keep_window =
+            sys->config.max_segments * sys->config.max_segment_length
+            + sys->config.segment_length;
+        hls_playlist_t *pl;
+        bool pruned = false;
+        hls_playlists_foreach (pl)
+        {
+            if (pl->ended && now - pl->ended_at > keep_window)
+            {
+                DeletePlaylist(pl);
+                pruned = true;
+            }
+        }
+        if (pruned)
+            UpdateMainManifest(stream);
     }
 }
 
@@ -1426,6 +1451,10 @@ error:
 static void Close(sout_stream_t *stream)
 {
     sout_stream_sys_t *sys = stream->p_sys;
+
+    hls_playlist_t *pl;
+    hls_playlists_foreach(pl)
+        DeletePlaylist(pl);
 
     if (sys->http_host != NULL)
     {
