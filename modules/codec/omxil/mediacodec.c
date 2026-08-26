@@ -1594,6 +1594,7 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
                               p_dec->fmt_out.video.i_height,
                               NULL, NULL, &chroma_div) )
             {
+                p_sys->api.release_out(&p_sys->api, p_out->buf.i_index, false);
                 picture_Release(p_pic);
                 return -1;
             }
