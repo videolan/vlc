@@ -265,6 +265,11 @@ static NSImage *ImageFromEmoji(NSString *emoji, NSSize size)
                             withSize:(NSSize)size
                    completionHandler:(void (^)(NSImage *))completionHandler
 {
+    if (path.length == 0) {
+        completionHandler(nil);
+        return;
+    }
+
     NSURL * const pathUrl = [NSURL fileURLWithPath:path];
     [self quickLookPreviewForLocalURL:pathUrl withSize:size completionHandler:completionHandler];
 }
@@ -273,6 +278,11 @@ static NSImage *ImageFromEmoji(NSString *emoji, NSSize size)
                            withSize:(NSSize)size 
                   completionHandler:(void (^)(NSImage *))completionHandler
 {
+    if (url == nil || !url.isFileURL) {
+        completionHandler(nil);
+        return;
+    }
+
     if (@available(macOS 10.15, *)) {
         const QLThumbnailGenerationRequestRepresentationTypes type = 
             QLThumbnailGenerationRequestRepresentationTypeAll;
@@ -304,12 +314,20 @@ static NSImage *ImageFromEmoji(NSString *emoji, NSSize size)
 
 + (instancetype)quickLookPreviewForLocalPath:(NSString *)path withSize:(NSSize)size
 {
+    if (path.length == 0) {
+        return nil;
+    }
+
     NSURL *pathUrl = [NSURL fileURLWithPath:path];
     return [self quickLookPreviewForLocalURL:pathUrl withSize:size];
 }
 
 + (instancetype)quickLookPreviewForLocalURL:(NSURL *)url withSize:(NSSize)size
 {
+    if (url == nil || !url.isFileURL) {
+        return nil;
+    }
+
     NSDictionary *dict = @{(NSString*)kQLThumbnailOptionIconModeKey : [NSNumber numberWithBool:NO]};
     CFDictionaryRef dictRef = CFBridgingRetain(dict);
     if (dictRef == NULL) {
