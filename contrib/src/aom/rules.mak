@@ -15,6 +15,8 @@ $(TARBALLS)/libaom-$(AOM_VERSION).tar.gz:
 aom: libaom-$(AOM_VERSION).tar.gz .sum-aom
 	$(UNPACK)
 	$(APPLY) $(SRC)/aom/0001-Do-not-force-_WIN32_WINNT.patch
+	# do not force C++17, it's not supported by older compilers we support
+	sed -i.orig 's,++17,++14,g' $(UNPACK_DIR)/cmake/aom_configure.cmake
 ifndef HAVE_WINSTORE
 	# disable Windows InitOnceBeginInitialize not compatible with XP
 	sed -i.orig 's,defined(_WIN32),0,' $(UNPACK_DIR)/aom_ports/aom_once.h
