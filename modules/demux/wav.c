@@ -458,12 +458,11 @@ static int ChunkParseFmt( demux_t *p_demux, uint32_t i_size )
                     }
                 }
 
-                i_match = p_sys->fmt.audio.i_channels - i_missing;
-            }
-            if( i_match < p_sys->fmt.audio.i_channels )
-            {
-                msg_Err( p_demux, "Invalid/unsupported channel mask" );
-                p_sys->i_channel_mask = 0;
+                if( i_missing > 0 )
+                {
+                    msg_Err( p_demux, "Invalid/unsupported channel mask" );
+                    p_sys->i_channel_mask = 0;
+                }
             }
         }
     }
