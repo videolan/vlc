@@ -55,7 +55,6 @@ typedef struct
 
     date_t          pts;
 
-    uint32_t i_channel_mask;
     uint8_t i_chans_to_reorder;            /* do we need channel reordering */
     uint8_t pi_chan_table[AOUT_CHAN_MAX];
 } demux_sys_t;
@@ -352,7 +351,6 @@ static void InitFmt( demux_t *p_demux )
     p_sys->i_frame_size = 0;
     p_sys->i_frame_samples = 0;
     p_sys->i_chans_to_reorder = 0;
-    p_sys->i_channel_mask = 0;
 }
 
 static int ChunkParseFmt( demux_t *p_demux, uint32_t i_size )
@@ -396,6 +394,7 @@ static int ChunkParseFmt( demux_t *p_demux, uint32_t i_size )
         p_sys->fmt.i_extra = __MIN( GetWLE( &p_wf->cbSize ), i_size - sizeof(WAVEFORMATEX) );
     i_extended = 0;
 
+    unsigned i_channel_mask = 0;
     /* Handle new WAVE_FORMAT_EXTENSIBLE wav files */
     /* see the following link for more information:
      * http://www.microsoft.com/whdc/device/audio/multichaud.mspx#EFAA */
@@ -423,7 +422,7 @@ static int ChunkParseFmt( demux_t *p_demux, uint32_t i_size )
         if( dwChannelMask )
         {
             int i_match = 0;
-            p_sys->i_channel_mask = getChannelMask( &dwChannelMask, p_sys->fmt.audio.i_channels, &i_match );
+            i_channel_mask = getChannelMask( &dwChannelMask, p_sys->fmt.audio.i_channels, &i_match );
             if( dwChannelMask )
                 msg_Warn( p_demux, "Some channels are unrecognized or uselessly specified (0x%x)", dwChannelMask );
             if( i_match < p_sys->fmt.audio.i_channels )
@@ -442,18 +441,18 @@ static int ChunkParseFmt( demux_t *p_demux, uint32_t i_size )
                 /* Try to complete with pair */
                 for( unsigned i = 0; i < ARRAY_SIZE(pi_pair); i++ )
                 {
-                    if( i_missing >= 2 && !(p_sys->i_channel_mask & pi_pair[i] ) )
+                    if( i_missing >= 2 && !(i_channel_mask & pi_pair[i] ) )
                     {
                         i_missing -= 2;
-                        p_sys->i_channel_mask |= pi_pair[i];
+                        i_channel_mask |= pi_pair[i];
                     }
                 }
                 /* Well fill up with what we can */
                 for( unsigned i = 0; pi_channels_aout[i] && i_missing > 0; i++ )
                 {
-                    if( !( p_sys->i_channel_mask & pi_channels_aout[i] ) )
+                    if( !( i_channel_mask & pi_channels_aout[i] ) )
                     {
-                        p_sys->i_channel_mask |= pi_channels_aout[i];
+                        i_channel_mask |= pi_channels_aout[i];
                         i_missing--;
                     }
                 }
@@ -461,12 +460,12 @@ static int ChunkParseFmt( demux_t *p_demux, uint32_t i_size )
                 if( i_missing > 0 )
                 {
                     msg_Err( p_demux, "Invalid/unsupported channel mask" );
-                    p_sys->i_channel_mask = 0;
+                    i_channel_mask = 0;
                 }
             }
         }
     }
-    if( p_sys->i_channel_mask == 0 && p_sys->fmt.audio.i_channels > 2
+    if( i_channel_mask == 0 && p_sys->fmt.audio.i_channels > 2
      && p_sys->fmt.audio.i_channels <= AOUT_CHAN_MAX )
     {
         /* A dwChannelMask of 0 tells the audio device to render the first
@@ -484,23 +483,23 @@ static int ChunkParseFmt( demux_t *p_demux, uint32_t i_size )
         for( unsigned i = 0; i < p_sys->fmt.audio.i_channels &&
              i < ARRAY_SIZE(pi_default_channels);
              i++ )
-            p_sys->i_channel_mask |= pi_default_channels[i];
+            i_channel_mask |= pi_default_channels[i];
     }
 
-    if( p_sys->i_channel_mask )
+    if( i_channel_mask )
     {
         if( p_sys->fmt.i_codec == VLC_FOURCC('a','r','a','w') ||
             p_sys->fmt.i_codec == VLC_FOURCC('a','f','l','t') )
             p_sys->i_chans_to_reorder =
                 aout_CheckChannelReorder( pi_channels_aout, NULL,
-                                          p_sys->i_channel_mask,
+                                          i_channel_mask,
                                           p_sys->pi_chan_table );
 
         msg_Dbg( p_demux, "channel mask: %x, reordering: %u",
-                 p_sys->i_channel_mask, p_sys->i_chans_to_reorder );
+                 i_channel_mask, p_sys->i_chans_to_reorder );
     }
 
-    p_sys->fmt.audio.i_physical_channels = p_sys->i_channel_mask;
+    p_sys->fmt.audio.i_physical_channels = i_channel_mask;
 
     if( p_sys->fmt.i_extra > 0 )
     {
