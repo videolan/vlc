@@ -815,6 +815,7 @@ static int DemuxHEIF( demux_t *p_demux )
 
     if( !p_sys->id )
     {
+        block_Release(p_block);
         p_sys->current.p_infe = NULL; /* Goto next picture */
         return VLC_DEMUXER_SUCCESS;
     }
