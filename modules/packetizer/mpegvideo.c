@@ -57,6 +57,7 @@
 #include "h26x_nal_common.h"
 
 #include <limits.h>
+#include <stdckdint.h>
 
 #define SYNC_INTRAFRAME_TEXT N_("Sync on Intra Frame")
 #define SYNC_INTRAFRAME_LONGTEXT N_("Normally the packetizer would " \
@@ -232,7 +233,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_pts = VLC_TICK_INVALID;
 
     unsigned num, den;
-    if( p_dec->fmt_in->video.i_frame_rate && p_dec->fmt_in->video.i_frame_rate_base )
+    if( p_dec->fmt_in->video.i_frame_rate && p_dec->fmt_in->video.i_frame_rate_base &&
+        !ckd_mul(&num, p_dec->fmt_in->video.i_frame_rate, 2) )
     {
         num = p_dec->fmt_in->video.i_frame_rate;
         den = p_dec->fmt_in->video.i_frame_rate_base;
