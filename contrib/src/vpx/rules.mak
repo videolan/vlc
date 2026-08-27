@@ -38,6 +38,8 @@ endif
 	$(APPLY) $(SRC)/vpx/0001-fix-compilation-with-Apple-Clang-13.patch
 	# make sure we can build when targetting Windows XP
 	$(APPLY) $(SRC)/vpx/0001-force-detection-of-pthread-on-Windows.patch
+	# do not force C++17, it's not supported by older compilers we support
+	sed -i.orig 's,++17,++14,g' $(UNPACK_DIR)/configure
 	$(MOVE)
 
 DEPS_vpx =
