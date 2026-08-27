@@ -363,10 +363,11 @@ Store(vlc_keystore *p_keystore, const char *const ppsz_values[KEY_MAX],
         if (i_enc_secret_len == 0)
             goto end;
 
-        if (vlc_keystore_entry_set_secret(p_entry, p_enc_secret,
-                                          i_enc_secret_len))
-            goto end;
+        int ret = vlc_keystore_entry_set_secret(p_entry, p_enc_secret,
+                                                  i_enc_secret_len);
         free(p_enc_secret);
+        if (ret)
+            goto end;
     }
     else
 #endif
