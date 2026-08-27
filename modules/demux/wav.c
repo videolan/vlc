@@ -404,7 +404,7 @@ static int ChunkParseFmt( demux_t *p_demux, uint32_t i_size )
         ( p_sys->fmt.i_extra + sizeof( WAVEFORMATEX )
             >= sizeof( WAVEFORMATEXTENSIBLE ) ) )
     {
-        unsigned i_channel_mask;
+        unsigned dwChannelMask;
         GUID guid_subformat;
 
         guid_subformat = p_wf_ext->SubFormat;
@@ -419,13 +419,13 @@ static int ChunkParseFmt( demux_t *p_demux, uint32_t i_size )
         i_extended = sizeof( WAVEFORMATEXTENSIBLE ) - sizeof( WAVEFORMATEX );
         p_sys->fmt.i_extra -= i_extended;
 
-        i_channel_mask = GetDWLE( &p_wf_ext->dwChannelMask );
-        if( i_channel_mask )
+        dwChannelMask = GetDWLE( &p_wf_ext->dwChannelMask );
+        if( dwChannelMask )
         {
             int i_match = 0;
-            p_sys->i_channel_mask = getChannelMask( &i_channel_mask, p_sys->fmt.audio.i_channels, &i_match );
-            if( i_channel_mask )
-                msg_Warn( p_demux, "Some channels are unrecognized or uselessly specified (0x%x)", i_channel_mask );
+            p_sys->i_channel_mask = getChannelMask( &dwChannelMask, p_sys->fmt.audio.i_channels, &i_match );
+            if( dwChannelMask )
+                msg_Warn( p_demux, "Some channels are unrecognized or uselessly specified (0x%x)", dwChannelMask );
             if( i_match < p_sys->fmt.audio.i_channels )
             {
                 int i_missing = p_sys->fmt.audio.i_channels - i_match;
