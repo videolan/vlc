@@ -1212,6 +1212,25 @@ static void DeletePlaylist(hls_playlist_t *playlist)
     free(playlist);
 }
 
+static int UpdateMainManifest(sout_stream_t *stream)
+{
+    sout_stream_sys_t *sys = stream->p_sys;
+
+    struct hls_storage *new_manifest;
+    const int ret = GenerateMainManifest(sys, &new_manifest);
+    if (unlikely(ret != VLC_SUCCESS))
+        return ret;
+
+    if (sys->http_host != NULL)
+        httpd_UrlCatch(sys->http_manifest, HTTPD_MSG_GET, HTTPCallback,
+                       (httpd_callback_sys_t *)new_manifest);
+
+    if (sys->manifest != NULL)
+        hls_storage_Destroy(sys->manifest);
+    sys->manifest = new_manifest;
+    return VLC_SUCCESS;
+}
+
 static hls_playlist_t *AddPlaylist(sout_stream_t *stream,
                                    enum hls_playlist_type type,
                                    struct vlc_list *head)
@@ -1272,8 +1291,7 @@ Add(sout_stream_t *stream, const es_format_t *fmt, const char *es_id)
 
     vlc_list_append(&track->node, &playlist->tracks);
 
-    struct hls_storage *new_manifest;
-    const int manifest_ret = GenerateMainManifest(sys, &new_manifest);
+    const int manifest_ret = UpdateMainManifest(stream);
     if (unlikely(manifest_ret != VLC_SUCCESS))
     {
         msg_Err(stream, "Failed to generate main manifest: %s",
@@ -1282,18 +1300,6 @@ Add(sout_stream_t *stream, const es_format_t *fmt, const char *es_id)
         free(track);
         goto error;
     }
-
-    if (sys->http_host != NULL)
-    {
-        httpd_UrlCatch(sys->http_manifest,
-                       HTTPD_MSG_GET,
-                       HTTPCallback,
-                       (httpd_callback_sys_t *)new_manifest);
-    }
-
-    if (sys->manifest != NULL)
-        hls_storage_Destroy(sys->manifest);
-    sys->manifest = new_manifest;
 
     if (map != NULL && map->playlist_ref == NULL)
         map->playlist_ref = playlist;
