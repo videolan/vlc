@@ -71,11 +71,13 @@ static void vlcThumbnailerToFilesOnEnded(vlc_preparser_req *req,
                                          size_t resultCount,
                                          void *data)
 {
-    VLCThumbnailRequest * const request = (__bridge VLCThumbnailRequest *)data;
-    [request.imageCache thumbnailRequest:request
-                     didFinishWithStatus:status
-                                 results:results
-                             resultCount:resultCount];
+    @autoreleasepool {
+        VLCThumbnailRequest * const request = (__bridge VLCThumbnailRequest *)data;
+        [request.imageCache thumbnailRequest:request
+                         didFinishWithStatus:status
+                                     results:results
+                                 resultCount:resultCount];
+    }
     vlc_preparser_req_Release(req);
 }
 
