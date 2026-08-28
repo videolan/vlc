@@ -433,10 +433,6 @@ int VarTree::getIndex( const Iterator& item )
 
 VarTree::Iterator VarTree::getItemFromSlider()
 {
-    // a simple (int)(...) causes rounding errors !
-#ifdef _MSC_VER
-#       define lrint (int)
-#endif
     VarPercent &rVarPos = getPositionVar();
     double percentage = rVarPos.get();
 

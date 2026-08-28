@@ -710,10 +710,6 @@ CtrlTree::Iterator CtrlTree::findItemAtPos( int pos )
 
 CtrlTree::Iterator CtrlTree::getFirstFromSlider()
 {
-    // a simple (int)(...) causes rounding errors !
-#ifdef _MSC_VER
-#       define lrint (int)
-#endif
     VarPercent &rVarPos = m_rTree.getPositionVar();
     double percentage = rVarPos.get();
 

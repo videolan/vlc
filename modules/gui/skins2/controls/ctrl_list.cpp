@@ -93,10 +93,6 @@ void CtrlList::onUpdate( Subject<VarPercent> &rPercent, void *arg  )
     int excessItems = m_rList.size() - maxItems;
     if( excessItems > 0 )
     {
-        // a simple (int)(...) causes rounding errors !
-#ifdef _MSC_VER
-#   define lrint (int)
-#endif
         firstItem = lrint( (1.0 - rVarPos.get()) * (double)excessItems );
     }
     if( m_lastPos != firstItem )
@@ -502,4 +498,3 @@ void CtrlList::makeImage()
 
     }
 }
-
