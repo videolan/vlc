@@ -79,15 +79,17 @@ cb_playlist_items_reset(vlc_playlist_t *const __unused playlist,
                         size_t numberOfItems,
                         void *p_data)
 {
-    NSMutableArray * const array = [NSMutableArray arrayWithCapacity:numberOfItems];
-    for (size_t i = 0; i < numberOfItems; i++) {
-        VLCPlayQueueItem * const item = [[VLCPlayQueueItem alloc] initWithPlaylistItem:items[i]];
-        [array addObject:item];
+    @autoreleasepool {
+        NSMutableArray * const array = [NSMutableArray arrayWithCapacity:numberOfItems];
+        for (size_t i = 0; i < numberOfItems; i++) {
+            VLCPlayQueueItem * const item = [[VLCPlayQueueItem alloc] initWithPlaylistItem:items[i]];
+            [array addObject:item];
+        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            VLCPlayQueueController * const playQueueController = (__bridge VLCPlayQueueController *)p_data;
+            [playQueueController playQueueResetWithItems:array];
+        });
     }
-    dispatch_async(dispatch_get_main_queue(), ^{
-        VLCPlayQueueController * const playQueueController = (__bridge VLCPlayQueueController *)p_data;
-        [playQueueController playQueueResetWithItems:array];
-    });
 }
 
 static void
@@ -97,15 +99,17 @@ cb_playlist_items_added(vlc_playlist_t *const __unused playlist,
                         size_t numberOfAddedItems,
                         void *p_data)
 {
-    NSMutableArray * const array = [NSMutableArray arrayWithCapacity:numberOfAddedItems];
-    for (size_t i = 0; i < numberOfAddedItems; i++) {
-        VLCPlayQueueItem * const item = [[VLCPlayQueueItem alloc] initWithPlaylistItem:items[i]];
-        [array addObject:item];
+    @autoreleasepool {
+        NSMutableArray * const array = [NSMutableArray arrayWithCapacity:numberOfAddedItems];
+        for (size_t i = 0; i < numberOfAddedItems; i++) {
+            VLCPlayQueueItem * const item = [[VLCPlayQueueItem alloc] initWithPlaylistItem:items[i]];
+            [array addObject:item];
+        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            VLCPlayQueueController * const playQueueController = (__bridge VLCPlayQueueController *)p_data;
+            [playQueueController playQueueAdded:array atIndex:insertionIndex count:numberOfAddedItems];
+        });
     }
-    dispatch_async(dispatch_get_main_queue(), ^{
-        VLCPlayQueueController * const playQueueController = (__bridge VLCPlayQueueController *)p_data;
-        [playQueueController playQueueAdded:array atIndex:insertionIndex count:numberOfAddedItems];
-    });
 }
 
 static void
