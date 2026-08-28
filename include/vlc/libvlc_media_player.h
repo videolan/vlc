@@ -290,6 +290,17 @@ struct libvlc_media_player_cbs
     void (*on_buffering_changed)( void *opaque, float buffering );
 
     /**
+     * Callback prototype that notify when the playback rate has changed
+     *
+     * \note Optional (can be NULL),
+     * available since version 0
+     *
+     * \param opaque opaque pointer set by libvlc_media_player_new()
+     * \param rate the new playback rate
+     */
+    void (*on_rate_changed)( void *opaque, float rate );
+
+    /**
      * Callback prototype that notify when the player capabilities changed
      *
      * \note Optional (can be NULL),

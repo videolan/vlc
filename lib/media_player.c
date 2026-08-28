@@ -193,6 +193,19 @@ on_buffering_changed(vlc_player_t *player, float new_buffering, void *data)
 }
 
 static void
+on_rate_changed(vlc_player_t *player, float new_rate, void *data)
+{
+    (void) player;
+
+    libvlc_media_player_t *mp = data;
+
+    if (mp->cbs == NULL || mp->cbs->on_rate_changed == NULL)
+        return;
+
+    mp->cbs->on_rate_changed(mp->cbs_opaque, new_rate);
+}
+
+static void
 on_capabilities_changed(vlc_player_t *player, int old_caps, int new_caps, void *data)
 {
     (void) player;
@@ -584,6 +597,7 @@ static const struct vlc_player_cbs vlc_player_cbs = {
     .on_state_changed = on_state_changed,
     .on_error_changed = on_error_changed,
     .on_buffering_changed = on_buffering_changed,
+    .on_rate_changed = on_rate_changed,
     .on_capabilities_changed = on_capabilities_changed,
     .on_position_changed = on_position_changed,
     .on_length_changed = on_length_changed,
