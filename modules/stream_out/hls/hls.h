@@ -60,6 +60,7 @@ struct hls_config
     vlc_tick_t max_segment_length;
     size_t max_memory;
     enum hls_playlist_type preferred_type;
+    bool legacy_codecs;
 };
 
 #define BYTES_FROM_KB(x) ((x) * 1000)

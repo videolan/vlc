@@ -247,7 +247,8 @@ static inline hls_track_t *MediaGetTrack(const hls_playlist_t *media_playlist)
 }
 
 VLC_MALLOC static char *GeneratePlaylistCodecInfo(const struct vlc_list *media_list,
-                                                  const hls_playlist_t *playlist)
+                                                  const hls_playlist_t *playlist,
+                                                  bool legacy_codecs)
 {
     es_format_vec_t already_described = VLC_VECTOR_INITIALIZER;
 
@@ -264,7 +265,7 @@ VLC_MALLOC static char *GeneratePlaylistCodecInfo(const struct vlc_list *media_l
 
         if (!is_stream_empty)
             vlc_memstream_putc(&out, ',');
-        if (hls_codec_Format(&out, &track->input->fmt) != VLC_SUCCESS)
+        if (hls_codec_Format(&out, &track->input->fmt, legacy_codecs) != VLC_SUCCESS)
             goto error;
         is_stream_empty = false;
         vlc_vector_push(&already_described, &track->input->fmt);
@@ -281,7 +282,7 @@ VLC_MALLOC static char *GeneratePlaylistCodecInfo(const struct vlc_list *media_l
 
         if (!is_stream_empty)
             vlc_memstream_putc(&out, ',');
-        if (hls_codec_Format(&out, &track->input->fmt) != VLC_SUCCESS)
+        if (hls_codec_Format(&out, &track->input->fmt, legacy_codecs) != VLC_SUCCESS)
             goto error;
         is_stream_empty = false;
         vlc_vector_push(&already_described, &track->input->fmt);
@@ -424,8 +425,8 @@ static int GenerateMainManifest(const sout_stream_sys_t *sys,
                 bandwidth += track->input->fmt.i_bitrate;
             MANIFEST_ADD_ATTRIBUTE("BANDWIDTH=%u", bandwidth);
 
-            char *codecs =
-                GeneratePlaylistCodecInfo(&sys->media_playlists, playlist);
+            char *codecs = GeneratePlaylistCodecInfo(
+                &sys->media_playlists, playlist, sys->config.legacy_codecs);
             if (unlikely(codecs == NULL))
                 goto error;
             MANIFEST_ADD_ATTRIBUTE("CODECS=\"%s\"", codecs);
@@ -1501,6 +1502,7 @@ static int Open(vlc_object_t *this)
         "base-url",
         "host-http",
         "max-memory",
+        "legacy-codecs",
         "num-seg",
         "out-dir",
         "pace",
@@ -1518,6 +1520,8 @@ static int Open(vlc_object_t *this)
     sys->config.max_segments =
         var_GetInteger(stream, SOUT_CFG_PREFIX "num-seg");
     sys->config.pace = var_GetBool(stream, SOUT_CFG_PREFIX "pace");
+    sys->config.legacy_codecs =
+        var_GetBool(stream, SOUT_CFG_PREFIX "legacy-codecs");
     sys->config.segment_length =
         VLC_TICK_FROM_SEC(var_GetInteger(stream, SOUT_CFG_PREFIX "seg-len"));
     sys->config.max_segment_length =
@@ -1659,6 +1663,14 @@ variant_error:
 
 #define SEGTYPE_LONGTEXT N_("Specifies the segments container")
 #define SEGTYPE_TEXT N_("Segment muxed format")
+#define LEGACYCODECS_TEXT N_("Use legacy codec identifiers")
+#define LEGACYCODECS_LONGTEXT                                                  \
+    N_("Use legacy codec identifiers instead of the spec-compliant ones. "     \
+       "Some codecs that were unofficially supported before an official "      \
+       "MPEG standardization differ in identifiers (eg. flac and opus). "      \
+       "Enable this for compatibility with clients that do not support the "   \
+       "standard identifiers.")
+
 static const char *const SEGMENT_TYPE_LIST[] = {
     "ts",
     "fmp4",
@@ -1686,6 +1698,7 @@ vlc_module_begin()
     add_integer(SOUT_CFG_PREFIX "num-seg", 0, NUMSEG_TEXT, NUMSEG_TEXT)
     add_string(SOUT_CFG_PREFIX "out-dir", NULL, OUTDIR_TEXT, OUTDIR_LONGTEXT)
     add_bool(SOUT_CFG_PREFIX "pace", false, PACE_TEXT, PACE_LONGTEXT)
+    add_bool(SOUT_CFG_PREFIX "legacy-codecs", false, LEGACYCODECS_TEXT, LEGACYCODECS_LONGTEXT)
     add_integer(SOUT_CFG_PREFIX "seg-len", 4, SEGLEN_TEXT, SEGLEN_LONGTEXT)
         change_integer_range(1, 60)
     add_integer(SOUT_CFG_PREFIX "max-seg-len", 0, MAXSEGLEN_TEXT, MAXSEGLEN_LONGTEXT)

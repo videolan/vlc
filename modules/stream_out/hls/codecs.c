@@ -163,7 +163,8 @@ static int FormatWebVTT(struct vlc_memstream *ms)
     return (written <= 0) ? VLC_ENOMEM : VLC_SUCCESS;
 }
 
-int hls_codec_Format(struct vlc_memstream *ms, const es_format_t *fmt)
+int hls_codec_Format(struct vlc_memstream *ms, const es_format_t *fmt,
+                     bool legacy_codecs)
 {
     switch (fmt->i_codec)
     {
