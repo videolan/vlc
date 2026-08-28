@@ -2002,7 +2002,7 @@ static int Ogg_ConfigureStream( demux_t *p_demux, ogg_packet oggpacket, logical_
                     else
                     {
                         msg_Dbg( p_demux, "stream %d has an old header "
-                            "but is of an unknown type", p_ogg->i_streams-1 );
+                            "but is of an unknown type", p_ogg->i_streams );
                         return VLC_EGENERIC;
                     }
                 }
@@ -2154,7 +2154,7 @@ static int Ogg_ConfigureStream( demux_t *p_demux, ogg_packet oggpacket, logical_
                     else
                     {
                         msg_Dbg( p_demux, "stream %d has a header marker "
-                            "but is of an unknown type", p_ogg->i_streams-1 );
+                            "but is of an unknown type", p_ogg->i_streams );
                         return VLC_EGENERIC;
                     }
                 }
@@ -2164,7 +2164,7 @@ static int Ogg_ConfigureStream( demux_t *p_demux, ogg_packet oggpacket, logical_
                 {
                     /* Skeleton */
                     msg_Dbg( p_demux, "stream %d is a skeleton",
-                                p_ogg->i_streams-1 );
+                                p_ogg->i_streams );
                     Ogg_ReadSkeletonHeader( p_demux, p_stream, &oggpacket );
                 }
                 /* Check for OggSpots header */
