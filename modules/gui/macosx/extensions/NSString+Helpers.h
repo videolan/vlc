@@ -60,6 +60,12 @@ extern NSString *const kVLCMediaVideoTSFolder;
 extern NSString *const kVLCMediaBDMVFolder;
 extern NSString *const kVLCMediaUnknown;
 
+/**
+ * Convert an UTF-8 C string to a NSString.
+ *
+ * The returned string is autoreleased, so callers must take care of
+ * setting up an appropriate @autoreleasepool block where suitable.
+ */
 NSString *toNSStr(const char *str);
 
 /**
