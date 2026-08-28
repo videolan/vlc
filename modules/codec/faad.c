@@ -159,11 +159,14 @@ static int Open( vlc_object_t *p_this )
             return VLC_EGENERIC;
         }
 
-        p_dec->fmt_out.audio.i_rate = i_rate;
-        p_dec->fmt_out.audio.i_channels = i_channels;
-        p_dec->fmt_out.audio.i_physical_channels
-            = MPEG4_asc_channelsbyindex[i_channels];
-        date_Init( &p_sys->date, i_rate, 1 );
+        if( i_rate != 0 )
+        {
+            p_dec->fmt_out.audio.i_rate = i_rate;
+            p_dec->fmt_out.audio.i_channels = i_channels;
+            p_dec->fmt_out.audio.i_physical_channels
+                = MPEG4_asc_channelsbyindex[i_channels];
+            date_Init( &p_sys->date, i_rate, 1 );
+        }
     }
     else
     {
