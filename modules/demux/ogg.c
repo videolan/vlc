@@ -1685,7 +1685,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                     break;
                 }
             }
-            break;
+            return p_ogg->i_streams ? VLC_SUCCESS : VLC_EGENERIC;
         }
 
         /* Try to configure the new stream */
@@ -1699,7 +1699,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
             p_stream->b_initializing &= p_stream->b_force_backup;
     }
 
-    return p_ogg->i_streams ? VLC_SUCCESS : VLC_EGENERIC;
+    return VLC_EGENERIC;
 }
 
 static int Ogg_ConfigureStream( demux_t *p_demux, ogg_packet oggpacket, logical_stream_t *p_stream )
