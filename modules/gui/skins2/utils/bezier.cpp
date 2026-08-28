@@ -31,9 +31,7 @@
 
 // XXX should be in VLC core
 #ifndef HAVE_LRINTF
-#   ifdef HAVE_LRINT
-#       define lrintf( x ) (int)rint( x )
-#   elif defined _WIN32
+#   if defined _WIN32
         __inline long int lrintf( float x )
         {
             int i;
@@ -227,4 +225,3 @@ void Bezier::computePoint( float t, int &x, int &y ) const
     x = lrintf(xPos);
     y = lrintf(yPos);
 }
-
