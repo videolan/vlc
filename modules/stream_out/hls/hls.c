@@ -180,6 +180,15 @@ typedef struct
             (i_##it == 0 ? &sys->variant_playlists : &sys->media_playlists),   \
             node)
 
+#define hls_active_playlists_foreach(it)                                       \
+    hls_playlists_foreach (it)                                                 \
+        if ((it)->ended) continue; else
+
+#define hls_active_playlist_foreach(it, list)                                  \
+    vlc_list_foreach_const (it, list, node)                                    \
+        if ((it)->ended) continue; else
+
+
 static int HTTPCallback(httpd_callback_sys_t *sys,
                         httpd_client_t *client,
                         httpd_message_t *answer,
@@ -261,7 +270,7 @@ VLC_MALLOC static char *GeneratePlaylistCodecInfo(const struct vlc_list *media_l
 
     /* Describe codecs from all the EXT-X-MEDIA tracks. */
     const hls_playlist_t *media;
-    vlc_list_foreach_const (media, media_list, node)
+    hls_active_playlist_foreach (media, media_list)
     {
         track = MediaGetTrack(media);
 
@@ -295,7 +304,7 @@ static bool HasMediaRendition(const sout_stream_sys_t *sys,
                               enum es_format_category_e cat)
 {
     const hls_playlist_t *playlist;
-    vlc_list_foreach_const (playlist, &sys->media_playlists, node)
+    hls_active_playlist_foreach (playlist, &sys->media_playlists)
     {
         if (MediaGetTrack(playlist)->input->fmt.i_cat == cat)
             return true;
@@ -350,7 +359,7 @@ static int GenerateMainManifest(const sout_stream_sys_t *sys,
     bool spu_default_set = false;
 
     const hls_playlist_t *playlist;
-    vlc_list_foreach_const (playlist, &sys->media_playlists, node)
+    hls_active_playlist_foreach (playlist, &sys->media_playlists)
     {
         const hls_track_t *track = MediaGetTrack(playlist);
         const es_format_t *fmt = &track->input->fmt;
@@ -404,7 +413,7 @@ static int GenerateMainManifest(const sout_stream_sys_t *sys,
     }
 
     /* Format EXT-X-STREAM-INF */
-    vlc_list_foreach_const (playlist, &sys->variant_playlists, node)
+    hls_active_playlist_foreach (playlist, &sys->variant_playlists)
     {
         MANIFEST_START_TAG("#EXT-X-STREAM-INF")
             unsigned int bandwidth = 0;
@@ -996,6 +1005,9 @@ static ssize_t AccessOutWrite(sout_access_out_t *access, block_t *block)
         if (it->access == access)
             PlaylistWriteMuxedOutput(it, block, length);
 
+        if (it->ended)
+            continue;
+
         if (!IsSegmentReady(it,
                             sys->config.segment_length,
                             sys->config.max_segment_length))
@@ -1005,7 +1017,7 @@ static ssize_t AccessOutWrite(sout_access_out_t *access, block_t *block)
 
     if (segments_ready)
     {
-        hls_playlists_foreach (it)
+        hls_active_playlists_foreach (it)
         {
             while (IsSegmentReady(it,
                                   sys->config.segment_length,
