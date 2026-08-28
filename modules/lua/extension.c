@@ -580,8 +580,6 @@ int lua_ExtensionDeactivate( extensions_manager_t *p_mgr, extension_t *p_ext )
     assert( p_mgr != NULL && p_ext != NULL );
     struct lua_extension *sys = p_ext->p_sys;
 
-    vlclua_fd_interrupt(&sys->dtable);
-
     // Unset and release input objects
     if (sys->p_item)
     {
@@ -589,7 +587,19 @@ int lua_ExtensionDeactivate( extensions_manager_t *p_mgr, extension_t *p_ext )
         sys->p_item = NULL;
     }
 
-    return lua_ExecuteFunction( p_mgr, p_ext, "deactivate", LUA_END );
+    if (sys->L == NULL)
+        return VLC_SUCCESS;
+
+    vlclua_fd_interrupt(&sys->dtable);
+
+    int i_ret = lua_ExecuteFunction( p_mgr, p_ext, "deactivate", LUA_END );
+
+    /* Clear Lua State */
+    lua_close(sys->L);
+    vlclua_fd_cleanup(&sys->dtable);
+    sys->L = NULL;
+
+    return i_ret;
 }
 
 int lua_ExtensionWidgetClick( extensions_manager_t *p_mgr,
