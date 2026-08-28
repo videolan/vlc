@@ -527,12 +527,12 @@ libvlc_media_subitems( libvlc_media_t *p_md );
 /**
  * Get duration (in us) of media descriptor object item.
  *
- * Note, you need to parse using libvlc_parser_queue() or play the media
- * at least once before calling this function.
- * Not doing this will result in an undefined result.
+ * The duration is known if the media was parsed using libvlc_parser_queue(),
+ * played at least once, or created by a source that already advertises it,
+ * such as a playlist carrying duration metadata.
  *
  * \param p_md media descriptor object
- * \return duration of media item or -1 on error
+ * \return duration of media item or -1 if it is unknown
  */
 LIBVLC_API libvlc_time_t
    libvlc_media_get_duration( libvlc_media_t *p_md );
