@@ -14,6 +14,7 @@ DEPS_gme = zlib $(DEPS_zlib)
 
 game-music-emu: game-music-emu-$(GME_VERSION).tar.gz .sum-gme
 	$(UNPACK)
+	$(APPLY) $(SRC)/gme/ae10a8f05479e3c8f80429e7a59759fed06f8c13.patch
 	$(call pkg_static,"gme/libgme.pc.in")
 	$(MOVE)
 

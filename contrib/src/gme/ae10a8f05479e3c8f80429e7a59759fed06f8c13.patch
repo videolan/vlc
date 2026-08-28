@@ -1,0 +1,25 @@
+From ae10a8f05479e3c8f80429e7a59759fed06f8c13 Mon Sep 17 00:00:00 2001
+From: Wohlstand <admin@wohlnet.ru>
+Date: Sat, 4 Jul 2026 15:56:19 +0300
+Subject: [PATCH] Ay_Emu.cpp: Don't read farther than buffer allows
+
+Even at release builds!
+---
+ gme/Ay_Emu.cpp | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/gme/Ay_Emu.cpp b/gme/Ay_Emu.cpp
+index e99b6fdc..af290fbc 100644
+--- a/gme/Ay_Emu.cpp
++++ b/gme/Ay_Emu.cpp
+@@ -54,7 +54,9 @@ static byte const* get_data( Ay_Emu::file_t const& file, byte const* ptr, int mi
+ {
+ 	long pos = ptr - (byte const*) file.header;
+ 	long file_size = file.end - (byte const*) file.header;
+-	assert( (unsigned long) pos <= (unsigned long) file_size - 2 );
++	// assert( (unsigned long) pos <= (unsigned long) file_size - 2 );
++	if ( (unsigned long) pos > (unsigned long) file_size - 2 )
++		return 0; // Don't read farther than buffer allows
+ 	int offset = (int16_t) get_be16( ptr );
+ 	if ( !offset || uint32_t (pos + offset) > uint32_t (file_size - min_size) )
+ 		return 0;
