@@ -29,10 +29,6 @@
 #include "bezier.hpp"
 #include <math.h>
 
-// XXX should be in VLC core
-#ifndef HAVE_LRINTF
-#endif
-
 Bezier::Bezier( intf_thread_t *p_intf, const std::vector<float> &rAbscissas,
                 const std::vector<float> &rOrdinates, Flag_t flag )
     : SkinObject( p_intf )

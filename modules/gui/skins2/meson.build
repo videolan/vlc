@@ -4,7 +4,7 @@ skins2_enabled = get_option('skins2') \
     .allowed()
 
 skins2_flags = []
-skins2_deps = [ freetype_dep ]
+skins2_deps = [ freetype_dep, m_lib ]
 
 if skins2_enabled
     fribidi_dep = dependency('fribidi', required: get_option('fribidi'))
@@ -18,11 +18,6 @@ if skins2_enabled
             skins2_flags += [ '-DHAVE_HARFBUZZ' ]
         endif
     endif
-endif
-
-if cc.has_function('lrintf', dependencies: [m_lib])
-    cdata.set('HAVE_LRINTF', 1)
-    skins2_deps += [ m_lib ]
 endif
 
 skins2_sources = files(
