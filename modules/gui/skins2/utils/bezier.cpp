@@ -31,14 +31,6 @@
 
 // XXX should be in VLC core
 #ifndef HAVE_LRINTF
-#   if defined _WIN32
-        __inline long int lrintf( float x )
-        {
-            int i;
-            _asm fld x __asm fistp i
-            return i;
-        }
-#   endif
 #endif
 
 Bezier::Bezier( intf_thread_t *p_intf, const std::vector<float> &rAbscissas,
