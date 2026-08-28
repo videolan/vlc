@@ -9,6 +9,9 @@ ifdef GPL
 PKGS += faad2
 endif
 endif
+ifeq ($(call need_pkg,"faad2"),)
+PKGS_FOUND += faad2
+endif
 
 $(TARBALLS)/faad2-$(FAAD2_VERSION).tar.gz:
 	$(call download_pkg,$(FAAD2_URL),faad2)
