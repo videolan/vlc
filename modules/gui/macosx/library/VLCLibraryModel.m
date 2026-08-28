@@ -157,127 +157,129 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         return;
     }
 
-    switch(p_event->i_type)
-    {
-        case VLC_ML_EVENT_MEDIA_ADDED:
-            [libraryModel handleMediaItemAddedEvent:p_event];
-            break;
-        case VLC_ML_EVENT_MEDIA_UPDATED:
-            [libraryModel handleMediaItemUpdateEvent:p_event];
-            break;
-        case VLC_ML_EVENT_MEDIA_DELETED:
-            [libraryModel handleMediaItemDeletionEvent:p_event];
-            break;
-        case VLC_ML_EVENT_MEDIA_THUMBNAIL_GENERATED:
-            if (p_event->media_thumbnail_generated.b_success) {
-                VLCMediaLibraryMediaItem *mediaItem = [[VLCMediaLibraryMediaItem alloc] initWithMediaItem:(struct vlc_ml_media_t *)p_event->media_thumbnail_generated.p_media];
-                if (mediaItem == nil) {
-                    return;
+    @autoreleasepool {
+        switch(p_event->i_type)
+        {
+            case VLC_ML_EVENT_MEDIA_ADDED:
+                [libraryModel handleMediaItemAddedEvent:p_event];
+                break;
+            case VLC_ML_EVENT_MEDIA_UPDATED:
+                [libraryModel handleMediaItemUpdateEvent:p_event];
+                break;
+            case VLC_ML_EVENT_MEDIA_DELETED:
+                [libraryModel handleMediaItemDeletionEvent:p_event];
+                break;
+            case VLC_ML_EVENT_MEDIA_THUMBNAIL_GENERATED:
+                if (p_event->media_thumbnail_generated.b_success) {
+                    VLCMediaLibraryMediaItem *mediaItem = [[VLCMediaLibraryMediaItem alloc] initWithMediaItem:(struct vlc_ml_media_t *)p_event->media_thumbnail_generated.p_media];
+                    if (mediaItem == nil) {
+                        return;
+                    }
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [libraryModel mediaItemThumbnailGenerated:mediaItem];
+                    });
                 }
+                break;
+            case VLC_ML_EVENT_ARTIST_ADDED:
+                [libraryModel resetCachedListOfArtists];
+                break;
+            case VLC_ML_EVENT_ARTIST_UPDATED:
+                [libraryModel handleArtistUpdateEvent:p_event];
+                break;
+            case VLC_ML_EVENT_ARTIST_DELETED:
+                [libraryModel handleArtistDeletionEvent:p_event];
+                break;
+            case VLC_ML_EVENT_ALBUM_ADDED:
+                [libraryModel resetCachedListOfAlbums];
+                break;
+            case VLC_ML_EVENT_ALBUM_UPDATED:
+                [libraryModel handleAlbumUpdateEvent:p_event];
+                break;
+            case VLC_ML_EVENT_ALBUM_DELETED:
+                [libraryModel handleAlbumDeletionEvent:p_event];
+                break;
+            case VLC_ML_EVENT_GENRE_ADDED:
+                [libraryModel resetCachedListOfGenres];
+                break;
+            case VLC_ML_EVENT_GENRE_UPDATED:
+                [libraryModel handleGenreUpdateEvent:p_event];
+                break;
+            case VLC_ML_EVENT_GENRE_DELETED:
+                [libraryModel handleGenreDeletionEvent:p_event];
+                break;
+            case VLC_ML_EVENT_GROUP_ADDED:
+                [libraryModel resetCachedListOfGroups];
+                break;
+            case VLC_ML_EVENT_GROUP_UPDATED:
+                [libraryModel handleGroupUpdateEvent:p_event];
+                break;
+            case VLC_ML_EVENT_GROUP_DELETED:
+                [libraryModel handleGroupDeletionEvent:p_event];
+                break;
+            case VLC_ML_EVENT_PLAYLIST_ADDED:
+                [libraryModel handlePlaylistAddedEvent:p_event];
+                break;
+            case VLC_ML_EVENT_PLAYLIST_UPDATED:
+                [libraryModel handlePlaylistUpdateEvent:p_event];
+                break;
+            case VLC_ML_EVENT_PLAYLIST_DELETED:
+                [libraryModel handlePlaylistDeletionEvent:p_event];
+                break;
+            case VLC_ML_EVENT_FOLDER_ADDED:
+            case VLC_ML_EVENT_FOLDER_UPDATED:
+            case VLC_ML_EVENT_FOLDER_DELETED:
+                [libraryModel resetCachedListOfMonitoredFolders];
+                break;
+            case VLC_ML_EVENT_HISTORY_CHANGED:
+                [libraryModel resetCachedListOfRecentMedia];
+                [libraryModel resetCachedListOfRecentAudioMedia];
+                break;
+            case VLC_ML_EVENT_FAVORITES_CHANGED:
+            {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [libraryModel mediaItemThumbnailGenerated:mediaItem];
+                    [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelFavoriteAudioMediaListReset object:libraryModel];
+                    [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelFavoriteVideoMediaListReset object:libraryModel];
+                    [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelFavoriteAlbumsListReset object:libraryModel];
+                    [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelFavoriteArtistsListReset object:libraryModel];
+                    [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelFavoriteGenresListReset object:libraryModel];
                 });
+                break;
             }
-            break;
-        case VLC_ML_EVENT_ARTIST_ADDED:
-            [libraryModel resetCachedListOfArtists];
-            break;
-        case VLC_ML_EVENT_ARTIST_UPDATED:
-            [libraryModel handleArtistUpdateEvent:p_event];
-            break;
-        case VLC_ML_EVENT_ARTIST_DELETED:
-            [libraryModel handleArtistDeletionEvent:p_event];
-            break;
-        case VLC_ML_EVENT_ALBUM_ADDED:
-            [libraryModel resetCachedListOfAlbums];
-            break;
-        case VLC_ML_EVENT_ALBUM_UPDATED:
-            [libraryModel handleAlbumUpdateEvent:p_event];
-            break;
-        case VLC_ML_EVENT_ALBUM_DELETED:
-            [libraryModel handleAlbumDeletionEvent:p_event];
-            break;
-        case VLC_ML_EVENT_GENRE_ADDED:
-            [libraryModel resetCachedListOfGenres];
-            break;
-        case VLC_ML_EVENT_GENRE_UPDATED:
-            [libraryModel handleGenreUpdateEvent:p_event];
-            break;
-        case VLC_ML_EVENT_GENRE_DELETED:
-            [libraryModel handleGenreDeletionEvent:p_event];
-            break;
-        case VLC_ML_EVENT_GROUP_ADDED:
-            [libraryModel resetCachedListOfGroups];
-            break;
-        case VLC_ML_EVENT_GROUP_UPDATED:
-            [libraryModel handleGroupUpdateEvent:p_event];
-            break;
-        case VLC_ML_EVENT_GROUP_DELETED:
-            [libraryModel handleGroupDeletionEvent:p_event];
-            break;
-        case VLC_ML_EVENT_PLAYLIST_ADDED:
-            [libraryModel handlePlaylistAddedEvent:p_event];
-            break;
-        case VLC_ML_EVENT_PLAYLIST_UPDATED:
-            [libraryModel handlePlaylistUpdateEvent:p_event];
-            break;
-        case VLC_ML_EVENT_PLAYLIST_DELETED:
-            [libraryModel handlePlaylistDeletionEvent:p_event];
-            break;
-        case VLC_ML_EVENT_FOLDER_ADDED:
-        case VLC_ML_EVENT_FOLDER_UPDATED:
-        case VLC_ML_EVENT_FOLDER_DELETED:
-            [libraryModel resetCachedListOfMonitoredFolders];
-            break;
-        case VLC_ML_EVENT_HISTORY_CHANGED:
-            [libraryModel resetCachedListOfRecentMedia];
-            [libraryModel resetCachedListOfRecentAudioMedia];
-            break;
-        case VLC_ML_EVENT_FAVORITES_CHANGED:
-        {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelFavoriteAudioMediaListReset object:libraryModel];
-                [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelFavoriteVideoMediaListReset object:libraryModel];
-                [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelFavoriteAlbumsListReset object:libraryModel];
-                [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelFavoriteArtistsListReset object:libraryModel];
-                [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelFavoriteGenresListReset object:libraryModel];
-            });
-            break;
+            case VLC_ML_EVENT_DISCOVERY_STARTED:
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
+                    [defaultCenter postNotificationName:VLCLibraryModelDiscoveryStarted object:nil];
+                });
+                break;
+            case VLC_ML_EVENT_DISCOVERY_PROGRESS:
+            {
+                NSString * const entryPoint = toNSStr(p_event->discovery_progress.psz_entry_point);
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    NSDictionary<NSString *, NSString *> * const info = entryPoint == nil
+                        ? nil
+                        : @{@"entryPoint": entryPoint};
+                    NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
+                    [defaultCenter postNotificationName:VLCLibraryModelDiscoveryProgress
+                                                 object:nil
+                                               userInfo:info];
+                });
+                break;
+            }
+            case VLC_ML_EVENT_DISCOVERY_COMPLETED:
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
+                    [defaultCenter postNotificationName:VLCLibraryModelDiscoveryCompleted object:nil];
+                });
+                break;
+            case VLC_ML_EVENT_DISCOVERY_FAILED:
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
+                    [defaultCenter postNotificationName:VLCLibraryModelDiscoveryFailed object:nil];
+                });
+                break;
+            default:
+                break;
         }
-        case VLC_ML_EVENT_DISCOVERY_STARTED:
-            dispatch_async(dispatch_get_main_queue(), ^{
-                NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
-                [defaultCenter postNotificationName:VLCLibraryModelDiscoveryStarted object:nil];
-            });
-            break;
-        case VLC_ML_EVENT_DISCOVERY_PROGRESS:
-        {
-            NSString * const entryPoint = toNSStr(p_event->discovery_progress.psz_entry_point);
-            dispatch_async(dispatch_get_main_queue(), ^{
-                NSDictionary<NSString *, NSString *> * const info = entryPoint == nil
-                    ? nil
-                    : @{@"entryPoint": entryPoint};
-                NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
-                [defaultCenter postNotificationName:VLCLibraryModelDiscoveryProgress
-                                             object:nil
-                                           userInfo:info];
-            });
-            break;
-        }
-        case VLC_ML_EVENT_DISCOVERY_COMPLETED:
-            dispatch_async(dispatch_get_main_queue(), ^{
-                NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
-                [defaultCenter postNotificationName:VLCLibraryModelDiscoveryCompleted object:nil];
-            });
-            break;
-        case VLC_ML_EVENT_DISCOVERY_FAILED:
-            dispatch_async(dispatch_get_main_queue(), ^{
-                NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
-                [defaultCenter postNotificationName:VLCLibraryModelDiscoveryFailed object:nil];
-            });
-            break;
-        default:
-            break;
     }
 }
 
