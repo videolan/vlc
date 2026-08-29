@@ -14,6 +14,7 @@
 #import <XCTest/XCTest.h>
 
 #import "library/VLCLibraryDataTypes.h"
+#import "tests/VLCInputItemTestSupport.h"
 #import "tests/VLCLibraryDataTypesTestSupport.h"
 
 #pragma clang diagnostic push
@@ -70,6 +71,30 @@
     XCTAssertNil(emptyFile.MRL);
     XCTAssertNil(emptyFile.fileURL);
     XCTAssertEqualObjects(emptyFile.readableFileType, @"Unknown");
+}
+
+- (void)testTrackAndShowEpisodeNilInitializersHaveSafeDefaults
+{
+    VLCMediaLibraryTrack * const emptyTrack =
+        [[VLCMediaLibraryTrack alloc] initWithTrack:NULL];
+    XCTAssertNotNil(emptyTrack);
+    XCTAssertNil(emptyTrack.codec);
+    XCTAssertNil(emptyTrack.language);
+    XCTAssertNil(emptyTrack.trackDescription);
+    XCTAssertEqual(emptyTrack.trackType, VLC_ML_TRACK_TYPE_UNKNOWN);
+    XCTAssertEqual(emptyTrack.bitrate, (uint32_t)0);
+    XCTAssertNil(emptyTrack.resolutionLabel);
+    XCTAssertEqualObjects(emptyTrack.readableCodecName, @"");
+    XCTAssertEqualObjects(emptyTrack.readableTrackType, @"Unknown");
+    XCTAssertTrue([emptyTrack.description containsString:@"VLCMediaLibraryTrack"]);
+
+    VLCMediaLibraryShowEpisode * const emptyEpisode =
+        [[VLCMediaLibraryShowEpisode alloc] initWithShowEpisode:NULL];
+    XCTAssertNotNil(emptyEpisode);
+    XCTAssertNil(emptyEpisode.summary);
+    XCTAssertNil(emptyEpisode.tvdbID);
+    XCTAssertEqual(emptyEpisode.episodeNumber, (uint32_t)0);
+    XCTAssertEqual(emptyEpisode.seasonNumber, (uint32_t)0);
 }
 
 - (void)testTrackMapsFieldsAndResolutionLabels
@@ -177,6 +202,45 @@
     VLCMediaLibraryArtist * const unknownArtist =
         [[VLCMediaLibraryArtist alloc] initWithArtist:&artistData];
     XCTAssertEqualObjects(unknownArtist.displayString, @"Unknown Artist");
+}
+
+- (void)testArtistAlbumAndGenreFactoriesFailWithoutAMediaLibrary
+{
+    XCTAssertNil([VLCMediaLibraryArtist artistWithID:7]);
+    XCTAssertNil([VLCMediaLibraryAlbum albumWithID:8]);
+    XCTAssertNil([VLCMediaLibraryGenre genreWithID:9]);
+
+    struct vlc_ml_artist_t emptyArtistData = { 0 };
+    VLCMediaLibraryArtist * const emptyArtist =
+        [[VLCMediaLibraryArtist alloc] initWithArtist:&emptyArtistData];
+    XCTAssertEqualObjects(emptyArtist.displayString, @"Unknown Artist");
+    XCTAssertEqualObjects(emptyArtist.durationString, @"0 albums, 0 songs");
+    XCTAssertEqualObjects(emptyArtist.genreString, @"");
+    XCTAssertEqualObjects(emptyArtist.artists, @[ emptyArtist ]);
+    XCTAssertNil(emptyArtist.albums);
+    XCTAssertNil(emptyArtist.mediaItems);
+    XCTAssertNil(emptyArtist.secondaryActionableDetailLibraryItem);
+
+    struct vlc_ml_album_t emptyAlbumData = { 0 };
+    VLCMediaLibraryAlbum * const emptyAlbum =
+        [[VLCMediaLibraryAlbum alloc] initWithAlbum:&emptyAlbumData];
+    XCTAssertEqualObjects(emptyAlbum.displayString, @"Unknown Album");
+    XCTAssertEqualObjects(emptyAlbum.durationString, @"--:--");
+    XCTAssertEqualObjects(emptyAlbum.genreString, @"");
+    XCTAssertEqualObjects(emptyAlbum.albums, @[ emptyAlbum ]);
+    XCTAssertNil(emptyAlbum.mediaItems);
+    XCTAssertNil(emptyAlbum.primaryActionableDetailLibraryItem);
+    XCTAssertNil(emptyAlbum.secondaryActionableDetailLibraryItem);
+
+    struct vlc_ml_genre_t emptyGenreData = { 0 };
+    VLCMediaLibraryGenre * const emptyGenre =
+        [[VLCMediaLibraryGenre alloc] initWithGenre:&emptyGenreData];
+    XCTAssertEqualObjects(emptyGenre.displayString, @"Unknown Genre");
+    XCTAssertEqualObjects(emptyGenre.durationString, @"0 songs");
+    XCTAssertEqualObjects(emptyGenre.genres, @[ emptyGenre ]);
+    XCTAssertNil(emptyGenre.albums);
+    XCTAssertNil(emptyGenre.artists);
+    XCTAssertNil(emptyGenre.mediaItems);
 }
 
 - (void)testAlbumProperties
@@ -333,6 +397,28 @@
     XCTAssertTrue(entryPoint.isBanned);
 }
 
+- (void)testGroupEmptyStateAndRemainingCounts
+{
+    struct vlc_ml_group_t groupData = { 0 };
+    groupData.psz_name = (char *)"";
+    groupData.i_nb_present_media = 2;
+    groupData.i_nb_present_video = 1;
+    groupData.i_nb_present_audio = 1;
+    groupData.i_nb_present_unknown = 0;
+    groupData.i_nb_present_seen = 1;
+
+    VLCMediaLibraryGroup * const group =
+        [[VLCMediaLibraryGroup alloc] initWithGroup:&groupData];
+    XCTAssertEqualObjects(group.displayString, @"Unknown Group");
+    XCTAssertEqual(group.numberOfPresentTotalItems, (NSUInteger)2);
+    XCTAssertEqual(group.numberOfPresentVideoItems, (NSUInteger)1);
+    XCTAssertEqual(group.numberOfPresentAudioItems, (NSUInteger)1);
+    XCTAssertEqual(group.numberOfPresentUnknownItems, (NSUInteger)0);
+    XCTAssertEqual(group.numberOfPresentSeenItems, (NSUInteger)1);
+    XCTAssertEqualObjects(group.mediaItems, @[]);
+    XCTAssertNil(group.firstMediaItem);
+}
+
 - (void)testMediaItemMapsFilesTracksAndSubtypes
 {
     VLCMediaLibraryMediaItem * const albumTrack =
@@ -348,7 +434,11 @@
     XCTAssertEqualObjects(albumTrack.durationString, @"02:03");
     XCTAssertEqual(albumTrack.year, 2024);
     XCTAssertEqual(albumTrack.playCount, (uint32_t)2);
+    XCTAssertEqual(albumTrack.lastPlayedDate, (time_t)4567);
     XCTAssertEqual(albumTrack.progress, .5);
+    XCTAssertTrue(albumTrack.favorited);
+    XCTAssertTrue(albumTrack.smallArtworkGenerated);
+    XCTAssertEqualObjects(albumTrack.smallArtworkMRL, @"file:///tmp/media.jpg");
     XCTAssertEqual(albumTrack.files.count, (NSUInteger)1);
     XCTAssertEqual(albumTrack.tracks.count, (NSUInteger)2);
     XCTAssertEqual(albumTrack.firstVideoTrack, albumTrack.tracks.firstObject);
@@ -374,6 +464,39 @@
         VLCLibraryDataTypesTestMediaItemWithSubtype(VLC_ML_MEDIA_SUBTYPE_UNKNOWN);
     XCTAssertEqualObjects(unknown.readableMediaType, @"Video");
     XCTAssertEqualObjects(unknown.readableMediaSubType, @"Unknown Media Type");
+}
+
+- (void)testMovieShowAndEntryPointEmptyDefaults
+{
+    VLCMediaLibraryMovie * const emptyMovie =
+        [[VLCMediaLibraryMovie alloc] initWithMediaItem:NULL];
+    XCTAssertNotNil(emptyMovie);
+    XCTAssertNil(emptyMovie.summary);
+    XCTAssertNil(emptyMovie.imdbID);
+    XCTAssertNil(emptyMovie.displayString);
+    XCTAssertEqualObjects(emptyMovie.mediaItems, @[]);
+    XCTAssertNil(emptyMovie.firstMediaItem);
+
+    struct vlc_ml_show_t emptyShowData = { 0 };
+    VLCMediaLibraryShow * const emptyShow =
+        [[VLCMediaLibraryShow alloc] initWithShow:&emptyShowData];
+    XCTAssertNotNil(emptyShow);
+    XCTAssertEqualObjects(emptyShow.name, @"");
+    XCTAssertEqualObjects(emptyShow.summary, @"");
+    XCTAssertEqualObjects(emptyShow.tvdbId, @"");
+    XCTAssertNil(emptyShow.episodes);
+    XCTAssertNil(emptyShow.mediaItems);
+    XCTAssertEqualObjects(emptyShow.primaryDetailString, @"0 seasons, 0 episodes");
+    XCTAssertEqualObjects(emptyShow.secondaryDetailString, @"Released in 0");
+    XCTAssertNil([VLCMediaLibraryShow showWithLibraryId:10]);
+
+    VLCMediaLibraryEntryPoint * const emptyEntryPoint =
+        [[VLCMediaLibraryEntryPoint alloc] initWithEntryPoint:NULL];
+    XCTAssertNotNil(emptyEntryPoint);
+    XCTAssertNil(emptyEntryPoint.MRL);
+    XCTAssertNil(emptyEntryPoint.decodedMRL);
+    XCTAssertFalse(emptyEntryPoint.isPresent);
+    XCTAssertFalse(emptyEntryPoint.isBanned);
 }
 
 - (void)testDummyItemEnumeratesAndDescribesItsChildren
@@ -403,12 +526,18 @@
     XCTAssertEqualObjects(item.mediaItems, (@[ first, second ]));
     XCTAssertEqual(item.firstMediaItem, first);
 
-    NSMutableArray<VLCMediaLibraryMediaItem *> * const enumerated = NSMutableArray.array;
+    NSMutableArray<VLCMediaLibraryMediaItem *> * enumerated = NSMutableArray.array;
     [item enumerateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem *childItem, BOOL *stop) {
         [enumerated addObject:childItem];
         *stop = childItem == first;
     }];
     XCTAssertEqualObjects(enumerated, @[ first ]);
+
+    enumerated = NSMutableArray.array;
+    [item iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem *childItem) {
+        [enumerated addObject:childItem];
+    }];
+    XCTAssertEqualObjects(enumerated, (@[ first, second ]));
 }
 
 @end
