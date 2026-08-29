@@ -249,17 +249,19 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
         _frameRate = p_track->v.i_fpsNum;
         _frameRateDenominator = p_track->v.i_fpsDen;
 
-        const unsigned int realHeight = MIN(_videoWidth, _videoHeight);
-        const unsigned int realWidth = MAX(_videoWidth, _videoHeight);
+        if (p_track->i_type == VLC_ML_TRACK_TYPE_VIDEO) {
+            const unsigned int realHeight = MIN(_videoWidth, _videoHeight);
+            const unsigned int realWidth = MAX(_videoWidth, _videoHeight);
 
-        if (realHeight >= VLCMediaLibrary8KHeight || realWidth >= VLCMediaLibrary8KHeight * (16.0 / 9.0)) {
-            _resolutionLabel = _NS("8K");
-        } else if (realHeight >= VLCMediaLibrary4KHeight || realWidth >= VLCMediaLibrary4KHeight * (16.0 / 9.0)) {
-            _resolutionLabel = _NS("4K");
-        } else if (realHeight >= VLCMediaLibrary1080pHeight || realWidth >= VLCMediaLibrary1080pHeight * (16.0 / 9.0)) {
-            _resolutionLabel = _NS("HD");
-        } else if (realHeight >= VLCMediaLibrary540pHeight || realWidth >= VLCMediaLibrary540pHeight * (16.0 / 9.0)) {
-            _resolutionLabel = _NS("SD");
+            if (realHeight >= VLCMediaLibrary8KHeight || realWidth >= VLCMediaLibrary8KHeight * (16.0 / 9.0)) {
+                _resolutionLabel = _NS("8K");
+            } else if (realHeight >= VLCMediaLibrary4KHeight || realWidth >= VLCMediaLibrary4KHeight * (16.0 / 9.0)) {
+                _resolutionLabel = _NS("4K");
+            } else if (realHeight >= VLCMediaLibrary1080pHeight || realWidth >= VLCMediaLibrary1080pHeight * (16.0 / 9.0)) {
+                _resolutionLabel = _NS("HD");
+            } else if (realHeight >= VLCMediaLibrary540pHeight || realWidth >= VLCMediaLibrary540pHeight * (16.0 / 9.0)) {
+                _resolutionLabel = _NS("SD");
+            }
         }
     }
     return self;
