@@ -11,6 +11,7 @@ TESTS += $(macosx_gui_xctest_bundles)
 VLCMacOSXTests_SOURCES = \
 	gui/macosx/tests/VLCHexNumberFormatterTest.m \
 	gui/macosx/tests/NSStringHelpersTest.m \
+	gui/macosx/tests/VLCLibraryDataTypesTest.m \
 	gui/macosx/tests/VLCLibraryDataTypesTestSupport.m \
 	gui/macosx/tests/VLCInputItemTest.m \
 	gui/macosx/tests/VLCInputItemTestSupport.m \
@@ -21,6 +22,7 @@ VLCMacOSXTests_SOURCES = \
 	gui/macosx/extensions/VLCHexNumberFormatter.m \
 	gui/macosx/extensions/VLCPositionFormatter.m \
 	gui/macosx/extensions/NSString+Helpers.m \
+	gui/macosx/library/VLCLibraryDataTypes.m \
 	gui/macosx/library/VLCInputItem.m \
 	gui/macosx/library/VLCInputNode.m \
 	gui/macosx/windows/logging/VLCLogMessage.m \
