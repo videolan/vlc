@@ -18,27 +18,27 @@
  * Preparser's operations
  */
 struct vlc_preparser_operations {
-    /** Called by `vlc_preparser_Push`. */
-    struct vlc_preparser_req *(*push)(void *opaque, input_item_t *item,
-                                      int type_options,
-                                      const struct vlc_preparser_cbs *cbs,
-                                      void *cbs_userdata);
+    struct vlc_preparser_req *(*req_new_parse)
+                                  (void *opaque, input_item_t *item,
+                                   int type_options,
+                                   const struct vlc_preparser_cbs *cbs,
+                                   void *cbs_userdata);
 
-    /** Called by `vlc_preparser_GenerateThumbnail`. */
-    struct vlc_preparser_req *(*generate_thumbnail)
+    struct vlc_preparser_req *(*req_new_thumbnail)
                                   (void *opaque, input_item_t *item,
                                    const struct vlc_thumbnailer_arg *thumb_arg,
                                    const struct vlc_thumbnailer_cbs *cbs,
                                    void *cbs_userdata);
 
-    /** Called by `vlc_preparser_GenerateThumbnailToFiles`. */
-    struct vlc_preparser_req *(*generate_thumbnail_to_files)
-                               (void *opaque, input_item_t *item,
-                                const struct vlc_thumbnailer_arg *thumb_arg,
-                                const struct vlc_thumbnailer_output *outputs,
-                                size_t output_count,
-                                const struct vlc_thumbnailer_to_files_cbs *cbs,
-                                void *cbs_userdata);
+    struct vlc_preparser_req *(*req_new_thumbnail_to_files)
+                                  (void *opaque, input_item_t *item,
+                                   const struct vlc_thumbnailer_arg *thumb_arg,
+                                   const struct vlc_thumbnailer_output *outputs,
+                                   size_t output_count,
+                                   const struct vlc_thumbnailer_to_files_cbs *cbs,
+                                   void *cbs_userdata);
+
+    int (*submit)(void *opaque, struct vlc_preparser_req *req);
 
     /** Called by `vlc_preparser_Cancel`. */
     size_t (*cancel)(void *opaque, struct vlc_preparser_req *req);

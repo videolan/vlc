@@ -625,10 +625,10 @@ PreparserRequestRetain(struct vlc_preparser_req *req)
 }
 
 static vlc_preparser_req *
-preparser_Push( void *opaque, input_item_t *item,
-                int type_options,
-                const struct vlc_preparser_cbs *cbs,
-                void *cbs_userdata )
+preparser_req_NewParse( void *opaque, input_item_t *item,
+                        int type_options,
+                        const struct vlc_preparser_cbs *cbs,
+                        void *cbs_userdata )
 {
     assert(opaque != NULL);
     struct preparser_sys *preparser = opaque;
@@ -650,40 +650,15 @@ preparser_Push( void *opaque, input_item_t *item,
         .parser = cbs,
     };
 
-    struct vlc_preparser_req *req = PreparserRequestNew(preparser, ParserRun, item, type_options,
-                                                        NULL, req_cbs, cbs_userdata);
-    if( !req )
-        return NULL;
-
-    struct vlc_preparser_req_owner *req_owner = preparser_req_get_owner(req);
-
-    PreparserRequestRetain(req);
-
-    if (preparser->parser != NULL)
-    {
-        PreparserAddTask(preparser, req);
-
-        vlc_executor_Submit(preparser->parser, &req_owner->runnable);
-
-        return req;
-    }
-
-    int ret = Fetch(req);
-    if (ret != VLC_SUCCESS)
-    {
-        /* Never submitted: drop the caller and the task references */
-        vlc_preparser_req_Release(req);
-        vlc_preparser_req_Release(req);
-        return NULL;
-    }
-    return req;
+    return PreparserRequestNew(preparser, ParserRun, item, type_options,
+                               NULL, req_cbs, cbs_userdata);
 }
 
 static vlc_preparser_req *
-preparser_GenerateThumbnail( void *opaque, input_item_t *item,
-                             const struct vlc_thumbnailer_arg *thumb_arg,
-                             const struct vlc_thumbnailer_cbs *cbs,
-                             void *cbs_userdata )
+preparser_req_NewThumbnail( void *opaque, input_item_t *item,
+                            const struct vlc_thumbnailer_arg *thumb_arg,
+                            const struct vlc_thumbnailer_cbs *cbs,
+                            void *cbs_userdata )
 {
     assert(opaque != NULL);
     struct preparser_sys *preparser = opaque;
@@ -695,20 +670,8 @@ preparser_GenerateThumbnail( void *opaque, input_item_t *item,
         .thumbnailer = cbs,
     };
 
-    struct vlc_preparser_req *req =
-        PreparserRequestNew(preparser, ThumbnailerRun, item, VLC_PREPARSER_TYPE_THUMBNAIL,
-                            thumb_arg, req_cbs, cbs_userdata);
-    if (req == NULL)
-        return NULL;
-
-    PreparserAddTask(preparser, req);
-
-    struct vlc_preparser_req_owner *req_owner = preparser_req_get_owner(req);
-
-    PreparserRequestRetain(req);
-    vlc_executor_Submit(preparser->thumbnailer, &req_owner->runnable);
-
-    return req;
+    return PreparserRequestNew(preparser, ThumbnailerRun, item, VLC_PREPARSER_TYPE_THUMBNAIL,
+                               thumb_arg, req_cbs, cbs_userdata);
 }
 
 static int
@@ -782,12 +745,12 @@ vlc_preparser_CheckThumbnailerFormat(enum vlc_thumbnailer_format format)
 }
 
 static vlc_preparser_req *
-preparser_GenerateThumbnailToFiles( void *opaque, input_item_t *item,
-                                    const struct vlc_thumbnailer_arg *thumb_arg,
-                                    const struct vlc_thumbnailer_output *outputs,
-                                    size_t output_count,
-                                    const struct vlc_thumbnailer_to_files_cbs *cbs,
-                                    void *cbs_userdata )
+preparser_req_NewThumbnailToFiles( void *opaque, input_item_t *item,
+                                   const struct vlc_thumbnailer_arg *thumb_arg,
+                                   const struct vlc_thumbnailer_output *outputs,
+                                   size_t output_count,
+                                   const struct vlc_thumbnailer_to_files_cbs *cbs,
+                                   void *cbs_userdata )
 {
     assert(opaque != NULL);
     struct preparser_sys *preparser = opaque;
@@ -851,12 +814,44 @@ preparser_GenerateThumbnailToFiles( void *opaque, input_item_t *item,
         return NULL;
     }
 
-    PreparserAddTask(preparser, req);
-
-    PreparserRequestRetain(req);
-    vlc_executor_Submit(preparser->thumbnailer, &req_owner->runnable);
-
     return req;
+}
+
+static int
+preparser_Submit( void *opaque, struct vlc_preparser_req *req )
+{
+    assert(opaque != NULL);
+    struct preparser_sys *preparser = opaque;
+
+    struct vlc_preparser_req_owner *req_owner = preparser_req_get_owner(req);
+    assert(req_owner->preparser == preparser);
+
+    /* the task's reference */
+    PreparserRequestRetain(req);
+
+    if (req_owner->options & (VLC_PREPARSER_TYPE_THUMBNAIL |
+                              VLC_PREPARSER_TYPE_THUMBNAIL_TO_FILES))
+    {
+        assert(preparser->thumbnailer != NULL);
+        PreparserAddTask(preparser, req);
+        vlc_executor_Submit(preparser->thumbnailer, &req_owner->runnable);
+        return VLC_SUCCESS;
+    }
+
+    if (preparser->parser != NULL)
+    {
+        PreparserAddTask(preparser, req);
+        vlc_executor_Submit(preparser->parser, &req_owner->runnable);
+        return VLC_SUCCESS;
+    }
+
+    if (Fetch(req) != VLC_SUCCESS)
+    {
+        vlc_preparser_req_Release(req); /* task ref only; caller keeps theirs */
+        return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
 }
 
 static size_t preparser_Cancel( void *opaque, vlc_preparser_req *req )
@@ -1032,9 +1027,10 @@ vlc_preparser_internal_New(vlc_preparser_t *owner, vlc_object_t *parent,
     vlc_list_init(&preparser->submitted_tasks);
 
     static const struct vlc_preparser_operations ops = {
-        .push = preparser_Push,
-        .generate_thumbnail = preparser_GenerateThumbnail,
-        .generate_thumbnail_to_files = preparser_GenerateThumbnailToFiles,
+        .req_new_parse = preparser_req_NewParse,
+        .req_new_thumbnail = preparser_req_NewThumbnail,
+        .req_new_thumbnail_to_files = preparser_req_NewThumbnailToFiles,
+        .submit = preparser_Submit,
         .cancel = preparser_Cancel,
         .delete = preparser_Delete,
     };
