@@ -32,6 +32,7 @@
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryRepresentedItem.h"
 #import "library/VLCLibrarySegment.h"
+#import "library/VLCLibraryWindow.h"
 
 #import "main/VLCMain.h"
 
@@ -205,6 +206,8 @@
 {
     VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
     NSArray<VLCMediaLibraryMediaItem *> * const recents = libraryModel.listOfRecentMedia;
+    const BOOL isFavoritesSegment =
+        VLCMain.sharedInstance.libraryWindow.librarySegmentType == VLCLibraryFavoritesSegmentType;
 
     _removeFromPlaylistItem.hidden = YES;
     _renamePlaylistItem.hidden = YES;
@@ -216,6 +219,7 @@
         [self menuItems:_folderInputItemRequiringMenuItems setHidden:YES];
         [self menuItems:_recentsMediaItemRequiringMenuItems setHidden:YES];
         [self menuItems:_mediaItemRequiringMenuItems setHidden:NO];
+        self.favoriteItem.hidden = isFavoritesSegment;
         return;
     }
 
@@ -264,6 +268,7 @@
         self.favoriteItem.title = anyUnfavorited ? _NS("Add to Favorites") : _NS("Remove from Favorites");
         self.favoriteItem.action = anyUnfavorited ? @selector(addFavorite:) : @selector(removeFavorite:);
         [self.favoriteItem vlc_setActionImageWithSystemSymbolName:(anyUnfavorited ? @"heart" : @"heart.slash")];
+        self.favoriteItem.hidden = isFavoritesSegment;
         
         // Update delete menu item title based on whether items are file-backed
         BOOL hasFileBacked = NO;
@@ -292,6 +297,7 @@
         [self menuItems:_mediaItemRequiringMenuItems setHidden:YES];
         _removeFromPlaylistItem.hidden = YES;
         [self menuItems:_inputItemRequiringMenuItems setHidden:NO];
+        self.favoriteItem.hidden = YES;
 
         BOOL anyStream = NO;
         for (VLCInputItem * const inputItem in self.representedInputItems) {
