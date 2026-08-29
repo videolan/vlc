@@ -859,7 +859,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
                 [remainingBookmarkedLocations removeObject:locationMrl];
                 continue;
             }
-            NSString * const locationName = locationMrl.lastPathComponent;
+            NSString * const locationName = [locationMrl.lastPathComponent stringByRemovingPercentEncoding];
             VLCLibrarySegmentBookmarkedLocation * const descriptor =
                 [[VLCLibrarySegmentBookmarkedLocation alloc] initWithSegmentType:segmentType
                                                                             name:locationName
