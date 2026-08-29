@@ -528,24 +528,24 @@ static struct vlc_pw_stream *vlc_pw_stream_create(audio_output_t *aout,
             return NULL;
         }
 
+        // NOTE: MUST match VLC (WG4) order
         static const unsigned char map[] = {
-            SPA_AUDIO_CHANNEL_FC,
             SPA_AUDIO_CHANNEL_FL,
             SPA_AUDIO_CHANNEL_FR,
-            0 /* unassigned */,
-            SPA_AUDIO_CHANNEL_RC,
-            SPA_AUDIO_CHANNEL_RL,
-            SPA_AUDIO_CHANNEL_RR,
-            0 /* unassigned */,
             SPA_AUDIO_CHANNEL_SL,
             SPA_AUDIO_CHANNEL_SR,
-            0 /* unassigned */,
-            0 /* unassigned */,
+            SPA_AUDIO_CHANNEL_RL,
+            SPA_AUDIO_CHANNEL_RR,
+            SPA_AUDIO_CHANNEL_RC,
+            SPA_AUDIO_CHANNEL_FC,
             SPA_AUDIO_CHANNEL_LFE,
         };
 
+        static_assert (ARRAY_SIZE(map) <= ARRAY_SIZE(pi_vlc_chan_order_wg4),
+                       "Array size mismatch");
+
         for (size_t i = 0; i < ARRAY_SIZE(map); i++)
-            if ((fmt->i_physical_channels >> i) & 1)
+            if (fmt->i_physical_channels & pi_vlc_chan_order_wg4[i])
                 rawfmt.position[mapped++] = map[i];
 
         while (mapped < fmt->i_channels) {
