@@ -1,0 +1,71 @@
+/****************************************************************************
+ * VLCLibraryDataTypesTestSupport.m: VLC library data type test fixtures
+ ****************************************************************************
+ * Copyright (C) 2026 VLC authors and VideoLAN
+ *
+ * Authors: Claudio Cambra <developer@claudiocambra.com>
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2, or (at your option) any later
+ * version.
+ ****************************************************************************/
+
+#import "VLCLibraryDataTypesTestSupport.h"
+
+@interface VLCMediaLibraryMediaItem (VLCLibraryDataTypesTestPrivate)
+- (instancetype)initWithMediaItem:(struct vlc_ml_media_t *)mediaItem
+                          library:(vlc_medialibrary_t *)mediaLibrary;
+@end
+
+VLCMediaLibraryMediaItem *VLCLibraryDataTypesTestMediaItemWithSubtype(vlc_ml_media_subtype_t subtype)
+{
+    struct TestFileList {
+        size_t i_nb_items;
+        vlc_ml_file_t p_items[1];
+    } files = { 0 };
+    files.i_nb_items = 1;
+    files.p_items[0].psz_mrl = (char *)"file:///tmp/media.mp4";
+    files.p_items[0].i_type = VLC_ML_FILE_TYPE_MAIN;
+
+    struct TestTrackList {
+        size_t i_nb_items;
+        vlc_ml_media_track_t p_items[2];
+    } tracks = { 0 };
+    tracks.i_nb_items = 2;
+    tracks.p_items[0].psz_codec = (char *)"avc1";
+    tracks.p_items[0].i_type = VLC_ML_TRACK_TYPE_VIDEO;
+    tracks.p_items[0].v.i_width = 1920;
+    tracks.p_items[0].v.i_height = 1080;
+    tracks.p_items[1].psz_codec = (char *)"mp4a";
+    tracks.p_items[1].i_type = VLC_ML_TRACK_TYPE_AUDIO;
+
+    struct vlc_ml_media_t media = { 0 };
+    media.i_id = 13;
+    media.i_type = VLC_ML_MEDIA_TYPE_VIDEO;
+    media.i_subtype = subtype;
+    media.p_files = (vlc_ml_file_list_t *)&files;
+    media.p_tracks = (vlc_ml_media_track_list_t *)&tracks;
+    media.i_year = 2024;
+    media.i_duration = 123000;
+    media.i_playcount = 2;
+    media.f_progress = .5;
+    media.psz_title = (char *)"Media";
+
+    if (subtype == VLC_ML_MEDIA_SUBTYPE_SHOW_EPISODE) {
+        media.show_episode.i_episode_nb = 4;
+        media.show_episode.i_season_number = 2;
+    } else if (subtype == VLC_ML_MEDIA_SUBTYPE_MOVIE) {
+        media.movie.psz_summary = (char *)"Movie summary";
+        media.movie.psz_imdb_id = (char *)"tt123";
+    } else if (subtype == VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK) {
+        media.album_track.i_artist_id = 7;
+        media.album_track.i_album_id = 8;
+        media.album_track.i_genre_id = 9;
+        media.album_track.i_track_nb = 3;
+        media.album_track.i_disc_nb = 1;
+    }
+
+    return [[VLCMediaLibraryMediaItem alloc]
+        initWithMediaItem:&media library:(vlc_medialibrary_t *)0x1];
+}

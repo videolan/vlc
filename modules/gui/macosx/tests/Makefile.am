@@ -11,6 +11,7 @@ TESTS += $(macosx_gui_xctest_bundles)
 VLCMacOSXTests_SOURCES = \
 	gui/macosx/tests/VLCHexNumberFormatterTest.m \
 	gui/macosx/tests/NSStringHelpersTest.m \
+	gui/macosx/tests/VLCLibraryDataTypesTestSupport.m \
 	gui/macosx/tests/VLCInputItemTest.m \
 	gui/macosx/tests/VLCInputItemTestSupport.m \
 	gui/macosx/tests/VLCInputNodeTest.m \
@@ -25,7 +26,9 @@ VLCMacOSXTests_SOURCES = \
 	gui/macosx/windows/logging/VLCLogMessage.m \
 	gui/macosx/views/VLCTimeFormatter.m
 
-noinst_HEADERS += gui/macosx/tests/VLCInputItemTestSupport.h
+noinst_HEADERS += \
+	gui/macosx/tests/VLCInputItemTestSupport.h \
+	gui/macosx/tests/VLCLibraryDataTypesTestSupport.h
 
 VLCMacOSXTests_CPPFLAGS = \
 	$(AM_CPPFLAGS) \

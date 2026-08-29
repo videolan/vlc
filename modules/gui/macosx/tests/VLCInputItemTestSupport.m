@@ -21,11 +21,18 @@ static NSImage *sWorkspaceImage;
 static BOOL sDidReveal;
 static BOOL sDidReload;
 
+const char vlc_module_name[] = "VLCMacOSXTests";
+
 @interface VLCLibraryController : NSObject
 @end
 
 @interface VLCMain : NSObject
 + (instancetype)sharedInstance;
+@end
+
+@interface VLCLibraryNameCache : NSObject
++ (instancetype)sharedInstance;
+- (NSString *)artistNameForID:(int64_t)artistID;
 @end
 
 @implementation VLCLibraryController
@@ -57,6 +64,25 @@ static BOOL sDidReload;
         libraryController = [[VLCLibraryController alloc] init];
     });
     return libraryController;
+}
+
+@end
+
+@implementation VLCLibraryNameCache
+
++ (instancetype)sharedInstance
+{
+    static VLCLibraryNameCache *cache;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        cache = [[VLCLibraryNameCache alloc] init];
+    });
+    return cache;
+}
+
+- (NSString *)artistNameForID:(int64_t __unused)artistID
+{
+    return nil;
 }
 
 @end
