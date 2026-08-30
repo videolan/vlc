@@ -20,6 +20,12 @@
 
 VLCMediaLibraryMediaItem *VLCLibraryDataTypesTestMediaItemWithSubtype(vlc_ml_media_subtype_t subtype)
 {
+    return VLCLibraryDataTypesTestMediaItemWithTypeAndSubtype(VLC_ML_MEDIA_TYPE_VIDEO, subtype);
+}
+
+VLCMediaLibraryMediaItem *VLCLibraryDataTypesTestMediaItemWithTypeAndSubtype(vlc_ml_media_type_t type,
+                                                                             vlc_ml_media_subtype_t subtype)
+{
     struct TestFileList {
         size_t i_nb_items;
         vlc_ml_file_t p_items[1];
@@ -42,7 +48,7 @@ VLCMediaLibraryMediaItem *VLCLibraryDataTypesTestMediaItemWithSubtype(vlc_ml_med
 
     struct vlc_ml_media_t media = { 0 };
     media.i_id = 13;
-    media.i_type = VLC_ML_MEDIA_TYPE_VIDEO;
+    media.i_type = type;
     media.i_subtype = subtype;
     media.p_files = (vlc_ml_file_list_t *)&files;
     media.p_tracks = (vlc_ml_media_track_list_t *)&tracks;
@@ -50,7 +56,10 @@ VLCMediaLibraryMediaItem *VLCLibraryDataTypesTestMediaItemWithSubtype(vlc_ml_med
     media.i_duration = 123000;
     media.i_playcount = 2;
     media.f_progress = .5;
+    media.i_last_played_date = 4567;
     media.psz_title = (char *)"Media";
+    media.thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl = (char *)"file:///tmp/media.jpg";
+    media.b_is_favorite = true;
 
     if (subtype == VLC_ML_MEDIA_SUBTYPE_SHOW_EPISODE) {
         media.show_episode.i_episode_nb = 4;

@@ -15,3 +15,6 @@
 
 VLCMediaLibraryMediaItem * _Nonnull VLCLibraryDataTypesTestMediaItemWithSubtype(
     vlc_ml_media_subtype_t subtype);
+VLCMediaLibraryMediaItem * _Nonnull VLCLibraryDataTypesTestMediaItemWithTypeAndSubtype(
+    vlc_ml_media_type_t type,
+    vlc_ml_media_subtype_t subtype);
