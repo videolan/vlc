@@ -93,6 +93,26 @@
     XCTAssertEqual(audioTrack.audioSampleRate, (uint32_t)48000);
 }
 
+- (void)testTrackReadableTypes
+{
+    const vlc_ml_track_type_t trackTypes[] = {
+        VLC_ML_TRACK_TYPE_AUDIO,
+        VLC_ML_TRACK_TYPE_VIDEO,
+        VLC_ML_TRACK_TYPE_UNKNOWN,
+    };
+    NSArray<NSString *> * const readableTypes = @[
+        @"Audio", @"Video", @"Unknown"
+    ];
+
+    for (NSUInteger i = 0; i < sizeof(trackTypes) / sizeof(trackTypes[0]); ++i) {
+        struct vlc_ml_media_track_t track = { 0 };
+        track.i_type = trackTypes[i];
+        VLCMediaLibraryTrack * const typedTrack =
+            [[VLCMediaLibraryTrack alloc] initWithTrack:&track];
+        XCTAssertEqualObjects(typedTrack.readableTrackType, readableTypes[i]);
+    }
+}
+
 - (void)testTrackResolutionLabels
 {
     struct vlc_ml_media_track_t track = { 0 };
@@ -381,6 +401,14 @@
     XCTAssertEqual(group.numberOfPresentSeenItems, (NSUInteger)1);
 }
 
+- (void)testGroupDisplayStringFallsBackForMissingName
+{
+    struct vlc_ml_group_t groupData = { 0 };
+    VLCMediaLibraryGroup * const group =
+        [[VLCMediaLibraryGroup alloc] initWithGroup:&groupData];
+    XCTAssertEqualObjects(group.displayString, @"Unknown Group");
+}
+
 - (void)testEmptyGroupHasNoMediaItems
 {
     struct vlc_ml_group_t groupData = { 0 };
@@ -388,6 +416,17 @@
         [[VLCMediaLibraryGroup alloc] initWithGroup:&groupData];
     XCTAssertEqualObjects(group.mediaItems, @[]);
     XCTAssertNil(group.firstMediaItem);
+}
+
+- (void)testEmptyPlaylistDefaults
+{
+    struct vlc_ml_playlist_t playlistData = { 0 };
+    VLCMediaLibraryPlaylist * const emptyPlaylist =
+        [[VLCMediaLibraryPlaylist alloc] initWithPlaylist:&playlistData];
+    XCTAssertEqualObjects(emptyPlaylist.primaryDetailString, @"No item");
+    XCTAssertEqualObjects(emptyPlaylist.durationString, @"--:--");
+    XCTAssertFalse(emptyPlaylist.readOnly);
+    XCTAssertFalse(emptyPlaylist.favorited);
 }
 
 - (void)testMediaItemMapsAlbumTrackFields
