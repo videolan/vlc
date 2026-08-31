@@ -127,10 +127,10 @@ video_filter_PLUGINS += \
 libsam3_plugin_la_SOURCES = video_filter/sam3.cpp
 libsam3_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(OPENCV4_CFLAGS)
 libsam3_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) -fexceptions
-libsam3_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(GC_SECTIONS_LDFLAGS) -rpath '$(video_filterdir)'
+libsam3_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(GC_SECTIONS_LDFLAGS) $(video_filter_RPATH)
 libsam3_plugin_la_LIBADD = $(LIBM) $(OPENCV4_LIBS)
 EXTRA_LTLIBRARIES += libsam3_plugin.la
-video_filter_LTLIBRARIES += $(LTLIBsam3)
+video_filter_PLUGINS += $(LTLIBsam3)
 
 # macOS / iOS hardware video filters
 libci_filters_plugin_la_SOURCES = video_filter/ci_filters.m codec/vt_utils.c codec/vt_utils.h
@@ -233,5 +233,5 @@ libgladjust_plugin_la_SOURCES = video_filter/gladjust.c
 libgladjust_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_PLUGIN_CFLAGS)
 libgladjust_plugin_la_LIBADD = $(GL_PLUGIN_LIBADD)
 if HAVE_GL_OR_GLES2
-video_filter_LTLIBRARIES += libgladjust_plugin.la
+video_filter_PLUGINS += libgladjust_plugin.la
 endif
