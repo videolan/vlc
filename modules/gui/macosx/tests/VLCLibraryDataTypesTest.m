@@ -556,6 +556,59 @@
     XCTAssertFalse(emptyPlaylist.favorited);
 }
 
+- (void)testPlaylistIsFileBackedOnlyForExistingLocalFiles
+{
+    struct vlc_ml_playlist_t playlistData = { 0 };
+    playlistData.psz_mrl = (char *)"https://example.com/playlist.m3u";
+    VLCMediaLibraryPlaylist * const remotePlaylist =
+        [[VLCMediaLibraryPlaylist alloc] initWithPlaylist:&playlistData];
+    XCTAssertFalse(remotePlaylist.isFileBacked);
+
+    NSString * const path = [NSTemporaryDirectory() stringByAppendingPathComponent:
+                             @"vlc-datatypes-file-backed-test.m3u"];
+    XCTAssertTrue([[NSFileManager defaultManager] createFileAtPath:path
+                                                              contents:[NSData data]
+                                                            attributes:nil]);
+    NSString * const fileMRL = [NSURL fileURLWithPath:path].absoluteString;
+    playlistData.psz_mrl = (char *)fileMRL.UTF8String;
+    VLCMediaLibraryPlaylist * const filePlaylist =
+        [[VLCMediaLibraryPlaylist alloc] initWithPlaylist:&playlistData];
+    XCTAssertTrue(filePlaylist.isFileBacked);
+    [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
+
+    VLCMediaLibraryPlaylist * const missingFilePlaylist =
+        [[VLCMediaLibraryPlaylist alloc] initWithPlaylist:&playlistData];
+    XCTAssertFalse(missingFilePlaylist.isFileBacked);
+}
+
+- (void)testPlaylistRevealInFinder
+{
+    VLCInputItemTestResetAppKitState();
+    struct vlc_ml_playlist_t playlistData = { 0 };
+    NSString * const path = [NSTemporaryDirectory() stringByAppendingPathComponent:
+                             @"vlc-datatypes-reveal-test.m3u"];
+    XCTAssertTrue([[NSFileManager defaultManager] createFileAtPath:path
+                                                              contents:[NSData data]
+                                                            attributes:nil]);
+    NSString * const fileMRL = [NSURL fileURLWithPath:path].absoluteString;
+    playlistData.psz_mrl = (char *)fileMRL.UTF8String;
+    VLCMediaLibraryPlaylist * const playlist =
+        [[VLCMediaLibraryPlaylist alloc] initWithPlaylist:&playlistData];
+    [playlist revealInFinder];
+    XCTAssertTrue(VLCInputItemTestDidReveal());
+    [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
+}
+
+- (void)testPlaylistRevealInFinderWithoutMRLDoesNothing
+{
+    VLCInputItemTestResetAppKitState();
+    struct vlc_ml_playlist_t playlistData = { 0 };
+    VLCMediaLibraryPlaylist * const playlist =
+        [[VLCMediaLibraryPlaylist alloc] initWithPlaylist:&playlistData];
+    [playlist revealInFinder];
+    XCTAssertFalse(VLCInputItemTestDidReveal());
+}
+
 - (void)testMediaItemMapsCommonFields
 {
     VLCMediaLibraryMediaItem * const item =
