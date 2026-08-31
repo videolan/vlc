@@ -46,7 +46,7 @@ enum h266_general_profile_idc_e
 #define H266_CONSTRAINT_BYTES(bits) (((bits)+7)/8)
 #define H266_MAX_CONSTRAINT_BYTES H266_CONSTRAINT_BYTES(H266_MIN_CONSTRAINT_BITS + \
                                                         H266_MAX_CONSTRAINT_ADDITIONAL_BITS)
-#define H266_MAX_NUH_LAYER_ID 55
+#define H266_MAX_NUH_LAYER_ID 55 /* values 56-63 are reserved */
 #define H266_MAX_NUM_PTL_SUBLAYERS 7
 #define H266_MAX_NUM_SUBLAYERS (1+H266_MAX_NUM_PTL_SUBLAYERS)
 #define H266_MAX_NUM_SUB_PROFILES 256

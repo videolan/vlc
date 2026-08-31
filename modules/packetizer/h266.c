@@ -804,6 +804,11 @@ static block_t *ParseFrameHeader(decoder_t *p_dec, uint8_t i_nal_type,
 
     bool b_new_au = !p_sys->previous.b_valid;
     const uint8_t i_layer = h266_getNALLayer(p_buffer);
+    if(unlikely(i_layer >= H266_MAX_NUH_LAYER_ID))
+    {
+        block_Release(p_frag);
+        return NULL;
+    }
     if(b_header)
     {
         h266_sequence_parameter_set_t *p_sps = NULL;
