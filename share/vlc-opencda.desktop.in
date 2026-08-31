@@ -1,6 +1,7 @@
 [Desktop Entry]
 Version=1.0
 Name=VLC media player (Audio CD)
+Name[fr]=Lecteur multimédia VLC (CD Audio)
 NoDisplay=true
 Exec=@bindir@/vlc --started-from-file cdda://%f
 Icon=vlc
