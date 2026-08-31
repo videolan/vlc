@@ -1013,6 +1013,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     self = [super init];
     if (self && p_playlist != NULL) {
         self.libraryID = p_playlist->i_id;
+        self.smallArtworkGenerated = p_playlist->psz_artwork_mrl != NULL;
         self.smallArtworkMRL = toNSStr(p_playlist->psz_artwork_mrl);
         self.displayString = toNSStr(p_playlist->psz_name);
         const unsigned int numberOfMedia = p_playlist->i_nb_media;
