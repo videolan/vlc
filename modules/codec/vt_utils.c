@@ -221,30 +221,33 @@ cvpxpic_unmap(picture_t *mapped_pic)
     return hw_pic;
 }
 
+OSType
+cvpx_map_vlc_chroma_to_cv_pixel_format(vlc_fourcc_t chroma)
+{
+    switch (chroma)
+    {
+        case VLC_CODEC_CVPX_UYVY:
+            return kCVPixelFormatType_422YpCbCr8;
+        case VLC_CODEC_CVPX_NV12:
+            return kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange;
+        case VLC_CODEC_CVPX_I420:
+            return kCVPixelFormatType_420YpCbCr8Planar;
+        case VLC_CODEC_CVPX_BGRA:
+            return kCVPixelFormatType_32BGRA;
+        case VLC_CODEC_CVPX_P010:
+            return 'x420'; /* kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange */
+        default:
+            return 0;
+    }
+}
+
 CVPixelBufferPoolRef
 cvpxpool_create(const video_format_t *fmt, unsigned count)
 {
-    int cvpx_format;
-    switch (fmt->i_chroma)
-    {
-        case VLC_CODEC_CVPX_UYVY:
-            cvpx_format = kCVPixelFormatType_422YpCbCr8;
-            break;
-        case VLC_CODEC_CVPX_NV12:
-            cvpx_format = kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange;
-            break;
-        case VLC_CODEC_CVPX_I420:
-            cvpx_format = kCVPixelFormatType_420YpCbCr8Planar;
-            break;
-        case VLC_CODEC_CVPX_BGRA:
-            cvpx_format = kCVPixelFormatType_32BGRA;
-            break;
-        case VLC_CODEC_CVPX_P010:
-            cvpx_format = 'x420'; /* kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange */
-            break;
-        default:
-            return NULL;
-    }
+    OSType cvpx_format =
+        cvpx_map_vlc_chroma_to_cv_pixel_format(fmt->i_chroma);
+    if (cvpx_format == 0)
+        return NULL;
 
     /* destination pixel buffer attributes */
     CFMutableDictionaryRef cvpx_attrs_dict = cfdict_create(5);

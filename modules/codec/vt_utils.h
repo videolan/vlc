@@ -72,6 +72,14 @@ picture_t *cvpxpic_unmap(picture_t *mapped_pic);
  */
 CVPixelBufferPoolRef cvpxpool_create(const video_format_t *fmt, unsigned count);
 
+/**
+ * @brief Get a Core Video pixel format corresponding to a VLC CVPX chroma
+ *
+ * @param chroma one of the VLC_CODEC_CVPX_* chromas
+ * @return a Core Video pixel format or 0 if the chroma is not supported
+ */
+OSType cvpx_map_vlc_chroma_to_cv_pixel_format(vlc_fourcc_t chroma);
+
 /*
  * Get a cvpx buffer from a pool
  */
