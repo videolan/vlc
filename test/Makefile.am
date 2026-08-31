@@ -286,6 +286,10 @@ test_src_player_seeks_SOURCES = src/player/common.h src/player/modules.c \
 test_src_player_seeks_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBM)
 test_src_player_teletext_SOURCES = src/player/common.h src/player/modules.c \
 	src/player/teletext.c
+test_src_player_teletext_CPPFLAGS = $(AM_CPPFLAGS)
+if HAVE_ZVBI
+test_src_player_teletext_CPPFLAGS += -DZVBI_COMPILED=1
+endif
 test_src_player_teletext_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBM)
 test_src_player_timers_SOURCES = src/player/common.h src/player/modules.c \
 	src/player/timers.c src/player/timers.h
