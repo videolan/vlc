@@ -97,6 +97,7 @@ Item {
             width: height
 
             x: control.width * model.position - width/2
+            y: VLCStyle.dp(1, VLCStyle.scale)
             focusPolicy: Qt.NoFocus
 
             onClicked: modelBookmark.select(modelBookmark.index(index, 0))
