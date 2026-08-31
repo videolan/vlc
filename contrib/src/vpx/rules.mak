@@ -138,12 +138,10 @@ VPX_CONF += --disable-runtime-cpu-detect
 endif
 VPX_CONF += --enable-vp8-decoder
 endif
-ifdef HAVE_DARWIN_OS
 ifeq ($(ARCH),$(filter $(ARCH), arm aarch64))
-ifneq ($(call clang_at_least, 13), true)
-# arm_neon.h broken on clang 12
+ifneq ($(call apple_clang_at_least, 13), true)
+# arm_neon.h broken on Apple Clang 12
 VPX_CONF += --disable-neon-dotprod
-endif
 endif
 endif
 

@@ -152,12 +152,23 @@ EXTRA_LDFLAGS += -m32
 endif
 endif
 
+apple_clang_at_least = $(shell echo false)
+apple_clang_at_most  = $(shell echo false)
+apple_clang_major_is = $(shell echo false)
 clang_at_least = $(shell echo false)
 clang_at_most  = $(shell echo false)
 clang_major_is = $(shell echo false)
 gcc_at_least = $(shell echo false)
 gcc_at_most  = $(shell echo false)
 gcc_major_is = $(shell echo false)
+ifeq ($(shell $(CC) --version 2>/dev/null | grep -qi "Apple clang" || echo FAIL),)
+HAVE_APPLE_CLANG := 1
+HAVE_CLANG := 1
+CLANG_VERSION := $(shell $(CC) --version | head -1 | grep -o '[0-9]\+\.' | head -1 | cut -d '.' -f 1)
+apple_clang_at_least = $(shell [ $(CLANG_VERSION) -ge $(1) ] && echo true)
+apple_clang_at_most  = $(shell [ $(CLANG_VERSION) -le $(1) ] && echo true)
+apple_clang_major_is = $(shell [ $(CLANG_VERSION) -eq $(1) ] && echo true)
+else
 ifneq ($(findstring clang, $(shell $(CC) --version 2>/dev/null | grep -qi clang && echo "clang")),)
 HAVE_CLANG := 1
 CLANG_VERSION := $(shell $(CC) --version | head -1 | grep -o '[0-9]\+\.' | head -1 | cut -d '.' -f 1)
@@ -173,14 +184,13 @@ gcc_at_most  = $(shell [ $(GCC_VERSION) -le $(1) ] && echo true)
 gcc_major_is = $(shell [ $(GCC_VERSION) -eq $(1) ] && echo true)
 endif
 endif
+endif
 
 # -fno-stack-check is a workaround for a possible
 # bug in Xcode 11 or macOS 10.15+
-ifdef HAVE_DARWIN_OS
-ifeq ($(call clang_major_is, 11), true)
+ifeq ($(call apple_clang_major_is,11), true)
 EXTRA_CFLAGS += -fno-stack-check
 XCODE_FLAGS += OTHER_CFLAGS=-fno-stack-check
-endif
 endif
 
 cppcheck = $(shell printf '$(2)' | $(CC) $(CFLAGS) -E -dM - 2>/dev/null | grep -E $(1))
