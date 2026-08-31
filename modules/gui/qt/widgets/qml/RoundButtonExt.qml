@@ -66,7 +66,7 @@ T.RoundButton {
         radius: control.radius
         enabled: control.enabled
         visible: !control.flat || control.down || control.checked || control.highlighted
-        color: theme.bg.secondary // ###
+        color: theme.fg.primary
         border.color: theme.border
     }
 }
