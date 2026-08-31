@@ -30,7 +30,6 @@
 #include <vlc_filter.h>
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
-#include <vlc_atomic.h>
 #include <vlc_modules.h>
 
 #import "VLCDrawable.h"
@@ -636,6 +635,214 @@ shouldInheritContentsScale:(CGFloat)newScale
 
 #pragma mark -
 
+@interface VLCDisplayCriteriaMatcher : NSObject
+- (instancetype)initWithWindow:(VLCView *)window;
+- (void)prepare;
+- (void)matchVideoFormat:(const video_format_t *)format;
+- (void)matchFormatDescription:(CMVideoFormatDescriptionRef)formatDescription;
+- (void)close;
+@end
+
+#if TARGET_OS_TV || (defined(TARGET_OS_VISION) && TARGET_OS_VISION)
+API_AVAILABLE(tvos(17.0), visionos(1.0))
+@interface VLCDisplayCriteriaMatcher ()
+@property (nonatomic, weak) VLCView *window;
+@property (nonatomic) AVDisplayManager *displayManager;
+@property (nonatomic) float refreshRate;
+@property (nonatomic, copy) NSString *matrix;
+@property (nonatomic, copy) NSString *primaries;
+@property (nonatomic, copy) NSString *transfer;
+@property (nonatomic) BOOL installedDisplayCriteria;
+@property (nonatomic) AVDisplayCriteria *pendingDisplayCriteria;
+@end
+
+@implementation VLCDisplayCriteriaMatcher
+
+- (instancetype)initWithWindow:(VLCView *)window
+{
+    self = [super init];
+    if (self)
+        _window = window;
+    return self;
+}
+
+- (void)installDisplayCriteria:(AVDisplayCriteria *)criteria
+    API_AVAILABLE(tvos(17.0), visionos(1.0))
+{
+    if (@available(tvOS 17.0, visionOS 1.0, *)) {
+        AVDisplayManager *displayManager = self.displayManager;
+        if (displayManager == nil) {
+            displayManager = self.window.window.avDisplayManager;
+            self.displayManager = displayManager;
+        }
+
+        if (criteria == nil)
+            return;
+
+        if (displayManager == nil) {
+            self.pendingDisplayCriteria = criteria;
+            return;
+        }
+
+        self.pendingDisplayCriteria = nil;
+        if (displayManager.isDisplayCriteriaMatchingEnabled) {
+            displayManager.preferredDisplayCriteria = criteria;
+            self.installedDisplayCriteria = YES;
+        }
+    }
+}
+
+- (void)prepare
+{
+    if (@available(tvOS 17.0, visionOS 1.0, *))
+        [self installDisplayCriteria:self.pendingDisplayCriteria];
+}
+
+- (void)matchFormatDescription:(CMVideoFormatDescriptionRef)formatDescription
+{
+    if (formatDescription == NULL)
+        return;
+
+    NSDictionary *extensions = (__bridge NSDictionary *)
+        CMFormatDescriptionGetExtensions(formatDescription);
+    NSString *matrix =
+        extensions[(__bridge NSString *)kCVImageBufferYCbCrMatrixKey];
+    NSString *primaries =
+        extensions[(__bridge NSString *)kCVImageBufferColorPrimariesKey];
+    NSString *transfer =
+        extensions[(__bridge NSString *)kCVImageBufferTransferFunctionKey];
+    if (matrix == nil || primaries == nil || transfer == nil)
+        return;
+
+    [self matchFormatDescription:formatDescription
+                     refreshRate:self.refreshRate
+                          matrix:matrix
+                       primaries:primaries
+                        transfer:transfer];
+}
+
+- (void)matchVideoFormat:(const video_format_t *)format
+{
+    if (format == NULL || format->i_visible_width == 0 ||
+        format->i_visible_height == 0 ||
+        format->i_frame_rate == 0 || format->i_frame_rate_base == 0)
+        return;
+
+    OSType pixelFormat =
+        cvpx_map_vlc_chroma_to_cv_pixel_format(format->i_chroma);
+    if (pixelFormat == 0)
+        return;
+
+    CFMutableDictionaryRef extensions = cfdict_create(3);
+    if (extensions == NULL)
+        return;
+
+    CFStringRef matrix = cvpx_map_YCbCrMatrix_from_vcs(format->space);
+    if (matrix != NULL)
+        CFDictionarySetValue(extensions, kCVImageBufferYCbCrMatrixKey, matrix);
+
+    CFStringRef primaries = cvpx_map_ColorPrimaries_from_vcp(format->primaries);
+    if (primaries != NULL)
+        CFDictionarySetValue(extensions, kCVImageBufferColorPrimariesKey,
+                             primaries);
+
+    CFStringRef transfer = cvpx_map_TransferFunction_from_vtf(format->transfer);
+    if (transfer != NULL)
+        CFDictionarySetValue(extensions, kCVImageBufferTransferFunctionKey,
+                             transfer);
+
+    CMVideoFormatDescriptionRef formatDescription = NULL;
+    OSStatus status = CMVideoFormatDescriptionCreate(
+        kCFAllocatorDefault, pixelFormat, format->i_visible_width,
+        format->i_visible_height, extensions, &formatDescription);
+    CFRelease(extensions);
+    if (status != noErr)
+        return;
+
+    [self matchFormatDescription:formatDescription
+                     refreshRate:(float)format->i_frame_rate /
+                                 (float)format->i_frame_rate_base
+                          matrix:(__bridge NSString *)matrix
+                       primaries:(__bridge NSString *)primaries
+                        transfer:(__bridge NSString *)transfer];
+    CFRelease(formatDescription);
+}
+
+- (void)matchFormatDescription:(CMVideoFormatDescriptionRef)formatDescription
+                    refreshRate:(float)refreshRate
+                         matrix:(NSString *)matrix
+                      primaries:(NSString *)primaries
+                       transfer:(NSString *)transfer
+{
+    if (@available(tvOS 17.0, visionOS 1.0, *)) {
+        if (refreshRate == 0.f || formatDescription == NULL)
+            return;
+
+        if (self.refreshRate == refreshRate &&
+            [self.matrix isEqualToString:matrix] &&
+            [self.primaries isEqualToString:primaries] &&
+            [self.transfer isEqualToString:transfer])
+            return;
+
+        AVDisplayCriteria *criteria =
+            [[AVDisplayCriteria alloc] initWithRefreshRate:refreshRate
+                                         formatDescription:formatDescription];
+        if (criteria == nil)
+            return;
+
+        self.refreshRate = refreshRate;
+        self.matrix = matrix;
+        self.primaries = primaries;
+        self.transfer = transfer;
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self installDisplayCriteria:criteria];
+        });
+    }
+}
+
+- (void)close
+{
+    if (@available(tvOS 17.0, visionOS 1.0, *)) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            AVDisplayManager *displayManager = self.displayManager;
+            self.pendingDisplayCriteria = nil;
+            if (self.installedDisplayCriteria)
+                displayManager.preferredDisplayCriteria = nil;
+            self.installedDisplayCriteria = NO;
+        });
+    }
+}
+
+@end
+
+#else
+
+@implementation VLCDisplayCriteriaMatcher
+
+- (instancetype)initWithWindow:(VLCView *)window
+{
+    self = [super init];
+    VLC_UNUSED(window);
+    return nil;
+}
+
+- (void)matchVideoFormat:(const video_format_t *)format
+{
+    VLC_UNUSED(format);
+}
+
+- (void)prepare {}
+
+- (void)matchFormatDescription:(CMVideoFormatDescriptionRef)formatDescription
+{
+    VLC_UNUSED(formatDescription);
+}
+- (void)close {}
+
+@end
+#endif
+
 @interface VLCSampleBufferDisplay: NSObject
 {
     @public
@@ -648,6 +855,7 @@ shouldInheritContentsScale:(CGFloat)newScale
     @property (nonatomic) VLCSampleBufferSubpictureView *spuView;
     @property (nonatomic) VLCSampleBufferSubpicture *subpicture;
     @property (nonatomic) id<VLCPixelBufferRotationContext> rotationContext;
+    @property (nonatomic) VLCDisplayCriteriaMatcher *displayModeMatcher;
 
     @property (nonatomic, readonly) pip_controller_t *pipcontroller;
 
@@ -693,6 +901,12 @@ shouldInheritContentsScale:(CGFloat)newScale
     _pipcontroller = CreatePipController(vd, (__bridge void *)self);
 
     _vd = vd;
+
+#if TARGET_OS_TV || (defined(TARGET_OS_VISION) && TARGET_OS_VISION)
+    if (@available(tvOS 17.0, visionOS 1.0, *))
+        _displayModeMatcher = [[VLCDisplayCriteriaMatcher alloc]
+            initWithWindow:window];
+#endif
 
     return self;
 }
@@ -746,6 +960,7 @@ shouldInheritContentsScale:(CGFloat)newScale
         spuView = [VLCSampleBufferSubpictureView new];
         [window addSubview:displayView];
         [window addSubview:spuView];
+        [sys.displayModeMatcher prepare];
 
         displayView.frame = [sys frameForPlace:&place];
         [spuView setFrame:[window bounds]];
@@ -811,6 +1026,7 @@ shouldInheritContentsScale:(CGFloat)newScale
 
 - (void)close {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [self.displayModeMatcher close];
 
     VLCSampleBufferDisplay *sys = self;
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -927,6 +1143,8 @@ static void RenderPicture(vout_display_t *vd, picture_t *pic, vlc_tick_t date) {
         CVPixelBufferRelease(pixelBuffer);
         return;
     }
+
+    [sys.displayModeMatcher matchFormatDescription:formatDesc];
 
     vlc_tick_t now = vlc_tick_now();
     CFTimeInterval ca_now = CACurrentMediaTime();
@@ -1175,6 +1393,10 @@ static int UpdateFormat(vout_display_t *vd, const video_format_t *fmt,
 
     DeleteCVPXConverter(sys->converter);
     sys->converter = converter;
+
+    const video_format_t *displayFormat =
+        converter != NULL ? &converter->fmt_out.video : fmt;
+    [sys.displayModeMatcher matchVideoFormat:displayFormat];
     return VLC_SUCCESS;
 }
 
@@ -1208,6 +1430,10 @@ static int Open (vout_display_t *vd,
         }
 
         sys->converter = converter;
+
+        const video_format_t *displayFormat =
+            converter != NULL ? &converter->fmt_out.video : fmt;
+        [sys.displayModeMatcher matchVideoFormat:displayFormat];
 
         vd->sys = (__bridge_retained void*)sys;
 
