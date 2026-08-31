@@ -304,6 +304,8 @@
     albumData.i_duration = 61000;
     albumData.i_year = 2026;
     albumData.b_is_favorite = true;
+    albumData.thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl =
+        (char *)"file:///tmp/album.jpg";
 
     VLCMediaLibraryAlbum * const album =
         [[VLCMediaLibraryAlbum alloc] initWithAlbum:&albumData];
@@ -319,6 +321,8 @@
     XCTAssertEqualObjects(album.durationString, @"01:01");
     XCTAssertEqualObjects(album.albums, @[ album ]);
     XCTAssertTrue(album.favorited);
+    XCTAssertTrue(album.smallArtworkGenerated);
+    XCTAssertEqualObjects(album.smallArtworkMRL, @"file:///tmp/album.jpg");
     XCTAssertEqual(album.matchingParentType, VLCMediaLibraryParentGroupTypeAlbum);
     XCTAssertEqualObjects(album.genreString, @"");
 }
@@ -330,6 +334,8 @@
     genreData.psz_name = (char *)"Genre";
     genreData.i_nb_tracks = 4;
     genreData.b_is_favorite = true;
+    genreData.thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl =
+        (char *)"file:///tmp/genre.jpg";
 
     VLCMediaLibraryGenre * const genre =
         [[VLCMediaLibraryGenre alloc] initWithGenre:&genreData];
@@ -340,6 +346,8 @@
     XCTAssertTrue(genre.favorited);
     XCTAssertEqualObjects(genre.genres, @[ genre ]);
     XCTAssertEqual(genre.matchingParentType, VLCMediaLibraryParentGroupTypeGenre);
+    XCTAssertTrue(genre.smallArtworkGenerated);
+    XCTAssertEqualObjects(genre.smallArtworkMRL, @"file:///tmp/genre.jpg");
 }
 
 - (void)testShowProperties
@@ -445,6 +453,8 @@
     XCTAssertEqual(playlist.libraryID, (int64_t)12);
     XCTAssertEqualObjects(playlist.MRL, @"file:///tmp/playlist.m3u");
     XCTAssertEqualObjects(playlist.displayString, @"Playlist");
+    XCTAssertTrue(playlist.smallArtworkGenerated);
+    XCTAssertEqualObjects(playlist.smallArtworkMRL, @"file:///tmp/playlist.jpg");
     XCTAssertEqualObjects(playlist.primaryDetailString, @"2 items");
     XCTAssertEqualObjects(playlist.durationString, @"01:30");
     XCTAssertEqual(playlist.numberOfMedia, (unsigned int)2);
