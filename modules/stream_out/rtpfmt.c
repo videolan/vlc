@@ -1956,6 +1956,10 @@ static int rtp_packetize_rawvideo( sout_stream_id_sys_t *id, block_t *in, vlc_fo
             else vlc_assert_unreachable();
         }
 
+        /* Block was allocated before knowing how many (partial) lines fit,
+           so trim it to the bytes written. */
+        out->i_buffer = p_outdata - out->p_buffer;
+
         /* rtp common header */
         rtp_packetize_common( id, out, i_line_number >= i_height,
                 (in->i_pts != VLC_TICK_INVALID ? in->i_pts : in->i_dts) );
