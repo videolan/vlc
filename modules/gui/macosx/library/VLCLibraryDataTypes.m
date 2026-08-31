@@ -1184,6 +1184,10 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 - (void)revealInFinder
 {
+    if (_MRL.length == 0) {
+        return;
+    }
+
     NSURL * const URL = [NSURL URLWithString:_MRL];
     if (URL) {
         [NSWorkspace.sharedWorkspace activateFileViewerSelectingURLs:@[URL]];
