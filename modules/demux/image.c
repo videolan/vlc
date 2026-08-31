@@ -422,19 +422,21 @@ static bool IsJfif(stream_t *s)
         uint8_t marker = FindJpegMarker(&position, header, size);
         switch (marker) {
             case 0xe2: { // ICC Profile
-                size_t icc_size = GetWBE(&header[position]);
-                position += 2;
-                if (position + 12 > size)
+                if (position + 14 > size)
                     return false;
+                size_t icc_size = GetWBE(&header[position]);
+                if (icc_size < 2)
+                    return false;
+                position += 2;
                 if (memcmp(&header[position], "ICC_PROFILE\0", 12))
                     return false;
                 position += icc_size - 2;
                 break;
             }
             case 0xe0: { // APP0
-                position += 2;  /* Skip size */
-                if (position + 5 > size)
+                if (position + 7 > size)
                     return false;
+                position += 2;  /* Skip size */
                 return (memcmp(&header[position], "JFIF\0", 5) == 0);
             }
             default:
