@@ -335,7 +335,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
                 FlushBuffer( p_sys, i_read );
         }
 
-        if( i_rate == 0 )
+        if( i_rate == 0 || i_channels >= MPEG4_ASC_MAX_INDEXEDPOS )
         {
             /* Can not init decoder at all for now */
             FlushBuffer( p_sys, SIZE_MAX );
@@ -404,7 +404,8 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
                 if( NeAACDecInit( hfaad,
                                   p_sys->p_block->p_buffer,
                                   p_sys->p_block->i_buffer,
-                                  &i_rate,&i_channels ) < 0 )
+                                  &i_rate,&i_channels ) < 0 ||
+                    i_channels >= MPEG4_ASC_MAX_INDEXEDPOS )
                 {
                     /* reinitialization failed */
                     NeAACDecClose( hfaad );
