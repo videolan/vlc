@@ -279,6 +279,7 @@ vlc_tests += {
         'player/teletext.c'),
     'suite' : ['src', 'test_src'],
     'link_with' : [libvlc, libvlccore],
+    'c_args' : use_zvbi ? ['-DZVBI_COMPILED=1'] : [],
     'module_depends' : vlc_plugins_targets.keys()
 }
 
