@@ -18,13 +18,31 @@
                           library:(vlc_medialibrary_t *)mediaLibrary;
 @end
 
+static VLCMediaLibraryMediaItem *VLCLibraryDataTypesTestMediaItemWithTypeAndSubtypeAndTitle(vlc_ml_media_type_t type,
+                                                                                              vlc_ml_media_subtype_t subtype,
+                                                                                              const char *title);
+
 VLCMediaLibraryMediaItem *VLCLibraryDataTypesTestMediaItemWithSubtype(vlc_ml_media_subtype_t subtype)
 {
     return VLCLibraryDataTypesTestMediaItemWithTypeAndSubtype(VLC_ML_MEDIA_TYPE_VIDEO, subtype);
 }
 
+VLCMediaLibraryMediaItem *VLCLibraryDataTypesTestMediaItemWithEmptyTitle(vlc_ml_media_subtype_t subtype)
+{
+    return VLCLibraryDataTypesTestMediaItemWithTypeAndSubtypeAndTitle(VLC_ML_MEDIA_TYPE_VIDEO,
+                                                                       subtype,
+                                                                       "");
+}
+
 VLCMediaLibraryMediaItem *VLCLibraryDataTypesTestMediaItemWithTypeAndSubtype(vlc_ml_media_type_t type,
                                                                              vlc_ml_media_subtype_t subtype)
+{
+    return VLCLibraryDataTypesTestMediaItemWithTypeAndSubtypeAndTitle(type, subtype, "Media");
+}
+
+static VLCMediaLibraryMediaItem *VLCLibraryDataTypesTestMediaItemWithTypeAndSubtypeAndTitle(vlc_ml_media_type_t type,
+                                                                                              vlc_ml_media_subtype_t subtype,
+                                                                                              const char *title)
 {
     struct TestFileList {
         size_t i_nb_items;
@@ -43,6 +61,10 @@ VLCMediaLibraryMediaItem *VLCLibraryDataTypesTestMediaItemWithTypeAndSubtype(vlc
     tracks.p_items[0].i_type = VLC_ML_TRACK_TYPE_VIDEO;
     tracks.p_items[0].v.i_width = 1920;
     tracks.p_items[0].v.i_height = 1080;
+    tracks.p_items[0].v.i_sarNum = 16;
+    tracks.p_items[0].v.i_sarDen = 9;
+    tracks.p_items[0].v.i_fpsNum = 24;
+    tracks.p_items[0].v.i_fpsDen = 1;
     tracks.p_items[1].psz_codec = (char *)"mp4a";
     tracks.p_items[1].i_type = VLC_ML_TRACK_TYPE_AUDIO;
 
@@ -57,7 +79,7 @@ VLCMediaLibraryMediaItem *VLCLibraryDataTypesTestMediaItemWithTypeAndSubtype(vlc
     media.i_playcount = 2;
     media.f_progress = .5;
     media.i_last_played_date = 4567;
-    media.psz_title = (char *)"Media";
+    media.psz_title = (char *)title;
     media.thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl = (char *)"file:///tmp/media.jpg";
     media.b_is_favorite = true;
 

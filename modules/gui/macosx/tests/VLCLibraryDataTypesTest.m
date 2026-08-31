@@ -14,8 +14,8 @@
 #import <XCTest/XCTest.h>
 
 #import "library/VLCLibraryDataTypes.h"
-#import "tests/VLCInputItemTestSupport.h"
 #import "tests/VLCLibraryDataTypesTestSupport.h"
+#import "tests/VLCInputItemTestSupport.h"
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wnonnull"
@@ -113,6 +113,36 @@
     }
 }
 
+- (void)testTrackReadableCodecNames
+{
+    const struct {
+        const char *codec;
+        NSString *readableName;
+    } codecs[] = {
+        { "avc1", @"H264 - MPEG-4 AVC (part 10)" },
+        { "mp4a", @"MPEG AAC Audio" },
+    };
+
+    for (NSUInteger i = 0; i < sizeof(codecs) / sizeof(codecs[0]); ++i) {
+        struct vlc_ml_media_track_t track = { 0 };
+        track.psz_codec = (char *)codecs[i].codec;
+        VLCMediaLibraryTrack * const typedTrack =
+            [[VLCMediaLibraryTrack alloc] initWithTrack:&track];
+        XCTAssertEqualObjects(typedTrack.readableCodecName, codecs[i].readableName);
+    }
+}
+
+- (void)testAudioTrackHasNoResolutionLabel
+{
+    struct vlc_ml_media_track_t track = { 0 };
+    track.i_type = VLC_ML_TRACK_TYPE_AUDIO;
+    track.v.i_width = 1920;
+    track.v.i_height = 1080;
+    VLCMediaLibraryTrack * const audioTrack =
+        [[VLCMediaLibraryTrack alloc] initWithTrack:&track];
+    XCTAssertNil(audioTrack.resolutionLabel);
+}
+
 - (void)testTrackResolutionLabels
 {
     struct vlc_ml_media_track_t track = { 0 };
@@ -137,6 +167,27 @@
             [[VLCMediaLibraryTrack alloc] initWithTrack:&track];
         XCTAssertEqualObjects(videoTrack.resolutionLabel, resolutions[i].label);
     }
+}
+
+- (void)testVideoTrackMapsVideoFields
+{
+    struct vlc_ml_media_track_t track = { 0 };
+    track.i_type = VLC_ML_TRACK_TYPE_VIDEO;
+    track.v.i_width = 1920;
+    track.v.i_height = 1080;
+    track.v.i_sarNum = 16;
+    track.v.i_sarDen = 9;
+    track.v.i_fpsNum = 24;
+    track.v.i_fpsDen = 1;
+
+    VLCMediaLibraryTrack * const videoTrack =
+        [[VLCMediaLibraryTrack alloc] initWithTrack:&track];
+    XCTAssertEqual(videoTrack.videoWidth, (uint32_t)1920);
+    XCTAssertEqual(videoTrack.videoHeight, (uint32_t)1080);
+    XCTAssertEqual(videoTrack.sourceAspectRatio, (uint32_t)16);
+    XCTAssertEqual(videoTrack.sourceAspectRatioDenominator, (uint32_t)9);
+    XCTAssertEqual(videoTrack.frameRate, (uint32_t)24);
+    XCTAssertEqual(videoTrack.frameRateDenominator, (uint32_t)1);
 }
 
 - (void)testShowEpisodeMapsFields
@@ -184,6 +235,16 @@
     XCTAssertEqual(artist.matchingParentType, VLCMediaLibraryParentGroupTypeArtist);
 }
 
+- (void)testArtistDurationStringUsesSingularForms
+{
+    struct vlc_ml_artist_t artistData = { 0 };
+    artistData.i_nb_album = 1;
+    artistData.i_nb_tracks = 1;
+    VLCMediaLibraryArtist * const artist =
+        [[VLCMediaLibraryArtist alloc] initWithArtist:&artistData];
+    XCTAssertEqualObjects(artist.durationString, @"1 album, 1 song");
+}
+
 - (void)testArtistDisplayStringFallsBackForMissingName
 {
     struct vlc_ml_artist_t artistData = { 0 };
@@ -220,6 +281,15 @@
         [[VLCMediaLibraryGenre alloc] initWithGenre:&emptyGenreData];
     XCTAssertEqualObjects(emptyGenre.displayString, @"Unknown Genre");
     XCTAssertEqualObjects(emptyGenre.durationString, @"0 songs");
+}
+
+- (void)testGenreDurationStringUsesSingularForm
+{
+    struct vlc_ml_genre_t genreData = { 0 };
+    genreData.i_nb_tracks = 1;
+    VLCMediaLibraryGenre * const genre =
+        [[VLCMediaLibraryGenre alloc] initWithGenre:&genreData];
+    XCTAssertEqualObjects(genre.durationString, @"1 song");
 }
 
 - (void)testAlbumProperties
@@ -299,6 +369,16 @@
     XCTAssertEqualObjects(show.smallArtworkMRL, @"file:///tmp/show.jpg");
 }
 
+- (void)testShowPrimaryDetailStringUsesSingularForms
+{
+    struct vlc_ml_show_t showData = { 0 };
+    showData.i_nb_seasons = 1;
+    showData.i_nb_episodes = 1;
+    VLCMediaLibraryShow * const show =
+        [[VLCMediaLibraryShow alloc] initWithShow:&showData];
+    XCTAssertEqualObjects(show.primaryDetailString, @"1 season, 1 episode");
+}
+
 - (void)testGroupProperties
 {
     struct vlc_ml_group_t groupData = { 0 };
@@ -335,6 +415,15 @@
                           [NSDate dateWithTimeIntervalSince1970:200]);
 }
 
+- (void)testGroupPrimaryDetailStringUsesSingularForm
+{
+    struct vlc_ml_group_t groupData = { 0 };
+    groupData.i_nb_total_media = 1;
+    VLCMediaLibraryGroup * const group =
+        [[VLCMediaLibraryGroup alloc] initWithGroup:&groupData];
+    XCTAssertEqualObjects(group.primaryDetailString, @"1 item");
+}
+
 - (void)testPlaylistProperties
 {
     struct vlc_ml_playlist_t playlistData = { 0 };
@@ -365,6 +454,44 @@
     XCTAssertEqual(playlist.numberDurationUnknown, (uint32_t)1);
     XCTAssertTrue(playlist.readOnly);
     XCTAssertTrue(playlist.favorited);
+}
+
+- (void)testPlaylistPrimaryDetailStringUsesSingularForm
+{
+    struct vlc_ml_playlist_t playlistData = { 0 };
+    playlistData.i_nb_media = 1;
+    VLCMediaLibraryPlaylist * const playlist =
+        [[VLCMediaLibraryPlaylist alloc] initWithPlaylist:&playlistData];
+    XCTAssertEqualObjects(playlist.primaryDetailString, @"1 item");
+}
+
+- (void)testPlaylistMapsPresentCounts
+{
+    struct vlc_ml_playlist_t playlistData = { 0 };
+    playlistData.i_nb_present_media = 3;
+    playlistData.i_nb_present_audio = 1;
+    playlistData.i_nb_present_video = 2;
+    playlistData.i_nb_present_unknown = 0;
+
+    VLCMediaLibraryPlaylist * const playlist =
+        [[VLCMediaLibraryPlaylist alloc] initWithPlaylist:&playlistData];
+    XCTAssertEqual(playlist.numberOfPresentMedia, (unsigned int)3);
+    XCTAssertEqual(playlist.numberOfPresentAudios, (uint32_t)1);
+    XCTAssertEqual(playlist.numberOfPresentVideos, (uint32_t)2);
+    XCTAssertEqual(playlist.numberOfPresentUnknowns, (uint32_t)0);
+}
+
+- (void)testPlaylistMapsArtworkAndCreationDate
+{
+    struct vlc_ml_playlist_t playlistData = { 0 };
+    playlistData.i_creation_date = 300;
+    playlistData.psz_artwork_mrl = (char *)"file:///tmp/playlist.jpg";
+
+    VLCMediaLibraryPlaylist * const playlist =
+        [[VLCMediaLibraryPlaylist alloc] initWithPlaylist:&playlistData];
+    XCTAssertEqualObjects(playlist.creationDate,
+                          [NSDate dateWithTimeIntervalSince1970:300]);
+    XCTAssertEqualObjects(playlist.smallArtworkMRL, @"file:///tmp/playlist.jpg");
 }
 
 - (void)testEntryPointProperties
@@ -427,6 +554,44 @@
     XCTAssertEqualObjects(emptyPlaylist.durationString, @"--:--");
     XCTAssertFalse(emptyPlaylist.readOnly);
     XCTAssertFalse(emptyPlaylist.favorited);
+}
+
+- (void)testMediaItemMapsCommonFields
+{
+    VLCMediaLibraryMediaItem * const item =
+        VLCLibraryDataTypesTestMediaItemWithSubtype(VLC_ML_MEDIA_SUBTYPE_MOVIE);
+    XCTAssertEqual(item.libraryID, (int64_t)13);
+    XCTAssertEqual(item.mediaType, VLC_ML_MEDIA_TYPE_VIDEO);
+    XCTAssertEqualObjects(item.readableMediaType, @"Video");
+    XCTAssertEqualObjects(item.title, @"Media");
+    XCTAssertEqualObjects(item.displayString, @"Media");
+    XCTAssertEqual(item.year, 2024);
+    XCTAssertEqual(item.duration, (int64_t)123000);
+    XCTAssertEqualObjects(item.durationString, @"02:03");
+    XCTAssertEqual(item.playCount, (uint32_t)2);
+    XCTAssertEqual(item.lastPlayedDate, (time_t)4567);
+    XCTAssertEqual(item.progress, .5);
+    XCTAssertTrue(item.favorited);
+    XCTAssertTrue(item.smallArtworkGenerated);
+    XCTAssertEqualObjects(item.smallArtworkMRL, @"file:///tmp/media.jpg");
+}
+
+- (void)testMediaItemDisplayStringFallsBackForMissingTitle
+{
+    VLCMediaLibraryMediaItem * const item =
+        VLCLibraryDataTypesTestMediaItemWithEmptyTitle(VLC_ML_MEDIA_SUBTYPE_MOVIE);
+    XCTAssertEqualObjects(item.displayString, @"Unknown item");
+}
+
+- (void)testMediaItemMapsFilesAndTracks
+{
+    VLCMediaLibraryMediaItem * const item =
+        VLCLibraryDataTypesTestMediaItemWithSubtype(VLC_ML_MEDIA_SUBTYPE_MOVIE);
+    XCTAssertEqual(item.files.count, (NSUInteger)1);
+    XCTAssertEqual(item.tracks.count, (NSUInteger)2);
+    XCTAssertEqual(item.firstVideoTrack, item.tracks.firstObject);
+    XCTAssertEqual(item.firstVideoTrack.videoWidth, (uint32_t)1920);
+    XCTAssertEqual(item.firstVideoTrack.videoHeight, (uint32_t)1080);
 }
 
 - (void)testMediaItemMapsAlbumTrackFields
@@ -515,12 +680,19 @@
     XCTAssertEqualObjects(item.mediaItems, @[ item ]);
 }
 
-- (void)testMediaItemActionableDetailsAreNilForMovies
+- (void)testMediaItemActionableDetailsDependOnSubtype
 {
-    VLCMediaLibraryMediaItem * const item =
+    VLCMediaLibraryMediaItem * const movie =
         VLCLibraryDataTypesTestMediaItemWithSubtype(VLC_ML_MEDIA_SUBTYPE_MOVIE);
-    XCTAssertNil(item.primaryActionableDetailLibraryItem);
-    XCTAssertNil(item.secondaryActionableDetailLibraryItem);
+    XCTAssertFalse(movie.primaryActionableDetail);
+    XCTAssertFalse(movie.secondaryActionableDetail);
+    XCTAssertNil(movie.primaryActionableDetailLibraryItem);
+    XCTAssertNil(movie.secondaryActionableDetailLibraryItem);
+
+    VLCMediaLibraryMediaItem * const albumTrack =
+        VLCLibraryDataTypesTestMediaItemWithSubtype(VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK);
+    XCTAssertTrue(albumTrack.primaryActionableDetail);
+    XCTAssertTrue(albumTrack.secondaryActionableDetail);
 }
 
 - (void)testMediaItemSecureCoding
