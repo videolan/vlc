@@ -361,6 +361,21 @@ static void clearCmd( access_sys_t *p_sys )
     }
 }
 
+/* Sanitize for the protocol rfc1738. epscially \n\r */
+static bool HasControlChar( const char *p )
+{
+    if( p )
+    {
+        for( ; *p; p++ )
+        {
+            unsigned char c = (unsigned char)*p;
+            if( (c < 0x20 && c != '\t') || c == 0x7F || c == 0xFF /* IAC control byte */ )
+                return true;
+        }
+    }
+    return false;
+}
+
 static int Login( vlc_object_t *p_access, access_sys_t *p_sys, const char *path )
 {
     int i_answer;
@@ -469,6 +484,13 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys, const char *path 
     {
         const char *psz_username = credential.psz_username;
 
+        if( HasControlChar( credential.psz_username ) ||
+            HasControlChar( credential.psz_password ) )
+        {
+            msg_Err( p_access, "Invalid chars in the username/password" );
+            break;
+        }
+
         if( psz_username == NULL ) /* use anonymous by default */
             psz_username = "anonymous";
 
@@ -532,10 +554,14 @@ static int LoginUserPwd( vlc_object_t *p_access, access_sys_t *p_sys,
                     char *psz;
                     msg_Dbg( p_access, "account needed" );
                     psz = var_InheritString( p_access, "ftp-account" );
-                    if( ftp_SendCommand( p_access, p_sys, "ACCT %s",
+                    bool badchars = HasControlChar( psz );
+                    if( badchars ||
+                        ftp_SendCommand( p_access, p_sys, "ACCT %s",
                                          psz ) < 0 ||
                         ftp_RecvCommand( p_access, p_sys, &i_answer, NULL ) < 0 )
                     {
+                        if( badchars )
+                            msg_Err( p_access, "Invalid chars in the ftp-account" );
                         free( psz );
                         return -1;
                     }
@@ -638,7 +664,7 @@ error:
 }
 
 
-static int parseURL( vlc_url_t *url, const char *path, enum tls_mode_e mode )
+static int parseURL( vlc_object_t *p_obj, vlc_url_t *url, const char *path, enum tls_mode_e mode )
 {
     if( path == NULL )
         return VLC_EGENERIC;
@@ -679,6 +705,11 @@ static int parseURL( vlc_url_t *url, const char *path, enum tls_mode_e mode )
             return VLC_EGENERIC; /* ASCII and directory not supported */
     }
     vlc_uri_decode( url->psz_path );
+    if( HasControlChar( url->psz_path ) )
+    {
+        msg_Err( p_obj, "Invalid chars in the path" );
+        return VLC_EGENERIC;
+    }
     return VLC_SUCCESS;
 }
 
@@ -705,7 +736,7 @@ static int InOpen( vlc_object_t *p_this )
     if( readTLSMode( p_this, p_sys, p_access->psz_name ) )
         goto exit_error;
 
-    if( parseURL( &p_sys->url, p_access->psz_url, p_sys->tlsmode ) )
+    if( parseURL( p_this,&p_sys->url, p_access->psz_url, p_sys->tlsmode ) )
         goto exit_error;
 
     if( Connect( p_this, p_sys, p_access->psz_url ) )
@@ -791,7 +822,7 @@ static int OutOpen( vlc_object_t *p_this )
     if( readTLSMode( p_this, p_sys, p_access->psz_access ) )
         goto exit_error;
 
-    if( parseURL( &p_sys->url, p_access->psz_path, p_sys->tlsmode ) )
+    if( parseURL( p_this, &p_sys->url, p_access->psz_path, p_sys->tlsmode ) )
         goto exit_error;
     if( p_sys->url.psz_path == NULL )
     {
