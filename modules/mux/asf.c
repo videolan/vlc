@@ -1140,7 +1140,7 @@ static block_t *asf_packet_flush( sout_mux_t *p_mux )
 
     if( !p_sys->pk ) return 0;
 
-    i_pad = p_sys->i_packet_size - p_sys->i_pk_used;
+    i_pad = p_sys->i_packet_size + i_preheader - p_sys->i_pk_used;
     memset( p_sys->pk->p_buffer + p_sys->i_pk_used, 0, i_pad );
 
     bo_init( &bo, p_sys->pk->p_buffer, 14 + i_preheader );
