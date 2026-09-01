@@ -34,6 +34,7 @@ libgpg-error: libgpg-error-$(GPGERROR_VERSION).tar.bz2 .sum-gpg-error
 	$(APPLY) $(SRC)/gpg-error/0015-core-disable-process-spawning-with-disable-threads.patch
 	$(APPLY) $(SRC)/gpg-error/0016-w32-utils-fix-init-utils-syntax.patch
 	$(APPLY) $(SRC)/gpg-error/0016-core-disable-registry-access-in-UWP.patch
+	$(APPLY) $(SRC)/gpg-error/0017-sysutils-disable-_putenv_s-usage-not-available-in-Wi.patch
 	# use the ANSI version of Environment API's as the rest of the code
 	sed -i.orig -e 's/ExpandEnvironmentStrings /ExpandEnvironmentStringsA /g' $(UNPACK_DIR)/src/w32-reg.c
 	sed -i.orig -e 's/SetEnvironmentVariable /SetEnvironmentVariableA /g' $(UNPACK_DIR)/src/sysutils.c

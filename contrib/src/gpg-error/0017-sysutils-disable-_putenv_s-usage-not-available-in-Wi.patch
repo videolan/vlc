@@ -1,0 +1,45 @@
+From 11de6bb8d41ba7004fe1eb5e824b018a7b42affc Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Tue, 1 Sep 2026 14:47:28 +0200
+Subject: [PATCH 17/17] sysutils: disable _putenv_s() usage not available in
+ Windows XP
+
+We can use it when targetting UCRT.
+---
+ src/sysutils.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/sysutils.c b/src/sysutils.c
+index 2830452..022929a 100644
+--- a/src/sysutils.c
++++ b/src/sysutils.c
+@@ -144,7 +144,7 @@ _gpgrt_setenv (const char *name, const char *value, int overwrite)
+         if (!SetEnvironmentVariable (name, NULL))
+           return GPG_ERR_EINVAL;
+         if (getenv (name))
+-#if defined(_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES)
++#if defined(_UCRT)
+           {
+             int e = _putenv_s (name, "");
+ 
+@@ -176,7 +176,7 @@ _gpgrt_setenv (const char *name, const char *value, int overwrite)
+     if ((! exists || overwrite) && !SetEnvironmentVariable (name, value))
+       return GPG_ERR_EINVAL; /* (Might also be ENOMEM.) */
+     if (overwrite || !getenv (name))
+-#if defined(_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES)
++#if defined(_UCRT)
+       {
+         int e = _putenv_s (name, value);
+ 
+@@ -189,7 +189,7 @@ _gpgrt_setenv (const char *name, const char *value, int overwrite)
+ #else
+       {
+         /* Ugly: Leaking memory.  */
+-        buf = _gpgrt_strconcat (name, "=", value, NULL);
++        char *buf = _gpgrt_strconcat (name, "=", value, NULL);
+         if (!buf)
+           return _gpg_err_code_from_syserror ();
+         if (putenv (buf))
+-- 
+2.52.0.windows.1
+
