@@ -1647,6 +1647,7 @@ static block_t *FixPES( sout_mux_t *p_mux, block_fifo_t *p_fifo )
         }
         i_copy = __MIN( STD_PES_PAYLOAD - i_size, p_next->i_buffer );
 
+        p_data->i_buffer = i_size + i_copy;
         memcpy( &p_data->p_buffer[i_size], p_next->p_buffer, i_copy );
         if( p_next->i_pts )
             p_next->i_pts += p_next->i_length * i_copy / p_next->i_buffer;
