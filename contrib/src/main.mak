@@ -195,6 +195,8 @@ endif
 
 cppcheck = $(shell printf '$(2)' | $(CC) $(CFLAGS) -E -dM - 2>/dev/null | grep -E $(1))
 
+try_cxx_compile = $(shell printf '$(1)' | $(CXX) $(CXXFLAGS) $(2) -x c++ -c - -o /dev/null 2>/dev/null && echo true)
+
 EXTRA_CFLAGS += -I$(PREFIX)/include
 CPPFLAGS := $(CPPFLAGS) $(EXTRA_CFLAGS)
 CFLAGS := $(CFLAGS) $(EXTRA_CFLAGS)
