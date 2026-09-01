@@ -637,7 +637,10 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simp
             memcpy( p_block->p_buffer, track.p_compression_data->GetBuffer(), track.p_compression_data->GetSize() );
         }
         if ( track.fmt.i_codec == VLC_CODEC_PRORES )
+        {
+            SetDWBE( p_block->p_buffer, p_block->i_buffer - 8);
             memcpy( p_block->p_buffer + 4, "icpf", 4 );
+        }
 
         if ( b_key_picture )
             p_block->i_flags |= BLOCK_FLAG_TYPE_I;
