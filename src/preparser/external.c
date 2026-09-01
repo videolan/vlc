@@ -1080,11 +1080,11 @@ static size_t preparser_Cancel(void *opaque, struct vlc_preparser_req *req)
 
     size_t count = 0;
     if (sys->pool_preparser != NULL) {
-        count = preparser_pool_Cancel(sys->pool_preparser, req);
+        count += preparser_pool_Cancel(sys->pool_preparser, req);
     }
 
     if (sys->pool_thumbnailer != NULL) {
-        count = preparser_pool_Cancel(sys->pool_thumbnailer, req);
+        count += preparser_pool_Cancel(sys->pool_thumbnailer, req);
     }
 
     return count;
