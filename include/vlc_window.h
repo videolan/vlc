@@ -645,6 +645,9 @@ VLC_API void vlc_window_ReportWindowed(vlc_window_t *wnd);
  */
 VLC_API void vlc_window_ReportFullscreen(vlc_window_t *wnd, const char *id);
 
+/**
+ * \copydoc vlc_window_callbacks::mouse_event
+ */
 static inline void vlc_window_SendMouseEvent(vlc_window_t *window,
                                               const vlc_window_mouse_event_t *mouse)
 {

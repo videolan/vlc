@@ -280,9 +280,7 @@ static inline picture_t *filter_NewPicture( filter_t *p_filter )
 }
 
 /**
- * Flush a filter
- *
- * This function will flush the state of a filter (audio or video).
+ * \copydoc vlc_filter_operations::flush
  */
 static inline void filter_Flush( filter_t *p_filter )
 {
@@ -290,6 +288,9 @@ static inline void filter_Flush( filter_t *p_filter )
         p_filter->ops->flush( p_filter );
 }
 
+/**
+ * \copydoc vlc_filter_operations::change_viewpoint
+ */
 static inline void filter_ChangeViewpoint( filter_t *p_filter,
                                            const vlc_viewpoint_t *vp)
 {

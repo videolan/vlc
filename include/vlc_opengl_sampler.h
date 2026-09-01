@@ -192,18 +192,27 @@ struct vlc_gl_sampler {
     void *sys;
 };
 
+/**
+ * \copydoc vlc_gl_sampler_ops::fetch_locations
+ */
 static inline void
 vlc_gl_sampler_FetchLocations(struct vlc_gl_sampler *sampler, uint32_t program)
 {
     sampler->ops->fetch_locations(sampler, program);
 }
 
+/**
+ * \copydoc vlc_gl_sampler_ops::load
+ */
 static inline void
 vlc_gl_sampler_Load(struct vlc_gl_sampler *sampler)
 {
     sampler->ops->load(sampler);
 }
 
+/**
+ * \copydoc vlc_gl_sampler_ops::update
+ */
 static inline int
 vlc_gl_sampler_Update(struct vlc_gl_sampler *sampler,
                       const struct vlc_gl_picture *picture)
@@ -211,6 +220,9 @@ vlc_gl_sampler_Update(struct vlc_gl_sampler *sampler,
     return sampler->ops->update(sampler, picture);
 }
 
+/**
+ * \copydoc vlc_gl_sampler_ops::select_plane
+ */
 static inline void
 vlc_gl_sampler_SelectPlane(struct vlc_gl_sampler *sampler, unsigned plane)
 {

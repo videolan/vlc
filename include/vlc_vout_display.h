@@ -478,7 +478,7 @@ VLC_API picture_t *vout_display_Prepare(vout_display_t *vd, picture_t *picture,
                                         const struct vlc_render_subpicture *subpic, vlc_tick_t date);
 
 /**
- * Displays a picture.
+ * \copydoc vlc_display_operations::display
  */
 static inline void vout_display_Display(vout_display_t *vd, picture_t *picture)
 {
@@ -542,11 +542,17 @@ static inline bool vout_display_cfg_IsWindowed(const vout_display_cfg_t *cfg)
     return cfg->window->type != VLC_WINDOW_TYPE_DUMMY;
 }
 
-static inline int vout_display_ChangeProjection(vout_display_t *vd, video_projection_mode_t projection)
+/**
+ * \copydoc vlc_display_operations::change_source_projection
+ *
+ * \retval VLC_ENOTSUP the display does not implement projection changes
+ */
+static inline int vout_display_ChangeProjection(vout_display_t *display,
+                                                video_projection_mode_t projection)
 {
-    if (vd->ops->change_source_projection == NULL)
+    if (display->ops->change_source_projection == NULL)
         return VLC_ENOTSUP;
-    return vd->ops->change_source_projection(vd, projection);
+    return display->ops->change_source_projection(display, projection);
 }
 
 /**
