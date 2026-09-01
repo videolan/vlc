@@ -1,0 +1,66 @@
+From 9cb2dc5643480bde33909e11b0ec1ddeb6339f45 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Tue, 1 Sep 2026 10:33:56 +0300
+Subject: [PATCH] Avoid brittle wcscpy_s and wcscat_s defines on mingw
+
+These wcscpy_s and wcscat_s fallback defines seem to be inteded for
+older versions of MSVC. When building in mingw mode, _MSC_VER isn't
+defined at all.
+
+Previously this led to these defines being used, which was harmless
+at time time.
+
+After https://github.com/mingw-w64/mingw-w64/commit/9dff64a5101937c377575a5de7b446ef32f6b206
+in mingw-w64, these fallback defines break using mingw-w64 headers;
+the expansion of wcscpy_s into two separate statements breaks use of
+wcscpy_s function in an expression context, leading to errors
+like this:
+
+    In file included from /home/martin/code/libvpl/libvpl/src/windows/mfx_dispatcher.cpp:14:
+    In file included from /home/martin/clang-nightly/x86_64-w64-mingw32/include/windows.h:114:
+    /home/martin/clang-nightly/x86_64-w64-mingw32/include/stralign.h:208:67: error: expected ')'
+      208 |     if(WSTR_ALIGNED(Source) && WSTR_ALIGNED(Destination)) return (wcscpy_s((PWSTR)Destination,DestinationSize,(PCWSTR)Source)==0 ? Destination : NULL);
+          |                                                                   ^
+    /home/martin/code/libvpl/libvpl/src/windows/mfx_dispatcher_defs.h:22:24: note: expanded from macro 'wcscpy_s'
+       22 |         (void)(to_size);                \
+          |                        ^
+    /home/martin/clang-nightly/x86_64-w64-mingw32/include/stralign.h:208:66: note: to match this '('
+      208 |     if(WSTR_ALIGNED(Source) && WSTR_ALIGNED(Destination)) return (wcscpy_s((PWSTR)Destination,DestinationSize,(PCWSTR)Source)==0 ? Destination : NULL);
+          |                                                                  ^
+    /home/martin/clang-nightly/x86_64-w64-mingw32/include/stralign.h:208:67: error: cannot initialize return object of type 'PUWSTR' (aka 'wchar_t *') with an rvalue of type 'void'
+      208 |     if(WSTR_ALIGNED(Source) && WSTR_ALIGNED(Destination)) return (wcscpy_s((PWSTR)Destination,DestinationSize,(PCWSTR)Source)==0 ? Destination : NULL);
+          |                                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    /home/martin/code/libvpl/libvpl/src/windows/mfx_dispatcher_defs.h:22:9: note: expanded from macro 'wcscpy_s'
+       22 |         (void)(to_size);                \
+          |         ^~~~~~~~~~~~~~~
+    In file included from /home/martin/code/libvpl/libvpl/src/windows/mfx_dispatcher.cpp:14:
+    In file included from /home/martin/clang-nightly/x86_64-w64-mingw32/include/windows.h:114:
+    /home/martin/clang-nightly/x86_64-w64-mingw32/include/stralign.h:208:150: error: extraneous ')' before ';'
+      208 |     if(WSTR_ALIGNED(Source) && WSTR_ALIGNED(Destination)) return (wcscpy_s((PWSTR)Destination,DestinationSize,(PCWSTR)Source)==0 ? Destination : NULL);
+          |                                                                                                                                                      ^
+    3 errors generated.
+
+Avoid this issue by simply limiting the fallback wcscpy_s and
+wcscat_s defines to older MSVC versions, which seems to be the
+original intent, avoiding defining them on mingw targets, that don't
+need them.
+---
+ libvpl/src/windows/mfx_dispatcher_defs.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libvpl/src/windows/mfx_dispatcher_defs.h b/libvpl/src/windows/mfx_dispatcher_defs.h
+index 38fd221..a23f1ce 100644
+--- a/libvpl/src/windows/mfx_dispatcher_defs.h
++++ b/libvpl/src/windows/mfx_dispatcher_defs.h
+@@ -17,7 +17,7 @@
+ #define MAX_PLUGIN_PATH 4096
+ #define MAX_PLUGIN_NAME 4096
+ 
+-#if _MSC_VER < 1400
++#if defined(_MSC_VER) && _MSC_VER < 1400
+     #define wcscpy_s(to, to_size, from) \
+         (void)(to_size);                \
+         wcscpy(to, from)
+-- 
+2.43.0
+
