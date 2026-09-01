@@ -75,7 +75,7 @@ ifndef HAVE_LIVE555_CPP20_ATOMIC_TEST
 endif
 	# Add the Extra_CFLAGS to the config files
 	sed -i.orig \
-		-e 's%^\(COMPILE_OPTS.*\)$$%\1 '"$(LIVE_EXTRA_CFLAGS)%" $(UNPACK_DIR)/config.$(LIVE_TARGET)
+		-e 's%COMPILE_OPTS =%COMPILE_OPTS = $$(EXTRA_CFLAGS)%' $(UNPACK_DIR)/config.$(LIVE_TARGET)
 	# We want 64bits offsets and PIC on Linux
 	sed -e 's%-D_FILE_OFFSET_BITS=64%-D_FILE_OFFSET_BITS=64\ -fPIC\ -DPIC%' -i.orig $(UNPACK_DIR)/config.linux
 	# Disable Locale for Solaris
@@ -106,7 +106,7 @@ endif
 	$(MOVE)
 
 LIVE555_ENV := $(HOSTVARS) C_COMPILER=$(CC) CPLUSPLUS_COMPILER=$(CXX) LIBRARY_LINK="$(AR) cr " \
-	PREFIX=$(PREFIX) DESTDIR= LIBDIR=$(PREFIX)/lib
+	PREFIX=$(PREFIX) DESTDIR= LIBDIR=$(PREFIX)/lib EXTRA_CFLAGS="$(LIVE_EXTRA_CFLAGS)"
 
 .live555: BUILD_DIR=$<
 .live555: live555
