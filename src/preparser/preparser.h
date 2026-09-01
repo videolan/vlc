@@ -18,18 +18,21 @@
  * Preparser's operations
  */
 struct vlc_preparser_operations {
+    /** Called by `vlc_preparser_req_NewParse`. */
     struct vlc_preparser_req *(*req_new_parse)
                                   (void *opaque, input_item_t *item,
                                    int type_options,
                                    const struct vlc_preparser_cbs *cbs,
                                    void *cbs_userdata);
 
+    /** Called by `vlc_preparser_req_NewThumbnail`. */
     struct vlc_preparser_req *(*req_new_thumbnail)
                                   (void *opaque, input_item_t *item,
                                    const struct vlc_thumbnailer_arg *thumb_arg,
                                    const struct vlc_thumbnailer_cbs *cbs,
                                    void *cbs_userdata);
 
+    /** Called by `vlc_preparser_req_NewThumbnailToFiles`. */
     struct vlc_preparser_req *(*req_new_thumbnail_to_files)
                                   (void *opaque, input_item_t *item,
                                    const struct vlc_thumbnailer_arg *thumb_arg,
@@ -38,6 +41,7 @@ struct vlc_preparser_operations {
                                    const struct vlc_thumbnailer_to_files_cbs *cbs,
                                    void *cbs_userdata);
 
+    /** Called by `vlc_preparser_Submit`. */
     int (*submit)(void *opaque, struct vlc_preparser_req *req);
 
     /** Called by `vlc_preparser_Cancel`. */
@@ -71,6 +75,9 @@ struct vlc_preparser_req_operations {
 
 struct vlc_preparser_req {
     const struct vlc_preparser_req_operations *ops;
+
+    /* re-submission guard for debug builds */
+    bool submitted;
 };
 
 #endif /* PREPARSER_INTERNAL_H */

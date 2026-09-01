@@ -145,6 +145,68 @@ vlc_preparser_GenerateThumbnailToFiles(vlc_preparser_t *preparser,
     return req;
 }
 
+struct vlc_preparser_req *
+vlc_preparser_req_NewParse(vlc_preparser_t *preparser, input_item_t *item,
+                           int type_option,
+                           const struct vlc_preparser_cbs *cbs,
+                           void *cbs_userdata)
+{
+    assert(preparser != NULL);
+    assert(preparser->ops != NULL);
+    assert(preparser->ops->req_new_parse != NULL);
+    return preparser->ops->req_new_parse(preparser->sys, item, type_option,
+                                         cbs, cbs_userdata);
+}
+
+struct vlc_preparser_req *
+vlc_preparser_req_NewThumbnail(vlc_preparser_t *preparser, input_item_t *item,
+                               const struct vlc_thumbnailer_arg *thumb_arg,
+                               const struct vlc_thumbnailer_cbs *cbs,
+                               void *cbs_userdata)
+{
+    assert(preparser != NULL);
+    assert(preparser->ops != NULL);
+    assert(preparser->ops->req_new_thumbnail != NULL);
+    return preparser->ops->req_new_thumbnail(preparser->sys, item, thumb_arg,
+                                             cbs, cbs_userdata);
+}
+
+struct vlc_preparser_req *
+vlc_preparser_req_NewThumbnailToFiles(vlc_preparser_t *preparser,
+                                input_item_t *item,
+                                const struct vlc_thumbnailer_arg *thumb_arg,
+                                const struct vlc_thumbnailer_output *outputs,
+                                size_t output_count,
+                                const struct vlc_thumbnailer_to_files_cbs *cbs,
+                                void *cbs_userdata)
+{
+    assert(preparser != NULL);
+    assert(preparser->ops != NULL);
+    assert(preparser->ops->req_new_thumbnail_to_files != NULL);
+    return preparser->ops->req_new_thumbnail_to_files(preparser->sys, item,
+                                                      thumb_arg, outputs,
+                                                      output_count, cbs,
+                                                      cbs_userdata);
+}
+
+int
+vlc_preparser_Submit(vlc_preparser_t *preparser, struct vlc_preparser_req *req)
+{
+    assert(preparser != NULL);
+    assert(preparser->ops != NULL);
+    assert(preparser->ops->submit != NULL);
+    assert(req != NULL);
+
+    assert(!req->submitted);
+    req->submitted = true;
+
+    int ret = preparser->ops->submit(preparser->sys, req);
+    if (ret != VLC_SUCCESS)
+        req->submitted = false;
+
+    return ret;
+}
+
 size_t vlc_preparser_Cancel(vlc_preparser_t *preparser,
                             struct vlc_preparser_req *req)
 {

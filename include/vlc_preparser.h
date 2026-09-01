@@ -46,16 +46,19 @@ typedef struct vlc_preparser_t vlc_preparser_t;
 /**
  * Preparser request opaque handle.
  *
- * Identifies a request submitted via vlc_preparser_Push(),
- * vlc_preparser_GenerateThumbnail(), or vlc_preparser_GenerateThumbnailToFiles().
+ * Identifies a request created by vlc_preparser_req_NewParse(),
+ * vlc_preparser_req_NewThumbnail() or vlc_preparser_req_NewThumbnailToFiles()
+ * and started with vlc_preparser_Submit().
  * It can be passed to vlc_preparser_Cancel() to cancel that request.
  *
  * @note
- * - Validity starts when a submit function returns a non-NULL handle and ends
- *   with vlc_preparser_req_Release().
+ * - Ownership of the handle is transferred to the caller by the
+ *   vlc_preparser_req_New*() functions. The caller must release it with
+ *   vlc_preparser_req_Release() once it is no longer needed, whether or not it
+ *   was submitted.
  *
- * - The user must ensure that callbacks and their context remain valid
- *   until request termination.
+ * - The caller must ensure that the callbacks and their context remain valid
+ *   until the request terminates.
  */
 typedef struct vlc_preparser_req vlc_preparser_req;
 
@@ -409,12 +412,118 @@ vlc_preparser_GenerateThumbnailToFiles( vlc_preparser_t *preparser, input_item_t
                                         void *cbs_userdata );
 
 /**
+ * Create a parse/fetch request.
+ *
+ * The request is created idle, nothing runs and no callback can fire until it
+ * is handed to vlc_preparser_Submit(). The caller owns the returned handle
+ * from the moment this function returns.
+ *
+ * @param preparser the preparser object
+ * @param item a valid item to preparse
+ * @param type_option a combination of VLC_PREPARSER_TYPE_* and
+ * VLC_PREPARSER_OPTION_* flags. The type must be in the set specified in
+ * vlc_preparser_New() (it is possible to select less types).
+ * @param cbs callback to listen to events (can't be NULL)
+ * @param cbs_userdata opaque pointer used by the callbacks
+ * @return a request handle owned by the caller, or NULL in case of error. It
+ * must be released with vlc_preparser_req_Release(), whether or not it is
+ * submitted.
+ *
+ * @note The provided input_item will be held by the preparser and can safely be
+ * released after calling this function.
+ */
+VLC_API vlc_preparser_req *
+vlc_preparser_req_NewParse( vlc_preparser_t *preparser, input_item_t *item,
+                            int type_option,
+                            const struct vlc_preparser_cbs *cbs,
+                            void *cbs_userdata );
+
+/**
+ * Create a thumbnail generation request.
+ *
+ * The request is created idle, nothing runs and no callback can fire until it
+ * is handed to vlc_preparser_Submit(). The caller owns the returned handle
+ * from the moment this function returns.
+ *
+ * @param preparser the preparser object
+ * @param item a valid item to generate the thumbnail for
+ * @param arg pointer to the arg struct, NULL for default options
+ * @param cbs callback to listen to events (can't be NULL)
+ * @param cbs_userdata opaque pointer used by the callbacks
+ * @return a request handle owned by the caller, or NULL in case of error. It
+ * must be released with vlc_preparser_req_Release(), whether or not it is
+ * submitted.
+ *
+ * @note The provided input_item will be held by the preparser and can safely be
+ * released after calling this function.
+ */
+VLC_API vlc_preparser_req *
+vlc_preparser_req_NewThumbnail( vlc_preparser_t *preparser, input_item_t *item,
+                                const struct vlc_thumbnailer_arg *arg,
+                                const struct vlc_thumbnailer_cbs *cbs,
+                                void *cbs_userdata );
+
+/**
+ * Create a request generating a thumbnail to one or several files.
+ *
+ * The request is created idle, nothing runs and no callback can fire until it
+ * is handed to vlc_preparser_Submit(). The caller owns the returned handle
+ * from the moment this function returns.
+ *
+ * @param preparser the preparser object
+ * @param item a valid item to generate the thumbnail for
+ * @param arg pointer to the arg struct, NULL for default options
+ * @param outputs array of outputs, one file will be generated per output for a
+ * single thumbnail
+ * @param output_count outputs array size, must be > 0
+ * @param cbs callback to listen to events (can't be NULL)
+ * @param cbs_userdata opaque pointer used by the callbacks
+ * @return a request handle owned by the caller, or NULL in case of error. It
+ * must be released with vlc_preparser_req_Release(), whether or not it is
+ * submitted.
+ *
+ * @note The provided input_item will be held by the preparser and can safely be
+ * released after calling this function.
+ */
+VLC_API vlc_preparser_req *
+vlc_preparser_req_NewThumbnailToFiles( vlc_preparser_t *preparser,
+                                       input_item_t *item,
+                                       const struct vlc_thumbnailer_arg *arg,
+                                       const struct vlc_thumbnailer_output *outputs,
+                                       size_t output_count,
+                                       const struct vlc_thumbnailer_to_files_cbs *cbs,
+                                       void *cbs_userdata );
+
+/**
+ * Submit a request created by one of the vlc_preparser_req_New*() functions.
+ *
+ * @param preparser the preparser object the request was created from
+ * @param req a request handle that has never been submitted successfully
+ * @return VLC_SUCCESS if the request was queued, VLC_EGENERIC otherwise
+ *
+ * @note
+ * - On success the `on_ended` callback is guaranteed to be invoked exactly
+ *   once. It may be invoked even before this function returns.
+ *
+ * - On failure the request was not queued and no callback will be invoked.
+ *   The caller keeps its reference and may submit the request again.
+ *
+ * - A request may be submitted at most once, and may only be re-submitted if
+ *   the previous attempt failed. Submitting a request that was already queued
+ *   successfully is undefined behaviour.
+ *
+ * - Submitting the same request concurrently from several threads is
+ *   undefined behaviour.
+ */
+VLC_API int
+vlc_preparser_Submit( vlc_preparser_t *preparser, vlc_preparser_req *req );
+
+/**
  * This function cancels ongoing or queued preparsing/thumbnail generation
  * for a given request handle.
  *
  * @param preparser the preparser object
- * @param req request handle returned by vlc_preparser_Push(),
- * vlc_preparser_GenerateThumbnail(), or vlc_preparser_GenerateThumbnailToFiles().
+ * @param req request handle returned by a vlc_preparser_req_New*() function.
  * Pass NULL to cancel all pending and running tasks.
  * @return number of tasks cancelled
  *
@@ -422,8 +531,9 @@ vlc_preparser_GenerateThumbnailToFiles( vlc_preparser_t *preparser, input_item_t
  * - When a request is cancelled, the `on_ended` callback will be triggered
  *   with -EINTR status.
  *
- * - If the request is already in a terminated state (finished, cancelled, or error),
- *   the call is a no-op and no callback will be invoked.
+ * - If the request is already in a terminated state (finished, cancelled or
+ *   error), or if it was never submitted, the call is a no-op and no callback
+ *   will be invoked.
  */
 VLC_API size_t vlc_preparser_Cancel( vlc_preparser_t *preparser,
                                      vlc_preparser_req *req );
@@ -431,8 +541,7 @@ VLC_API size_t vlc_preparser_Cancel( vlc_preparser_t *preparser,
 /**
  * Fetch the input item associated with the request.
  *
- * @param req request handle returned by vlc_preparser_Push(),
- * vlc_preparser_GenerateThumbnail(), or vlc_preparser_GenerateThumbnailToFiles().
+ * @param req request handle returned by a vlc_preparser_req_New*() function.
  * @return input_item_t associated with the request
  *
  * @note The returned input item is held by the request, it must not be
@@ -446,8 +555,6 @@ VLC_API input_item_t *vlc_preparser_req_GetItem(vlc_preparser_req *req);
  * @param req the preparser request handle
  *
  * @note
- * - The request handle is retained when returned by a submit function.
- *
  * - Mandatory to call to avoid memory leaks.
  *
  * - It is safe to call this API from within the on_ended callback.

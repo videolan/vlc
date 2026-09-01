@@ -155,6 +155,7 @@ PreparserRequestNew(struct preparser_sys *preparser, void (*run)(void *), input_
         .release = preparser_req_Release,
     };
     req_owner->req.ops = &ops;
+    req_owner->req.submitted = false;
 
     if (thumb_arg == NULL)
         req_owner->thumb_arg = (struct vlc_thumbnailer_arg) {

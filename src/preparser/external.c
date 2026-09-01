@@ -366,6 +366,7 @@ preparser_task_New(input_item_t *item,
         .release = preparser_task_req_Release,
     };
     task->req.ops = &ops;
+    task->req.submitted = false;
     vlc_atomic_rc_init(&task->rc);
 
     return task;
@@ -977,6 +978,7 @@ preparser_pool_New(vlc_object_t *obj, size_t max, vlc_tick_t timeout,
 
 /**
  * Preparser request creation for a parse request.
+ * (see `vlc_preparser_req_NewParse`)
  */
 static struct vlc_preparser_req *
 preparser_req_NewParse(void *opaque, input_item_t *item, int options,
@@ -1005,6 +1007,7 @@ preparser_req_NewParse(void *opaque, input_item_t *item, int options,
 
 /**
  * Preparser request creation for a thumbnail request.
+ * (see `vlc_preparser_req_NewThumbnail`)
  */
 static struct vlc_preparser_req *
 preparser_req_NewThumbnail(void *opaque, input_item_t *item,
@@ -1035,6 +1038,7 @@ preparser_req_NewThumbnail(void *opaque, input_item_t *item,
 
 /**
  * Preparser request creation for a thumbnail-to-files request.
+ * (see `vlc_preparser_req_NewThumbnailToFiles`)
  */
 static struct vlc_preparser_req *
 preparser_req_NewThumbnailToFiles(void *opaque, input_item_t *item,
@@ -1069,6 +1073,7 @@ preparser_req_NewThumbnailToFiles(void *opaque, input_item_t *item,
 
 /**
  * Preparser submit operation.
+ * (see `vlc_preparser_Submit`)
  */
 static int
 preparser_Submit(void *opaque, struct vlc_preparser_req *req)
