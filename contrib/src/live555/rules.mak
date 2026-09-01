@@ -67,6 +67,8 @@ live555: $(LIVE555_FILE) .sum-live555
 	chmod -R u+w $(UNPACK_DIR)
 	# Remove hardcoded cc, c++, ar variables
 	sed -e 's%C_COMPILER%#C_COMPILER%' -e 's%CPLUSPLUS_COMPILER%#CPLUSPLUS_COMPILER%' -e 's%LIBRARY_LINK%#LIBRARY_LINK%' -i.orig $(UNPACK_DIR)/config.$(LIVE_TARGET)
+	# Use CXXFLAGS when compiling C++ code
+	sed -e 's%CPLUSPLUS_FLAGS =%CPLUSPLUS_FLAGS = $$(CXXFLAGS)%' -i.orig $(UNPACK_DIR)/config.$(LIVE_TARGET)
 	# Remove hardcoded --std=c+20 on un supported compilers
 ifndef HAVE_LIVE555_CPP20_ATOMIC_TEST
 	sed -e 's%-std=c++20% -DNO_STD_LIB=1%' -i.orig $(UNPACK_DIR)/config.$(LIVE_TARGET)
