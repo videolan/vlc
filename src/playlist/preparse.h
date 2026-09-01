@@ -24,11 +24,17 @@
 #include <vlc_common.h>
 #include <vlc_preparser.h>
 
+#include "item.h"
+
 typedef struct vlc_playlist vlc_playlist_t;
 typedef struct input_item_node_t input_item_node_t;
 
-vlc_preparser_req *
-vlc_playlist_AutoPreparse(vlc_playlist_t *playlist, input_item_t *input,
+/* Start an auto-preparse request for the media of a playlist item.
+   On success, the request is stored in `item->preparser_req`, which owns it.
+   Do nothing if the media does not need to be preparsed or if the request
+   could not be started. */
+void
+vlc_playlist_AutoPreparse(vlc_playlist_t *playlist, vlc_playlist_item_t *item,
                           bool parse_subitems);
 
 int

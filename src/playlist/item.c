@@ -53,6 +53,8 @@ vlc_playlist_item_Release(vlc_playlist_item_t *item)
 {
     if (vlc_atomic_rc_dec(&item->rc))
     {
+        if (item->preparser_req != NULL)
+            vlc_preparser_req_Release(item->preparser_req);
         input_item_Release(item->media);
         free(item);
     }

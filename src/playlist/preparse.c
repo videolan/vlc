@@ -91,14 +91,11 @@ on_subtree_added(vlc_preparser_req *req, input_item_node_t *subtree,
 static void
 on_preparse_ended(vlc_preparser_req *req, int status, void *userdata)
 {
+    if (status != VLC_SUCCESS)
+        return;
+
     input_item_t *media = vlc_preparser_req_GetItem(req);
     vlc_playlist_t *playlist = userdata;
-
-    if (status != VLC_SUCCESS)
-    {
-        vlc_preparser_req_Release(req);
-        return;
-    }
 
     vlc_playlist_Lock(playlist);
     ssize_t index = vlc_playlist_IndexOfMedia(playlist, media);
@@ -106,7 +103,6 @@ on_preparse_ended(vlc_preparser_req *req, int status, void *userdata)
         vlc_playlist_Notify(playlist, on_items_updated, index,
                             &playlist->items.data[index], 1);
     vlc_playlist_Unlock(playlist);
-    vlc_preparser_req_Release(req);
 }
 
 static const struct vlc_preparser_cbs preparser_callbacks = {
@@ -114,13 +110,16 @@ static const struct vlc_preparser_cbs preparser_callbacks = {
     .on_subtree_added = on_subtree_added,
 };
 
-vlc_preparser_req *
-vlc_playlist_AutoPreparse(vlc_playlist_t *playlist, input_item_t *input,
+void
+vlc_playlist_AutoPreparse(vlc_playlist_t *playlist, vlc_playlist_item_t *item,
                           bool parse_subitems)
 {
 #ifdef TEST_PLAYLIST
     VLC_UNUSED(preparser_callbacks);
 #endif
+
+    input_item_t *input = item->media;
+    assert(item->preparser_req == NULL);
 
     if (playlist->parser != NULL && !input_item_IsPreparsed(input))
     {
@@ -141,7 +140,7 @@ vlc_playlist_AutoPreparse(vlc_playlist_t *playlist, input_item_t *input,
         enum input_item_type_e input_type = input_item_GetType(input, &input_net);
 
         if (input_net)
-            return NULL;
+            return;
 
         switch (input_type)
         {
@@ -151,15 +150,27 @@ vlc_playlist_AutoPreparse(vlc_playlist_t *playlist, input_item_t *input,
             case ITEM_TYPE_PLAYLIST:
                 break;
             default:
-                return NULL;
+                return;
         }
 
         int options = VLC_PREPARSER_TYPE_PARSE | VLC_PREPARSER_TYPE_FETCHMETA_LOCAL;
         if (parse_subitems)
             options |= VLC_PREPARSER_OPTION_SUBITEMS;
 
-        return vlc_preparser_Push(playlist->parser, input, options,
-                                  &preparser_callbacks, playlist);
+        vlc_preparser_req *req =
+            vlc_preparser_req_NewParse(playlist->parser, input, options,
+                                       &preparser_callbacks, playlist);
+        if (req == NULL)
+            return;
+
+        /* Store the request before submitting it. The callbacks may run
+           even before vlc_preparser_Submit returns. */
+        item->preparser_req = req;
+
+        if (vlc_preparser_Submit(playlist->parser, req) != VLC_SUCCESS)
+        {
+            item->preparser_req = NULL;
+            vlc_preparser_req_Release(req);
+        }
     }
-    return NULL;
 }
