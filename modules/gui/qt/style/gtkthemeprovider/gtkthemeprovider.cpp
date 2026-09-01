@@ -312,6 +312,15 @@ static int updatePalette(vlc_qt_theme_provider_t* obj)
         setGtkColorSetBg(obj, CS, VQTC_NAME_PRIMARY, BUTTON_STANDARD_SELECTOR);
         setGtkColorSetFg(obj, CS, VQTC_NAME_PRIMARY, BUTTON_STANDARD_SELECTOR);
         setGtkColorSetBorder(obj, CS, BUTTON_STANDARD_SELECTOR);
+
+        setGtkColorSetBg(obj, CS, VQTC_NAME_NEGATIVE, BUTTON_STANDARD_SELECTOR ".destructive-action");
+        setGtkColorSetFg(obj, CS, VQTC_NAME_NEGATIVE, BUTTON_STANDARD_SELECTOR ".destructive-action");
+
+        setGtkColorSetBg(obj, CS, VQTC_NAME_NEUTRAL, BUTTON_STANDARD_SELECTOR ".warning");
+        setGtkColorSetFg(obj, CS, VQTC_NAME_NEUTRAL, BUTTON_STANDARD_SELECTOR ".warning");
+
+        setGtkColorSetBg(obj, CS, VQTC_NAME_POSITIVE, BUTTON_STANDARD_SELECTOR ".suggested-action");
+        setGtkColorSetFg(obj, CS, VQTC_NAME_POSITIVE, BUTTON_STANDARD_SELECTOR ".suggested-action");
     }
 
 #define BUTTON_ACCENT_SELECTOR VIEW_SELECTOR " GtkButton#button.suggested-action"
