@@ -228,6 +228,7 @@ void MainUI::registerQMLTypes()
 #endif
         qmlRegisterTypesAndRevisions<SearchCtx>(uri, versionMajor);
         qmlRegisterTypesAndRevisions<SortCtx>(uri, versionMajor);
+        qmlRegisterTypesAndRevisions<SidePanelCtx>(uri, versionMajor);
         qmlRegisterUncreatableType<UINotifier>(uri, versionMajor, versionMinor, "UINotifier", "");
         qmlRegisterSingletonInstance<UINotifier>(uri, versionMajor, versionMinor, "UINotifier", new UINotifier(m_mainCtx, m_mainCtx));
         qmlRegisterSingletonInstance<NavigationHistory>(uri, versionMajor, versionMinor, "History", new NavigationHistory(this));

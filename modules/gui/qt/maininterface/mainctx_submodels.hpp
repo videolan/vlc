@@ -117,6 +117,9 @@ class SidePanelCtx: public QObject
     Q_PROPERTY(BadgeType badge READ badge WRITE setBadge NOTIFY badgeChanged FINAL)
     Q_PROPERTY(double width READ width WRITE setWidth NOTIFY widthChanged FINAL)
 
+    QML_ELEMENT
+    QML_UNCREATABLE("")
+
 public:
     enum BadgeType
     {
