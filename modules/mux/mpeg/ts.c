@@ -1601,6 +1601,7 @@ static block_t *FixPES( block_fifo_t *p_fifo )
         }
         i_copy = __MIN( STD_PES_PAYLOAD - i_size, p_next->i_buffer );
 
+        p_data->i_buffer = i_size + i_copy;
         memcpy( &p_data->p_buffer[i_size], p_next->p_buffer, i_copy );
         vlc_tick_t offset = p_next->i_length * i_copy / p_next->i_buffer;
         if( p_next->i_pts )
