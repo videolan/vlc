@@ -18,6 +18,8 @@ $(TARBALLS)/libmodplug-$(MODPLUG_VERSION).tar.gz:
 libmodplug: libmodplug-$(MODPLUG_VERSION).tar.gz .sum-modplug
 	$(UNPACK)
 	# $(call update_autoconfig,.)
+	$(APPLY) $(SRC)/modplug/0001-Fix-misc.-bugs-found-by-libfuzzer.patch
+	$(APPLY) $(SRC)/modplug/0002-Fix-MIDI-issues-from-the-fuzz-patch-1-oob_read_fixes.patch
 	$(APPLY) $(SRC)/modplug/modplug-win32-static.patch
 	$(APPLY) $(SRC)/modplug/macosx-do-not-force-min-version.patch
 	$(APPLY) $(SRC)/modplug/fix-endianness-check.diff
