@@ -292,13 +292,15 @@ upload_plane(const struct vlc_gl_interop *interop, unsigned tex_idx,
             uint8_t *destination;
             if (priv->texture_temp_buf_size < buf_size)
             {
-                priv->texture_temp_buf =
-                    realloc_or_free(priv->texture_temp_buf, buf_size);
-                if (priv->texture_temp_buf == NULL)
+                void *r_texture_buf = realloc(priv->texture_temp_buf, buf_size);
+                if (r_texture_buf == NULL)
                 {
+                    free(priv->texture_temp_buf);
+                    priv->texture_temp_buf = NULL;
                     priv->texture_temp_buf_size = 0;
                     return VLC_ENOMEM;
                 }
+                priv->texture_temp_buf = r_texture_buf;
                 priv->texture_temp_buf_size = buf_size;
             }
             destination = priv->texture_temp_buf;
