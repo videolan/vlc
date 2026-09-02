@@ -147,8 +147,8 @@ static struct vlc_param *vlc_config_create(vlc_plugin_t *plugin, int type)
 
     if ((confsize & 0xf) == 0)
     {
-        tab = realloc_or_free (tab, (confsize + 17) * sizeof (*tab));
-        if (tab == NULL)
+        tab = vlc_reallocarray( tab, (confsize + 17), sizeof (*tab) );
+        if (unlikely(tab == NULL))
             return NULL;
 
         plugin->conf.params = tab;
