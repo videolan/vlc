@@ -4911,7 +4911,7 @@ static int ProbeFragments( demux_t *p_demux, bool b_force, bool *pb_fragmented )
                     if( p_traf )
                         p_tfdt = MP4_BoxGet( p_traf, "tfdt" );
 
-                    if( p_tfdt && BOXDATA(p_tfdt) )
+                    if( p_tfdt && BOXDATA(p_tfdt) && p_tfdt->data.p_tfdt->i_base_media_decode_time <= INT64_MAX)
                     {
                         pi_track_times[i] = p_tfdt->data.p_tfdt->i_base_media_decode_time;
                     }
