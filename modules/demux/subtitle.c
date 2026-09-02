@@ -1328,9 +1328,13 @@ static int  ParseSSA( vlc_object_t *p_obj, subs_properties_t *p_props,
             header_len = strlen( p_props->psz_header );
 
         size_t s_len = strlen( s );
-        p_props->psz_header = realloc_or_free( p_props->psz_header, header_len + s_len + 2 );
-        if( !p_props->psz_header )
+        void *r_header = realloc( p_props->psz_header, header_len + s_len + 2 );
+        if ( unlikely( r_header == NULL) )
+        {
+            free( p_props->psz_header );
             return VLC_ENOMEM;
+        }
+        p_props->psz_header = r_header;
         snprintf( p_props->psz_header + header_len, s_len + 2, "%s\n", s );
         header_len += s_len + 1;
     }
