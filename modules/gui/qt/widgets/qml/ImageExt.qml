@@ -17,8 +17,6 @@
  *****************************************************************************/
 import QtQuick
 
-import VLC.Util
-
 // NOTE: ImageExt behaves exactly like Image, except when at least one of these features are used:
 //       - `PreserveAspectCrop` fill mode without requiring a clip node.
 //       - Rounded rectangular shaping.
@@ -250,13 +248,6 @@ Item {
 
         fragmentShader: (shouldCrop || (borderRange > 0)) ? "qrc:///shaders/SDFAARoundedTexture_cropsupport_bordersupport.frag.qsb"
                                                           : "qrc:///shaders/SDFAARoundedTexture.frag.qsb"
-
-        TextureProviderObserver {
-            id: tpObserver
-
-            source: shaderEffect.visible ? shaderEffect.source : null
-            notifyAllChanges: shaderEffect.visible
-        }
     }
 
     Image {
