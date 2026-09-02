@@ -386,9 +386,14 @@ vlc_gl_sub_renderer_Draw(struct vlc_gl_sub_renderer *sr)
         sr->buffer_object_count = 0;
 
         int new_count = 2 * sr->region_count;
-        sr->buffer_objects = realloc_or_free(sr->buffer_objects, new_count * sizeof(GLuint));
-        if (!sr->buffer_objects)
+        void *r_objects = vlc_reallocarray(sr->buffer_objects, new_count, sizeof(GLuint));
+        if ( unlikely( r_objects == NULL ) )
+        {
+            free( sr->buffer_objects );
+            sr->buffer_objects = NULL;
             return VLC_ENOMEM;
+        }
+        sr->buffer_objects = r_objects;
 
         sr->buffer_object_count = new_count;
         vt->GenBuffers(sr->buffer_object_count, sr->buffer_objects);
