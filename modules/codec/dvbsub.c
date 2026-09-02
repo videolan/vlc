@@ -972,7 +972,14 @@ static void decode_region_composition( decoder_t *p_dec, bs_t *s, uint16_t i_seg
         }
         else
         {
-            p_region->p_pixbuf = realloc_or_free( p_region->p_pixbuf, i_alloc );
+            void *r_pixbuf = realloc( p_region->p_pixbuf, i_alloc );
+            if( unlikely( r_pixbuf == NULL ) )
+            {
+                free( p_region->p_pixbuf );
+                p_region->p_pixbuf = NULL;
+            }
+            else
+                p_region->p_pixbuf = r_pixbuf;
             p_region->i_depth = 0;
         }
 
