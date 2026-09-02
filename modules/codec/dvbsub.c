@@ -1362,13 +1362,14 @@ static void decode_object( decoder_t *p_dec, bs_t *s, uint16_t i_segment_length 
 
                 if( p_region->p_object_defs[i].i_id != i_id ) continue;
 
-                char *psz_text = p_region->p_object_defs[i].psz_text;
-
-                p_region->p_object_defs[i].psz_text = psz_text =
-                        realloc_or_free( psz_text, i_number_of_codes + 1 );
-
-                if( !psz_text )
+                char *psz_text = realloc( p_region->p_object_defs[i].psz_text, i_number_of_codes + 1 );
+                if( unlikely( psz_text == NULL ) )
+                {
+                    free( p_region->p_object_defs[i].psz_text );
+                    p_region->p_object_defs[i].psz_text = NULL;
                     continue;
+                }
+                p_region->p_object_defs[i].psz_text = psz_text;
 
                 /* FIXME 16bits -> char ??? See Preamble */
                 for( j = 0; j < i_number_of_codes; j++ )
