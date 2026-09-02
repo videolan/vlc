@@ -5282,10 +5282,16 @@ static int FragCreateTrunIndex( demux_t *p_demux, MP4_Box_t *p_moof,
         if( !p_track )
             continue;
 
-        p_track->context.runs.p_array = realloc_or_free(p_track->context.runs.p_array,
-            (i_trun_count + p_track->context.runs.i_count) * sizeof(mp4_run_t));
-        if(!p_track->context.runs.p_array)
+        void *r_array = vlc_reallocarray( p_track->context.runs.p_array,
+            i_trun_count + p_track->context.runs.i_count, sizeof(mp4_run_t) );
+        if ( unlikely( r_array == NULL ))
+        {
+            free( p_track->context.runs.p_array );
+            p_track->context.runs.p_array = NULL;
+            p_track->context.runs.i_count = 0;
             continue;
+        }
+        p_track->context.runs.p_array = r_array;
         memset(&p_track->context.runs.p_array[p_track->context.runs.i_count], 0, i_trun_count * sizeof(mp4_run_t));
         i_trun_count += p_track->context.runs.i_count;
 
