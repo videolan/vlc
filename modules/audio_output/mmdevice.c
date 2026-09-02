@@ -1449,24 +1449,34 @@ static void Reload_DevicesEnum_Added(void *data, LPCWSTR wid, IMMDevice *dev)
     struct mm_list *list = data;
 
     size_t new_count = list->count + 1;
-    list->ids = realloc_or_free(list->ids, new_count * sizeof(char *));
-    list->names = realloc_or_free(list->names, new_count * sizeof(char *));
-    if (!list->ids || !list->names)
+    void *r_ids = vlc_reallocarray(list->ids, new_count, sizeof(char *));
+    if ( unlikely( r_ids == NULL ) )
+        return;
+    void *r_names = vlc_reallocarray(list->names, new_count, sizeof(char *));
+    if ( unlikely( r_names == NULL ) )
     {
-        free(list->ids);
+        free( r_ids );
         return;
     }
 
     char *id = FromWide(wid);
     if (!id)
+    {
+        free( r_ids );
+        free( r_names );
         return;
+    }
 
     char *name = DeviceGetFriendlyName(dev);
     if (!name && !(name = strdup(id)))
     {
         free(id);
+        free( r_ids );
+        free( r_names );
         return;
     }
+    list->ids = r_ids;
+    list->names = r_names;
     list->ids[list->count] = id;
     list->names[list->count] = name;
 
