@@ -61,6 +61,10 @@ ImageExt {
     TextureProviderIndirection {
         id: textureProviderIndirection
 
+        // `Image` interface, as `ImageExt` needs it:
+        readonly property int status: (source instanceof Image ? ((source.status === Image.Ready && observer.isValid) ? Image.Ready : Image.Loading)
+                                                               : (observer.isValid ? Image.Ready : Image.Null))
+
         implicitWidth: (source instanceof Image) ? source.implicitWidth : textureSize.width
         implicitHeight: (source instanceof Image) ? source.implicitHeight : textureSize.height
 
