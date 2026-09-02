@@ -411,9 +411,9 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 - (void)updatePresentedView
 {
     self.audioDataSource.audioLibrarySegment = [self currentLibrarySegmentToAudioLibrarySegment];
-    const BOOL anyAudioMedia = self.audioDataSource.libraryModel.numberOfAudioMedia > 0;
+    const BOOL hasResultsForCurrentSegment = self.audioDataSource.collectionToDisplayCount > 0;
 
-    if (anyAudioMedia) {
+    if (hasResultsForCurrentSegment) {
         [self.libraryWindow displayLibraryView:self.audioLibraryView];
         [self hideAllViews];
 
