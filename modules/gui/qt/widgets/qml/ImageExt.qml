@@ -75,7 +75,10 @@ Item {
     // WARNING: Consumers who downcast this item to `Image` are doing this on their own
     //          discretion. It is discouraged, but not forbidden (or evil).
     readonly property Item sourceTextureProviderItem: image
-    // NOTE:    It is allowed to adjust this property to use an external texture provider.
+    // NOTE:    It is allowed to adjust this property to use an external texture provider, where
+    //          in that case the texture provider item should provide a subset of `Image`'s
+    //          interface, that is, provide and `implicitWidth`/`implicitHeight` that reflect
+    //          the texture size.
     // NOTE:    If `textureProviderItem` is set to `null`, the default `Image` is going to be
     //          used as fallback. For that reason, it is recommended to keep providing the
     //          `source` url if there is a possibility of `textureProviderItem` being `null`
@@ -173,13 +176,8 @@ Item {
         anchors.alignWhenCentered: true
         anchors.centerIn: parent
 
-        implicitWidth: (source instanceof Image) ? source.implicitWidth : textureSize.width
-        implicitHeight: (source instanceof Image) ? source.implicitHeight : textureSize.height
-
-        // WARNING: Do not put this into the uniform block of the shader,
-        //          since it would break batch rendering as it reflects
-        //          the sub-texture size.
-        readonly property size textureSize: tpObserver.textureSize
+        implicitWidth: (root.status === Image.Ready) ? source.implicitWidth : 64
+        implicitHeight: (root.status === Image.Ready) ? source.implicitHeight : 64
 
         width: paintedSize.width
         height: paintedSize.height
