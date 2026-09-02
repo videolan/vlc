@@ -130,18 +130,7 @@ Item {
     readonly property color effectiveBackgroundColor: shaderEffect.visible ? backgroundColor : "transparent"
 
     property alias blending: shaderEffect.blending
-    blending: {
-        if (effectiveRadius > 0.0)
-            return true // Outside the radius is always transparent, need blending
-
-        if (effectiveBackgroundColor.a > (1.0 - Number.EPSILON))
-            return false // If background color is opaque, no need for blending
-
-        if (!tpObserver.hasAlphaChannel)
-            return false // If the texture is opaque, no need for blending
-
-        return true
-    }
+    blending: (effectiveRadius > 0.0) || (effectiveBackgroundColor.a < 1.0)
 
     // Border:
     // NOTE: The border is an overlay for the texture (the
