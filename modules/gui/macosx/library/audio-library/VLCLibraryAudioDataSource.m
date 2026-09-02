@@ -82,6 +82,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 @interface VLCLibraryAudioDataSource () <NSMenuDelegate>
 
 @property (readwrite, atomic) NSMutableArray *displayedCollection;
+@property (readonly) BOOL isSearchActive;
 @property (readonly) BOOL displayAllArtistsGenresTableEntry;
 @property (readwrite, strong) NSMenu *songsTableHeaderMenu;
 
@@ -724,6 +725,18 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
             }
         }
 
+        if (self.isSearchActive &&
+            (self.currentParentType == VLCMediaLibraryParentGroupTypeArtist ||
+             self.currentParentType == VLCMediaLibraryParentGroupTypeAlbum ||
+             self.currentParentType == VLCMediaLibraryParentGroupTypeGenre) &&
+            self.displayedCollection.count > 0 &&
+            self.collectionSelectionTableView.selectedRow < 0 &&
+            self.gridModeListTableView.selectedRow < 0) {
+            NSIndexSet * const firstRowIndexSet = [NSIndexSet indexSetWithIndex:0];
+            [self tableView:collectionSelectionTableView selectRowIndices:firstRowIndexSet];
+            [self tableView:gridModeListTableView selectRowIndices:firstRowIndexSet];
+        }
+
         [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification object:self];
     });
 }
@@ -824,10 +837,16 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
 #pragma mark - table view data source and delegation
 
+- (BOOL)isSearchActive
+{
+    return self.libraryModel.filterString.length > 0;
+}
+
 - (BOOL)displayAllArtistsGenresTableEntry
 {
-    return self.currentParentType == VLCMediaLibraryParentGroupTypeGenre ||
-           self.currentParentType == VLCMediaLibraryParentGroupTypeArtist;
+    return !self.isSearchActive &&
+           (self.currentParentType == VLCMediaLibraryParentGroupTypeGenre ||
+            self.currentParentType == VLCMediaLibraryParentGroupTypeArtist);
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
