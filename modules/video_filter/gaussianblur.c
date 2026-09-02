@@ -203,7 +203,7 @@ static void Filter( filter_t *p_filter, picture_t *p_pic, picture_t *p_outpic )
 
     if( !p_sys->pt_buffer )
     {
-        p_sys->pt_buffer = realloc_or_free( p_sys->pt_buffer, i_y_plane_bytes );
+        p_sys->pt_buffer = malloc( i_y_plane_bytes );
         if( !p_sys->pt_buffer )
             return;
     }
