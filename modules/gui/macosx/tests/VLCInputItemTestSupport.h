@@ -10,9 +10,11 @@
  ****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
+#import <vlc_interface.h>
 
 void VLCInputItemTestSetQuickLookImage(NSImage * _Nullable image);
 void VLCInputItemTestSetWorkspaceImage(NSImage * _Nullable image);
+void VLCInputItemTestSetInterface(intf_thread_t * _Nullable interfaceThread);
 void VLCInputItemTestResetAppKitState(void);
 BOOL VLCInputItemTestDidReveal(void);
 BOOL VLCInputItemTestDidReload(void);

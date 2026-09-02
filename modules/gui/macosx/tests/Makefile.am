@@ -35,7 +35,8 @@ noinst_HEADERS += \
 VLCMacOSXTests_CPPFLAGS = \
 	$(AM_CPPFLAGS) \
 	-F"$(macosx_gui_xctest_frameworks_dir)" \
-	-I$(srcdir)/gui/macosx
+	-I$(srcdir)/gui/macosx \
+	-I$(top_srcdir)
 
 VLCMacOSXTests_OBJCFLAGS = \
 	$(AM_OBJCFLAGS) \
@@ -49,12 +50,15 @@ VLCMacOSXTests_LDFLAGS = \
 	-F"$(macosx_gui_xctest_frameworks_dir)" \
 	-Wl,-rpath,"$(macosx_gui_xctest_frameworks_dir)" \
 	-Wl,-rpath,"$(abs_top_builddir)/src/.libs" \
+	-Wl,-rpath,"$(abs_top_builddir)/lib/.libs" \
 	-Wl,-framework,XCTest \
 	-Wl,-framework,Foundation \
 	-Wl,-framework,Cocoa \
 	-Wl,-framework,IOKit
 
-VLCMacOSXTests_LDADD = $(top_builddir)/src/libvlccore.la
+VLCMacOSXTests_LDADD = \
+	$(top_builddir)/lib/libvlc.la \
+	$(top_builddir)/src/libvlccore.la
 
 VLCMacOSXTests_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(OBJCLD) \
