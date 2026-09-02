@@ -124,7 +124,9 @@ Item {
     property real radiusBottomLeft: radius
     readonly property real effectiveRadius: shaderEffect.visible ? Math.max(radiusTopRight, radiusTopLeft, radiusBottomRight, radiusBottomLeft) : 0.0
 
-    property color backgroundColor: "transparent"
+    // If effective radius is 0.0 (no rounding), use "black" as the default background
+    // color so that blending is not used:
+    property color backgroundColor: (effectiveRadius > 0.0 ? "transparent" : "black")
     readonly property color effectiveBackgroundColor: shaderEffect.visible ? backgroundColor : "transparent"
 
     property alias blending: shaderEffect.blending
