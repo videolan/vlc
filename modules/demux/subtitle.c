@@ -1111,9 +1111,13 @@ static int ParseSubRipSubViewer( vlc_object_t *p_obj, subs_properties_t *p_props
             return VLC_SUCCESS;
         }
 
-        psz_text = realloc_or_free( psz_text, i_old + i_len + 1 + 1 );
-        if( !psz_text )
+        void *r_text = realloc( psz_text, i_old + i_len + 1 + 1 );
+        if( unlikely( r_text == NULL ) )
+        {
+            free( psz_text );
             return VLC_ENOMEM;
+        }
+        psz_text = r_text;
 
         memcpy( &psz_text[i_old], s, i_len );
         psz_text[i_old + i_len + 0] = '\n';
@@ -1553,9 +1557,13 @@ static int ParseDVDSubtitle(vlc_object_t *p_obj, subs_properties_t *p_props,
             return VLC_SUCCESS;
         }
 
-        psz_text = realloc_or_free( psz_text, i_old + i_len + 1 + 1 );
-        if( !psz_text )
+        void *r_text = realloc( psz_text, i_old + i_len + 1 + 1 );
+        if( unlikely( r_text == NULL ) )
+        {
+            free( psz_text );
             return VLC_ENOMEM;
+        }
+        psz_text = r_text;
 
         memcpy( &psz_text[i_old], s, i_len );
         psz_text[i_old + i_len + 0] = '\n';
@@ -1661,9 +1669,13 @@ static int ParseAQT(vlc_object_t *p_obj, subs_properties_t *p_props, text_t *txt
         else
         {
             i_len = strlen( s );
-            psz_text = realloc_or_free( psz_text, i_old + i_len + 1 + 1 );
-            if( !psz_text )
-                 return VLC_ENOMEM;
+            void *r_text = realloc( psz_text, i_old + i_len + 1 + 1 );
+            if( unlikely( r_text == NULL ) )
+            {
+                free( psz_text );
+                return VLC_ENOMEM;
+            }
+            psz_text = r_text;
 
             memcpy( &psz_text[i_old], s, i_len );
             psz_text[i_old + i_len + 0] = '\n';
@@ -1801,9 +1813,13 @@ static int ParseMPSub( vlc_object_t *p_obj, subs_properties_t *p_props,
         if( i_len == 0 )
             break;
 
-        psz_text = realloc_or_free( psz_text, i_old + i_len + 1 + 1 );
-        if( !psz_text )
-             return VLC_ENOMEM;
+        void *r_text = realloc( psz_text, i_old + i_len + 1 + 1 );
+        if( unlikely( r_text == NULL ) )
+        {
+            free( psz_text );
+            return VLC_ENOMEM;
+        }
+        psz_text = r_text;
 
         memcpy( &psz_text[i_old], s, i_len );
         psz_text[i_old + i_len + 0] = '\n';
@@ -1953,9 +1969,13 @@ static int ParseJSS( vlc_object_t *p_obj, subs_properties_t *p_props,
 
         size_t i_old = strlen( psz_text );
 
-        psz_text = realloc_or_free( psz_text, i_old + i_len + 1 );
-        if( !psz_text )
-             return VLC_ENOMEM;
+        void *r_text = realloc( psz_text, i_old + i_len + 1 );
+        if( unlikely( r_text == NULL ) )
+        {
+            free( psz_text );
+            return VLC_ENOMEM;
+        }
+        psz_text = r_text;
 
         psz_orig = psz_text;
         strcat( psz_text, s2 );
@@ -2215,9 +2235,13 @@ static int ParseRealText( vlc_object_t *p_obj, subs_properties_t *p_props,
             break;
         }
 
-        psz_text = realloc_or_free( psz_text, i_old + i_len + 1 + 1 );
-        if( !psz_text )
+        void *r_text = realloc( psz_text, i_old + i_len + 1 + 1 );
+        if( unlikely( r_text == NULL ) )
+        {
+            free( psz_text );
             return VLC_ENOMEM;
+        }
+        psz_text = r_text;
 
         memcpy( &psz_text[i_old], s, i_len );
         psz_text[i_old + i_len + 0] = '\n';
@@ -2386,9 +2410,13 @@ static int ParseCommonSBV( vlc_object_t *p_obj, subs_properties_t *p_props,
             return VLC_SUCCESS;
         }
 
-        psz_text = realloc_or_free( psz_text, i_old + i_len + 1 + 1 );
-        if( !psz_text )
+        void *r_text = realloc( psz_text, i_old + i_len + 1 + 1 );
+        if( unlikely( r_text == NULL ) )
+        {
+            free( psz_text );
             return VLC_ENOMEM;
+        }
+        psz_text = r_text;
 
         memcpy( &psz_text[i_old], s, i_len );
         psz_text[i_old + i_len + 0] = '\n';
