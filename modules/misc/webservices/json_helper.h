@@ -60,12 +60,14 @@ void * json_retrieve_document(vlc_object_t *p_obj, const char *psz_url, size_t *
         if(*buf_size >= (SIZE_MAX - i_read - 1))
             break;
 
-        p_buffer = realloc_or_free(p_buffer, 1 + *buf_size + i_read);
-        if(unlikely(p_buffer == NULL))
+        void *rbuffer = realloc(p_buffer, 1 + *buf_size + i_read);
+        if(unlikely(rbuffer == NULL))
         {
+            free(p_buffer);
             vlc_stream_Delete(p_stream);
             return NULL;
         }
+        p_buffer = rbuffer;
 
         i_read = vlc_stream_Read(p_stream, &p_buffer[*buf_size], i_read);
         if(i_read <= 0)
@@ -97,7 +99,7 @@ size_t json_read(void *data, void *buf, size_t size)
     struct json_helper_sys *sys = data;
 
     /* Read the smallest number of byte between size and the string length */
-    size_t s = size < sys->size ? size : sys->size; 
+    size_t s = size < sys->size ? size : sys->size;
     memcpy(buf, sys->buffer, s);
 
     sys->buffer += s;
