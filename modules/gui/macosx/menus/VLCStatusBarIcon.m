@@ -91,6 +91,21 @@
     [_controlsView setAutoresizingMask:NSViewWidthSizable];
     [_playbackInfoView setAutoresizingMask:NSViewWidthSizable];
 
+    if (@available(macOS 11.0, *)) {
+        backwardsButton.image = [NSImage imageWithSystemSymbolName:@"backward.fill"
+                                       accessibilityDescription:_NS("Previous")];
+        backwardsButton.alternateImage = backwardsButton.image;
+        playPauseButton.image = [NSImage imageWithSystemSymbolName:@"play.fill"
+                                         accessibilityDescription:_NS("Play")];
+        playPauseButton.alternateImage = [NSImage imageWithSystemSymbolName:@"pause.fill"
+                                                     accessibilityDescription:_NS("Pause")];
+        forwardButton.image = [NSImage imageWithSystemSymbolName:@"forward.fill"
+                                    accessibilityDescription:_NS("Next")];
+        forwardButton.alternateImage = forwardButton.image;
+        randomButton.image = [NSImage imageWithSystemSymbolName:@"shuffle"
+                                    accessibilityDescription:_NS("Shuffle")];
+    }
+
     [self configurationChanged:nil];
 
     // Set Accessibility Attributes for Image Buttons
