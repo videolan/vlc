@@ -22,6 +22,25 @@
 
 @implementation VLCLibraryDataTypesIntegrationTest
 
+- (VLCMediaLibraryMediaItem *)integrationMediaItem
+{
+    VLCMediaLibraryMediaItem * const item =
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
+    XCTAssertNotNil(item);
+    return item;
+}
+
+- (VLCMediaLibraryPlaylist *)integrationPlaylist
+{
+    const int64_t playlistID = VLCLibraryDataTypesIntegrationCreatePlaylist();
+    XCTAssertNotEqual(playlistID, (int64_t)0);
+
+    VLCMediaLibraryPlaylist * const playlist =
+        [VLCMediaLibraryPlaylist playlistForLibraryID:playlistID];
+    XCTAssertNotNil(playlist);
+    return playlist;
+}
+
 + (void)setUp
 {
     [super setUp];
@@ -36,10 +55,8 @@
 
 - (void)testMediaItemFactoryResolvesPersistedExternalMedia
 {
-    VLCMediaLibraryMediaItem * const item =
-        [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
+    VLCMediaLibraryMediaItem * const item = [self integrationMediaItem];
 
-    XCTAssertNotNil(item);
     XCTAssertEqual(item.libraryID, VLCLibraryDataTypesIntegrationMediaID());
 }
 
@@ -48,14 +65,13 @@
     NSURL * const url = [NSURL URLWithString:@"mock://macosx-datatypes-integration"];
     VLCMediaLibraryMediaItem * const item = [VLCMediaLibraryMediaItem mediaItemForURL:url];
 
-    XCTAssertNotNil(item);
     XCTAssertEqual(item.libraryID, VLCLibraryDataTypesIntegrationMediaID());
 }
 
 - (void)testMediaItemExposesPersistedInputItem
 {
-    VLCMediaLibraryMediaItem * const item =
-        [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
+    VLCMediaLibraryMediaItem * const item = [self integrationMediaItem];
+
     VLCInputItem * const inputItem = item.inputItem;
 
     XCTAssertNotNil(inputItem);
@@ -64,12 +80,7 @@
 
 - (void)testMediaItemRatingRoundTripsThroughMediaLibrary
 {
-    VLCMediaLibraryMediaItem * const item =
-        [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
-    XCTAssertNotNil(item);
-    if (item == nil) {
-        return;
-    }
+    VLCMediaLibraryMediaItem * const item = [self integrationMediaItem];
 
     item.rating = 1;
     XCTAssertEqual(item.rating, 1);
@@ -89,12 +100,7 @@
 
 - (void)testMediaItemFavoritePersistsThroughMediaLibrary
 {
-    VLCMediaLibraryMediaItem * const item =
-        [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
-    XCTAssertNotNil(item);
-    if (item == nil) {
-        return;
-    }
+    VLCMediaLibraryMediaItem * const item = [self integrationMediaItem];
 
     XCTAssertEqual([item setFavorite:YES], VLC_SUCCESS);
 
@@ -106,12 +112,7 @@
 
 - (void)testMediaItemPlaybackRateRoundTripsThroughMediaLibrary
 {
-    VLCMediaLibraryMediaItem * const item =
-        [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
-    XCTAssertNotNil(item);
-    if (item == nil) {
-        return;
-    }
+    VLCMediaLibraryMediaItem * const item = [self integrationMediaItem];
 
     item.lastPlaybackRate = 0.75f;
     XCTAssertEqualWithAccuracy(item.lastPlaybackRate, 0.75f, 0.001f);
@@ -131,12 +132,7 @@
 
 - (void)testMediaItemStringPlaybackPreferenceRoundTripsThroughMediaLibrary
 {
-    VLCMediaLibraryMediaItem * const item =
-        [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
-    XCTAssertNotNil(item);
-    if (item == nil) {
-        return;
-    }
+    VLCMediaLibraryMediaItem * const item = [self integrationMediaItem];
 
     item.lastAspectRatio = @"4:3";
     XCTAssertEqualObjects(item.lastAspectRatio, @"4:3");
@@ -152,6 +148,99 @@
     refreshedItem =
         [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
     XCTAssertEqualObjects(refreshedItem.lastAspectRatio, @"16:9");
+}
+
+- (void)testPlaylistAppendMedia
+{
+    VLCMediaLibraryPlaylist * const playlist = [self integrationPlaylist];
+    VLCMediaLibraryMediaItem * const item = [self integrationMediaItem];
+    XCTAssertTrue([playlist appendMediaItems:@[item]]);
+    XCTAssertEqual(playlist.mediaItems.count, (NSUInteger)1);
+
+    vlc_ml_playlist_delete(VLCLibraryDataTypesIntegrationMediaLibrary(), playlist.libraryID);
+}
+
+- (void)testPlaylistAppendPersistsMediaCount
+{
+    VLCMediaLibraryPlaylist * const playlist = [self integrationPlaylist];
+    VLCMediaLibraryMediaItem * const item = [self integrationMediaItem];
+
+    XCTAssertTrue([playlist appendMediaItems:@[item]]);
+    VLCMediaLibraryPlaylist * const refreshedPlaylist =
+        [VLCMediaLibraryPlaylist playlistForLibraryID:playlist.libraryID];
+    XCTAssertEqual(refreshedPlaylist.numberOfMedia, (unsigned int)1);
+    XCTAssertEqual(refreshedPlaylist.mediaItems.firstObject.libraryID, item.libraryID);
+
+    vlc_ml_playlist_delete(VLCLibraryDataTypesIntegrationMediaLibrary(), playlist.libraryID);
+}
+
+- (void)testPlaylistAppendPreservesMediaOrder
+{
+    vlc_ml_media_t * const secondMedia =
+        vlc_ml_new_external_media(VLCLibraryDataTypesIntegrationMediaLibrary(),
+                                  "mock://macosx-datatypes-second-item");
+    VLCMediaLibraryPlaylist * const playlist = [self integrationPlaylist];
+    VLCMediaLibraryMediaItem * const firstItem = [self integrationMediaItem];
+    VLCMediaLibraryMediaItem * const secondItem = secondMedia == NULL ? nil :
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:secondMedia->i_id];
+    if (secondMedia != NULL) {
+        vlc_ml_media_release(secondMedia);
+    }
+
+    NSArray<VLCMediaLibraryMediaItem *> * const items = @[firstItem, secondItem];
+    XCTAssertTrue([playlist appendMediaItems:items]);
+    VLCMediaLibraryPlaylist * const refreshedPlaylist =
+        [VLCMediaLibraryPlaylist playlistForLibraryID:playlist.libraryID];
+    XCTAssertEqual(refreshedPlaylist.mediaItems.count, (NSUInteger)2);
+    XCTAssertEqual(refreshedPlaylist.mediaItems[0].libraryID, firstItem.libraryID);
+    XCTAssertEqual(refreshedPlaylist.mediaItems[1].libraryID, secondItem.libraryID);
+
+    vlc_ml_playlist_delete(VLCLibraryDataTypesIntegrationMediaLibrary(), playlist.libraryID);
+}
+
+- (void)testPlaylistRenamePersistsThroughMediaLibrary
+{
+    VLCMediaLibraryPlaylist *playlist = [self integrationPlaylist];
+
+    XCTAssertTrue([playlist renameTo:@"Renamed Integration Playlist"]);
+    playlist = [VLCMediaLibraryPlaylist playlistForLibraryID:playlist.libraryID];
+    XCTAssertEqualObjects(playlist.displayString, @"Renamed Integration Playlist");
+
+    vlc_ml_playlist_delete(VLCLibraryDataTypesIntegrationMediaLibrary(), playlist.libraryID);
+}
+
+- (void)testPlaylistRemoveMediaInvalidatesCachedMediaItems
+{
+    VLCMediaLibraryPlaylist * const playlist = [self integrationPlaylist];
+    VLCMediaLibraryMediaItem * const item = [self integrationMediaItem];
+    XCTAssertTrue([playlist appendMediaItems:@[item]]);
+    XCTAssertEqual(playlist.mediaItems.count, (NSUInteger)1);
+
+    [playlist removeMediaItemsAtPositions:@[@0]];
+    XCTAssertEqual(playlist.mediaItems.count, (NSUInteger)0);
+
+    VLCMediaLibraryPlaylist * const refreshedPlaylist =
+        [VLCMediaLibraryPlaylist playlistForLibraryID:playlist.libraryID];
+    XCTAssertEqual(refreshedPlaylist.mediaItems.count, (NSUInteger)0);
+
+    vlc_ml_playlist_delete(VLCLibraryDataTypesIntegrationMediaLibrary(), playlist.libraryID);
+}
+
+- (void)testDeletedPlaylistIsNotReturnedByFactory
+{
+    VLCMediaLibraryPlaylist * const playlist = [self integrationPlaylist];
+    XCTAssertEqual(vlc_ml_playlist_delete(VLCLibraryDataTypesIntegrationMediaLibrary(), playlist.libraryID), VLC_SUCCESS);
+    XCTAssertNil([VLCMediaLibraryPlaylist playlistForLibraryID:playlist.libraryID]);
+}
+
+- (void)testPlaylistFavoriteRoundTripsThroughMediaLibrary
+{
+    VLCMediaLibraryPlaylist *playlist = [self integrationPlaylist];
+    XCTAssertTrue([playlist setFavorite:YES] == VLC_SUCCESS);
+    playlist = [VLCMediaLibraryPlaylist playlistForLibraryID:playlist.libraryID];
+    XCTAssertTrue(playlist.favorited);
+
+    vlc_ml_playlist_delete(VLCLibraryDataTypesIntegrationMediaLibrary(), playlist.libraryID);
 }
 
 @end
