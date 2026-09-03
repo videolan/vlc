@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This document presents the new clock archictecture for **VLC**, starting from
+This document presents the new clock architecture for **VLC**, starting from
 VLC 4.0.
 
 The clock is the element that manages the synchronisation of all [ES][ES],
@@ -10,7 +10,7 @@ notably audio and video (+subtitles) synchronization.
 
 While it can seem simple, at first glance, this part is not trivial, because
 one must take care of numerous clocks in parallel, and they can be out-of-sync:
-for example, your audio clock and your system clock are not necessary in-sync.
+for example, your audio clock and your system clock are not necessarily in-sync.
 This is the same issue between your streamer's clock and your player's clock.
 And most clocks drift.
 
@@ -64,7 +64,7 @@ Every output *(audio, video, stream)* has a clock, managed in the core. One of
 those clock is master, the other are slaves.
 
 The main clock is the part managing the selection of the clocks and it will
-derivate the main timings from the system clock *(the monotonic clock)* and
+derive the main timings from the system clock *(the monotonic clock)* and
 will provide those timings to the rest of VLC, including outputs, modules and
 interfaces.
 
