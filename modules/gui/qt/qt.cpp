@@ -72,6 +72,7 @@ extern "C" char **environ;
 #ifdef RHI_HEADER_AVAILABLE
 #include <QOffscreenSurface>
 #include <QThreadPool>
+#include <QThread>
 #include "util/asynctask.hpp"
 #endif
 
@@ -1044,7 +1045,7 @@ static void *Thread( void *obj )
 #endif
 
         std::optional<QPair<QSGRendererInterface::GraphicsApi, bool>> retGlProbe;
-        QMetaObject::invokeMethod(qApp, [&retGlProbe]() {
+        const auto probeGl = [&retGlProbe]() {
             // Due to offscreen surface involvement, this has to be done in the
             // gui thread only:
             QRhiGles2InitParams params;
@@ -1062,7 +1063,12 @@ static void *Thread( void *obj )
                 QSurfaceFormat::setDefaultFormat(*format);
             }
             delete params.fallbackSurface;
-        }, Qt::BlockingQueuedConnection);
+        };
+        if (QThread::currentThread() == qApp->thread())
+            probeGl();
+        else
+            QMetaObject::invokeMethod(qApp, probeGl, Qt::BlockingQueuedConnection);
+
         if (retGlProbe)
             return *retGlProbe;
 
