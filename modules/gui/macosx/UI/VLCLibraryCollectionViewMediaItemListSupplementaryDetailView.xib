@@ -34,7 +34,7 @@
                                     <constraints>
                                         <constraint firstAttribute="width" secondItem="xZd-Hk-h2M" secondAttribute="height" multiplier="1:1" priority="750" id="TIK-Ez-QbE"/>
                                     </constraints>
-                                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="no-art" id="6X6-Og-u8A"/>
+                                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="noart" id="6X6-Og-u8A"/>
                                 </imageView>
                                 <stackView distribution="fillEqually" orientation="horizontal" alignment="top" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalHuggingPriority="1000" verticalHuggingPriority="1000" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6Nc-Mb-wDa" customClass="VLCStackView">
                                     <userDefinedRuntimeAttributes>
@@ -296,7 +296,7 @@
         </view>
     </objects>
     <resources>
-        <image name="no-art" width="128" height="128"/>
+        <image name="noart" width="128" height="128"/>
         <image name="play.fill" catalog="system" width="12" height="13"/>
         <image name="plus" catalog="system" width="14" height="13"/>
         <namedColor name="VLCAccentColor">
