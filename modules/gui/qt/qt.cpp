@@ -1044,38 +1044,44 @@ static void *Thread( void *obj )
         }
 #endif
 
-        std::optional<QPair<QSGRendererInterface::GraphicsApi, bool>> retGlProbe;
-        const auto probeGl = [&retGlProbe]() {
-            // Due to offscreen surface involvement, this has to be done in the
-            // gui thread only:
+        if (const std::optional<QSurfaceFormat> format = createCompatibleOpenGLFormat())
+        {
             QRhiGles2InitParams params;
+            QOffscreenSurface *surface = nullptr; // This is needed to not use explicit cast.
 
-            const std::optional<QSurfaceFormat> format = createCompatibleOpenGLFormat();
-            if (format)
-                params.format = *format;
+            params.format = *format;
+
+            // Caller takes the ownership of the created fallback surface:
+            const auto initializeFallbackSurface = [&params, &surface, &format]() {
+                // Due to offscreen surface involvement, this has to be done in the
+                // gui thread only:
+                surface = new QOffscreenSurface;
+                params.fallbackSurface = surface;
+                surface->setFormat(*format);
+                surface->create();
+                assert(surface->isValid()); // The provided format is guaranteed to be valid (see `createCompatibleOpenGLFormat()`).
+            };
+
+            const auto isGuiThread = QThread::currentThread() == qApp->thread();
+
+            if (isGuiThread)
+                initializeFallbackSurface();
             else
-                return;
+                QMetaObject::invokeMethod(qApp, initializeFallbackSurface, Qt::BlockingQueuedConnection);
 
-            const auto offscreenSurface = new QOffscreenSurface; // Needed to not have explicit cast
-            params.fallbackSurface = offscreenSurface;
-            offscreenSurface->setFormat(*format);
-            offscreenSurface->create();
-            assert(offscreenSurface->isValid()); // The provided format is guaranteed to be valid.
+            const bool probe = QRhi::probe(QRhi::OpenGLES2, &params);
 
-            if (QRhi::probe(QRhi::OpenGLES2, &params))
+            if (isGuiThread)
+                delete surface;
+            else
+                surface->deleteLater(); // No need to be blocking.
+
+            if (probe)
             {
-                retGlProbe = {QSGRendererInterface::OpenGL, false};
                 QSurfaceFormat::setDefaultFormat(*format);
+                return {QSGRendererInterface::OpenGL, false};
             }
-            delete params.fallbackSurface;
-        };
-        if (QThread::currentThread() == qApp->thread())
-            probeGl();
-        else
-            QMetaObject::invokeMethod(qApp, probeGl, Qt::BlockingQueuedConnection);
-
-        if (retGlProbe)
-            return *retGlProbe;
+        }
 
         // TODO: Investigate if using Vulkan makes sense on Windows.
         // TODO: Investigate if it makes sense to try D3D12 when probing D3D11 failed.
