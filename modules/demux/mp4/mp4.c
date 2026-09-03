@@ -3456,19 +3456,25 @@ static int TrackGetNearestSeekPoint( demux_t *p_demux, mp4_track_t *p_track,
             }
         }
     }
-
-    if (*pi_sync_sample != i_sample)
+    else // no stss, any sample is sync point
     {
-        /* try or refine using RAP with recovery roll info */
-        uint32_t i_alternative_sync_sample = i_sample;
-        if( MP4_SampleToGroupInfo( p_track->p_stbl, i_sample, SAMPLEGROUP_rap,
-                                0, &i_alternative_sync_sample, true, NULL ) )
+        return VLC_EGENERIC;
+    }
+
+    if( i_ret == VLC_SUCCESS && *pi_sync_sample == i_sample )
+        return VLC_SUCCESS; // nothing to do
+
+    /* Empty but present stss, try or refine using RAP with recovery roll info */
+    uint32_t i_alternative_sync_sample = i_sample;
+    if( MP4_SampleToGroupInfo( p_track->p_stbl, i_sample, SAMPLEGROUP_rap,
+                               0, &i_alternative_sync_sample, true, NULL ) )
+    {
+        msg_Dbg( p_demux, "tk %u sbgp gives %d --> %" PRIu32 " (sample number)",
+                 p_track->i_track_ID, i_sample, i_alternative_sync_sample );
+        if( i_alternative_sync_sample > *pi_sync_sample || i_ret != VLC_SUCCESS )
         {
-            msg_Dbg( p_demux, "tk %u sbgp gives %d --> %" PRIu32 " (sample number)",
-                    p_track->i_track_ID, i_sample, i_alternative_sync_sample );
-            if( i_alternative_sync_sample > *pi_sync_sample &&
-                i_alternative_sync_sample < i_sample )
-                *pi_sync_sample = i_alternative_sync_sample;
+            *pi_sync_sample = i_alternative_sync_sample;
+            return VLC_SUCCESS;
         }
     }
 
