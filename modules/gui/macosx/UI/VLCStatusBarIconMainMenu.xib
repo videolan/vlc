@@ -76,7 +76,7 @@
             <rect key="frame" x="0.0" y="0.0" width="247" height="70"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="0kw-t4-DcN">
+                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="0kw-t4-DcN" customClass="VLCImageView">
                     <rect key="frame" x="6" y="4" width="62" height="62"/>
                     <constraints>
                         <constraint firstAttribute="width" relation="lessThanOrEqual" constant="90" id="A0x-WX-x1a"/>
