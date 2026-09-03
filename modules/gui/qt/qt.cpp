@@ -1056,7 +1056,12 @@ static void *Thread( void *obj )
             else
                 return;
 
-            params.fallbackSurface = QRhiGles2InitParams::newFallbackSurface();
+            const auto offscreenSurface = new QOffscreenSurface; // Needed to not have explicit cast
+            params.fallbackSurface = offscreenSurface;
+            offscreenSurface->setFormat(*format);
+            offscreenSurface->create();
+            assert(offscreenSurface->isValid()); // The provided format is guaranteed to be valid.
+
             if (QRhi::probe(QRhi::OpenGLES2, &params))
             {
                 retGlProbe = {QSGRendererInterface::OpenGL, false};
