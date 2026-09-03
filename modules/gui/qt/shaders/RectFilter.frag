@@ -23,16 +23,28 @@ layout(location = 0) out vec4 fragColor;
 layout(std140, binding = 0) uniform buf {
     mat4 qt_Matrix;
     float qt_Opacity;
-    vec4 discardRect;
+
+    // QTBUG-50493, use array when supported:
+    vec4 discardRect0;
+    vec4 discardRect1;
+    vec4 discardRect2;
+    vec4 discardRect3;
 };
 
 layout(binding = 1) uniform sampler2D source;
 
+void rectFilter(vec4 rect)
+{
+    if ((qt_TexCoord0.x >= rect.x && qt_TexCoord0.x <= rect.z) &&
+        (qt_TexCoord0.y >= rect.y && qt_TexCoord0.y <= rect.w))
+            discard;
+}
 
 void main() {
-    if (((qt_TexCoord0.x >= discardRect.x && qt_TexCoord0.x <= discardRect.z) &&
-        (qt_TexCoord0.y >= discardRect.y && qt_TexCoord0.y <= discardRect.w)))
-        discard;
+    rectFilter(discardRect0);
+    rectFilter(discardRect1);
+    rectFilter(discardRect2);
+    rectFilter(discardRect3);
 
     highp vec4 texel = texture(source, qt_TexCoord0);
 

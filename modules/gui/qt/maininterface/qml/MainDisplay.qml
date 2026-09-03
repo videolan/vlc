@@ -394,19 +394,18 @@ FocusScope {
                 // Each pass of the blur effect also suffers from the border neighbour pixel issue mentioned
                 // above, making all the borders problematic, to a less considerable extent. For that reason,
                 // we extend both the top and the bottom edges and use viewport to prevent overdraw:
-                effectRect: Qt.rect(-stackView.x,
-                                    stackView.height - stackViewParent.edgeExtension,
-                                    stackViewParent.width + 2 * stackViewParent.edgeExtension,
-                                    loaderUpdatePane.height + miniPlayer.height + 2 * stackViewParent.edgeExtension)
+                effectRects: [Qt.rect(-stackView.x,
+                                      stackView.height - stackViewParent.edgeExtension,
+                                      stackViewParent.width + 2 * stackViewParent.edgeExtension,
+                                      loaderUpdatePane.height + miniPlayer.height + 2 * stackViewParent.edgeExtension)]
 
                 // WARNING: We are not using `sourceVisualRect` because it is not trivial to guarantee that
                 //          the visual (`ShaderEffect`) scene graph sizing and sub-texturing are synchronized.
                 //          This can cause the visual to deviate from 1:1 representation of the texture
                 //          momentarily, leading to sizing glitches during initialization and animations.
 
-                effect: frostedGlassEffect
-
-                Widgets.FrostedGlassEffect {
+                // NOTE: This is a `Component`, the effect item is instantiated by `PartialEffect`:
+                effect: Widgets.FrostedGlassEffect {
                     id: frostedGlassEffect
 
                     ColorContext {
@@ -418,6 +417,10 @@ FocusScope {
                     backgroundColor: (ready ? "transparent" : stackViewParent.color)
                     tint: frostedTheme.bg.secondary
 
+                    // We only care about edge extension in mini player (by checking if `index` is 0),
+                    // since it becomes obvious only when the main view is scrolled:
+                    required property int index
+
                     // Prevent overdraw (the extension margin should not be painted).
                     // This also saves video memory compared to solely using visual rect.
                     // Note that viewport rect does not cover edge extension in y-axis
@@ -427,16 +430,17 @@ FocusScope {
                     // view mode). Since we don't do texture extension in y-axis, we
                     // don't need to cover the edge extension in y-axis, which allows
                     // us to save some video memory (as opposed to `visualRect`).
-                    viewportRect: Qt.rect(stackView.x,
-                                          stackViewParent.edgeExtension,
-                                          stackView.width + (2 * stackViewParent.edgeExtension),
-                                          height - (2 * stackViewParent.edgeExtension))
+                    viewportRect: (index === 0) ? Qt.rect(stackView.x,
+                                                          stackViewParent.edgeExtension,
+                                                          stackView.width + (2 * stackViewParent.edgeExtension),
+                                                          height - (2 * stackViewParent.edgeExtension))
+                                                : Qt.rect(0.0, 0.0, 0.0, 0.0)
 
-                    visualRect: (stackView.width < stackViewParent.width) ? Qt.rect(stackViewParent.edgeExtension,
-                                                                                    viewportRect.y,
-                                                                                    width - (2 * stackViewParent.edgeExtension),
-                                                                                    viewportRect.height)
-                                                                          : Qt.rect(0, 0, 0, 0)
+                    visualRect: (index === 0) ? Qt.rect(stackViewParent.edgeExtension,
+                                                        viewportRect.y,
+                                                        width - (2 * stackViewParent.edgeExtension),
+                                                        viewportRect.height)
+                                              : Qt.rect(0, 0, 0, 0)
                 }
             }
 

@@ -36,10 +36,15 @@ Item {
     // a texture provider without creating an extra layer.
     // Make sure that the sampler name is set to "source" (default) if
     // this is used as a layer effect.
-    property alias source: textureProviderIndirection.source
+    property Item source
 
-    // Rectangular area where the effect should be applied:
-    property alias effectRect: textureProviderIndirection.effectRect
+    // Rectangular area(s) where the effect should be applied:
+    property var effectRects
+
+    // If set false, whenever effect rects shrink, the created effects
+    // will be destroyed. It is not recommended to set it to false if
+    // the `effectRects` array size alternates multiple times.
+    property bool persistentEffects: true
 
     // Not mandatory to provide, but when feasible (such as, effect is not
     // an isolated inner area), provide it for optimization. When not provided,
@@ -52,7 +57,10 @@ Item {
     // is recommended to provide this only in non-opaque cases (blending is set):
     property rect sourceVisualRect
 
-    property Item effect
+    // `index` will be provided to the effect, if it has such required property.
+    // Property `inhibit` will be set on destruction, if such property exists.
+    property Component effect
+
     property string samplerName: "source"
 
     // Enable blending if source or the effect is not opaque.
@@ -77,6 +85,70 @@ Item {
 
     property real _eDPR: MainCtx.effectiveDevicePixelRatio(Window.window) || 1.0
     readonly property int _alignNumber: pixelAlignedForDPR ? Helpers.denominatorForFloat(_eDPR) : 1
+
+    property list<Item> _effects
+
+    Component.onCompleted: {
+        root.effectRectsChanged.connect(root, root._initializeEffects)
+        root.effectChanged.connect(root, root._initializeEffects)
+
+        _initializeEffects()
+    }
+
+    Component.onDestruction: {
+        for (let i in _effects) { // for .. of is broken in Qt 6.2
+            if (typeof _effects[i].inhibit === 'boolean')
+                _effects[i].inhibit = true
+        }
+    }
+
+    function _initializeEffects() {
+        const effectRectsLength = (effectRects?.length ?? 0)
+
+        const diff = (effectRectsLength - _effects.length)
+        if (diff > 0) {
+            if (effect) {
+                for (let i = 0; i < diff; ++i) {
+                    const index = _effects.length
+                    const effectItem = effect.createObject(root, {index: index,
+                                                                  visible: Qt.binding(() => (root.effectRects?.length > index)),
+                                                                  x: Qt.binding(() => (root.effectRects?.length > index) ? root.effectRects[index].x : 0.0),
+                                                                  y: Qt.binding(() => (root.effectRects?.length > index) ? root.effectRects[index].y : 0.0),
+                                                                  width: Qt.binding(() => (root.effectRects?.length > index) ? Helpers.alignUp(root.effectRects[index].width, root._alignNumber)
+                                                                                                                             : 0.0),
+                                                                  height: Qt.binding(() => (root.effectRects?.length > index) ? Helpers.alignUp(root.effectRects[index].height, root._alignNumber)
+                                                                                                                              : 0.0),
+                                                                  blending: Qt.binding(() => root.blending)})
+
+                    const effectAcceptsSourceRect = (typeof effectItem.sourceRect !== "undefined") // typeof `rect` is "object"
+                    if (effectAcceptsSourceRect) {
+                         effectItem[root.samplerName] = Qt.binding(() => effectItem.visible ? root.source : null)
+                         effectItem.sourceRect = Qt.binding(() => Qt.rect(effectItem.x,
+                                                                          effectItem.y,
+                                                                          effectItem.width,
+                                                                          effectItem.height))
+                    } else {
+                        const tpi = tpiComponent.createObject(effectItem, { 'effect': effectItem })
+                        console.assert(tpi)
+                        effectItem[root.samplerName] = Qt.binding(() => effectItem.visible ? tpi : null)
+                    }
+
+                    _effects.push(effectItem)
+                }
+            }
+        } else if ((diff < 0) && !persistentEffects) {
+            for (let i = (_effects.length - 1); i >= effectRectsLength; --i) {
+                const effectItem = _effects[i]
+                console.assert(effectItem)
+                console.debug(root, ": destroying effect:", effectItem)
+                if (typeof _effects[i].inhibit === 'boolean')
+                    effectItem.inhibit = true
+                effectItem.destroy()
+            }
+
+            _effects.length = effectRectsLength // Truncate the list
+        }
+    }
 
     Connections {
         target: MainCtx
@@ -103,15 +175,37 @@ Item {
         //          case it would act as a dummy indirection to prevent the Qt bug.
         readonly property Item source: ((MainCtx.qtVersion() < MainCtx.qtVersionCheck(6, 4, 2)) || useSubTexture) ? sourceVisualTextureProviderIndirection : root.source
 
-        readonly property rect discardRect: {
-            if (blending && !useSubTexture)
-                return Qt.rect(textureProviderIndirection.x / root.width,
-                               textureProviderIndirection.y / root.height,
-                               (textureProviderIndirection.x + textureProviderIndirection.width) / root.width,
-                               (textureProviderIndirection.y + textureProviderIndirection.height) / root.height)
-            else // If blending is not enabled, no need to make the normalization calculations
-                return Qt.rect(0, 0, 0, 0)
+        readonly property var discardRects: {
+            let ret = []
+
+            if (!blending || useSubTexture) // If blending is not enabled, no need to make the normalization calculations
+                return ret
+
+            for (let i in root._effects) { // for .. of loop is broken in Qt 6.2
+                const effect = root._effects[i]
+                console.assert(effect)
+
+                const rect = Qt.rect(effect.x / root.width,
+                                     effect.y / root.height,
+                                     (effect.x + effect.width) / root.width,
+                                     (effect.y + effect.height) / root.height)
+
+                if (rect.width > 0.0 && rect.height > 0.0)
+                    ret.push(rect)
+            }
+
+            // We limit the size to 4 until Qt `ShaderEffect` supports forwarding arrays:
+            if (ret.length > 4)
+                console.debug(root, "Discarding areas in source visual that overlap the effect rectangles is currently limited to 4.")
+
+            return ret
         }
+
+        // QTBUG-50493, ShaderEffect does not support arrays, so for now we manually feed the values:
+        readonly property rect discardRect0: discardRects[0] ?? Qt.rect(0,0,0,0)
+        readonly property rect discardRect1: discardRects[1] ?? Qt.rect(0,0,0,0)
+        readonly property rect discardRect2: discardRects[2] ?? Qt.rect(0,0,0,0)
+        readonly property rect discardRect3: discardRects[3] ?? Qt.rect(0,0,0,0)
 
         readonly property bool useSubTexture: (root.sourceVisualRect.width > 0.0 && root.sourceVisualRect.height > 0.0)
 
@@ -119,7 +213,7 @@ Item {
 
         // cullMode: ShaderEffect.BackFaceCulling // QTBUG-136611 (Layering breaks culling with OpenGL)
 
-        fragmentShader: (discardRect.width > 0.0 && discardRect.height > 0.0) ? "qrc:///shaders/RectFilter.frag.qsb" : ""
+        fragmentShader: (discardRects.length > 0) ? "qrc:///shaders/RectFilter.frag.qsb" : ""
 
         TextureProviderIndirection {
             id: sourceVisualTextureProviderIndirection
@@ -134,71 +228,23 @@ Item {
         }
     }
 
-    // We use texture provider that uses QSGTextureView.
-    // QSGTextureView is able to denote a viewport that
-    // covers a certain area in the source texture.
-    // This way, we don't need to have another layer just
-    // to clip the source texture.
-    TextureProviderIndirection {
-        id: textureProviderIndirection
+    Component {
+        id: tpiComponent
 
-        x: effectRect.x
-        y: effectRect.y
-        width: Helpers.alignUp(effectRect.width, root._alignNumber)
-        height: Helpers.alignUp(effectRect.height, root._alignNumber)
+        TextureProviderIndirection {
+            id: textureProviderIndirection
 
-        readonly property Item sourceItem: source?.sourceItem ?? source
+            readonly property Item sourceItem: source?.sourceItem ?? source
 
-        property rect effectRect
+            // In practice this is the parent item:
+            required property Item effect
 
-        textureSubRect: Qt.rect(x * root._eDPR,
-                                y * root._eDPR,
-                                width * root._eDPR,
-                                height * root._eDPR)
+            source: root.source
 
-        readonly property bool effectAcceptsSourceRect: (typeof root.effect?.sourceRect !== "undefined") // typeof `rect` is "object"
-
-        // Effect's source is sub-texture through the texture provider, as long as the effect does not accept setting `sourceRect`.
-        // Unlike Qt's own effects, our `DualKawaseBlur` supports that. Note that we are not using a `Loader` to not load the
-        // indirection in case it is accepted by the effect, since its overhead is minimal. Also note that the texture provider
-        // is only created when `textureProvider()` is called, such that when this indirection is actually used (for example as
-        // a shader effect source).
-        Binding {
-            target: root.effect
-            property: root.samplerName
-            value: textureProviderIndirection.effectAcceptsSourceRect ? root.source : textureProviderIndirection
-        }
-
-        Binding {
-            target: root.effect
-            property: "sourceRect"
-            when: textureProviderIndirection.effectAcceptsSourceRect
-            value: Qt.rect(textureProviderIndirection.x,
-                           textureProviderIndirection.y,
-                           textureProviderIndirection.width,
-                           textureProviderIndirection.height)
-        }
-
-        // Adjust the blending. Currently MultiEffect/FastBlur does not
-        // support adjusting it:
-        Binding {
-            target: root.effect
-            when: root.effect && (typeof root.effect.blending === "boolean")
-            property: "blending"
-            value: root.blending
-        }
-
-        // Positioning:
-        Binding {
-            target: root.effect
-            property: "parent"
-            value: root
-        }
-
-        Binding {
-            target: root.effect
-            property: "anchors.fill"
-            value: textureProviderIndirection
+            textureSubRect: Qt.rect(effect.x * root._eDPR,
+                                    effect.y * root._eDPR,
+                                    effect.width * root._eDPR,
+                                    effect.height * root._eDPR)
         }
     }
 }
