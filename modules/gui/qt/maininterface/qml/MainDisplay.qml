@@ -523,7 +523,7 @@ FocusScope {
             }
         }
 
-        Rectangle {
+        MouseArea {
             id: smallScreenOverlay
 
             // overlay for smallscreens
@@ -536,18 +536,22 @@ FocusScope {
             height: parent.height - g_mainDisplay.displayMargin
 
             visible: VLCStyle.isScreenSmall && (playlistLoader.shown || (sidebar.visible && (sidebar.state === "expanded")))
-            color: "black"
-            opacity: 0.4
 
-            MouseArea {
+            hoverEnabled: true
+            onClicked:  pannelVisiblity.hideVisiblePanels()
+
+            // Capture WheelEvents before they reach stackView
+            onWheel: (wheel) => {
+                wheel.accepted = true
+            }
+
+            Rectangle {
                 anchors.fill: parent
-                hoverEnabled: true
-                onClicked:  pannelVisiblity.hideVisiblePanels()
+                anchors.leftMargin: sidebar.visible ? sidebar.width : 0.0
+                anchors.rightMargin: playlistLoader.shown ? playlistLoader.width : 0.0
 
-                // Capture WheelEvents before they reach stackView
-                onWheel: (wheel) => {
-                    wheel.accepted = true
-                }
+                color: "black"
+                opacity: 0.4
             }
         }
 
