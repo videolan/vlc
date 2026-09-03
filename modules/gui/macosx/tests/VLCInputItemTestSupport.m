@@ -16,6 +16,8 @@
 
 #import "VLCInputItemTestSupport.h"
 
+const char vlc_module_name[] = "VLCMacOSXTests";
+
 static NSImage *sQuickLookImage;
 static NSImage *sWorkspaceImage;
 static BOOL sDidReveal;
