@@ -122,8 +122,8 @@ T.Pane {
 
                 colorContext.colorSet: ColorContext.Window
 
-                fadingEdge.backgroundColor:  (root.background && (root.background.color.a >= 1.0)) ? root.background.color
-                                                                                                   : "transparent"
+                fadingEdge.backgroundColor:  (root.background && root.background.visible && (root.background.color.a >= 1.0)) ? root.background.color
+                                                                                                                              : "transparent"
 
                 component DelegateAnimation : NumberAnimation {
                     easing.type: Easing.InOutSine
