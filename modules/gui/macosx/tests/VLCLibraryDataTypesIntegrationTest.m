@@ -13,6 +13,8 @@
 
 #import <XCTest/XCTest.h>
 
+#include <stdint.h>
+
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "tests/VLCLibraryDataTypesIntegrationTestSupport.h"
@@ -41,6 +43,70 @@
     return playlist;
 }
 
+- (VLCMediaLibraryMediaItem *)factoryAudioTrack
+{
+    XCTAssertTrue(VLCLibraryDataTypesIntegrationPrepareFactoryFixtures());
+    VLCMediaLibraryMediaItem * const track =
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:
+            VLCLibraryDataTypesIntegrationFactoryAudioMediaID()];
+    XCTAssertNotNil(track);
+    return track;
+}
+
+- (VLCMediaLibraryMediaItem *)factoryVideoEpisode
+{
+    XCTAssertTrue(VLCLibraryDataTypesIntegrationPrepareFactoryFixtures());
+    VLCMediaLibraryMediaItem * const episode =
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:
+            VLCLibraryDataTypesIntegrationFactoryVideoMediaID()];
+    XCTAssertNotNil(episode);
+    return episode;
+}
+
+- (VLCMediaLibraryAlbum *)factoryAlbum
+{
+    VLCMediaLibraryMediaItem * const track = [self factoryAudioTrack];
+    VLCMediaLibraryAlbum * const album =
+        [VLCMediaLibraryAlbum albumWithID:track.albumID];
+    XCTAssertNotNil(album);
+    return album;
+}
+
+- (VLCMediaLibraryGenre *)factoryGenre
+{
+    VLCMediaLibraryMediaItem * const track = [self factoryAudioTrack];
+    VLCMediaLibraryGenre * const genre =
+        [VLCMediaLibraryGenre genreWithID:track.genreID];
+    XCTAssertNotNil(genre);
+    return genre;
+}
+
+- (VLCMediaLibraryArtist *)factoryArtist
+{
+    VLCMediaLibraryMediaItem * const track = [self factoryAudioTrack];
+    VLCMediaLibraryArtist * const artist = [VLCMediaLibraryArtist artistWithID:track.artistID];
+    XCTAssertNotNil(artist);
+    return artist;
+}
+
+- (VLCMediaLibraryShow *)factoryShow
+{
+    XCTAssertTrue(VLCLibraryDataTypesIntegrationPrepareFactoryFixtures());
+    VLCMediaLibraryShow * const show =
+        [VLCMediaLibraryShow showWithLibraryId:VLCLibraryDataTypesIntegrationShowID()];
+    XCTAssertNotNil(show);
+    return show;
+}
+
+- (VLCMediaLibraryGroup *)factoryGroup
+{
+    XCTAssertTrue(VLCLibraryDataTypesIntegrationPrepareFactoryFixtures());
+    VLCMediaLibraryGroup * const group =
+        [VLCMediaLibraryGroup groupWithID:VLCLibraryDataTypesIntegrationGroupID()];
+    XCTAssertNotNil(group);
+    return group;
+}
+
 + (void)setUp
 {
     [super setUp];
@@ -60,12 +126,344 @@
     XCTAssertEqual(item.libraryID, VLCLibraryDataTypesIntegrationMediaID());
 }
 
+- (void)testMediaItemFactoryRejectsUnknownLibraryID
+{
+    XCTAssertNil([VLCMediaLibraryMediaItem mediaItemForLibraryID:INT64_MAX]);
+}
+
 - (void)testMediaItemFactoryResolvesPersistedExternalMediaByURL
 {
     NSURL * const url = [NSURL URLWithString:@"mock://macosx-datatypes-integration"];
     VLCMediaLibraryMediaItem * const item = [VLCMediaLibraryMediaItem mediaItemForURL:url];
 
     XCTAssertEqual(item.libraryID, VLCLibraryDataTypesIntegrationMediaID());
+}
+
+- (void)testMediaItemFactoryRejectsUnknownURL
+{
+    NSURL * const url = [NSURL URLWithString:@"mock://macosx-datatypes-unknown"];
+    XCTAssertNil([VLCMediaLibraryMediaItem mediaItemForURL:url]);
+    XCTAssertNil([VLCMediaLibraryMediaItem mediaItemForURL:nil]);
+}
+
+- (void)testArtistFactoryRejectsUnknownLibraryID
+{
+    XCTAssertNil([VLCMediaLibraryArtist artistWithID:INT64_MAX]);
+}
+
+- (void)testArtistFactoryResolvesUnknownArtist
+{
+    VLCMediaLibraryArtist * const artist =
+        [VLCMediaLibraryArtist artistWithID:1];
+
+    XCTAssertNotNil(artist);
+    XCTAssertEqual(artist.libraryID, (int64_t)1);
+    XCTAssertEqualObjects(artist.name, @"Unknown Artist");
+}
+
+- (void)testArtistFactoryResolvesVariousArtists
+{
+    VLCMediaLibraryArtist * const artist =
+        [VLCMediaLibraryArtist artistWithID:2];
+
+    XCTAssertNotNil(artist);
+    XCTAssertEqual(artist.libraryID, (int64_t)2);
+    XCTAssertEqualObjects(artist.name, @"Various Artist");
+}
+
+- (void)testAlbumFactoryRejectsUnknownLibraryID
+{
+    XCTAssertNil([VLCMediaLibraryAlbum albumWithID:INT64_MAX]);
+}
+
+- (void)testAlbumFactoryResolvesPersistedAlbum
+{
+    VLCMediaLibraryMediaItem * const track = [self factoryAudioTrack];
+    VLCMediaLibraryAlbum * const album =
+        [VLCMediaLibraryAlbum albumWithID:track.albumID];
+
+    XCTAssertEqual(album.libraryID, track.albumID);
+    XCTAssertEqualObjects(album.title, @"Factory Album");
+}
+
+- (void)testGenreFactoryRejectsUnknownLibraryID
+{
+    XCTAssertNil([VLCMediaLibraryGenre genreWithID:INT64_MAX]);
+}
+
+- (void)testGenreFactoryResolvesPersistedGenre
+{
+    VLCMediaLibraryMediaItem * const track = [self factoryAudioTrack];
+    VLCMediaLibraryGenre * const genre =
+        [VLCMediaLibraryGenre genreWithID:track.genreID];
+
+    XCTAssertEqual(genre.libraryID, track.genreID);
+    XCTAssertEqualObjects(genre.name, @"Rock");
+}
+
+- (void)testShowFactoryRejectsUnknownLibraryID
+{
+    XCTAssertNil([VLCMediaLibraryShow showWithLibraryId:INT64_MAX]);
+}
+
+- (void)testShowFactoryResolvesUnknownShow
+{
+    VLCMediaLibraryShow * const show =
+        [VLCMediaLibraryShow showWithLibraryId:1];
+
+    XCTAssertNotNil(show);
+    XCTAssertEqual(show.libraryID, (int64_t)1);
+    XCTAssertEqualObjects(show.name, @"");
+}
+
+- (void)testShowFactoryResolvesPersistedShow
+{
+    VLCMediaLibraryShow * const show = [self factoryShow];
+
+    XCTAssertEqual(show.libraryID, VLCLibraryDataTypesIntegrationShowID());
+    XCTAssertEqualObjects(show.name, @"Factory Show");
+}
+
+- (void)testGroupFactoryRejectsUnknownLibraryID
+{
+    XCTAssertNil([VLCMediaLibraryGroup groupWithID:INT64_MAX]);
+}
+
+- (void)testGroupFactoryResolvesPersistedGroup
+{
+    VLCMediaLibraryGroup * const group = [self factoryGroup];
+
+    XCTAssertEqual(group.libraryID, VLCLibraryDataTypesIntegrationGroupID());
+    XCTAssertEqualObjects(group.displayString, @"Factory Show S01E01");
+}
+
+- (void)testArtistArtistsRelationshipContainsTheArtist
+{
+    VLCMediaLibraryArtist * const artist = [self factoryArtist];
+
+    XCTAssertEqual(artist.artists.count, (NSUInteger)1);
+    XCTAssertEqual(artist.artists.firstObject.libraryID, artist.libraryID);
+}
+
+- (void)testArtistAlbumsRelationshipContainsTheAlbum
+{
+    VLCMediaLibraryMediaItem * const track = [self factoryAudioTrack];
+    VLCMediaLibraryArtist * const artist = [self factoryArtist];
+
+    NSArray<VLCMediaLibraryAlbum *> * const albums = artist.albums;
+    XCTAssertEqual(albums.count, (NSUInteger)1);
+    XCTAssertEqual(albums.firstObject.libraryID, track.albumID);
+}
+
+- (void)testArtistGenresRelationshipContainsTheGenre
+{
+    VLCMediaLibraryArtist * const artist = [self factoryArtist];
+    VLCMediaLibraryMediaItem * const track = [self factoryAudioTrack];
+
+    NSArray<VLCMediaLibraryGenre *> * const genres = artist.genres;
+    XCTAssertEqual(genres.count, (NSUInteger)1);
+    XCTAssertEqual(genres.firstObject.libraryID, track.genreID);
+}
+
+- (void)testArtistMediaItemsRelationshipContainsTheAlbumTrack
+{
+    VLCMediaLibraryMediaItem * const track = [self factoryAudioTrack];
+    VLCMediaLibraryArtist * const artist = [self factoryArtist];
+
+    NSArray<VLCMediaLibraryMediaItem *> * const mediaItems = artist.mediaItems;
+    XCTAssertEqual(mediaItems.count, (NSUInteger)1);
+    XCTAssertEqual(mediaItems.firstObject.libraryID, track.libraryID);
+    XCTAssertEqual(mediaItems.firstObject.artistID, artist.libraryID);
+}
+
+- (void)testArtistSecondaryActionableDetailResolvesItsGenre
+{
+    VLCMediaLibraryArtist * const artist = [self factoryArtist];
+    VLCMediaLibraryMediaItem * const track = [self factoryAudioTrack];
+
+    XCTAssertEqual(artist.secondaryActionableDetailLibraryItem.libraryID,
+                   track.genreID);
+}
+
+- (void)testArtistEnumerationTraversesAlbumTracks
+{
+    VLCMediaLibraryArtist * const artist = [self factoryArtist];
+    __block NSUInteger enumeratedCount = 0;
+    __block int64_t enumeratedID = 0;
+
+    [artist enumerateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * const item,
+                                           BOOL * const __unused stop) {
+        enumeratedCount++;
+        enumeratedID = item.libraryID;
+    }];
+
+    XCTAssertEqual(enumeratedCount, (NSUInteger)1);
+    XCTAssertNotEqual(enumeratedID, (int64_t)0);
+}
+
+- (void)testArtistIterationTraversesAlbumTracks
+{
+    VLCMediaLibraryMediaItem * const track = [self factoryAudioTrack];
+    VLCMediaLibraryArtist * const artist = [self factoryArtist];
+    __block NSUInteger iteratedCount = 0;
+
+    [artist iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * const item) {
+        XCTAssertEqual(item.libraryID, track.libraryID);
+        iteratedCount++;
+    }];
+
+    XCTAssertEqual(iteratedCount, (NSUInteger)1);
+}
+
+- (void)testAlbumArtistsRelationshipResolvesThePersistedArtist
+{
+    VLCMediaLibraryMediaItem * const track = [self factoryAudioTrack];
+    VLCMediaLibraryAlbum * const album = [self factoryAlbum];
+
+    NSArray<VLCMediaLibraryArtist *> * const artists = album.artists;
+    XCTAssertEqual(artists.count, (NSUInteger)1);
+    XCTAssertEqual(artists.firstObject.libraryID, track.artistID);
+}
+
+- (void)testAlbumAlbumsRelationshipContainsTheAlbum
+{
+    VLCMediaLibraryAlbum * const album = [self factoryAlbum];
+
+    XCTAssertEqual(album.albums.count, (NSUInteger)1);
+    XCTAssertEqual(album.albums.firstObject.libraryID, album.libraryID);
+}
+
+- (void)testAlbumGenresRelationshipContainsThePersistedGenre
+{
+    VLCMediaLibraryAlbum * const album = [self factoryAlbum];
+    VLCMediaLibraryMediaItem * const track = [self factoryAudioTrack];
+
+    NSArray<VLCMediaLibraryGenre *> * const genres = album.genres;
+    XCTAssertEqual(genres.count, (NSUInteger)1);
+    XCTAssertEqual(genres.firstObject.libraryID, track.genreID);
+}
+
+- (void)testAlbumMediaItemsRelationshipContainsTheAlbumTrack
+{
+    VLCMediaLibraryMediaItem * const track = [self factoryAudioTrack];
+    VLCMediaLibraryAlbum * const album = [self factoryAlbum];
+
+    NSArray<VLCMediaLibraryMediaItem *> * const mediaItems = album.mediaItems;
+    XCTAssertEqual(mediaItems.count, (NSUInteger)1);
+    XCTAssertEqual(mediaItems.firstObject.libraryID, track.libraryID);
+    XCTAssertEqual(mediaItems.firstObject.albumID, album.libraryID);
+}
+
+- (void)testAlbumPrimaryActionableDetailResolvesItsArtist
+{
+    VLCMediaLibraryAlbum * const album = [self factoryAlbum];
+
+    XCTAssertEqual(album.primaryActionableDetailLibraryItem.libraryID, album.artistID);
+}
+
+- (void)testAlbumSecondaryActionableDetailResolvesItsGenre
+{
+    VLCMediaLibraryAlbum * const album = [self factoryAlbum];
+    VLCMediaLibraryMediaItem * const track = [self factoryAudioTrack];
+
+    XCTAssertEqual(album.secondaryActionableDetailLibraryItem.libraryID,
+                   track.genreID);
+}
+
+- (void)testGenreArtistsRelationshipContainsThePersistedArtist
+{
+    VLCMediaLibraryMediaItem * const track = [self factoryAudioTrack];
+    VLCMediaLibraryGenre * const genre = [self factoryGenre];
+
+    NSArray<VLCMediaLibraryArtist *> * const artists = genre.artists;
+    XCTAssertEqual(artists.count, (NSUInteger)1);
+    XCTAssertEqual(artists.firstObject.libraryID, track.artistID);
+}
+
+- (void)testGenreAlbumsRelationshipContainsThePersistedAlbum
+{
+    VLCMediaLibraryMediaItem * const track = [self factoryAudioTrack];
+    VLCMediaLibraryGenre * const genre = [self factoryGenre];
+
+    NSArray<VLCMediaLibraryAlbum *> * const albums = genre.albums;
+    XCTAssertEqual(albums.count, (NSUInteger)1);
+    XCTAssertEqual(albums.firstObject.libraryID, track.albumID);
+}
+
+- (void)testGenreGenresRelationshipContainsTheGenre
+{
+    VLCMediaLibraryGenre * const genre = [self factoryGenre];
+
+    XCTAssertEqual(genre.genres.count, (NSUInteger)1);
+    XCTAssertEqual(genre.genres.firstObject.libraryID, genre.libraryID);
+}
+
+- (void)testGenreMediaItemsRelationshipContainsTheAlbumTrack
+{
+    VLCMediaLibraryMediaItem * const track = [self factoryAudioTrack];
+    VLCMediaLibraryGenre * const genre = [self factoryGenre];
+
+    NSArray<VLCMediaLibraryMediaItem *> * const mediaItems = genre.mediaItems;
+    XCTAssertEqual(mediaItems.count, (NSUInteger)1);
+    XCTAssertEqual(mediaItems.firstObject.libraryID, track.libraryID);
+    XCTAssertEqual(mediaItems.firstObject.genreID, genre.libraryID);
+}
+
+- (void)testShowEpisodesRelationshipContainsThePersistedEpisode
+{
+    VLCMediaLibraryMediaItem * const episode = [self factoryVideoEpisode];
+    VLCMediaLibraryShow * const show = [self factoryShow];
+
+    NSArray<VLCMediaLibraryMediaItem *> * const episodes = show.episodes;
+    XCTAssertEqual(episodes.count, (NSUInteger)1);
+    XCTAssertEqual(episodes.firstObject.libraryID, episode.libraryID);
+    XCTAssertEqual(episodes.firstObject.showEpisode.seasonNumber,
+                   episode.showEpisode.seasonNumber);
+    XCTAssertEqual(episodes.firstObject.showEpisode.episodeNumber,
+                   episode.showEpisode.episodeNumber);
+}
+
+- (void)testShowMediaItemsRelationshipAliasesEpisodes
+{
+    VLCMediaLibraryShow * const show = [self factoryShow];
+
+    XCTAssertEqual(show.mediaItems.count, show.episodes.count);
+    XCTAssertEqual(show.mediaItems.firstObject.libraryID, show.episodes.firstObject.libraryID);
+}
+
+- (void)testGroupMediaItemsRelationshipContainsThePersistedEpisode
+{
+    VLCMediaLibraryMediaItem * const episode = [self factoryVideoEpisode];
+    VLCMediaLibraryGroup * const group = [self factoryGroup];
+
+    NSArray<VLCMediaLibraryMediaItem *> * const mediaItems = group.mediaItems;
+    XCTAssertEqual(mediaItems.count, (NSUInteger)1);
+    XCTAssertEqual(mediaItems.firstObject.libraryID, episode.libraryID);
+}
+
+- (void)testGroupFirstMediaItemMatchesItsMediaItemsRelationship
+{
+    VLCMediaLibraryGroup * const group = [self factoryGroup];
+
+    XCTAssertEqual(group.firstMediaItem.libraryID, group.mediaItems.firstObject.libraryID);
+}
+
+- (void)testPlaylistFactoryResolvesPersistedPlaylist
+{
+    VLCMediaLibraryPlaylist * const playlist = [self integrationPlaylist];
+    const int64_t playlistID = playlist.libraryID;
+
+    VLCMediaLibraryPlaylist * const refreshedPlaylist =
+        [VLCMediaLibraryPlaylist playlistForLibraryID:playlistID];
+    XCTAssertNotNil(refreshedPlaylist);
+    XCTAssertEqual(refreshedPlaylist.libraryID, playlistID);
+
+    vlc_ml_playlist_delete(VLCLibraryDataTypesIntegrationMediaLibrary(), playlistID);
+}
+
+- (void)testPlaylistFactoryRejectsUnknownLibraryID
+{
+    XCTAssertNil([VLCMediaLibraryPlaylist playlistForLibraryID:INT64_MAX]);
 }
 
 - (void)testMediaItemExposesPersistedInputItem

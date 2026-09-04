@@ -293,7 +293,7 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 @interface VLCMediaLibraryMediaItem : NSObject<VLCMediaLibraryItemProtocol, NSSecureCoding>
 
 + (nullable instancetype)mediaItemForLibraryID:(int64_t)libraryID;
-+ (nullable instancetype)mediaItemForURL:(NSURL *)url;
++ (nullable instancetype)mediaItemForURL:(nullable NSURL *)url;
 + (nullable NSArray<VLCMediaLibraryMediaItem *> *)mediaItemsFromPasteboardData:(NSData *)data;
 - (nullable instancetype)initWithMediaItem:(struct vlc_ml_media_t *)mediaItem;
 - (nullable instancetype)initWithExternalURL:(NSURL *)url;

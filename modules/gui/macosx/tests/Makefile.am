@@ -37,6 +37,7 @@ noinst_HEADERS += \
 
 VLCMacOSXTests_CPPFLAGS = \
 	$(AM_CPPFLAGS) \
+	-DVLC_MACOSX_TEST_SOURCE_DIR=\"$(abs_top_srcdir)\" \
 	-F"$(macosx_gui_xctest_frameworks_dir)" \
 	-I$(srcdir)/gui/macosx \
 	-I$(top_srcdir)
