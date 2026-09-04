@@ -50,7 +50,16 @@ bool CompositorPlatform::init()
     if (QOperatingSystemVersion::current() >= QOperatingSystemVersion::Windows8)
     {
         if (platformName == QLatin1String("windows") || platformName == QLatin1String("direct2d"))
-            return true;
+        {
+            // Video embedding with RHI often does not work, VirtualBox drivers may work, but VMWare
+            // and Nvidia drivers (non-VM) don't. So we only allow this in non-RHI modes at the
+            // moment. Note that using software rasterizer (such as D3D Warp), that can be requested
+            // with `QSG_RHI_PREFER_SOFTWARE_RENDERER`, also does not work.
+            if (qEnvironmentVariable("QT_QUICK_BACKEND", QStringLiteral("rhi")) == QLatin1String("rhi"))
+                return false;
+
+            return true; // Practically "software" and "openvg" modes (non-RHI).
+        }
     }
 #endif
 
