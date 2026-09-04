@@ -237,7 +237,10 @@ vlc_media_tree_Find(vlc_media_tree_t *tree, const input_item_t *media,
  * \param parser a valid preparser
  * \param media  the media to preparse
  * \returns NULL in case of error, or a valid request handle if the
- * item was scheduled for preparsing. Cancel it vlc_preparser_Cancel().
+ * item was scheduled for preparsing. Cancel it with vlc_preparser_Cancel().
+ *
+ * \note Ownership of the returned handle is transferred to the caller. It must
+ * be released with vlc_preparser_req_Release().
  */
 VLC_API vlc_preparser_req *
 vlc_media_tree_Preparse(vlc_media_tree_t *tree, vlc_preparser_t *parser,

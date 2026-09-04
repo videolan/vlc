@@ -173,12 +173,10 @@ media_subtree_preparse_ended(vlc_preparser_req *req, int status, void *user_data
     if (!found) {
         /* the node probably failed to be allocated */
         vlc_media_tree_Unlock(tree);
-        vlc_preparser_req_Release(req);
         return;
     }
     vlc_media_tree_Notify(tree, on_preparse_end, subtree_root, status);
     vlc_media_tree_Unlock(tree);
-    vlc_preparser_req_Release(req);
 }
 
 static inline void
@@ -342,9 +340,20 @@ vlc_media_tree_Preparse(vlc_media_tree_t *tree, vlc_preparser_t *parser,
     VLC_UNUSED(preparser_callbacks);
     return NULL;
 #else
-    return vlc_preparser_Push(parser, media, VLC_PREPARSER_TYPE_PARSE |
-                              VLC_PREPARSER_OPTION_INTERACT |
-                              VLC_PREPARSER_OPTION_SUBITEMS,
-                              &preparser_callbacks, tree);
+    vlc_preparser_req *req =
+        vlc_preparser_req_NewParse(parser, media, VLC_PREPARSER_TYPE_PARSE |
+                                   VLC_PREPARSER_OPTION_INTERACT |
+                                   VLC_PREPARSER_OPTION_SUBITEMS,
+                                   &preparser_callbacks, tree);
+    if (req == NULL)
+        return NULL;
+
+    if (vlc_preparser_Submit(parser, req) != VLC_SUCCESS)
+    {
+        vlc_preparser_req_Release(req);
+        return NULL;
+    }
+
+    return req;
 #endif
 }

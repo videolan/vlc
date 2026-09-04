@@ -370,6 +370,7 @@ static const char *const remoteBrowseDescription = "Remote Browse";
         });
         return [NSError errorWithDomain:NSPOSIXErrorDomain code:ENOMEM userInfo:nil];
     }
+    vlc_preparser_req_Release(request);
     return nil;
 }
 

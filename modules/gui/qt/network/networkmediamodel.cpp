@@ -440,6 +440,11 @@ public:
         }
 
         m_preparseSem.acquire();
+        if (m_parserReq != NULL)
+        {
+            vlc_preparser_req_Release( m_parserReq );
+            m_parserReq = NULL;
+        }
         m_parserReq = vlc_media_tree_Preparse( tree.get(), parser, m_treeItem.media.get() );
 
         m_listener = std::move( l );
@@ -516,13 +521,16 @@ NetworkMediaModel::~NetworkMediaModel()
         if (likely(parser != NULL))
         {
             if (d->m_parserReq != NULL)
-            {
                 vlc_preparser_Cancel( parser, d->m_parserReq );
-                d->m_parserReq = NULL;
-            }
             //wait for the callback call on cancel
             d->m_preparseSem.acquire();
         }
+    }
+
+    if (d->m_parserReq != NULL)
+    {
+        vlc_preparser_req_Release( d->m_parserReq );
+        d->m_parserReq = NULL;
     }
 }
 
