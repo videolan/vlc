@@ -78,6 +78,18 @@
     XCTAssertEqualObjects(inputItem.MRL, @"mock://macosx-datatypes-integration");
 }
 
+- (void)testStreamURLInitializerCreatesPersistedStream
+{
+    NSURL * const url = [NSURL URLWithString:@"mock://macosx-datatypes-stream"];
+    VLCMediaLibraryMediaItem * const item = [[VLCMediaLibraryMediaItem alloc] initWithStreamURL:url];
+
+    VLCMediaLibraryMediaItem * const refreshedItem =
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:item.libraryID];
+    XCTAssertNotNil(refreshedItem);
+    XCTAssertEqualObjects(refreshedItem.inputItem.MRL, url.absoluteString);
+    XCTAssertEqual(vlc_ml_remove_stream(VLCLibraryDataTypesIntegrationMediaLibrary(), item.libraryID), VLC_SUCCESS);
+}
+
 - (void)testMediaItemRatingRoundTripsThroughMediaLibrary
 {
     VLCMediaLibraryMediaItem * const item = [self integrationMediaItem];
@@ -148,6 +160,214 @@
     refreshedItem =
         [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
     XCTAssertEqualObjects(refreshedItem.lastAspectRatio, @"16:9");
+}
+
+- (void)testMediaItemTitlePreferencePersistsThroughMediaLibrary
+{
+    VLCMediaLibraryMediaItem * const item = [self integrationMediaItem];
+
+    item.lastTitle = 3;
+    XCTAssertEqual(item.lastTitle, 3);
+    VLCMediaLibraryMediaItem *refreshedItem =
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
+    XCTAssertEqual(refreshedItem.lastTitle, 3);
+
+    item.lastTitle = 8;
+    XCTAssertEqual(item.lastTitle, 8);
+    refreshedItem = [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
+    XCTAssertEqual(refreshedItem.lastTitle, 8);
+}
+
+- (void)testMediaItemChapterPreferencePersistsThroughMediaLibrary
+{
+    VLCMediaLibraryMediaItem * const item = [self integrationMediaItem];
+
+    item.lastChapter = 7;
+    XCTAssertEqual(item.lastChapter, 7);
+    VLCMediaLibraryMediaItem *refreshedItem =
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
+    XCTAssertEqual(refreshedItem.lastChapter, 7);
+
+    item.lastChapter = 11;
+    XCTAssertEqual(item.lastChapter, 11);
+    refreshedItem = [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
+    XCTAssertEqual(refreshedItem.lastChapter, 11);
+}
+
+- (void)testMediaItemProgramPreferencePersistsThroughMediaLibrary
+{
+    VLCMediaLibraryMediaItem * const item = [self integrationMediaItem];
+
+    item.lastProgram = 2;
+    XCTAssertEqual(item.lastProgram, 2);
+    VLCMediaLibraryMediaItem *refreshedItem =
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
+    XCTAssertEqual(refreshedItem.lastProgram, 2);
+
+    item.lastProgram = 5;
+    XCTAssertEqual(item.lastProgram, 5);
+    refreshedItem = [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
+    XCTAssertEqual(refreshedItem.lastProgram, 5);
+}
+
+- (void)testMediaItemVideoTrackPreferencePersistsThroughMediaLibrary
+{
+    VLCMediaLibraryMediaItem * const item = [self integrationMediaItem];
+
+    item.lastVideoTrack = 4;
+    XCTAssertEqual(item.lastVideoTrack, 4);
+    VLCMediaLibraryMediaItem *refreshedItem =
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
+    XCTAssertEqual(refreshedItem.lastVideoTrack, 4);
+
+    item.lastVideoTrack = 9;
+    XCTAssertEqual(item.lastVideoTrack, 9);
+    refreshedItem = [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
+    XCTAssertEqual(refreshedItem.lastVideoTrack, 9);
+}
+
+- (void)testMediaItemZoomPreferencePersistsThroughMediaLibrary
+{
+    VLCMediaLibraryMediaItem * const item = [self integrationMediaItem];
+
+    item.lastZoom = @"1.5";
+    XCTAssertEqualObjects(item.lastZoom, @"1.5");
+    VLCMediaLibraryMediaItem *refreshedItem =
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
+    XCTAssertEqualObjects(refreshedItem.lastZoom, @"1.5");
+
+    item.lastZoom = @"2.0";
+    XCTAssertEqualObjects(item.lastZoom, @"2.0");
+    refreshedItem = [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
+    XCTAssertEqualObjects(refreshedItem.lastZoom, @"2.0");
+}
+
+- (void)testMediaItemCropPreferencePersistsThroughMediaLibrary
+{
+    VLCMediaLibraryMediaItem * const item = [self integrationMediaItem];
+
+    item.lastCrop = @"16:9";
+    XCTAssertEqualObjects(item.lastCrop, @"16:9");
+    VLCMediaLibraryMediaItem *refreshedItem =
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
+    XCTAssertEqualObjects(refreshedItem.lastCrop, @"16:9");
+
+    item.lastCrop = @"4:3";
+    XCTAssertEqualObjects(item.lastCrop, @"4:3");
+    refreshedItem = [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
+    XCTAssertEqualObjects(refreshedItem.lastCrop, @"4:3");
+}
+
+- (void)testMediaItemDeinterlacePreferencePersistsThroughMediaLibrary
+{
+    VLCMediaLibraryMediaItem * const item = [self integrationMediaItem];
+
+    item.lastDeinterlaceFilter = @"yadif";
+    XCTAssertEqualObjects(item.lastDeinterlaceFilter, @"yadif");
+    VLCMediaLibraryMediaItem *refreshedItem =
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
+    XCTAssertEqualObjects(refreshedItem.lastDeinterlaceFilter, @"yadif");
+
+    item.lastDeinterlaceFilter = @"bwdif";
+    XCTAssertEqualObjects(item.lastDeinterlaceFilter, @"bwdif");
+    refreshedItem = [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
+    XCTAssertEqualObjects(refreshedItem.lastDeinterlaceFilter, @"bwdif");
+}
+
+- (void)testMediaItemVideoFiltersPreferencePersistsThroughMediaLibrary
+{
+    VLCMediaLibraryMediaItem * const item = [self integrationMediaItem];
+
+    item.lastVideoFilters = @"sepia";
+    XCTAssertEqualObjects(item.lastVideoFilters, @"sepia");
+    VLCMediaLibraryMediaItem *refreshedItem =
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
+    XCTAssertEqualObjects(refreshedItem.lastVideoFilters, @"sepia");
+
+    item.lastVideoFilters = @"grayscale";
+    XCTAssertEqualObjects(item.lastVideoFilters, @"grayscale");
+    refreshedItem = [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
+    XCTAssertEqualObjects(refreshedItem.lastVideoFilters, @"grayscale");
+}
+
+- (void)testMediaItemAudioTrackPreferencePersistsThroughMediaLibrary
+{
+    VLCMediaLibraryMediaItem * const item = [self integrationMediaItem];
+
+    item.lastAudioTrack = 5;
+    XCTAssertEqual(item.lastAudioTrack, 5);
+    VLCMediaLibraryMediaItem *refreshedItem =
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
+    XCTAssertEqual(refreshedItem.lastAudioTrack, 5);
+
+    item.lastAudioTrack = 8;
+    XCTAssertEqual(item.lastAudioTrack, 8);
+    refreshedItem = [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
+    XCTAssertEqual(refreshedItem.lastAudioTrack, 8);
+}
+
+- (void)testMediaItemGainPreferencePersistsThroughMediaLibrary
+{
+    VLCMediaLibraryMediaItem * const item = [self integrationMediaItem];
+
+    item.lastGain = 1.25f;
+    XCTAssertEqualWithAccuracy(item.lastGain, 1.25f, 0.001f);
+    VLCMediaLibraryMediaItem *refreshedItem =
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
+    XCTAssertEqualWithAccuracy(refreshedItem.lastGain, 1.25f, 0.001f);
+
+    item.lastGain = 0.75f;
+    XCTAssertEqualWithAccuracy(item.lastGain, 0.75f, 0.001f);
+    refreshedItem = [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
+    XCTAssertEqualWithAccuracy(refreshedItem.lastGain, 0.75f, 0.001f);
+}
+
+- (void)testMediaItemAudioDelayPreferencePersistsThroughMediaLibrary
+{
+    VLCMediaLibraryMediaItem * const item = [self integrationMediaItem];
+
+    item.lastAudioDelay = 120;
+    XCTAssertEqual(item.lastAudioDelay, 120);
+    VLCMediaLibraryMediaItem *refreshedItem =
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
+    XCTAssertEqual(refreshedItem.lastAudioDelay, 120);
+
+    item.lastAudioDelay = -240;
+    XCTAssertEqual(item.lastAudioDelay, -240);
+    refreshedItem = [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
+    XCTAssertEqual(refreshedItem.lastAudioDelay, -240);
+}
+
+- (void)testMediaItemSubtitleTrackPreferencePersistsThroughMediaLibrary
+{
+    VLCMediaLibraryMediaItem * const item = [self integrationMediaItem];
+
+    item.lastSubtitleTrack = 6;
+    XCTAssertEqual(item.lastSubtitleTrack, 6);
+    VLCMediaLibraryMediaItem *refreshedItem =
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
+    XCTAssertEqual(refreshedItem.lastSubtitleTrack, 6);
+
+    item.lastSubtitleTrack = 10;
+    XCTAssertEqual(item.lastSubtitleTrack, 10);
+    refreshedItem = [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
+    XCTAssertEqual(refreshedItem.lastSubtitleTrack, 10);
+}
+
+- (void)testMediaItemSubtitleDelayPreferencePersistsThroughMediaLibrary
+{
+    VLCMediaLibraryMediaItem * const item = [self integrationMediaItem];
+
+    item.lastSubtitleDelay = -80;
+    XCTAssertEqual(item.lastSubtitleDelay, -80);
+    VLCMediaLibraryMediaItem *refreshedItem =
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
+    XCTAssertEqual(refreshedItem.lastSubtitleDelay, -80);
+
+    item.lastSubtitleDelay = 160;
+    XCTAssertEqual(item.lastSubtitleDelay, 160);
+    refreshedItem = [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
+    XCTAssertEqual(refreshedItem.lastSubtitleDelay, 160);
 }
 
 - (void)testPlaylistAppendMedia
