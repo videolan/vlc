@@ -1,4 +1,4 @@
-From 2e74ca54c146bda95482900faba547e96ece24a1 Mon Sep 17 00:00:00 2001
+From 9958323702722501b6569675627db1b9c0f27220 Mon Sep 17 00:00:00 2001
 From: Fatih Uzunoglu <fuzun54@outlook.com>
 Date: Wed, 24 Jan 2024 16:31:06 +0200
 Subject: [PATCH] Try DCompositionCreateDevice3() first if available
@@ -6,34 +6,60 @@ Subject: [PATCH] Try DCompositionCreateDevice3() first if available
 When the native acrylic effect is not available, the application uses
 effects that can be created through IDCompositionDevice3 with the
 Direct Composition integration.
+
+It also uses `static` variable to not repeatedly resolve the same
+symbol every time the function called.
 ---
- src/gui/rhi/qrhid3dhelpers.cpp | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ src/gui/rhi/qrhid3dhelpers.cpp | 31 +++++++++++++++++++++++++------
+ 1 file changed, 25 insertions(+), 6 deletions(-)
 
 diff --git a/src/gui/rhi/qrhid3dhelpers.cpp b/src/gui/rhi/qrhid3dhelpers.cpp
-index 216c358cbe..79efb386eb 100644
+index 5d935ce5984..4fb65a57826 100644
 --- a/src/gui/rhi/qrhid3dhelpers.cpp
 +++ b/src/gui/rhi/qrhid3dhelpers.cpp
-@@ -110,7 +110,18 @@ IDCompositionDevice *createDirectCompositionDevice()
+@@ -26,17 +26,36 @@ pD3DCompile resolveD3DCompile()
+ 
+ IDCompositionDevice *createDirectCompositionDevice()
+ {
+-    QSystemLibrary dcomplib(QStringLiteral("dcomp"));
+     typedef HRESULT (__stdcall *DCompositionCreateDeviceFuncPtr)(
+         _In_opt_ IDXGIDevice *dxgiDevice,
          _In_ REFIID iid,
          _Outptr_ void **dcompositionDevice);
-     DCompositionCreateDeviceFuncPtr func = reinterpret_cast<DCompositionCreateDeviceFuncPtr>(
+-    DCompositionCreateDeviceFuncPtr func = reinterpret_cast<DCompositionCreateDeviceFuncPtr>(
 -        dcomplib.resolve("DCompositionCreateDevice"));
-+        dcomplib.resolve("DCompositionCreateDevice3"));
+-    if (!func) {
+-        qWarning("Unable to resolve DCompositionCreateDevice, perhaps dcomp.dll is missing?");
 +
-+    if (!func) {
-+        qDebug("Could not resolve DCompositionCreateDevice3, dcomp.dll missing or old. Trying DCompositionCreateDevice2...");
-+        func = reinterpret_cast<DCompositionCreateDeviceFuncPtr>(dcomplib.resolve("DCompositionCreateDevice2"));
-+    }
++    static const auto func = []() {
++        QSystemLibrary dcomplib(QStringLiteral("dcomp"));
 +
-+    if (!func) {
-+        qDebug("Could not resolve DCompositionCreateDevice2, dcomp.dll missing or old. Trying DCompositionCreateDevice...");
-+        func = reinterpret_cast<DCompositionCreateDeviceFuncPtr>(dcomplib.resolve("DCompositionCreateDevice"));
-+    }
++        DCompositionCreateDeviceFuncPtr func = reinterpret_cast<DCompositionCreateDeviceFuncPtr>(dcomplib.resolve("DCompositionCreateDevice3"));
 +
-     if (!func) {
-         qWarning("Unable to resolve DCompositionCreateDevice, perhaps dcomp.dll is missing?");
++        if (!func) {
++            qDebug("Could not resolve DCompositionCreateDevice3, dcomp.dll is missing or old. Trying DCompositionCreateDevice2...");
++            func = reinterpret_cast<DCompositionCreateDeviceFuncPtr>(dcomplib.resolve("DCompositionCreateDevice2"));
++        }
++
++        if (!func) {
++            qDebug("Could not resolve DCompositionCreateDevice2, dcomp.dll is missing or old. Trying DCompositionCreateDevice...");
++            func = reinterpret_cast<DCompositionCreateDeviceFuncPtr>(dcomplib.resolve("DCompositionCreateDevice"));
++        }
++
++        if (!func) {
++            qDebug("Unable to resolve DCompositionCreateDevice, perhaps dcomp.dll is missing?");
++        }
++
++        return func;
++    }();
++
++    if (!func)
          return nullptr;
+-    }
++
+     IDCompositionDevice *device = nullptr;
+     HRESULT hr = func(nullptr, __uuidof(IDCompositionDevice), reinterpret_cast<void **>(&device));
+     if (FAILED(hr)) {
 -- 
-2.44.0
+2.55.0
 
