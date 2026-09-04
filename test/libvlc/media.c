@@ -148,8 +148,9 @@ test_media_preparsed_ext(libvlc_instance_t *vlc, const char *path,
         .parse_flags = parse_flags,
     };
 
-    libvlc_parser_task *task = libvlc_parser_queue(parser, &req, &cbs, &sem);
+    libvlc_parser_task *task = libvlc_parser_task_new_parse(parser, &req, &cbs, &sem);
     assert(task != NULL);
+    assert(libvlc_parser_submit(parser, task) == 0);
 
     // Wait for preparsed event
     vlc_sem_wait (&sem);
@@ -430,8 +431,9 @@ static void test_media_subitems_media(libvlc_instance_t *vlc,
             .media = media,
             .parse_flags = 0,
         };
-        libvlc_parser_task *task = libvlc_parser_queue(parser, &req, &cbs, &sem);
+        libvlc_parser_task *task = libvlc_parser_task_new_parse(parser, &req, &cbs, &sem);
         assert(task != NULL);
+        assert(libvlc_parser_submit(parser, task) == 0);
 
         vlc_sem_wait (&sem);
         libvlc_parser_destroy(parser);

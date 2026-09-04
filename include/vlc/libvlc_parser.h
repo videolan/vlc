@@ -55,12 +55,12 @@ typedef struct libvlc_thumbnailer_request_t libvlc_thumbnailer_request_t;
 /**
  * Opaque handle of a parsing/thumbnailing task.
  *
- * Identifies a task request submitted via libvlc_parser_queue()
- * or libvlc_parser_queue_thumbnailing(). It can be passed to
- * libvlc_parser_cancel_request() to cancel that request.
+ * Identifies a task created by libvlc_parser_task_new_parse() or
+ * libvlc_parser_task_new_thumbnail() and started with libvlc_parser_submit().
+ * It can be passed to libvlc_parser_cancel_request() to cancel that request.
  *
- * \note Validity starts when a submit function returns a non-NULL handle
- * and ends with libvlc_parser_task_release().
+ * \note Validity starts when a libvlc_parser_task_new*() function returns a
+ * non-NULL handle and ends with libvlc_parser_task_release().
  */
 typedef struct libvlc_parser_task libvlc_parser_task;
 
@@ -145,7 +145,7 @@ typedef union libvlc_thumbnailer_seek_value_t
 } libvlc_thumbnailer_seek_value_t;
 
 /**
- * struct defining callbacks for libvlc_parser_queue
+ * struct defining callbacks for libvlc_parser_task_new_parse
  */
 struct libvlc_parser_cbs
 {
@@ -161,7 +161,7 @@ struct libvlc_parser_cbs
      * available since version 0
      *
      * \param opaque opaque pointer set by cbs_opaque
-     * \param task opaque handle returned by libvlc_parser_queue()
+     * \param task opaque handle returned by libvlc_parser_task_new_parse()
      * \param status terminal parse outcome, \ref libvlc_parser_status_t
      */
     void (*on_parsed)(void *opaque,
@@ -178,7 +178,7 @@ struct libvlc_parser_cbs
      * available since version 0
      *
      * \param opaque opaque pointer set by cbs_opaque
-     * \param task opaque handle returned by libvlc_parser_queue()
+     * \param task opaque handle returned by libvlc_parser_task_new_parse()
      * \param list list of pictures, the list is only valid from this
      * callback, each pictures can be held separately with
      * libvlc_picture_retain().
@@ -217,7 +217,7 @@ struct libvlc_parser_request_t
 };
 
 /**
- * struct defining callbacks for libvlc_parser_queue_thumbnailing
+ * struct defining callbacks for libvlc_parser_task_new_thumbnail
  */
 struct libvlc_thumbnailer_cbs
 {
@@ -233,7 +233,7 @@ struct libvlc_thumbnailer_cbs
      * available since version 0
      *
      * \param opaque opaque pointer set in cbs_opaque
-     * \param task opaque handle returned by libvlc_parser_queue_thumbnailing()
+     * \param task opaque handle returned by libvlc_parser_task_new_thumbnail()
      * \param picture generated thumbnail, the picture is only valid from this
      * callback, it can be held separately with libvlc_picture_retain().
      * NULL in case of an error, timeout or request was cancelled.
@@ -408,19 +408,17 @@ libvlc_parser_new(libvlc_instance_t *inst,
 LIBVLC_API void libvlc_parser_destroy(libvlc_parser_t *parser);
 
 /**
- * Parse a media asynchronously
+ * Create a media parsing task
  *
- * This fetches (local or network) art, meta data and/or tracks information.
- *
- * \note It is possible to cancel the request with
- * libvlc_parser_cancel_request()
- *
- * If the request is successfully queued, the \ref
- * libvlc_parser_cbs.on_parsed callback is guaranteed to be called
+ * This prepares a task handle to fetch (local or network) art, meta data and/or
+ * tracks information. Nothing runs and no callback can fire until the handle is passed
+ * to libvlc_parser_submit().
  *
  * \note A media can be parsed multiple times, for instance to refresh network
  * metadata; a previous successful, failed, timed out or cancelled parse does
- * not prevent re-queueing.
+ * not prevent submitting a new task created from the same libvlc_media_t,
+ * but re-submitting a task handle that was already submitted
+ * successfully is undefined behavior. \see libvlc_parser_submit().
  *
  * \param parser the parser
  * \param req a pointer to a valid request struct
@@ -428,23 +426,20 @@ LIBVLC_API void libvlc_parser_destroy(libvlc_parser_t *parser);
  * must be kept alive (and not modified) by the caller until libvlc_parser_cbs.on_parsed
  * is called for the returned task handle.
  * \param cbs_opaque an opaque pointer to be passed to the callbacks
- * \return NULL in case of error, or a valid handle if the item was scheduled
- * for parsing. If this returns NULL, the \ref libvlc_parser_cbs.on_parsed
- * callback will *not* be called.
+ * \return NULL in case of error, or a task handle owned by the caller. It must
+ * be released with libvlc_parser_task_release(), whether or not it is
+ * submitted.
  * \version LibVLC 4.0.0 or later
  */
 LIBVLC_API libvlc_parser_task *
-libvlc_parser_queue(libvlc_parser_t *parser, const libvlc_parser_request_t *req,
-                    const struct libvlc_parser_cbs *cbs, void *cbs_opaque);
+libvlc_parser_task_new_parse(libvlc_parser_t *parser,
+                             const libvlc_parser_request_t *req,
+                             const struct libvlc_parser_cbs *cbs, void *cbs_opaque);
 
 /**
- * Generate a thumbnail asynchronously
+ * Create a thumbnail generation task
  *
- * \note It is possible to cancel the request with
- * libvlc_parser_cancel_request()
- *
- * If the request is successfully queued, the \ref
- * libvlc_thumbnailer_cbs.on_ended callback is guaranteed to be called
+ * Nothing runs and no callback can fire until the task is passed to libvlc_parser_submit().
  *
  * \param parser the parser
  * \param req a pointer to a valid request struct
@@ -452,31 +447,54 @@ libvlc_parser_queue(libvlc_parser_t *parser, const libvlc_parser_request_t *req,
  * must be kept alive (and not modified) by the caller until libvlc_thumbnailer_cbs.on_ended
  * is called for the returned task handle.
  * \param cbs_opaque an opaque pointer to be passed to the callbacks
- * \return NULL in case of error, or a valid handle if the item was
- * scheduled for thumbnailing. If this returns an error, the \ref
- * libvlc_thumbnailer_cbs.on_ended callback will *not* be called.
+ * \return NULL in case of error, or a task handle owned by the caller
  * \version LibVLC 4.0.0 or later
  */
 LIBVLC_API libvlc_parser_task *
-libvlc_parser_queue_thumbnailing(libvlc_parser_t *parser,
+libvlc_parser_task_new_thumbnail(libvlc_parser_t *parser,
                                  const libvlc_thumbnailer_request_t *req,
                                  const struct libvlc_thumbnailer_cbs *cbs,
                                  void *cbs_opaque);
 
 /**
+ * Start a task created by libvlc_parser_task_new_parse() or
+ * libvlc_parser_task_new_thumbnail()
+ *
+ * On success the task is scheduled and its completion callback is
+ * guaranteed to be called exactly once, including when the task is cancelled
+ * with libvlc_parser_cancel_request(). That callback may run even before this
+ * function returns.
+ *
+ * \note On failure no callback is invoked. The caller keeps its reference and
+ * may submit the task again.
+ *
+ * \note A task may be submitted at most once, and may only be re-submitted if
+ * the previous attempt failed. Submitting does not transfer the caller's
+ * reference. It keeps owning the handle and must release it.
+ *
+ * \param parser the parser the task was created from
+ * \param task a task that has not been submitted yet
+ * \return 0 on success, -1 on error
+ * \version LibVLC 4.0.0 or later
+ */
+LIBVLC_API int
+libvlc_parser_submit(libvlc_parser_t *parser, libvlc_parser_task *task);
+
+/**
  * Cancel a parser request
  *
  * \param parser the parser
- * \param task A parser task returned by libvlc_parser_queue(), libvlc_parser_queue_thumbnailing()
+ * \param task A parser task returned by libvlc_parser_task_new_*()
  * or NULL to cancel all requests.
  * \return the number of requests cancelled
  *
  * \note
- * - When a task is cancelled, the `on_parsed` callback will be triggered
- *   with libvlc_parser_status_cancelled status.
+ * - When a task is cancelled, for parsing, the `on_parsed` callback will be triggered
+ *   with libvlc_parser_status_cancelled status, and for thumbnailing, the `on_ended`
+ *   callback will be triggered with a NULL picture.
  *
  * - If the request is already in a terminated state (finished, cancelled, error, timeout),
- *   the call is a no-op and no callback will be invoked.
+ *   or it was never submitted, the call is a no-op and no callback will be invoked.
  * \version libvlc 4.0.0 or later
  */
 LIBVLC_API size_t libvlc_parser_cancel_request(libvlc_parser_t *parser,
@@ -485,7 +503,7 @@ LIBVLC_API size_t libvlc_parser_cancel_request(libvlc_parser_t *parser,
 /**
  * Fetch the media associated with the task handle.
  *
- * \param task A parser task returned by libvlc_parser_queue() or libvlc_parser_queue_thumbnailing()
+ * \param task A parser task returned by libvlc_parser_task_new_*()
  * \return libvlc_media_t associated with the task
  *
  * \note The returned media is held by the task, it must not be
@@ -497,10 +515,11 @@ libvlc_parser_task_get_media(libvlc_parser_task *task);
 /**
  * Release a parser task handle.
  *
- * \param task the parser task handle
+ * \param task the parser task handle returned by libvlc_parser_task_new_*()
  *
  * \note
- * - The task handle is retained when returned by a submit function.
+ * - The libvlc_parser_task_new*() function call transfers the ownership of the task
+ *   handle to the caller. It must be released whether or not it was submitted.
  *
  * - Mandatory to call to avoid memory leaks.
  *

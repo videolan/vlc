@@ -114,8 +114,9 @@ libvlc_media_new_path
 libvlc_media_new_as_node
 libvlc_parser_new
 libvlc_parser_destroy
-libvlc_parser_queue
-libvlc_parser_queue_thumbnailing
+libvlc_parser_task_new_parse
+libvlc_parser_task_new_thumbnail
+libvlc_parser_submit
 libvlc_parser_cancel_request
 libvlc_parser_task_get_media
 libvlc_parser_task_release

@@ -386,7 +386,7 @@ schedulers), review every boundary.
 Header: `<vlc/libvlc_parser.h>`
 
 One parser object owns its own thread pool and can serve many concurrent
-parse and thumbnail requests. Each queued request returns an opaque task
+parse and thumbnail requests. Each request is identified with an opaque task
 handle.
 
 ### 6.1 Lifetime
@@ -423,7 +423,8 @@ libvlc_parser_request_t req = {
     .parse_flags = libvlc_media_parse | libvlc_media_fetch_local,
 };
 libvlc_parser_task *task =
-    libvlc_parser_queue(p, &req, &cbs, opaque);
+    libvlc_parser_task_new_parse(p, &req, &cbs, opaque);
+libvlc_parser_submit(p, task);
 /* later, when done: */
 libvlc_parser_task_release(task);
 ```
@@ -456,7 +457,8 @@ libvlc_thumbnailer_request_t treq = {
     .hw_dec  = false,
 };
 libvlc_parser_task *task =
-    libvlc_parser_queue_thumbnailing(p, &treq, &tcbs, opaque);
+    libvlc_parser_task_new_thumbnail(p, &treq, &tcbs, opaque);
+libvlc_parser_submit(p, task);
 /* later, when done: */
 libvlc_parser_task_release(task);
 ```
@@ -512,8 +514,9 @@ Work through these in order; each step compiles more of your tree:
 
 5. **Port parsing / thumbnailing.** Replace
    `libvlc_media_parse_request()` / `libvlc_media_thumbnail_request_by_*()`
-   calls with a shared `libvlc_parser_t` per libvlc instance; use
-   `libvlc_parser_queue()` / `libvlc_parser_queue_thumbnailing()` and remove
+   calls with a shared `libvlc_parser_t` per libvlc instance; create the task
+   with `libvlc_parser_task_new_parse()` / `libvlc_parser_task_new_thumbnail()`,
+   start it with `libvlc_parser_submit()`, and remove
    `libvlc_media_parse_stop()`.
 
 6. **Update the dialog struct.** Add `.version = 0` (the latest

@@ -90,8 +90,9 @@ static void test_media_thumbnail(libvlc_instance_t *vlc, const char *location,
         .type = picture_type,
         .hw_dec = false,
     };
-    libvlc_parser_task *task = libvlc_parser_queue_thumbnailing(parser, &request, &cbs, &sem);
+    libvlc_parser_task *task = libvlc_parser_task_new_thumbnail(parser, &request, &cbs, &sem);
     assert(task != NULL);
+    assert(libvlc_parser_submit(parser, task) == 0);
 
     vlc_sem_wait(&sem);
     libvlc_parser_destroy(parser);

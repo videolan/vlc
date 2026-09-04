@@ -59,8 +59,9 @@ libvlc_media_parse_sync(libvlc_instance_t *vlc, libvlc_media_t *p_m,
         .parse_flags = parse_flag,
     };
 
-    libvlc_parser_task *task = libvlc_parser_queue(parser, &req, &cbs, &sem);
+    libvlc_parser_task *task = libvlc_parser_task_new_parse(parser, &req, &cbs, &sem);
     assert(task != NULL);
+    assert(libvlc_parser_submit(parser, task) == 0);
 
     vlc_sem_wait (&sem);
 

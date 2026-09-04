@@ -158,11 +158,18 @@ static void snapshot(libvlc_instance_t *vlc, libvlc_media_t *m,
         .hw_dec = false,
     };
 
-    libvlc_parser_task *task = libvlc_parser_queue_thumbnailing(parser, &request,
-                                                                &cbs, &ctx);
+    libvlc_parser_task *task =
+        libvlc_parser_task_new_thumbnail(parser, &request, &cbs, &ctx);
     if (task == NULL)
     {
+        fprintf(stderr, "Failed to create thumbnail generation request\n");
+        exit(1);
+    }
+
+    if (libvlc_parser_submit(parser, task) != 0)
+    {
         fprintf(stderr, "Failed to queue thumbnail generation request\n");
+        libvlc_parser_task_release(task);
         exit(1);
     }
 

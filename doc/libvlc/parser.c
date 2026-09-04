@@ -115,11 +115,18 @@ parse_file_async(libvlc_parser_t *parser, const char *url, sem_t *sem)
 
     /* And send it to the parser, the actual parsing will be done from an other
      * thread */
-    libvlc_parser_task *task = libvlc_parser_queue(parser, &request, &cbs, sem);
+    libvlc_parser_task *task = libvlc_parser_task_new_parse(parser, &request, &cbs, sem);
     libvlc_media_release(media); /* media held by the request */
     if (task == NULL)
     {
+        fprintf(stderr, "Failed to create parsing request\n");
+        return -1; /* generic error code */
+    }
+
+    if (libvlc_parser_submit(parser, task) != 0)
+    {
         fprintf(stderr, "Failed to queue parsing request\n");
+        libvlc_parser_task_release(task);
         return -1; /* generic error code */
     }
 

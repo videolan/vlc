@@ -417,7 +417,7 @@ LIBVLC_API libvlc_media_t *libvlc_media_duplicate( libvlc_media_t *p_md );
 /**
  * Read the meta of the media.
  *
- * Note, you need to parse using libvlc_parser_queue() or play the media
+ * Note, you need to parse using libvlc_parser API or play the media
  * at least once before calling this function.
  * If the media has not yet been parsed this will return NULL.
  *
@@ -527,7 +527,7 @@ libvlc_media_subitems( libvlc_media_t *p_md );
 /**
  * Get duration (in us) of media descriptor object item.
  *
- * The duration is known if the media was parsed using libvlc_parser_queue(),
+ * The duration is known if the media was parsed using libvlc_parser API,
  * played at least once, or created by a source that already advertises it,
  * such as a playlist carrying duration metadata.
  *
@@ -542,7 +542,7 @@ LIBVLC_API libvlc_time_t
  *
  * \note 'stat' values are currently only parsed by directory accesses. This
  * mean that only sub medias of a directory media, parsed with
- * libvlc_parser_queue() can have valid 'stat' properties.
+ * libvlc_parser API can have valid 'stat' properties.
  * \version LibVLC 4.0.0 and later.
  *
  * \param p_md media descriptor object
@@ -589,7 +589,7 @@ LIBVLC_API void *libvlc_media_get_user_data( libvlc_media_t *p_md );
  *
  * \version LibVLC 4.0.0 and later.
  *
- * \note You need to parse using libvlc_parser_queue() or play the media
+ * \note You need to parse using libvlc_parser API or play the media
  * at least once before calling this function.  Not doing this will result in
  * an empty list.
  *
@@ -609,7 +609,7 @@ libvlc_media_get_tracklist( libvlc_media_t *p_md, libvlc_track_type_t type );
 /**
  * Get codec description from media elementary stream
  *
- * Note, you need to parse using libvlc_parser_queue() or play the media
+ * Note, you need to parse using libvlc_parser API or play the media
  * at least once before calling this function.
  *
  * \version LibVLC 3.0.0 and later.
@@ -646,7 +646,7 @@ libvlc_media_type_t libvlc_media_get_type( libvlc_media_t *p_md );
  * track (like a .srt) or an additional audio track (like a .ac3).
  *
  * \note This function must be called before the media is parsed (via
- * libvlc_parser_queue()) or before the media is played (via
+ * libvlc_parser API) or before the media is played (via
  * libvlc_media_player_play())
  *
  * \version LibVLC 3.0.0 and later.

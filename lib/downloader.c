@@ -437,6 +437,20 @@ libvlc_downloader_queue(libvlc_downloader_t *downloader, const libvlc_downloader
     if (task == NULL)
         return NULL;
 
+    libvlc_parser_request_t request = {
+        .version = 0,
+        .media = req->media,
+        .parse_flags = 0, /* default VLC_PREPARSER_TYPE_PARSE | VLC_PREPARSER_OPTION_SUBITEMS */
+    };
+
+    task->parser_task = libvlc_parser_task_new_parse(downloader->parser, &request,
+                                                     &parser_cbs, task);
+    if (task->parser_task == NULL)
+    {
+        DownloaderTaskDestroy(task);
+        return NULL;
+    }
+
     vlc_mutex_lock(&downloader->lock);
     vlc_list_append(&task->node, &downloader->submitted_tasks);
 
@@ -453,17 +467,9 @@ libvlc_downloader_queue(libvlc_downloader_t *downloader, const libvlc_downloader
     }
     vlc_mutex_unlock(&downloader->lock);
 
-    libvlc_parser_request_t request = {
-        .version = 0,
-        .media = req->media,
-        .parse_flags = 0, /* default VLC_PREPARSER_TYPE_PARSE | VLC_PREPARSER_OPTION_SUBITEMS */
-    };
-
     vlc_atomic_rc_inc(&task->rc);
 
-    libvlc_parser_task *parser_task = libvlc_parser_queue(downloader->parser, &request,
-                                                          &parser_cbs, task);
-    if (parser_task == NULL)
+    if (libvlc_parser_submit(downloader->parser, task->parser_task) != 0)
     {
         vlc_mutex_lock(&downloader->lock);
         vlc_list_remove(&task->node);
@@ -472,7 +478,6 @@ libvlc_downloader_queue(libvlc_downloader_t *downloader, const libvlc_downloader
         return NULL;
     }
 
-    task->parser_task = parser_task;
     return task;
 }
 
