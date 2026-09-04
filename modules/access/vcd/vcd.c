@@ -171,8 +171,8 @@ static int Open( vlc_object_t *p_this )
 
     for( int i = 0; i < USABLE_TITLES(p_sys->p_toc->i_tracks); i++ )
     {
-        msg_Dbg( p_access, "title[%d] start=%d", i, p_sys->p_toc->p_sectors[1+i].i_lba );
-        msg_Dbg( p_access, "title[%d] end=%d", i, p_sys->p_toc->p_sectors[i+2].i_lba );
+        msg_Dbg( p_access, "title[%d] start=%d", i, p_sys->p_toc->p_sectors[i].i_lba );
+        msg_Dbg( p_access, "title[%d] end=%d", i, p_sys->p_toc->p_sectors[i+1].i_lba );
     }
 
     /* Map entry points into chapters */
@@ -491,4 +491,3 @@ static int EntryPoints( stream_t *p_access )
 
     return VLC_SUCCESS;
 }
-
