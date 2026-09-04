@@ -751,28 +751,26 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
 - (void)reloadDataForMediaLibraryItem:(const id<VLCMediaLibraryItemProtocol>)item
 {
-    [self resetLayoutsForOperation:^{
-        const NSUInteger index = [self indexForMediaLibraryItemWithId:item.libraryID];
-        if (index == NSNotFound) {
-            return;
-        }
+    const NSUInteger index = [self indexForMediaLibraryItemWithId:item.libraryID];
+    if (index == NSNotFound) {
+        return;
+    }
 
-        [self.displayedCollection replaceObjectAtIndex:index withObject:item];
+    [self.displayedCollection replaceObjectAtIndex:index withObject:item];
 
-        NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:index inSection:0];
-        NSIndexSet * const rowIndexSet = [NSIndexSet indexSetWithIndex:index];
+    NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:index inSection:0];
+    NSIndexSet * const rowIndexSet = [NSIndexSet indexSetWithIndex:index];
 
-        const NSRange songsTableColumnRange = NSMakeRange(0, self->_songsTableView.numberOfColumns);
-        NSIndexSet * const songsTableColumnIndexSet = [NSIndexSet indexSetWithIndexesInRange:songsTableColumnRange];
+    const NSRange songsTableColumnRange = NSMakeRange(0, self->_songsTableView.numberOfColumns);
+    NSIndexSet * const songsTableColumnIndexSet = [NSIndexSet indexSetWithIndexesInRange:songsTableColumnRange];
 
-        [self.collectionView reloadItemsAtIndexPaths:[NSSet setWithObject:indexPath]];
-        [self.songsTableView reloadDataForRowIndexes:rowIndexSet columnIndexes:songsTableColumnIndexSet];
+    [self.collectionView reloadItemsAtIndexPaths:[NSSet setWithObject:indexPath]];
+    [self.songsTableView reloadDataForRowIndexes:rowIndexSet columnIndexes:songsTableColumnIndexSet];
 
-        // Don't update gridModeListSelectionCollectionView, let its VLCLibraryAudioGroupDataSource do it.
-        // Also don't update collectionSelectionTableView, as this will only show artists/genres/albums
+    // Don't update gridModeListSelectionCollectionView, let its VLCLibraryAudioGroupDataSource do it.
+    // Also don't update collectionSelectionTableView, as this will only show artists/genres/albums
 
-        [self.carouselView reloadData];
-    }];
+    [self.carouselView reloadData];
 }
 
 - (void)deleteDataForMediaLibraryItem:(const id<VLCMediaLibraryItemProtocol>)item
