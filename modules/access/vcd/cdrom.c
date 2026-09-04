@@ -981,8 +981,8 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
             p_toc->p_sectors = buf;
             p_toc->p_sectors[p_toc->i_tracks].i_lba = MSF_TO_LBA(i_min, i_sec, i_frame);
             p_toc->p_sectors[p_toc->i_tracks].i_control = track_subcodes;
-            msg_Dbg( p_this, "vcd track %i begins at sector:%i",
-                     p_toc->i_tracks, p_toc->p_sectors[p_toc->i_tracks].i_lba );
+            msg_Dbg( p_this, "vcd track %02u(%i) begins at sector:%i",
+                     track_num, p_toc->i_tracks, p_toc->p_sectors[p_toc->i_tracks].i_lba );
             p_toc->i_tracks++;
             break;
         }
