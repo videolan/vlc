@@ -680,7 +680,7 @@ static NSString *thumbnailHashForString(NSString *string)
         .on_ended = vlcThumbnailerToFilesOnEnded,
     };
 
-    vlc_preparser_req * const requestHandle = vlc_preparser_GenerateThumbnailToFiles(
+    vlc_preparser_req * const requestHandle = vlc_preparser_req_NewThumbnailToFiles(
         thumbnailer,
         inputItem.vlcInputItem,
         &thumbnailerArgument,
@@ -688,12 +688,17 @@ static NSString *thumbnailHashForString(NSString *string)
         1,
         &callbacks,
         (__bridge void *)request);
-    if (requestHandle == NULL) {
-        [self thumbnailRequest:request
-           didFinishWithStatus:VLC_EGENERIC
-                       results:NULL
-                   resultCount:0];
+    if (requestHandle != NULL) {
+        if (vlc_preparser_Submit(thumbnailer, requestHandle) == VLC_SUCCESS) {
+            return;
+        }
+        vlc_preparser_req_Release(requestHandle);
     }
+
+    [self thumbnailRequest:request
+       didFinishWithStatus:VLC_EGENERIC
+                   results:NULL
+               resultCount:0];
 }
 
 - (void)thumbnailRequest:(VLCThumbnailRequest *)request

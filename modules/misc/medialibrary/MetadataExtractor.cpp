@@ -256,14 +256,22 @@ medialibrary::parser::Status MetadataExtractor::run( medialibrary::parser::IItem
             return medialibrary::parser::Status::Fatal;
         }
 
-        vlc_preparser_req *req = vlc_preparser_Push(preparser,
-                                                   inputItem.get(), options,
-                                                   &cbs, &ctx);
+        vlc_preparser_req *req =
+            vlc_preparser_req_NewParse(preparser, inputItem.get(), options,
+                                       &cbs, &ctx);
         if (req == nullptr)
         {
             m_currentCtx = nullptr;
             return medialibrary::parser::Status::Fatal;
         }
+
+        if (vlc_preparser_Submit(preparser, req) != VLC_SUCCESS)
+        {
+            vlc_preparser_req_Release(req);
+            m_currentCtx = nullptr;
+            return medialibrary::parser::Status::Fatal;
+        }
+
         while (ctx.done == false)
             m_cond.wait(m_mutex);
         m_currentCtx = nullptr;

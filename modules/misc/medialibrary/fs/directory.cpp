@@ -173,10 +173,13 @@ SDDirectory::requestMetadataSync(input_item_t *media,
     if (preparser == nullptr) {
         return false;
     }
-    vlc_preparser_req *preparser_req = vlc_preparser_Push(preparser,
-                                                          media, options,
-                                                          &cbs, &req);
+    vlc_preparser_req *preparser_req =
+        vlc_preparser_req_NewParse(preparser, media, options, &cbs, &req);
     if (preparser_req == nullptr) {
+        return false;
+    }
+    if (vlc_preparser_Submit(preparser, preparser_req) != VLC_SUCCESS) {
+        vlc_preparser_req_Release(preparser_req);
         return false;
     }
     while (req.probe == false) {

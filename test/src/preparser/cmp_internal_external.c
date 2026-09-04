@@ -181,8 +181,9 @@ static input_item_t *test_preparser(vlc_object_t *obj, const char *mrl, vlc_tick
     };
 
     int options = VLC_PREPARSER_TYPE_PARSE | VLC_PREPARSER_TYPE_FETCHMETA_LOCAL;
-    req = vlc_preparser_Push(preparser, item, options, &cbs, &ctx);
+    req = vlc_preparser_req_NewParse(preparser, item, options, &cbs, &ctx);
     assert(req != NULL);
+    assert(vlc_preparser_Submit(preparser, req) == VLC_SUCCESS);
     vlc_preparser_req_Release(req);
 
     while (!ctx.done)

@@ -160,10 +160,12 @@ static void on_ended(vlc_preparser_req *thumbnailer_req, int status,
             }
 
             vlc_preparser_req *parser_req =
-                vlc_preparser_Push(context->preparser, thumb,
-                                   VLC_PREPARSER_TYPE_PARSE,
-                                   &parser_cbs, context);
+                vlc_preparser_req_NewParse(context->preparser, thumb,
+                                           VLC_PREPARSER_TYPE_PARSE,
+                                           &parser_cbs, context);
             assert(parser_req != NULL);
+            assert(vlc_preparser_Submit(context->preparser, parser_req)
+                   == VLC_SUCCESS);
             input_item_Release(thumb);
         }
     }
@@ -322,11 +324,11 @@ static int run_test(libvlc_instance_t *vlc, bool external)
     assert(item != NULL);
 
     vlc_preparser_req *req =
-        vlc_preparser_GenerateThumbnailToFiles(preparser, item, &arg,
-                                               entries, test_count,
-                                               &cbs, &context);
-
+        vlc_preparser_req_NewThumbnailToFiles(preparser, item, &arg,
+                                              entries, test_count,
+                                              &cbs, &context);
     assert(req != NULL);
+    assert(vlc_preparser_Submit(preparser, req) == VLC_SUCCESS);
 
     /* Wait for all tests */
     for (size_t i = 0; i < test_count; ++i)
@@ -431,9 +433,10 @@ static int run_alpha_crop_test(libvlc_instance_t *vlc, bool test_align)
     assert(item != NULL);
 
     vlc_preparser_req *req =
-        vlc_preparser_GenerateThumbnailToFiles(preparser, item, &arg, &output, 1,
-                                               &cbs, &ctx);
+        vlc_preparser_req_NewThumbnailToFiles(preparser, item, &arg, &output, 1,
+                                              &cbs, &ctx);
     assert(req != NULL);
+    assert(vlc_preparser_Submit(preparser, req) == VLC_SUCCESS);
     vlc_sem_wait(&ctx.sem);
 
     vlc_preparser_req_Release(req);

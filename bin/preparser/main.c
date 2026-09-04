@@ -157,8 +157,8 @@ static void thumbnailer_to_files_OnEnded(struct vlc_preparser_req *req,
  *****************************************************************************/
 
 static struct vlc_preparser_req *
-preparser_req_PreparsePush(vlc_preparser_t *preparser,
-                          struct preparser *pp)
+preparser_req_BuildParse(vlc_preparser_t *preparser,
+                         struct preparser *pp)
 {
     assert(pp->req_msg.req_type == VLC_PREPARSER_MSG_REQ_TYPE_PARSE);
 
@@ -168,13 +168,13 @@ preparser_req_PreparsePush(vlc_preparser_t *preparser,
         .on_subtree_added = parse_OnSubtreeAdded,
     };
 
-    return vlc_preparser_Push(preparser, pp->res_msg.res.item,
-                              pp->req_msg.req.options, &cbs, pp);
+    return vlc_preparser_req_NewParse(preparser, pp->res_msg.res.item,
+                                      pp->req_msg.req.options, &cbs, pp);
 }
 
 static struct vlc_preparser_req *
-preparser_req_PreparseThumbnail(vlc_preparser_t *preparser,
-                               struct preparser *pp)
+preparser_req_BuildThumbnail(vlc_preparser_t *preparser,
+                             struct preparser *pp)
 {
     assert(pp->req_msg.req_type == VLC_PREPARSER_MSG_REQ_TYPE_THUMBNAIL);
 
@@ -182,14 +182,13 @@ preparser_req_PreparseThumbnail(vlc_preparser_t *preparser,
         .on_ended = thumbnailer_OnEnded,
     };
 
-    return vlc_preparser_GenerateThumbnail(preparser, pp->res_msg.res.item,
-                                           &pp->req_msg.req.arg,
-                                           &cbs, pp);
+    return vlc_preparser_req_NewThumbnail(preparser, pp->res_msg.res.item,
+                                          &pp->req_msg.req.arg, &cbs, pp);
 }
 
 static struct vlc_preparser_req *
-preparser_req_PreparseThumbnailToFiles(vlc_preparser_t *preparser,
-                                       struct preparser *pp)
+preparser_req_BuildThumbnailToFiles(vlc_preparser_t *preparser,
+                                    struct preparser *pp)
 {
     assert(pp->req_msg.req_type == VLC_PREPARSER_MSG_REQ_TYPE_THUMBNAIL_TO_FILES);
 
@@ -197,12 +196,12 @@ preparser_req_PreparseThumbnailToFiles(vlc_preparser_t *preparser,
         .on_ended = thumbnailer_to_files_OnEnded,
     };
 
-    return vlc_preparser_GenerateThumbnailToFiles(preparser,
-                                                  pp->res_msg.res.item,
-                                                  &pp->req_msg.req.arg,
-                                                  pp->req_msg.req.outputs.data,
-                                                  pp->req_msg.req.outputs.size,
-                                                  &cbs, pp);
+    return vlc_preparser_req_NewThumbnailToFiles(preparser,
+                                                 pp->res_msg.res.item,
+                                                 &pp->req_msg.req.arg,
+                                                 pp->req_msg.req.outputs.data,
+                                                 pp->req_msg.req.outputs.size,
+                                                 &cbs, pp);
 }
 
 static int
@@ -224,16 +223,21 @@ preparser_req_Preparse(vlc_preparser_t *preparser, struct preparser *pp)
     struct vlc_preparser_req *req = NULL;
     switch (pp->req_msg.req_type) {
         case VLC_PREPARSER_MSG_REQ_TYPE_PARSE:
-            req = preparser_req_PreparsePush(preparser, pp);
+            req = preparser_req_BuildParse(preparser, pp);
             break;
         case VLC_PREPARSER_MSG_REQ_TYPE_THUMBNAIL:
-            req = preparser_req_PreparseThumbnail(preparser, pp);
+            req = preparser_req_BuildThumbnail(preparser, pp);
             break;
         case VLC_PREPARSER_MSG_REQ_TYPE_THUMBNAIL_TO_FILES:
-            req = preparser_req_PreparseThumbnailToFiles(preparser, pp);
+            req = preparser_req_BuildThumbnailToFiles(preparser, pp);
             break;
         default:
             goto end;
+    }
+
+    if (req != NULL && vlc_preparser_Submit(preparser, req) != VLC_SUCCESS) {
+        vlc_preparser_req_Release(req);
+        req = NULL;
     }
 
     if (req == NULL) {

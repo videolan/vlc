@@ -1111,7 +1111,6 @@ static void on_preparse_ended_callback(vlc_preparser_req *req,
     input_item_t *p_item = vlc_preparser_req_GetItem(req);
     PlayerControllerPrivate *me = reinterpret_cast<PlayerControllerPrivate *>(userdata);
     me->onArtFetchEnded(p_item, input_item_IsArtFetched(p_item));
-    vlc_preparser_req_Release(req);
 }
 
 
@@ -2133,8 +2132,17 @@ void PlayerController::requestArtUpdate( input_item_t *p_item )
             VLC_PREPARSER_TYPE_FETCHMETA_ALL :
             VLC_PREPARSER_TYPE_FETCHMETA_LOCAL;
 
-    vlc_preparser_Push( d->m_preparser, p_item, fetch_options,
-                        &art_fetcher_cbs, d  );
+    vlc_preparser_req *req =
+        vlc_preparser_req_NewParse( d->m_preparser, p_item, fetch_options,
+                                    &art_fetcher_cbs, d );
+    if (unlikely(req == nullptr))
+        return;
+
+    /* This request is never cancelled from here, so submit it and drop the
+       handle straight away: on success the running task owns it, on failure
+       this release is the one that frees it. */
+    vlc_preparser_Submit( d->m_preparser, req );
+    vlc_preparser_req_Release( req );
 }
 
 void PlayerControllerPrivate::onArtFetchEnded(input_item_t *p_item, bool)

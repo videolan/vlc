@@ -234,21 +234,21 @@ static void test_media_tracks(libvlc_instance_t *vlc)
 static void input_item_preparse_timeout( vlc_preparser_req *req,
                                          int status, void *user_data )
 {
+    (void)req;
     vlc_sem_t *p_sem = user_data;
 
     assert( status == VLC_ETIMEOUT );
     vlc_sem_post(p_sem);
-    vlc_preparser_req_Release(req);
 }
 
 static void input_item_preparse_cancel( vlc_preparser_req *req,
                                         int status, void *user_data )
 {
+    (void)req;
     vlc_sem_t *p_sem = user_data;
 
     assert( status == -EINTR );
     vlc_sem_post(p_sem);
-    vlc_preparser_req_Release(req);
 }
 
 static void test_input_metadata_timeout(libvlc_instance_t *vlc, int timeout,
@@ -285,8 +285,10 @@ static void test_input_metadata_timeout(libvlc_instance_t *vlc, int timeout,
     vlc_preparser_t *parser = vlc_preparser_New(VLC_OBJECT(vlc->p_libvlc_int),
                                                 &cfg);
     assert(parser != NULL);
-    vlc_preparser_req *req = vlc_preparser_Push(parser, p_item, options, &cbs, &sem);
+    vlc_preparser_req *req =
+        vlc_preparser_req_NewParse(parser, p_item, options, &cbs, &sem);
     assert(req != NULL);
+    assert(vlc_preparser_Submit(parser, req) == VLC_SUCCESS);
 
     if (wait_and_cancel > 0)
     {
@@ -295,6 +297,8 @@ static void test_input_metadata_timeout(libvlc_instance_t *vlc, int timeout,
         assert(count == 1);
     }
     vlc_sem_wait(&sem);
+
+    vlc_preparser_req_Release(req);
 
     input_item_Release(p_item);
     vlc_preparser_Delete(parser);
@@ -541,7 +545,7 @@ int main(int i_argc, char *ppsz_argv[])
     test_media_subitems (vlc);
     test_media_tracks (vlc);
 
-    /* Testing vlc_preparser_Push timeout and vlc_preparser_Cancel. For
+    /* Testing vlc_preparser_Submit timeout and vlc_preparser_Cancel. For
      * that, we need to create a local input_item_t based on a pipe. There is
      * no way to do that with a libvlc_media_t, that's why we don't use
      * libvlc_media_parse*() */
