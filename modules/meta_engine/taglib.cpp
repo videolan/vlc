@@ -227,6 +227,12 @@ public:
     ByteVector readBlock(ulong length)
 #endif
     {
+        if (length > std::numeric_limits<unsigned int>::max())
+            // ByteVector can't hold more data than unsigned int size
+            // we can read less and provide what we got
+            // we can't return nothing in case it considers it's EOF, so read 16 KB
+            length = 1 << 14;
+
         if(m_borked || m_seqReadLength >= m_seqReadLimit)
             return {};
         ByteVector res(length, 0);
