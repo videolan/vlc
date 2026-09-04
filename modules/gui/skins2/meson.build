@@ -109,7 +109,7 @@ skins2_sources = files(
 )
 
 
-if host_system == 'windows'
+if host_system == 'windows' and skins2_allowed
 skins2_flags += [ '-DWIN32_SKINS' ]
 skins2_deps += [
     cc.find_library('gdi32'),
