@@ -373,23 +373,6 @@ preparser_task_New(input_item_t *item,
 }
 
 /**
- * Delete a task and its message.
- */
-static void
-preparser_task_Delete(struct preparser_task *task)
-{
-    assert(task != NULL);
-    assert(task->item != NULL);
-
-    vlc_interrupt_destroy(task->interrupt);
-    vlc_preparser_msg_Clean(&task->req_msg);
-    vlc_preparser_msg_Clean(&task->res_msg);
-    input_item_Release(task->item);
-
-    free(task);
-}
-
-/**
  * Init a task for a Push request.
  */
 static void
