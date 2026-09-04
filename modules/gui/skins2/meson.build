@@ -4,7 +4,7 @@ skins2_option = get_option('skins2') \
 
 skins2_allowed = skins2_option.allowed()
 skins2_enabled = skins2_option.enabled()
-skins2_feasible = true
+skins2_feasible = skins2_allowed
 
 skins2_flags = []
 skins2_deps = [ freetype_dep, m_lib ]
