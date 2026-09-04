@@ -788,7 +788,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                      vlc_stream_GetSize( p_demux->s, &u64 ) == VLC_SUCCESS )
             {
                 *va_arg( args, vlc_tick_t * ) =
-                    vlc_tick_from_samples( u64 - p_sys->i_start_byte / 50, p_sys->i_mux_rate );
+                        vlc_tick_from_samples( u64 - p_sys->i_start_byte, p_sys->i_mux_rate * 50 );
                 return VLC_SUCCESS;
             }
             *va_arg( args, vlc_tick_t * ) = 0;
