@@ -155,6 +155,11 @@ typedef struct entries_sect_s
 vcddev_t *ioctl_Open         ( vlc_object_t *, const char * );
 void      ioctl_Close        ( vlc_object_t *, vcddev_t * );
 vcddev_toc_t * ioctl_GetTOC  ( vlc_object_t *, const vcddev_t * );
+
+/* Returns:
+ *    0  success
+ *   -1  recoverable failure, or at least not known not to be (ex: a scratch)
+ *   -2  irrecoverable failure (ex: disc ejected, device unplugged) */
 int       ioctl_ReadSectors  ( vlc_object_t *, const vcddev_t *,
                                int, uint8_t *, int, int );
 

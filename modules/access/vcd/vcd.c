@@ -369,11 +369,19 @@ static block_t *Block( stream_t *p_access, bool *restrict eof )
         return NULL;
     }
 
-    if( ioctl_ReadSectors( VLC_OBJECT(p_access), p_sys->vcddev,
-            p_sys->i_sector, p_block->p_buffer, i_blocks, VCD_TYPE ) < 0 )
+    int i_ret = ioctl_ReadSectors( VLC_OBJECT(p_access), p_sys->vcddev,
+                                   p_sys->i_sector, p_block->p_buffer, i_blocks, VCD_TYPE );
+    if( i_ret < 0 )
     {
         msg_Err( p_access, "cannot read sector %i", p_sys->i_sector );
         block_Release( p_block );
+
+        /* Nothing left to read: the disc is gone, or the drive is. */
+        if( i_ret == -2 )
+        {
+            *eof = true;
+            return NULL;
+        }
 
         /* Try to skip one sector (in case of bad sectors) */
         p_sys->offset += VCD_DATA_SIZE;

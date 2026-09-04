@@ -165,12 +165,17 @@ static int Demux(demux_t *demux)
     if (unlikely(block == NULL))
         return VLC_DEMUXER_EOF;
 
-    if (ioctl_ReadSectors(VLC_OBJECT(demux), sys->vcddev,
-                          sys->start + sys->position,
-                          block->p_buffer, count, CDDA_TYPE) < 0)
+    int ret = ioctl_ReadSectors(VLC_OBJECT(demux), sys->vcddev,
+                                sys->start + sys->position,
+                                block->p_buffer, count, CDDA_TYPE);
+    if (ret < 0)
     {
         msg_Err(demux, "cannot read sector %u", sys->position);
         block_Release(block);
+
+        /* Nothing left to read: the disc is gone, or the drive is. */
+        if (ret == -2)
+            return VLC_DEMUXER_EGENERIC;
 
         /* Skip potentially bad sector */
         sys->position++;

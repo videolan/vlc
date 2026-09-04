@@ -41,6 +41,7 @@
 #   define INCL_DOSDEVIOCTL
 #endif
 
+#include <errno.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/stat.h>
@@ -658,6 +659,7 @@ int ioctl_ReadSectors( vlc_object_t *p_this, const vcddev_t *p_vcddev,
 
         if( ioctl( p_vcddev->i_device_handle, DKIOCCDREAD, &cd_read ) == -1 )
         {
+            /* TODO return -2 in case of unrecoverable read failure. */
             msg_Err( p_this, "could not read block %d", i_sector );
             goto error;
         }
@@ -676,18 +678,40 @@ int ioctl_ReadSectors( vlc_object_t *p_this, const vcddev_t *p_vcddev,
                              VCD_SECTOR_SIZE * i_nb, &dwBytesReturned,
                              NULL ) == 0 )
         {
+            DWORD dwError = GetLastError();
+            bool b_read = false;
+
             if( i_type == VCD_TYPE )
             {
                 /* Retry in YellowMode2 */
                 cdrom_raw.TrackMode = YellowMode2;
-                if( DeviceIoControl( p_vcddev->h_device_handle,
-                                     IOCTL_CDROM_RAW_READ, &cdrom_raw,
-                                     sizeof(RAW_READ_INFO), p_block,
-                                     VCD_SECTOR_SIZE * i_nb, &dwBytesReturned,
-                                     NULL ) == 0 )
-                    goto error;
+                b_read = DeviceIoControl( p_vcddev->h_device_handle,
+                                          IOCTL_CDROM_RAW_READ, &cdrom_raw,
+                                          sizeof(RAW_READ_INFO), p_block,
+                                          VCD_SECTOR_SIZE * i_nb,
+                                          &dwBytesReturned, NULL ) != 0;
+                if( !b_read )
+                    dwError = GetLastError();
             }
-            else return -1;
+
+            if( !b_read )
+            {
+                if( dwError == ERROR_NOT_READY ||
+                    dwError == ERROR_MEDIA_CHANGED ||
+                    dwError == ERROR_NO_MEDIA_IN_DRIVE ||
+                    dwError == ERROR_DEV_NOT_EXIST ||
+                    dwError == ERROR_DEVICE_NOT_CONNECTED ||
+                    dwError == ERROR_DEVICE_REMOVED )
+                {
+                    msg_Err( p_this, "cannot read block %d: no disc",
+                             i_sector );
+                    goto unrecoverable;
+                }
+
+                msg_Err( p_this, "could not read block %d from disc "
+                         "(error %lu)", i_sector, dwError );
+                goto error;
+            }
         }
 
 #elif defined( __OS2__ )
@@ -706,6 +730,7 @@ int ioctl_ReadSectors( vlc_object_t *p_this, const vcddev_t *p_vcddev,
                           p_block, VCD_SECTOR_SIZE * i_nb, &data_len );
         if( rc )
         {
+            /* TODO return -2 in case of unrecoverable read failure. */
             msg_Err( p_this, "could not read block %d", i_sector );
             goto error;
         }
@@ -742,6 +767,7 @@ int ioctl_ReadSectors( vlc_object_t *p_this, const vcddev_t *p_vcddev,
         }
         if( sc.retsts || sc.error )
         {
+            /* TODO return -2 in case of unrecoverable read failure. */
             msg_Err( p_this, "SCSI command failed: status %d error %d",
                              sc.retsts, sc.error );
             goto error;
@@ -767,6 +793,7 @@ int ioctl_ReadSectors( vlc_object_t *p_this, const vcddev_t *p_vcddev,
         ssize_t toread = VCD_SECTOR_SIZE * i_nb;
         if( read( p_vcddev->i_device_handle, p_block, toread ) != toread )
         {
+            /* TODO return -2 in case of unrecoverable read failure. */
             msg_Err( p_this, "Could not read sector %d", i_sector );
             goto error;
         }
@@ -785,6 +812,21 @@ int ioctl_ReadSectors( vlc_object_t *p_this, const vcddev_t *p_vcddev,
             if( ioctl( p_vcddev->i_device_handle, CDROMREADRAW,
                        p_block + i * VCD_SECTOR_SIZE ) == -1 )
             {
+                /* ENOMEDIUM is Linux's, and this arm is the last #else of the
+                 * platform chain, so it may be compiled where that spelling
+                 * does not exist. ENODEV and ENXIO are POSIX and need no
+                 * guard. */
+                if( errno == ENODEV || errno == ENXIO
+#ifdef ENOMEDIUM
+                    || errno == ENOMEDIUM
+#endif
+                )
+                    {
+                        msg_Err( p_this, "cannot read block %i: no disc",
+                                 i_sector );
+                        goto unrecoverable;
+                    }
+
                 msg_Err( p_this, "could not read block %i from disc",
                          i_sector );
 
@@ -816,6 +858,11 @@ error:
     if( i_type == VCD_TYPE )
         free( p_block );
     return( -1 );
+
+unrecoverable:
+    if( i_type == VCD_TYPE )
+        free( p_block );
+    return( -2 );
 }
 
 /****************************************************************************
