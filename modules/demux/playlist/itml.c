@@ -232,7 +232,7 @@ static bool parse_dict( stream_t *p_demux, input_item_node_t *p_input_node,
             if( !strcmp( p_handler->name, "key" ) )
             {
                 free( psz_key );
-                psz_key = strdup( psz_value );
+                psz_key = psz_value ? strdup( psz_value ) : NULL;
             }
             /* call the simple handler */
             else if( p_handler->pf_handler.smpl )
