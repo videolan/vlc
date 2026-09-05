@@ -1518,11 +1518,13 @@ $(libqt_plugin_la_SHADER_FRAG:.frag=.frag.qsb):
 $(libqt_plugin_la_SHADER_VERT:.vert=.vert.qsb):
 	$(qsb_verbose)PATH="$(QSB_EXTRA_PATH)$$PATH" $(QSB) $(QSB_PARAMS) $(QSB_PARAMS_VERBOSE) -o $@ $(srcdir)/$(@:.qsb=)
 
-shaders/shaders.cpp: $(srcdir)/shaders/shaders.qrc $(libqt_plugin_la_SHADER_FRAG:.frag=.frag.qsb) $(libqt_plugin_la_SHADER_VERT:.vert=.vert.qsb)
-	$(AM_V_GEN) cp -f $< $(builddir)/shaders/shaders.qrc || true
-	$(AM_V_GEN) $(RCC) $(RCC_EXTRA_PARAMS) --name shaders -o $@ $(builddir)/shaders/shaders.qrc
+shaders/shaders.qrc: $(libqt_plugin_la_SHADER) Makefile
+	$(AM_V_GEN)$(PYTHON3) $(srcdir)/scripts/genqrc.py -o $@ --prefix shaders --sources $(libqt_plugin_la_SHADER_FRAG:.frag=.frag.qsb) $(libqt_plugin_la_SHADER_VERT:.vert=.vert.qsb)
 
-libqt_plugin_la_SOURCES += shaders/shaders.qrc $(libqt_plugin_la_SHADER)
+shaders/shaders.cpp: shaders/shaders.qrc $(libqt_plugin_la_SHADER_FRAG:.frag=.frag.qsb) $(libqt_plugin_la_SHADER_VERT:.vert=.vert.qsb)
+	$(AM_V_GEN) $(RCC) $(RCC_EXTRA_PARAMS) --name shaders -o $@ $<
+
+libqt_plugin_la_SOURCES += $(libqt_plugin_la_SHADER)
 CLEANFILES += shaders/shaders.qrc
 
 lib_qt_plugin_la_QRC = assets.qrc

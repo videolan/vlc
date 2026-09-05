@@ -1,7 +1,5 @@
 # Shader compilation and resource generation
 
-qt6 = import('qt6')
-
 env = environment()
 # For qsb to locate spirv-opt:
 env.append('PATH', contrib_dir + '/bin')
@@ -41,8 +39,10 @@ elif host_system == 'darwin'
 endif
 
 shader_targets = []
+shader_qsb = []
 foreach shader: shader_sources
     shader_target_name = shader + '.qsb'
+    shader_qsb += shader_target_name
 
     target = custom_target(shader_target_name,
       depend_files: ['Common.glsl'],
@@ -53,7 +53,16 @@ foreach shader: shader_sources
     shader_targets += [target]
 endforeach
 
-build_shaders = configure_file(input: 'shaders.qrc', output: 'shaders.qrc', copy: true)
+build_shaders = configure_file(
+    output: 'shaders.qrc',
+    command: [
+        find_program('python3'),
+        meson.current_source_dir() / '..' / 'scripts' / 'genqrc.py',
+        '-o', '@OUTPUT@',
+        '--prefix', 'shaders',
+        '--sources', shader_qsb,
+    ],
+)
 
 shaders_processed = qt6.preprocess(
         qresources: build_shaders,
