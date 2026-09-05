@@ -1006,7 +1006,7 @@ static text_segment_t * CEA708RowToSegments( const cea708_text_row_t *p_row,
         {
             *pp_last = CEA708CharsToSegment( p_row, i_start, i,
                                              b_addnewline && (i == p_row->lastcol) );
-            if( *pp_last )
+            while( *pp_last )
                 pp_last  = &((*pp_last)->p_next);
             i_start = i+1;
         }
@@ -1051,7 +1051,7 @@ static void CEA708SpuConvert( const cea708_window_t *p_w,
             continue;
 
         *pp_last = CEA708RowToSegments( p_w->rows[i], i < p_w->i_lastrow );
-        if( *pp_last )
+        while( *pp_last )
             pp_last  = &((*pp_last)->p_next);
     }
 
