@@ -13,14 +13,47 @@
 
 #import "VLCLibraryDataTypesTestSupport.h"
 
+#import "library/VLCInputItem.h"
+
+NSString * const VLCLibraryDataTypesTestInputItemNameKey = @"name";
+NSString * const VLCLibraryDataTypesTestInputItemTitleKey = @"title";
+NSString * const VLCLibraryDataTypesTestInputItemArtistKey = @"artist";
+NSString * const VLCLibraryDataTypesTestInputItemAlbumKey = @"album";
+NSString * const VLCLibraryDataTypesTestInputItemTrackNumberKey = @"trackNumber";
+NSString * const VLCLibraryDataTypesTestInputItemGenreKey = @"genre";
+NSString * const VLCLibraryDataTypesTestInputItemCopyrightKey = @"copyright";
+NSString * const VLCLibraryDataTypesTestInputItemPublisherKey = @"publisher";
+NSString * const VLCLibraryDataTypesTestInputItemLanguageKey = @"language";
+NSString * const VLCLibraryDataTypesTestInputItemDateKey = @"date";
+NSString * const VLCLibraryDataTypesTestInputItemDescriptionKey = @"contentDescription";
+NSString * const VLCLibraryDataTypesTestInputItemDirectorKey = @"director";
+NSString * const VLCLibraryDataTypesTestInputItemShowNameKey = @"showName";
+NSString * const VLCLibraryDataTypesTestInputItemActorsKey = @"actors";
+NSString * const VLCLibraryDataTypesTestInputItemArtworkURLKey = @"artworkURL";
+
 @interface VLCMediaLibraryMediaItem (VLCLibraryDataTypesTestPrivate)
 - (instancetype)initWithMediaItem:(struct vlc_ml_media_t *)mediaItem
                           library:(vlc_medialibrary_t *)mediaLibrary;
 @end
 
-static VLCMediaLibraryMediaItem *VLCLibraryDataTypesTestMediaItemWithTypeAndSubtypeAndTitle(vlc_ml_media_type_t type,
-                                                                                              vlc_ml_media_subtype_t subtype,
-                                                                                              const char *title);
+static VLCMediaLibraryMediaItem *VLCLibraryDataTypesTestMediaItemWithTypeAndSubtypeAndTitle(
+    vlc_ml_media_type_t type,
+    vlc_ml_media_subtype_t subtype,
+    const char *title,
+    VLCInputItem * _Nullable inputItem);
+
+@interface VLCLibraryDataTypesTestMediaItem : VLCMediaLibraryMediaItem
+@property (nonatomic, strong) VLCInputItem *testInputItem;
+@end
+
+@implementation VLCLibraryDataTypesTestMediaItem
+
+- (VLCInputItem *)inputItem
+{
+    return self.testInputItem;
+}
+
+@end
 
 VLCMediaLibraryMediaItem *VLCLibraryDataTypesTestMediaItemWithSubtype(vlc_ml_media_subtype_t subtype)
 {
@@ -31,18 +64,24 @@ VLCMediaLibraryMediaItem *VLCLibraryDataTypesTestMediaItemWithEmptyTitle(vlc_ml_
 {
     return VLCLibraryDataTypesTestMediaItemWithTypeAndSubtypeAndTitle(VLC_ML_MEDIA_TYPE_VIDEO,
                                                                        subtype,
-                                                                       "");
+                                                                       "",
+                                                                       nil);
 }
 
 VLCMediaLibraryMediaItem *VLCLibraryDataTypesTestMediaItemWithTypeAndSubtype(vlc_ml_media_type_t type,
                                                                              vlc_ml_media_subtype_t subtype)
 {
-    return VLCLibraryDataTypesTestMediaItemWithTypeAndSubtypeAndTitle(type, subtype, "Media");
+    return VLCLibraryDataTypesTestMediaItemWithTypeAndSubtypeAndTitle(type,
+                                                                       subtype,
+                                                                       "Media",
+                                                                       nil);
 }
 
-static VLCMediaLibraryMediaItem *VLCLibraryDataTypesTestMediaItemWithTypeAndSubtypeAndTitle(vlc_ml_media_type_t type,
-                                                                                              vlc_ml_media_subtype_t subtype,
-                                                                                              const char *title)
+static VLCMediaLibraryMediaItem *VLCLibraryDataTypesTestMediaItemWithTypeAndSubtypeAndTitle(
+    vlc_ml_media_type_t type,
+    vlc_ml_media_subtype_t subtype,
+    const char *title,
+    VLCInputItem * _Nullable inputItem)
 {
     struct TestFileList {
         size_t i_nb_items;
@@ -97,6 +136,64 @@ static VLCMediaLibraryMediaItem *VLCLibraryDataTypesTestMediaItemWithTypeAndSubt
         media.album_track.i_disc_nb = 1;
     }
 
-    return [[VLCMediaLibraryMediaItem alloc]
-        initWithMediaItem:&media library:(vlc_medialibrary_t *)0x1];
+    if (inputItem == nil) {
+        return [[VLCMediaLibraryMediaItem alloc]
+            initWithMediaItem:&media library:(vlc_medialibrary_t *)0x1];
+    }
+
+    VLCLibraryDataTypesTestMediaItem * const item =
+        [[VLCLibraryDataTypesTestMediaItem alloc]
+            initWithMediaItem:&media
+                      library:(vlc_medialibrary_t *)0x1];
+    item.testInputItem = inputItem;
+    return item;
+}
+
+VLCMediaLibraryMediaItem *VLCLibraryDataTypesTestMediaItemWithInputMetadata(
+    vlc_ml_media_subtype_t subtype,
+    NSDictionary<NSString *, id> * _Nullable metadata)
+{
+    NSDictionary<NSString *, id> * const defaultMetadata = @{
+        VLCLibraryDataTypesTestInputItemNameKey: @"Detail test item",
+        VLCLibraryDataTypesTestInputItemTitleKey: @"Detail test item",
+        VLCLibraryDataTypesTestInputItemArtistKey: @"Detail Artist",
+        VLCLibraryDataTypesTestInputItemAlbumKey: @"Detail Album",
+        VLCLibraryDataTypesTestInputItemTrackNumberKey: @"1",
+        VLCLibraryDataTypesTestInputItemGenreKey: @"Detail Genre",
+        VLCLibraryDataTypesTestInputItemCopyrightKey: @"Detail Copyright",
+        VLCLibraryDataTypesTestInputItemPublisherKey: @"Detail Publisher",
+        VLCLibraryDataTypesTestInputItemLanguageKey: @"en",
+        VLCLibraryDataTypesTestInputItemDescriptionKey: @"Detail Description",
+        VLCLibraryDataTypesTestInputItemActorsKey: @"Detail Actor",
+        VLCLibraryDataTypesTestInputItemArtworkURLKey: [NSURL fileURLWithPath:@"/tmp/detail-test.jpg"],
+    };
+    NSMutableDictionary<NSString *, id> * const resolvedMetadata =
+        [defaultMetadata mutableCopy];
+    [resolvedMetadata addEntriesFromDictionary:metadata ?: @{}];
+
+    VLCInputItem * const inputItem =
+        [VLCInputItem inputItemFromURL:[NSURL URLWithString:@"file:///tmp/detail-test.mp4"]];
+    inputItem.name = resolvedMetadata[VLCLibraryDataTypesTestInputItemNameKey];
+    inputItem.title = resolvedMetadata[VLCLibraryDataTypesTestInputItemTitleKey];
+    inputItem.artist = resolvedMetadata[VLCLibraryDataTypesTestInputItemArtistKey];
+    inputItem.album = resolvedMetadata[VLCLibraryDataTypesTestInputItemAlbumKey];
+    inputItem.trackNumber = resolvedMetadata[VLCLibraryDataTypesTestInputItemTrackNumberKey];
+    inputItem.genre = resolvedMetadata[VLCLibraryDataTypesTestInputItemGenreKey];
+    inputItem.copyright = resolvedMetadata[VLCLibraryDataTypesTestInputItemCopyrightKey];
+    inputItem.publisher = resolvedMetadata[VLCLibraryDataTypesTestInputItemPublisherKey];
+    inputItem.language = resolvedMetadata[VLCLibraryDataTypesTestInputItemLanguageKey];
+    inputItem.date = resolvedMetadata[VLCLibraryDataTypesTestInputItemDateKey];
+    inputItem.contentDescription = resolvedMetadata[VLCLibraryDataTypesTestInputItemDescriptionKey];
+    inputItem.director = resolvedMetadata[VLCLibraryDataTypesTestInputItemDirectorKey];
+    inputItem.showName = resolvedMetadata[VLCLibraryDataTypesTestInputItemShowNameKey];
+    inputItem.actors = resolvedMetadata[VLCLibraryDataTypesTestInputItemActorsKey];
+    inputItem.artworkURL = resolvedMetadata[VLCLibraryDataTypesTestInputItemArtworkURLKey];
+
+    const vlc_ml_media_type_t type = subtype == VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK
+        ? VLC_ML_MEDIA_TYPE_AUDIO
+        : VLC_ML_MEDIA_TYPE_VIDEO;
+    return VLCLibraryDataTypesTestMediaItemWithTypeAndSubtypeAndTitle(type,
+                                                                       subtype,
+                                                                       "Detail test item",
+                                                                       inputItem);
 }

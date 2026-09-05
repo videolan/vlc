@@ -20,6 +20,7 @@ const char vlc_module_name[] = "VLCMacOSXTests";
 
 static NSImage *sQuickLookImage;
 static NSImage *sWorkspaceImage;
+static NSString *sArtistName;
 static BOOL sDidReveal;
 static BOOL sDidReload;
 static intf_thread_t *sInterfaceThread;
@@ -83,7 +84,7 @@ static intf_thread_t *sInterfaceThread;
 
 - (NSString *)artistNameForID:(int64_t __unused)artistID
 {
-    return nil;
+    return sArtistName;
 }
 
 @end
@@ -103,6 +104,11 @@ void VLCInputItemTestSetWorkspaceImage(NSImage *image)
     sWorkspaceImage = image;
 }
 
+void VLCInputItemTestSetArtistName(NSString *artistName)
+{
+    sArtistName = [artistName copy];
+}
+
 void VLCInputItemTestSetInterface(intf_thread_t *interfaceThread)
 {
     sInterfaceThread = interfaceThread;
@@ -112,6 +118,7 @@ void VLCInputItemTestResetAppKitState(void)
 {
     sQuickLookImage = nil;
     sWorkspaceImage = nil;
+    sArtistName = nil;
     sDidReveal = NO;
     sDidReload = NO;
     sInterfaceThread = NULL;

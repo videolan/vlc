@@ -20,3 +20,23 @@ VLCMediaLibraryMediaItem * _Nonnull VLCLibraryDataTypesTestMediaItemWithEmptyTit
 VLCMediaLibraryMediaItem * _Nonnull VLCLibraryDataTypesTestMediaItemWithTypeAndSubtype(
     vlc_ml_media_type_t type,
     vlc_ml_media_subtype_t subtype);
+
+FOUNDATION_EXPORT NSString * _Nonnull const VLCLibraryDataTypesTestInputItemNameKey;
+FOUNDATION_EXPORT NSString * _Nonnull const VLCLibraryDataTypesTestInputItemTitleKey;
+FOUNDATION_EXPORT NSString * _Nonnull const VLCLibraryDataTypesTestInputItemArtistKey;
+FOUNDATION_EXPORT NSString * _Nonnull const VLCLibraryDataTypesTestInputItemAlbumKey;
+FOUNDATION_EXPORT NSString * _Nonnull const VLCLibraryDataTypesTestInputItemTrackNumberKey;
+FOUNDATION_EXPORT NSString * _Nonnull const VLCLibraryDataTypesTestInputItemGenreKey;
+FOUNDATION_EXPORT NSString * _Nonnull const VLCLibraryDataTypesTestInputItemCopyrightKey;
+FOUNDATION_EXPORT NSString * _Nonnull const VLCLibraryDataTypesTestInputItemPublisherKey;
+FOUNDATION_EXPORT NSString * _Nonnull const VLCLibraryDataTypesTestInputItemLanguageKey;
+FOUNDATION_EXPORT NSString * _Nonnull const VLCLibraryDataTypesTestInputItemDateKey;
+FOUNDATION_EXPORT NSString * _Nonnull const VLCLibraryDataTypesTestInputItemDescriptionKey;
+FOUNDATION_EXPORT NSString * _Nonnull const VLCLibraryDataTypesTestInputItemDirectorKey;
+FOUNDATION_EXPORT NSString * _Nonnull const VLCLibraryDataTypesTestInputItemShowNameKey;
+FOUNDATION_EXPORT NSString * _Nonnull const VLCLibraryDataTypesTestInputItemActorsKey;
+FOUNDATION_EXPORT NSString * _Nonnull const VLCLibraryDataTypesTestInputItemArtworkURLKey;
+
+VLCMediaLibraryMediaItem * _Nonnull VLCLibraryDataTypesTestMediaItemWithInputMetadata(
+    vlc_ml_media_subtype_t subtype,
+    NSDictionary<NSString *, id> * _Nullable metadata);
