@@ -789,6 +789,17 @@
     XCTAssertNil(emptyMovie.displayString);
 }
 
+- (void)testMovieDisplayStringUsesTitle
+{
+    struct vlc_ml_media_t movieData = { 0 };
+    movieData.psz_title = (char *)"Movie title";
+
+    VLCMediaLibraryMovie * const movie =
+        [[VLCMediaLibraryMovie alloc] initWithMediaItem:&movieData];
+
+    XCTAssertEqualObjects(movie.displayString, @"Movie title");
+}
+
 - (void)testShowEmptyDefaults
 {
     struct vlc_ml_show_t emptyShowData = { 0 };
