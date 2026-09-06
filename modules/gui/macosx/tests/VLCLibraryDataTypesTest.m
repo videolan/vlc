@@ -909,6 +909,26 @@
     XCTAssertNil([[VLCMediaLibraryMediaItem alloc] initWithCoder:nil]);
 }
 
+- (void)testMediaItemsFromPasteboardDataRejectsMalformedData
+{
+    NSData * const malformedData = [@"not a keyed archive"
+        dataUsingEncoding:NSUTF8StringEncoding];
+
+    XCTAssertNil([VLCMediaLibraryMediaItem mediaItemsFromPasteboardData:malformedData]);
+}
+
+- (void)testMediaItemsFromPasteboardDataRejectsUnexpectedArchiveRoot
+{
+    NSError *archiveError = nil;
+    NSData * const data = [NSKeyedArchiver archivedDataWithRootObject:@{
+        @"unexpected": @"root"
+    } requiringSecureCoding:NO error:&archiveError];
+
+    XCTAssertNil(archiveError);
+    XCTAssertNotNil(data);
+    XCTAssertNil([VLCMediaLibraryMediaItem mediaItemsFromPasteboardData:data]);
+}
+
 - (void)testMovieEmptyDefaults
 {
     VLCMediaLibraryMovie * const emptyMovie =

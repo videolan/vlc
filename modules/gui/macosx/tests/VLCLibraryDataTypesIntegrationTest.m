@@ -126,6 +126,26 @@
     XCTAssertEqual(item.libraryID, VLCLibraryDataTypesIntegrationMediaID());
 }
 
+- (void)testMediaItemsFromPasteboardDataRoundTripsPersistedItem
+{
+    VLCMediaLibraryMediaItem * const item = [self integrationMediaItem];
+    NSError *archiveError = nil;
+    NSData * const data = [NSKeyedArchiver archivedDataWithRootObject:@[ item ]
+                                                  requiringSecureCoding:YES
+                                                                  error:&archiveError];
+    XCTAssertNil(archiveError);
+    XCTAssertNotNil(data);
+
+    NSArray<VLCMediaLibraryMediaItem *> * const decodedItems =
+        [VLCMediaLibraryMediaItem mediaItemsFromPasteboardData:data];
+    XCTAssertEqual(decodedItems.count, (NSUInteger)1);
+
+    VLCMediaLibraryMediaItem * const decodedItem = decodedItems.firstObject;
+    XCTAssertNotNil(decodedItem);
+    XCTAssertNotEqual(decodedItem, item);
+    XCTAssertEqual(decodedItem.libraryID, item.libraryID);
+}
+
 - (void)testMediaItemFactoryRejectsUnknownLibraryID
 {
     XCTAssertNil([VLCMediaLibraryMediaItem mediaItemForLibraryID:INT64_MAX]);
