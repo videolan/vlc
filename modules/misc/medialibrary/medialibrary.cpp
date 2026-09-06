@@ -666,6 +666,7 @@ int MediaLibrary::Control( int query, va_list args )
         case VLC_ML_MEDIA_SET_TYPE:
         case VLC_ML_MEDIA_SET_PLAYED:
         case VLC_ML_MEDIA_SET_FAVORITE:
+        case VLC_ML_MEDIA_ADD_LABEL:
         case VLC_ML_MEDIA_ADD_BOOKMARK:
         case VLC_ML_MEDIA_REMOVE_BOOKMARK:
         case VLC_ML_MEDIA_REMOVE_ALL_BOOKMARKS:
@@ -1972,6 +1973,16 @@ int MediaLibrary::controlMedia( int query, va_list args )
             ev.favorites_changed.b_favorite = favorite;
             m_vlc_ml->cbs->pf_send_event( m_vlc_ml, &ev );
             
+            return VLC_SUCCESS;
+        }
+        case VLC_ML_MEDIA_ADD_LABEL:
+        {
+            const char * const labelName = va_arg( args, const char* );
+            if ( labelName == nullptr )
+                return VLC_EINVAL;
+            auto label = m_ml->createLabel( labelName );
+            if ( label == nullptr || m->addLabel( label ) == false )
+                return VLC_EGENERIC;
             return VLC_SUCCESS;
         }
         case VLC_ML_MEDIA_ADD_BOOKMARK:
