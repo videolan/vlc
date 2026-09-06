@@ -214,11 +214,11 @@
         return;
     }
 
-    NSInteger count = MIN(parts.count, 3 - startingField);
+    const NSUInteger count = MIN(parts.count, (NSUInteger)(3 - startingField));
 
     NSInteger newPosition = 0;
     NSInteger timeDifference = currentFieldSecs;
-    for (NSInteger i = 0; i < count; i++) {
+    for (NSUInteger i = 0; i < count; i++) {
         NSString *part = [parts[i]
             stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         newPosition += timeDifference * part.integerValue;
