@@ -28,7 +28,7 @@
 @interface VLCRendererMenuController : NSObject <VLCRendererDiscoveryDelegate>
 
 @property (readwrite, weak) NSMenu *rendererMenu;
-@property (readwrite, weak) NSMenuItem *rendererMenuItem;
+@property (readwrite, nonatomic, weak) NSMenuItem *rendererMenuItem;
 @property (readwrite, weak) NSMenuItem *rendererNoneItem;
 @property (readonly, strong) NSArray<VLCRendererItem *> *rendererItems;
 
