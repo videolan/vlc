@@ -1172,6 +1172,9 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
                     (unsigned long)range.length, (unsigned long)range.location, self.libraryID);
         }
     }
+
+    // Drop the cached media list so the next -mediaItems access re-fetches.
+    _mediaItems = nil;
 }
 
 - (void)revealInFinder
