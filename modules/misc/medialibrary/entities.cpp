@@ -579,7 +579,19 @@ input_item_t* MediaToInputItem( const medialibrary::IMedia* media )
             // Those types are not analyzed
             break;
         case medialibrary::IMedia::Type::Video:
+        {
+            if ( media->subType() != medialibrary::IMedia::SubType::ShowEpisode )
+                break;
+
+            auto episode = media->showEpisode();
+            if ( episode == nullptr )
+                break;
+
+            auto show = episode->show();
+            if ( show != nullptr )
+                input_item_SetShowName( inputItem.get(), show->title().c_str() );
             break;
+        }
         case medialibrary::IMedia::Type::Audio:
         {
             if ( media->subType() != medialibrary::IMedia::SubType::AlbumTrack )
