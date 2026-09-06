@@ -114,7 +114,7 @@
     _completionHandler = handler;
 
     [window beginSheet:self.window
-        completionHandler:^(NSModalResponse returnCode) {
+        completionHandler:^(NSModalResponse __unused returnCode) {
             if (self->_keyMonitor) {
                 [NSEvent removeMonitor:self->_keyMonitor];
             }
