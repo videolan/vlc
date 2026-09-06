@@ -646,6 +646,88 @@
     XCTAssertEqualObjects(item.displayString, @"Unknown item");
 }
 
+- (void)testMediaItemPrimaryDetailFallsBackToDuration
+{
+    VLCMediaLibraryMediaItem * const item =
+        VLCLibraryDataTypesTestMediaItemWithTypeAndSubtype(VLC_ML_MEDIA_TYPE_VIDEO,
+                                                           VLC_ML_MEDIA_SUBTYPE_UNKNOWN);
+
+    XCTAssertEqualObjects(item.primaryDetailString, item.durationString);
+}
+
+- (void)testMoviePrimaryDetailUsesDirector
+{
+    VLCMediaLibraryMediaItem * const movie =
+        VLCLibraryDataTypesTestMediaItemWithInputMetadata(VLC_ML_MEDIA_SUBTYPE_MOVIE,
+            @{ VLCLibraryDataTypesTestInputItemDirectorKey: @"Director" });
+
+    XCTAssertEqualObjects(movie.primaryDetailString, @"Director");
+}
+
+- (void)testMoviePrimaryDetailFallsBackForEmptyDirector
+{
+    VLCMediaLibraryMediaItem * const movie =
+        VLCLibraryDataTypesTestMediaItemWithInputMetadata(VLC_ML_MEDIA_SUBTYPE_MOVIE,
+            @{ VLCLibraryDataTypesTestInputItemDirectorKey: @"" });
+
+    XCTAssertEqualObjects(movie.primaryDetailString, movie.durationString);
+}
+
+- (void)testShowEpisodePrimaryDetailUsesShowName
+{
+    VLCMediaLibraryMediaItem * const episode =
+        VLCLibraryDataTypesTestMediaItemWithInputMetadata(VLC_ML_MEDIA_SUBTYPE_SHOW_EPISODE,
+            @{ VLCLibraryDataTypesTestInputItemShowNameKey: @"Show" });
+
+    XCTAssertEqualObjects(episode.primaryDetailString, @"Show");
+}
+
+- (void)testShowEpisodePrimaryDetailFallsBackToDurationWithoutShowName
+{
+    VLCMediaLibraryMediaItem * const episode =
+        VLCLibraryDataTypesTestMediaItemWithInputMetadata(VLC_ML_MEDIA_SUBTYPE_SHOW_EPISODE,
+            @{ VLCLibraryDataTypesTestInputItemShowNameKey: @"" });
+
+    XCTAssertEqualObjects(episode.primaryDetailString, episode.durationString);
+}
+
+- (void)testAlbumTrackPrimaryDetailUsesArtistName
+{
+    VLCInputItemTestSetArtistName(@"Artist");
+    VLCMediaLibraryMediaItem * const track =
+        VLCLibraryDataTypesTestMediaItemWithSubtype(VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK);
+
+    XCTAssertEqualObjects(track.primaryDetailString, @"Artist");
+    VLCInputItemTestSetArtistName(nil);
+}
+
+- (void)testAlbumTrackPrimaryDetailFallsBackForMissingArtistName
+{
+    VLCInputItemTestSetArtistName(nil);
+    VLCMediaLibraryMediaItem * const track =
+        VLCLibraryDataTypesTestMediaItemWithSubtype(VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK);
+
+    XCTAssertEqualObjects(track.primaryDetailString, track.durationString);
+}
+
+- (void)testMediaItemSecondaryDetailUsesInputItemDate
+{
+    VLCMediaLibraryMediaItem * const item =
+        VLCLibraryDataTypesTestMediaItemWithInputMetadata(VLC_ML_MEDIA_SUBTYPE_UNKNOWN,
+            @{ VLCLibraryDataTypesTestInputItemDateKey: @"2026-09-05" });
+
+    XCTAssertEqualObjects(item.secondaryDetailString, @"2026-09-05");
+}
+
+- (void)testAlbumTrackSecondaryDetailFallsBackToInputItemDateWithoutGenre
+{
+    VLCMediaLibraryMediaItem * const track =
+        VLCLibraryDataTypesTestMediaItemWithInputMetadata(VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK,
+            @{ VLCLibraryDataTypesTestInputItemDateKey: @"2026-09-05" });
+
+    XCTAssertEqualObjects(track.secondaryDetailString, @"2026-09-05");
+}
+
 - (void)testMediaItemMapsFilesAndTracks
 {
     VLCMediaLibraryMediaItem * const item =
@@ -688,6 +770,14 @@
     XCTAssertEqualObjects(episode.readableMediaSubType, @"Show Episode");
     XCTAssertEqual(episode.showEpisode.seasonNumber, (uint32_t)2);
     XCTAssertEqual(episode.showEpisode.episodeNumber, (uint32_t)4);
+}
+
+- (void)testShowEpisodeSecondaryDetailUsesEpisodeNumbers
+{
+    VLCMediaLibraryMediaItem * const episode =
+        VLCLibraryDataTypesTestMediaItemWithSubtype(VLC_ML_MEDIA_SUBTYPE_SHOW_EPISODE);
+
+    XCTAssertEqualObjects(episode.secondaryDetailString, @"Season 2, Episode 4");
 }
 
 - (void)testMediaItemMapsUnknownSubtype

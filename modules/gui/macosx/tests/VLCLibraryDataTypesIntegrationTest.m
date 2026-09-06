@@ -448,6 +448,41 @@
     XCTAssertEqual(group.firstMediaItem.libraryID, group.mediaItems.firstObject.libraryID);
 }
 
+- (void)testShowEpisodePrimaryDetailUsesShowName
+{
+    VLCMediaLibraryMediaItem * const episode = [self factoryVideoEpisode];
+
+    XCTAssertEqualObjects(episode.primaryDetailString, @"Factory Show");
+}
+
+- (void)testShowEpisodeInputItemContainsShowName
+{
+    VLCMediaLibraryMediaItem * const episode = [self factoryVideoEpisode];
+
+    XCTAssertEqualObjects(episode.inputItem.showName, @"Factory Show");
+}
+
+- (void)testAlbumTrackSecondaryDetailUsesGenre
+{
+    VLCMediaLibraryMediaItem * const track = [self factoryAudioTrack];
+
+    XCTAssertEqualObjects(track.secondaryDetailString, @"Rock");
+}
+
+- (void)testArtistSecondaryDetailUsesGenre
+{
+    VLCMediaLibraryArtist * const artist = [self factoryArtist];
+
+    XCTAssertEqualObjects(artist.secondaryDetailString, @"Rock");
+}
+
+- (void)testAlbumSecondaryDetailUsesGenre
+{
+    VLCMediaLibraryAlbum * const album = [self factoryAlbum];
+
+    XCTAssertEqualObjects(album.secondaryDetailString, @"Rock");
+}
+
 - (void)testPlaylistFactoryResolvesPersistedPlaylist
 {
     VLCMediaLibraryPlaylist * const playlist = [self integrationPlaylist];
