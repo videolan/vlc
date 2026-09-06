@@ -173,6 +173,10 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     #else
     rsvg_handle_get_dimensions( rsvg, &dim );
     #endif
+
+    if( dim.width <= 0 || dim.height <= 0 )
+        goto done;
+
     if( p_sys->f_scale > 0.0 )
     {
         i_width  = (int32_t)(p_sys->f_scale * dim.width);
