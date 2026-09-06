@@ -193,7 +193,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         else if( p_sys->i_width > 0 && p_sys->i_height < 0 )
         {
             i_width  = p_sys->i_width;
-            i_height = dim.height * p_sys->i_width / dim.height;
+            i_height = dim.height * p_sys->i_width / dim.width;
         }
         else if( p_sys->i_width > 0 && p_sys->i_height > 0 )
         {
