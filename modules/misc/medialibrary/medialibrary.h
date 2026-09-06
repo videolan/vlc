@@ -26,6 +26,7 @@
 #include <medialibrary/parser/IItem.h>
 #include <medialibrary/parser/Parser.h>
 #include <medialibrary/IMedia.h>
+#include <medialibrary/ILabel.h>
 #include <medialibrary/IThumbnailer.h>
 
 #include <vlc_common.h>

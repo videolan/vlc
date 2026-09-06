@@ -641,6 +641,7 @@ enum vlc_ml_control
     VLC_ML_MEDIA_SET_PLAYED,                /**< arg1: media id; arg2: bool */
     VLC_ML_MEDIA_SET_FAVORITE,              /**< arg1: media id; arg2: bool */
     VLC_ML_MEDIA_ADD_LABEL,                 /**< arg1: media id; arg2: label name */
+    VLC_ML_MEDIA_REMOVE_LABEL,              /**< arg1: media id; arg2: label name */
     VLC_ML_MEDIA_ADD_BOOKMARK,              /**< arg1: media id; arg2: int64_t */
     VLC_ML_MEDIA_REMOVE_BOOKMARK,           /**< arg1: media id; arg2: int64_t */
     VLC_ML_MEDIA_REMOVE_ALL_BOOKMARKS,      /**< arg1: media id */
@@ -1119,6 +1120,13 @@ static inline int vlc_ml_media_add_label( vlc_medialibrary_t* p_ml,
                                           const char* psz_label )
 {
     return vlc_ml_control(p_ml, VLC_ML_MEDIA_ADD_LABEL, i_media_id, psz_label);
+}
+
+static inline int vlc_ml_media_remove_label( vlc_medialibrary_t* p_ml,
+                                             int64_t i_media_id,
+                                             const char* psz_label )
+{
+    return vlc_ml_control(p_ml, VLC_ML_MEDIA_REMOVE_LABEL, i_media_id, psz_label);
 }
 
 static inline int vlc_ml_media_update_progress( vlc_medialibrary_t* p_ml, int64_t i_media_id,

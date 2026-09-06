@@ -667,6 +667,7 @@ int MediaLibrary::Control( int query, va_list args )
         case VLC_ML_MEDIA_SET_PLAYED:
         case VLC_ML_MEDIA_SET_FAVORITE:
         case VLC_ML_MEDIA_ADD_LABEL:
+        case VLC_ML_MEDIA_REMOVE_LABEL:
         case VLC_ML_MEDIA_ADD_BOOKMARK:
         case VLC_ML_MEDIA_REMOVE_BOOKMARK:
         case VLC_ML_MEDIA_REMOVE_ALL_BOOKMARKS:
@@ -1984,6 +1985,23 @@ int MediaLibrary::controlMedia( int query, va_list args )
             if ( label == nullptr || m->addLabel( label ) == false )
                 return VLC_EGENERIC;
             return VLC_SUCCESS;
+        }
+        case VLC_ML_MEDIA_REMOVE_LABEL:
+        {
+            const char * const labelName = va_arg( args, const char* );
+            if ( labelName == nullptr )
+                return VLC_EINVAL;
+
+            auto labels = m->labels();
+            if ( labels == nullptr )
+                return VLC_EGENERIC;
+
+            for ( const auto& label : labels->all() )
+            {
+                if ( label != nullptr && label->name() == labelName )
+                    return m->removeLabel( label ) ? VLC_SUCCESS : VLC_EGENERIC;
+            }
+            return VLC_EGENERIC;
         }
         case VLC_ML_MEDIA_ADD_BOOKMARK:
         {
