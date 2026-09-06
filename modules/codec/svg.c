@@ -152,9 +152,9 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     gboolean has_width, has_height, has_viewbox;
     RsvgLength width, height;
     RsvgRectangle viewbox;
-    
+
     rsvg_handle_get_intrinsic_dimensions( rsvg, &has_width, &width, &has_height, &height, &has_viewbox, &viewbox );
-    
+
     if( has_width && has_height && width.unit == RSVG_UNIT_PX && height.unit == RSVG_UNIT_PX )
     {
         dim.width = (int) width.length;
