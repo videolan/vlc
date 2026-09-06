@@ -57,7 +57,7 @@
     }
 }
 
-- (void)addError:(NSString *)title withMsg:(NSString *)message;
+- (void)addError:(NSString *)title withMsg:(NSString *)message
 {
     /* format our string as desired */
     NSMutableAttributedString * ourError;
