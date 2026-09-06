@@ -543,16 +543,150 @@
     XCTAssertEqual(refreshedItem.rating, 4);
 }
 
+- (void)testMediaItemRatingPersistsIndependentlyPerMediaItem
+{
+    const int64_t secondID =
+        VLCLibraryDataTypesIntegrationCreateExternalMedia("mock://macosx-datatypes-rating-isolation");
+    XCTAssertNotEqual(secondID, (int64_t)0);
+
+    VLCMediaLibraryMediaItem * const first = [self integrationMediaItem];
+    VLCMediaLibraryMediaItem * const second =
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:secondID];
+    XCTAssertNotNil(second);
+
+    first.rating = 2;
+    second.rating = 5;
+
+    VLCMediaLibraryMediaItem * const refreshedFirst =
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:first.libraryID];
+    VLCMediaLibraryMediaItem * const refreshedSecond =
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:second.libraryID];
+    XCTAssertEqual(refreshedFirst.rating, 2);
+    XCTAssertEqual(refreshedSecond.rating, 5);
+
+    vlc_ml_remove_stream(VLCLibraryDataTypesIntegrationMediaLibrary(), secondID);
+}
+
 - (void)testMediaItemFavoritePersistsThroughMediaLibrary
 {
     VLCMediaLibraryMediaItem * const item = [self integrationMediaItem];
 
     XCTAssertEqual([item setFavorite:YES], VLC_SUCCESS);
 
-    VLCMediaLibraryMediaItem * const refreshedItem =
+    VLCMediaLibraryMediaItem * refreshedItem =
         [VLCMediaLibraryMediaItem mediaItemForLibraryID:VLCLibraryDataTypesIntegrationMediaID()];
     XCTAssertNotNil(refreshedItem);
     XCTAssertTrue(refreshedItem.favorited);
+
+    XCTAssertEqual([refreshedItem toggleFavorite], VLC_SUCCESS);
+    refreshedItem = [VLCMediaLibraryMediaItem mediaItemForLibraryID:
+                     VLCLibraryDataTypesIntegrationMediaID()];
+    XCTAssertNotNil(refreshedItem);
+    XCTAssertFalse(refreshedItem.favorited);
+
+    XCTAssertEqual([refreshedItem toggleFavorite], VLC_SUCCESS);
+    refreshedItem = [VLCMediaLibraryMediaItem mediaItemForLibraryID:
+                     VLCLibraryDataTypesIntegrationMediaID()];
+    XCTAssertNotNil(refreshedItem);
+    XCTAssertTrue(refreshedItem.favorited);
+}
+
+- (void)testArtistToggleFavoritePersistsThroughMediaLibrary
+{
+    VLCMediaLibraryArtist * const artist = [self factoryArtist];
+    const int64_t artistID = artist.libraryID;
+
+    XCTAssertEqual([artist setFavorite:YES], VLC_SUCCESS);
+    VLCMediaLibraryArtist * refreshedArtist = [VLCMediaLibraryArtist artistWithID:artistID];
+    XCTAssertTrue(refreshedArtist.favorited);
+
+    XCTAssertEqual([refreshedArtist toggleFavorite], VLC_SUCCESS);
+    refreshedArtist = [VLCMediaLibraryArtist artistWithID:artistID];
+    XCTAssertFalse(refreshedArtist.favorited);
+
+    XCTAssertEqual([refreshedArtist toggleFavorite], VLC_SUCCESS);
+    refreshedArtist = [VLCMediaLibraryArtist artistWithID:artistID];
+    XCTAssertTrue(refreshedArtist.favorited);
+}
+
+- (void)testAlbumToggleFavoritePersistsThroughMediaLibrary
+{
+    VLCMediaLibraryAlbum * const album = [self factoryAlbum];
+    const int64_t albumID = album.libraryID;
+
+    XCTAssertEqual([album setFavorite:YES], VLC_SUCCESS);
+    VLCMediaLibraryAlbum * refreshedAlbum = [VLCMediaLibraryAlbum albumWithID:albumID];
+    XCTAssertTrue(refreshedAlbum.favorited);
+
+    XCTAssertEqual([refreshedAlbum toggleFavorite], VLC_SUCCESS);
+    refreshedAlbum = [VLCMediaLibraryAlbum albumWithID:albumID];
+    XCTAssertFalse(refreshedAlbum.favorited);
+
+    XCTAssertEqual([refreshedAlbum toggleFavorite], VLC_SUCCESS);
+    refreshedAlbum = [VLCMediaLibraryAlbum albumWithID:albumID];
+    XCTAssertTrue(refreshedAlbum.favorited);
+}
+
+- (void)testGenreToggleFavoritePersistsThroughMediaLibrary
+{
+    VLCMediaLibraryGenre * const genre = [self factoryGenre];
+    const int64_t genreID = genre.libraryID;
+
+    XCTAssertEqual([genre setFavorite:YES], VLC_SUCCESS);
+    VLCMediaLibraryGenre * refreshedGenre = [VLCMediaLibraryGenre genreWithID:genreID];
+    XCTAssertTrue(refreshedGenre.favorited);
+
+    XCTAssertEqual([refreshedGenre toggleFavorite], VLC_SUCCESS);
+    refreshedGenre = [VLCMediaLibraryGenre genreWithID:genreID];
+    XCTAssertFalse(refreshedGenre.favorited);
+
+    XCTAssertEqual([refreshedGenre toggleFavorite], VLC_SUCCESS);
+    refreshedGenre = [VLCMediaLibraryGenre genreWithID:genreID];
+    XCTAssertTrue(refreshedGenre.favorited);
+}
+
+- (void)testShowToggleFavoritePersistsThroughMediaLibrary
+{
+    VLCMediaLibraryShow * const show = [self factoryShow];
+    const int64_t showID = show.libraryID;
+
+    XCTAssertEqual([show setFavorite:YES], VLC_SUCCESS);
+    VLCMediaLibraryShow * refreshedShow =
+        [VLCMediaLibraryShow showWithLibraryId:showID];
+    XCTAssertNotNil(refreshedShow);
+    XCTAssertTrue(refreshedShow.favorited);
+
+    XCTAssertEqual([refreshedShow toggleFavorite], VLC_SUCCESS);
+    refreshedShow = [VLCMediaLibraryShow showWithLibraryId:showID];
+    XCTAssertNotNil(refreshedShow);
+    XCTAssertFalse(refreshedShow.favorited);
+
+    XCTAssertEqual([refreshedShow toggleFavorite], VLC_SUCCESS);
+    refreshedShow = [VLCMediaLibraryShow showWithLibraryId:showID];
+    XCTAssertNotNil(refreshedShow);
+    XCTAssertTrue(refreshedShow.favorited);
+}
+
+- (void)testGroupToggleFavoritePersistsThroughMediaLibrary
+{
+    VLCMediaLibraryGroup * const group = [self factoryGroup];
+    const int64_t groupID = group.libraryID;
+
+    XCTAssertEqual([group setFavorite:YES], VLC_SUCCESS);
+    VLCMediaLibraryGroup * refreshedGroup =
+        [VLCMediaLibraryGroup groupWithID:groupID];
+    XCTAssertNotNil(refreshedGroup);
+    XCTAssertTrue(refreshedGroup.favorited);
+
+    XCTAssertEqual([refreshedGroup toggleFavorite], VLC_SUCCESS);
+    refreshedGroup = [VLCMediaLibraryGroup groupWithID:groupID];
+    XCTAssertNotNil(refreshedGroup);
+    XCTAssertFalse(refreshedGroup.favorited);
+
+    XCTAssertEqual([refreshedGroup toggleFavorite], VLC_SUCCESS);
+    refreshedGroup = [VLCMediaLibraryGroup groupWithID:groupID];
+    XCTAssertNotNil(refreshedGroup);
+    XCTAssertTrue(refreshedGroup.favorited);
 }
 
 - (void)testMediaItemPlaybackRateRoundTripsThroughMediaLibrary
@@ -890,6 +1024,14 @@
 {
     VLCMediaLibraryPlaylist *playlist = [self integrationPlaylist];
     XCTAssertTrue([playlist setFavorite:YES] == VLC_SUCCESS);
+    playlist = [VLCMediaLibraryPlaylist playlistForLibraryID:playlist.libraryID];
+    XCTAssertTrue(playlist.favorited);
+
+    XCTAssertEqual([playlist toggleFavorite], VLC_SUCCESS);
+    playlist = [VLCMediaLibraryPlaylist playlistForLibraryID:playlist.libraryID];
+    XCTAssertFalse(playlist.favorited);
+
+    XCTAssertEqual([playlist toggleFavorite], VLC_SUCCESS);
     playlist = [VLCMediaLibraryPlaylist playlistForLibraryID:playlist.libraryID];
     XCTAssertTrue(playlist.favorited);
 
