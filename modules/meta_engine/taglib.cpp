@@ -212,8 +212,10 @@ public:
         : m_stream( p_stream )
         , m_previousPos( 0 )
         , m_borked( false )
+#ifndef VLC_PATCHED_TAGLIB_ID3V2_READSTYLE
         , m_seqReadLength( 0 )
         , m_seqReadLimit( std::numeric_limits<long>::max() )
+#endif
     {
     }
 
@@ -241,8 +243,12 @@ public:
             // we can't return nothing in case it considers it's EOF, so read 16 KB
             length = 1 << 14;
 
-        if(m_borked || m_seqReadLength >= m_seqReadLimit)
+        if(m_borked)
             return {};
+#ifndef VLC_PATCHED_TAGLIB_ID3V2_READSTYLE
+        if(m_seqReadLength >= m_seqReadLimit)
+            return {};
+#endif
         ByteVector res(length, 0);
         ssize_t i_read = vlc_stream_Read( m_stream, res.data(), length);
         if (i_read < 0)
@@ -250,7 +256,9 @@ public:
         else if ((size_t)i_read != length)
             res.resize(i_read);
         m_previousPos += i_read;
+#ifndef VLC_PATCHED_TAGLIB_ID3V2_READSTYLE
         m_seqReadLength += i_read;
+#endif
         return res;
     }
 
@@ -285,10 +293,12 @@ public:
         return true;
     }
 
+#ifndef VLC_PATCHED_TAGLIB_ID3V2_READSTYLE
     void setMaxSequentialRead(long s)
     {
         m_seqReadLimit = s;
     }
+#endif
 
 #if TAGLIB_VERSION >= VERSION_INT(2, 0, 0)
     void seek(offset_t offset, Position p) override
@@ -327,7 +337,9 @@ public:
         m_borked = (vlc_stream_Seek( m_stream, pos + offset ) != 0);
         if(!m_borked)
             m_previousPos = pos + offset;
+#ifndef VLC_PATCHED_TAGLIB_ID3V2_READSTYLE
         m_seqReadLength = 0;
+#endif
     }
 
     void clear() override
@@ -368,8 +380,10 @@ private:
     stream_t* m_stream;
     int64_t m_previousPos;
     bool m_borked;
+#ifndef VLC_PATCHED_TAGLIB_ID3V2_READSTYLE
     long m_seqReadLength;
     long m_seqReadLimit;
+#endif
 };
 #endif /* TAGLIB_VERSION_1_11 */
 
