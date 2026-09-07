@@ -209,6 +209,8 @@ vlc_gl_interop_New(struct vlc_gl_t *gl, vlc_video_context *context,
     return interop;
 
 error:
+    if (interop->vctx)
+       vlc_video_context_Release(interop->vctx);
     vlc_object_delete(interop);
     return NULL;
 }
