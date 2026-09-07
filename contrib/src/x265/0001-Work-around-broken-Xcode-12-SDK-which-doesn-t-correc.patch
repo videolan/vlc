@@ -1,0 +1,38 @@
+From 14f718ec25aea06638c990b2f2a9dd277340623a Mon Sep 17 00:00:00 2001
+From: Marvin Scholz <epirat07@gmail.com>
+Date: Tue, 8 Sep 2026 00:18:49 +0200
+Subject: [PATCH] Work around broken Xcode 12 SDK which doesn't correctly
+ define vdotq_lane_s32 as returning signed vs. unsigned
+
+---
+ source/CMakeLists.txt | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/source/CMakeLists.txt b/source/CMakeLists.txt
+index 7a47a7bef..168b81669 100755
+--- a/source/CMakeLists.txt
++++ b/source/CMakeLists.txt
+@@ -406,12 +406,20 @@ int main() { return 0; }")
+             add_definitions(-DHAVE_SVE2=1)
+         endif()
+         set(ARM_ARGS -O3)
++        if(CMAKE_CXX_COMPILER_ID MATCHES "AppleClang" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL "12" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "13")
++            # Workaround Xcode 12 SDK bug
++            check_cxx_compiler_flag(-flax-vector-conversions=integer CC_HAS_FLAX_VEC_CONV_INT)
++            if(CC_HAS_FLAX_VEC_CONV_INT)
++                set(ARM_ARGS ${ARM_ARGS} -flax-vector-conversions=integer)
++            endif()
++        else()
+         # Do not allow implicit vector type conversions in Clang builds (this
+         # is already the default in GCC builds).
+         check_cxx_compiler_flag(-flax-vector-conversions=none CC_HAS_FLAX_VEC_CONV_NONE)
+         if(CC_HAS_FLAX_VEC_CONV_NONE)
+             set(ARM_ARGS ${ARM_ARGS} -flax-vector-conversions=none)
+         endif()
++        endif()
+     endif()
+     if(ENABLE_PIC)
+         list(APPEND ARM_ARGS -DPIC -fPIC)
+-- 
+2.52.0.windows.1
+

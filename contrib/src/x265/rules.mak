@@ -33,6 +33,7 @@ x265: x265_$(X265_VERSION).tar.gz .sum-x265
 	$(APPLY) $(SRC)/x265/0002-CMake-don-t-force-_WIN32_WINNT-values.patch
 	$(APPLY) $(SRC)/x265/0010-CMake-allow-lpthread-in-the-pkg-config-file.patch
 	$(APPLY) $(SRC)/x265/0012-CMake-also-use-the-arch-flag-when-cross-compiling-ar.patch
+	$(APPLY) $(SRC)/x265/0001-Work-around-broken-Xcode-12-SDK-which-doesn-t-correc.patch
 	$(call pkg_static,"source/x265.pc.in")
 	$(MOVE)
 
