@@ -55,8 +55,8 @@ static void Close        ( filter_t * );
 #define HEIGHT_LONGTEXT N_("The height of the video window, in pixels.")
 
 vlc_module_begin ()
-    set_shortname( N_("vsxu"))
-    set_description( N_("vsxu") )
+    set_shortname( "VSXu" )
+    set_description( N_("Vovoid VSXu visualization") )
     set_capability( "visualization", 0 )
     set_subcategory( SUBCAT_AUDIO_VISUAL )
     add_integer( "vsxu-width", 1280, WIDTH_TEXT, WIDTH_LONGTEXT )
