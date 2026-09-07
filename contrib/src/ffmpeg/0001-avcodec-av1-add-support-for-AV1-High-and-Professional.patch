@@ -1,0 +1,123 @@
+From 32cf7d6b14934ab6422836576204a6a648869ee4 Mon Sep 17 00:00:00 2001
+From: Wassim Lalaoui <wassim@videolabs.io>
+Date: Fri, 10 Jul 2026 16:07:26 +0200
+Subject: [PATCH] avcodec/av1: add support for AV1 High and Professional DXVA
+ profiles
+
+The DXVA AV1 spec defines decoder GUIDs for the High (8/10-bit 4:4:4)
+and Professional (8/10-bit 4:2:2) profiles. Offer the D3D11VA
+hwaccel for the corresponding pixel formats and add the matching
+decoder GUIDs, including the 12-bit Professional GUID which is a
+superset that also decodes 8/10-bit 4:2:2 streams.
+
+The negotiated hwaccel is no longer kept across a sequence change that
+alters the pixel format: the existing decoder surfaces would have the
+wrong format, so a full renegotiation is needed.
+
+Intel GPUs expose these decoder profiles in their Windows drivers.
+
+---
+ libavcodec/av1dec.c | 27 ++++++++++++++++++++++-----
+ libavcodec/dxva2.c  | 10 ++++++++++
+ 2 files changed, 32 insertions(+), 5 deletions(-)
+
+diff --git a/libavcodec/av1dec.c b/libavcodec/av1dec.c
+index 2b3a36a..d50a7e3 100644
+--- a/libavcodec/av1dec.c
++++ b/libavcodec/av1dec.c
+@@ -613,11 +613,19 @@ static int get_pixel_format(AVCodecContext *avctx)
+ #endif
+         break;
+     case AV_PIX_FMT_YUV422P:
++#if CONFIG_AV1_D3D11VA_HWACCEL
++        *fmtp++ = AV_PIX_FMT_D3D11VA_VLD;
++        *fmtp++ = AV_PIX_FMT_D3D11;
++#endif
+ #if CONFIG_AV1_VULKAN_HWACCEL
+         *fmtp++ = AV_PIX_FMT_VULKAN;
+ #endif
+         break;
+     case AV_PIX_FMT_YUV422P10:
++#if CONFIG_AV1_D3D11VA_HWACCEL
++        *fmtp++ = AV_PIX_FMT_D3D11VA_VLD;
++        *fmtp++ = AV_PIX_FMT_D3D11;
++#endif
+ #if CONFIG_AV1_VULKAN_HWACCEL
+         *fmtp++ = AV_PIX_FMT_VULKAN;
+ #endif
+@@ -628,11 +636,19 @@ static int get_pixel_format(AVCodecContext *avctx)
+ #endif
+         break;
+     case AV_PIX_FMT_YUV444P:
++#if CONFIG_AV1_D3D11VA_HWACCEL
++        *fmtp++ = AV_PIX_FMT_D3D11VA_VLD;
++        *fmtp++ = AV_PIX_FMT_D3D11;
++#endif
+ #if CONFIG_AV1_VULKAN_HWACCEL
+         *fmtp++ = AV_PIX_FMT_VULKAN;
+ #endif
+         break;
+     case AV_PIX_FMT_YUV444P10:
++#if CONFIG_AV1_D3D11VA_HWACCEL
++        *fmtp++ = AV_PIX_FMT_D3D11VA_VLD;
++        *fmtp++ = AV_PIX_FMT_D3D11;
++#endif
+ #if CONFIG_AV1_VULKAN_HWACCEL
+         *fmtp++ = AV_PIX_FMT_VULKAN;
+ #endif
+@@ -657,11 +673,12 @@ static int get_pixel_format(AVCodecContext *avctx)
+     *fmtp++ = pix_fmt;
+     *fmtp = AV_PIX_FMT_NONE;
+ 
+-    for (int i = 0; pix_fmts[i] != pix_fmt; i++)
+-        if (pix_fmts[i] == avctx->pix_fmt) {
+-            s->pix_fmt = pix_fmt;
+-            return 1;
+-        }
++    /* the negotiated hwaccel can only be kept if the underlying pixel
++     * format did not change, otherwise its surfaces have the wrong format */
++    if (pix_fmt == avctx->sw_pix_fmt)
++        for (int i = 0; pix_fmts[i] != pix_fmt; i++)
++            if (pix_fmts[i] == avctx->pix_fmt)
++                return 1;
+ 
+     ret = ff_get_format(avctx, pix_fmts);
+ 
+diff --git a/libavcodec/dxva2.c b/libavcodec/dxva2.c
+index 217d63d..7c0bbf7 100644
+--- a/libavcodec/dxva2.c
++++ b/libavcodec/dxva2.c
+@@ -47,6 +47,9 @@ DEFINE_GUID(ff_DXVA2_ModeHEVC_VLD_Main10,0x107af0e0, 0xef1a,0x4d19,0xab,0xa8,0x6
+ DEFINE_GUID(ff_DXVA2_ModeVP9_VLD_Profile0,0x463707f8,0xa1d0,0x4585,0x87,0x6d,0x83,0xaa,0x6d,0x60,0xb8,0x9e);
+ DEFINE_GUID(ff_DXVA2_ModeVP9_VLD_10bit_Profile2,0xa4c749ef,0x6ecf,0x48aa,0x84,0x48,0x50,0xa7,0xa1,0x16,0x5f,0xf7);
+ DEFINE_GUID(ff_DXVA2_ModeAV1_VLD_Profile0,0xb8be4ccb,0xcf53,0x46ba,0x8d,0x59,0xd6,0xb8,0xa6,0xda,0x5d,0x2a);
++DEFINE_GUID(ff_DXVA2_ModeAV1_VLD_Profile1,0x6936ff0f,0x45b1,0x4163,0x9c,0xc1,0x64,0x6e,0xf6,0x94,0x61,0x08);
++DEFINE_GUID(ff_DXVA2_ModeAV1_VLD_Profile2,0x0c5f2aa1,0xe541,0x4089,0xbb,0x7b,0x98,0x11,0x0a,0x19,0xd7,0xc8);
++DEFINE_GUID(ff_DXVA2_ModeAV1_VLD_12bit_Profile2,0x17127009,0xa00f,0x4ce1,0x99,0x4e,0xbf,0x40,0x81,0xf6,0xf3,0xf0);
+ DEFINE_GUID(ff_DXVA2_NoEncrypt,          0x1b81beD0, 0xa0c7,0x11d3,0xb9,0x84,0x00,0xc0,0x4f,0x2e,0x73,0xc5);
+ DEFINE_GUID(ff_IID_IDirectXVideoDecoderService, 0xfc51a551,0xd5e7,0x11d9,0xaf,0x55,0x00,0x05,0x4e,0x43,0xff,0x02);
+ 
+@@ -77,6 +80,10 @@ static const int prof_vp9_profile2[] = {AV_PROFILE_VP9_2,
+                                         AV_PROFILE_UNKNOWN};
+ static const int prof_av1_profile0[] = {AV_PROFILE_AV1_MAIN,
+                                         AV_PROFILE_UNKNOWN};
++static const int prof_av1_profile1[] = {AV_PROFILE_AV1_HIGH,
++                                        AV_PROFILE_UNKNOWN};
++static const int prof_av1_profile2[] = {AV_PROFILE_AV1_PROFESSIONAL,
++                                        AV_PROFILE_UNKNOWN};
+ 
+ static const dxva_mode dxva_modes[] = {
+     /* MPEG-2 */
+@@ -111,6 +118,9 @@ static const dxva_mode dxva_modes[] = {
+ 
+     /* AV1 */
+     { &ff_DXVA2_ModeAV1_VLD_Profile0,       AV_CODEC_ID_AV1, prof_av1_profile0 },
++    { &ff_DXVA2_ModeAV1_VLD_Profile1,       AV_CODEC_ID_AV1, prof_av1_profile1 },
++    { &ff_DXVA2_ModeAV1_VLD_Profile2,       AV_CODEC_ID_AV1, prof_av1_profile2 },
++    { &ff_DXVA2_ModeAV1_VLD_12bit_Profile2, AV_CODEC_ID_AV1, prof_av1_profile2 },
+ 
+     { NULL,                          0 },
+ };
+-- 
+2.43.0
+

@@ -239,6 +239,7 @@ ffmpeg: ffmpeg-$(FFMPEG_VERSION).tar.xz .sum-ffmpeg
 	$(APPLY) $(SRC)/ffmpeg/dxva_vc1_crash.patch
 	$(APPLY) $(SRC)/ffmpeg/h264_early_SAR.patch
 	$(APPLY) $(SRC)/ffmpeg/0001-avcodec-dxva2-add-support-for-HEVC-RExt-DXVA-profile.patch
+	$(APPLY) $(SRC)/ffmpeg/0001-avcodec-av1-add-support-for-AV1-High-and-Professional.patch
 	$(APPLY) $(SRC)/ffmpeg/0001-avcodec-mpeg12dec-don-t-call-hw-end_frame-when-start.patch
 	$(APPLY) $(SRC)/ffmpeg/0002-avcodec-mpeg12dec-don-t-end-a-slice-without-first_sl.patch
 	$(APPLY) $(SRC)/ffmpeg/0001-fix-mf_utils-compilation-with-mingw64.patch
