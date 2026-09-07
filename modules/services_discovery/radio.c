@@ -391,9 +391,17 @@ static void Close(vlc_object_t *p_this)
     free(p_sys);
 }
 
+/* Radio Browser's CSV API serializes missing optional values as "null". */
+static bool FieldHasValue(csv_parser *parser, int index)
+{
+    return index >= 0 && parser->fields[index] != NULL &&
+           parser->fields[index][0] != '\0' &&
+           strcmp(parser->fields[index], "null") != 0;
+}
+
 static void SetMetaFromField(input_item_t *item, csv_parser *parser, int index, vlc_meta_type_t type)
 {
-    if (index < 0 || strlen(parser->fields[index]) == 0)
+    if (!FieldHasValue(parser, index))
         return;
 
     input_item_SetMeta(item, type, parser->fields[index]);
@@ -401,7 +409,7 @@ static void SetMetaFromField(input_item_t *item, csv_parser *parser, int index, 
 
 static void SetMetaExtraFromField(input_item_t *item, csv_parser *parser, int index, const char *name)
 {
-    if (index < 0 || strlen(parser->fields[index]) == 0)
+    if (!FieldHasValue(parser, index))
         return;
 
     input_item_SetMetaExtra(item, name, parser->fields[index]);
