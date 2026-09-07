@@ -309,13 +309,22 @@ check_service_running(void)
      * Indeed, secret_service_get_sync will spawn a service if it's not
      * running, even on non Gnome environments */
 
-    GMainContext *ctx = g_main_context_default();
+    /* Use a private context: another thread may own the default one for the
+     * whole lifetime of the process (Qt's GLib dispatcher does). Push it as
+     * the thread-default one, that is where g_bus_watch_name() attaches. */
+    GMainContext *ctx = g_main_context_new();
     if (unlikely(ctx == NULL))
         return VLC_ENOMEM;
 
+    g_main_context_push_thread_default(ctx);
+
     GMainLoop *loop = g_main_loop_new(ctx, FALSE);
     if (unlikely(loop == NULL))
+    {
+        g_main_context_pop_thread_default(ctx);
+        g_main_context_unref(ctx);
         return VLC_ENOMEM;
+    }
 
     struct secrets_watch_data watch_data = {
         .loop = loop,
@@ -337,6 +346,9 @@ check_service_running(void)
     g_bus_unwatch_name(i_id);
 
     g_main_loop_unref(loop);
+
+    g_main_context_pop_thread_default(ctx);
+    g_main_context_unref(ctx);
 
     atomic_store_explicit(&cache_running, watch_data.b_running ? 1 : -1,
                           memory_order_relaxed);
