@@ -127,14 +127,13 @@ struct vlc_thumbnailer_cbs
     /**
      * Event received on thumbnailing completion or error
      *
-     * This callback will always be called, provided
-     * vlc_preparser_req_NewThumbnail() returned a valid request, and provided
-     * the request is not cancelled before its completion.
+     * This callback is invoked exactly once for each request successfully
+     * submitted with vlc_preparser_Submit().
      *
      * @note This callback is mandatory if calling
      * vlc_preparser_req_NewThumbnail()
      *
-     * In case of failure, timeout or cancellation, p_thumbnail will be NULL.
+     * In case of failure, timeout or cancellation, thumbnail will be NULL.
      * The picture, if any, is owned by the thumbnailer, and must be acquired
      * by using \link picture_Hold \endlink to use it pass the callback's
      * scope.
@@ -142,11 +141,10 @@ struct vlc_thumbnailer_cbs
      * @param req request handle returned by vlc_preparser_req_NewThumbnail()
      * @param status VLC_SUCCESS in case of success, VLC_ETIMEOUT in case of
      * timeout, -EINTR if cancelled, an error otherwise
-     * @param thumbnail The generated thumbnail, or NULL in case of failure or
-     * timeout
+     * @param thumbnail The generated thumbnail, or NULL in case of failure,
+     * timeout or cancellation
      * @param data opaque pointer passed by
      * vlc_preparser_req_NewThumbnail()
-     *
      */
     void (*on_ended)(vlc_preparser_req *req, int status, picture_t* thumbnail, void *data);
 };
@@ -161,23 +159,26 @@ struct vlc_thumbnailer_to_files_cbs
     /**
      * Event received on thumbnailing completion or error
      *
-     * This callback will always be called, provided
-     *
-     * vlc_preparser_req_NewThumbnailToFiles() returned a valid request, and
-     * provided the request is not cancelled before its completion.
+     * This callback is invoked exactly once for each request successfully
+     * submitted with vlc_preparser_Submit().
      *
      * @note This callback is mandatory if calling
      * vlc_preparser_req_NewThumbnailToFiles()
+     *
+     * In case of failure, timeout or cancellation, result_array will be NULL
+     * and result_count will be 0.
      *
      * @param req request handle returned by vlc_preparser_req_NewThumbnailToFiles()
      * @param status VLC_SUCCESS in case of success, VLC_ETIMEOUT in case of
      * timeout, -EINTR if cancelled, an error otherwise. A success mean that an
      * image was generated but it is still possible that the export failed,
      * check result_array to assure export were successful.
-     * @param array of results, if result_array[i] is true, the outputs[i] from
-     * vlc_preparser_req_NewThumbnailToFiles() succeeded.
+     * @param result_array array of results, if result_array[i] is true, the
+     * outputs[i] from vlc_preparser_req_NewThumbnailToFiles() succeeded. NULL
+     * if the status is not VLC_SUCCESS.
      * @param result_count size of the array, same than the output_count arg
-     * from vlc_preparser_req_NewThumbnailToFiles()
+     * from vlc_preparser_req_NewThumbnailToFiles(), or 0 if the status is not
+     * VLC_SUCCESS
      * @param data opaque pointer passed by
      * vlc_preparser_req_NewThumbnailToFiles()
      */
