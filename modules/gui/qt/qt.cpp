@@ -979,6 +979,39 @@ static void *Thread( void *obj )
     // It is guaranteed that the returned format is supported, if a format is returned.
     static const auto createCompatibleOpenGLFormat = []() -> std::optional<QSurfaceFormat> {
         QOpenGLContext defaultCtx;
+
+        QSurfaceFormat defaultFormat = defaultCtx.format();
+
+        /// <QSGDefaultContext::defaultSurfaceFormat()>
+        /// This is copied from `QSGDefaultContext::defaultSurfaceFormat()`, since
+        /// it is not public. The default `QSurfaceFormat::defaultFormat()` that is
+        /// provided by Qt Gui naturally does not consider the default format of
+        /// Qt Quick:
+        // These depend solely on the env.vars., not QQuickGraphicsConfiguration
+        // since that does not have a flag that maps 100% to QSG_NO_xx_BUFFER.
+        static bool useDepth = qEnvironmentVariableIsEmpty("QSG_NO_DEPTH_BUFFER");
+        static bool useStencil = qEnvironmentVariableIsEmpty("QSG_NO_STENCIL_BUFFER");
+        static bool enableDebug = qEnvironmentVariableIsSet("QSG_OPENGL_DEBUG");
+        static bool disableVSync = qEnvironmentVariableIsSet("QSG_NO_VSYNC");
+        if (useDepth && defaultFormat.depthBufferSize() == -1)
+            defaultFormat.setDepthBufferSize(24);
+        else if (!useDepth)
+            defaultFormat.setDepthBufferSize(0);
+        if (useStencil && defaultFormat.stencilBufferSize() == -1)
+            defaultFormat.setStencilBufferSize(8);
+        else if (!useStencil)
+            defaultFormat.setStencilBufferSize(0);
+        if (enableDebug)
+            defaultFormat.setOption(QSurfaceFormat::DebugContext);
+        if (QQuickWindow::hasDefaultAlphaBuffer())
+            defaultFormat.setAlphaBufferSize(8);
+        defaultFormat.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+        if (disableVSync) // swapInterval defaults to 1, it has no -1 special value
+            defaultFormat.setSwapInterval(0);
+        /// </QSGDefaultContext::defaultSurfaceFormat()>
+
+        defaultCtx.setFormat(defaultFormat);
+
         // This is really unnecessary to check, since Qt should not be using unavailable contexts, but nevertheless.
         if (Q_UNLIKELY(!defaultCtx.create()))
             return std::nullopt;
