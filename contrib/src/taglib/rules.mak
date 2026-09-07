@@ -1,6 +1,6 @@
 # TagLib
 
-TAGLIB_VERSION := 2.3
+TAGLIB_VERSION := 2.3.2
 TAGLIB_URL := $(GITHUB)/taglib/taglib/releases/download/v$(TAGLIB_VERSION)/taglib-$(TAGLIB_VERSION).tar.gz
 
 PKGS += taglib
