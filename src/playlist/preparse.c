@@ -91,6 +91,10 @@ on_subtree_added(vlc_preparser_req *req, input_item_node_t *subtree,
 static void
 on_preparse_ended(vlc_preparser_req *req, int status, void *userdata)
 {
+    /* This function may be called synchronously on the calling thread if it was
+       cancelled when the request had not started yet. The playlist cancels with
+       the playlist lock held, so nothing here may take that lock before the status
+       has been checked. */
     if (status != VLC_SUCCESS)
         return;
 
