@@ -297,13 +297,18 @@ public:
 #endif
     {
         uint64_t pos = 0;
-        long len;
         switch (p)
         {
             case Current:
                 pos = m_previousPos;
                 break;
             case End:
+            {
+#if TAGLIB_VERSION >= VERSION_INT(2, 0, 0)
+                offset_t len;
+#else
+                long len;
+#endif
                 len = length();
                 if(len > -1)
                 {
@@ -315,6 +320,7 @@ public:
                     return;
                 }
                 break;
+            }
             default:
                 break;
         }
