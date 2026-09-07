@@ -868,6 +868,12 @@ static void *Thread( void *obj )
 #endif
     Q_INIT_RESOURCE( shaders );
 
+    // Qt Widgets uses shaders with RHI, which is
+    // enabled with `QT_WIDGETS_RHI`. Currently the
+    // shaders are pre-baked, so we don't need to
+    // require Qt shader tools when building qtbase.
+    Q_INIT_RESOURCE( gui_shaders );
+
     // NOTE:  Qt declarative 6.8.0 initializes scenegraph_shaders,
     //        but not scenegraph_curve_shaders. Curve shaders
     //        are used in particular cases even when curve
