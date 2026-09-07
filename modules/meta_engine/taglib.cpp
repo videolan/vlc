@@ -204,8 +204,6 @@ public:
         : m_stream( p_stream )
         , m_previousPos( 0 )
         , m_borked( false )
-        , m_seqReadLength( 0 )
-        , m_seqReadLimit( std::numeric_limits<long>::max() )
     {
     }
 
@@ -233,7 +231,7 @@ public:
             // we can't return nothing in case it considers it's EOF, so read 16 KB
             length = 1 << 14;
 
-        if(m_borked || m_seqReadLength >= m_seqReadLimit)
+        if(m_borked)
             return {};
         ByteVector res(length, 0);
         ssize_t i_read = vlc_stream_Read( m_stream, res.data(), length);
@@ -242,7 +240,6 @@ public:
         else if ((size_t)i_read != length)
             res.resize(i_read);
         m_previousPos += i_read;
-        m_seqReadLength += i_read;
         return res;
     }
 
@@ -277,11 +274,6 @@ public:
         return true;
     }
 
-    void setMaxSequentialRead(long s)
-    {
-        m_seqReadLimit = s;
-    }
-
 #if TAGLIB_VERSION >= VERSION_INT(2, 0, 0)
     void seek(offset_t offset, Position p)
 #else
@@ -313,7 +305,6 @@ public:
         m_borked = (vlc_stream_Seek( m_stream, pos + offset ) != 0);
         if(!m_borked)
             m_previousPos = pos + offset;
-        m_seqReadLength = 0;
     }
 
     void clear()
@@ -354,8 +345,6 @@ private:
     stream_t* m_stream;
     int64_t m_previousPos;
     bool m_borked;
-    long m_seqReadLength;
-    long m_seqReadLimit;
 };
 
 static int ExtractCoupleNumberValues( vlc_meta_t* p_meta, const char *psz_value,
