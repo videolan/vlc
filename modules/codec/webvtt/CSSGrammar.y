@@ -614,9 +614,12 @@ declaration_list:
         $$ = $1;
     }
     | decl_list declaration {
-        $$ = $1;
-        if( $$ )
+        if ($1) {
+            $$ = $1;
             vlc_css_declarations_Append( $$, $2 );
+        } else {
+            $$ = $2;
+        }
     }
     | decl_list {
         $$ = $1;
