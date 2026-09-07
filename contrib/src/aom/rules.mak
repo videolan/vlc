@@ -21,6 +21,7 @@ ifndef HAVE_WINSTORE
 	# disable Windows InitOnceBeginInitialize not compatible with XP
 	sed -i.orig 's,defined(_WIN32),0,' $(UNPACK_DIR)/aom_ports/aom_once.h
 endif
+	$(APPLY) $(SRC)/aom/0001-Work-around-broken-Xcode-12-SDK-which-doesn-t-correc.patch
 	$(MOVE)
 
 DEPS_aom =

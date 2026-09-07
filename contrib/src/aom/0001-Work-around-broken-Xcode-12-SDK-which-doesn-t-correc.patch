@@ -1,0 +1,33 @@
+From 4611d41a7c9ebcac286a69122f0d0006ec7d61f3 Mon Sep 17 00:00:00 2001
+From: Marvin Scholz <epirat07@gmail.com>
+Date: Mon, 7 Sep 2026 23:38:55 +0200
+Subject: [PATCH] Work around broken Xcode 12 SDK which doesn't correctly
+ define vdotq_lane_s32 as returning signed vs. unsigned
+
+Co-authored-by: Steve Lhomme <robux4@ycbcr.xyz>
+Change-Id: I84709659987eec504934101703bc7dffad6e78a6
+---
+ cmake/aom_configure.cmake | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/cmake/aom_configure.cmake b/cmake/aom_configure.cmake
+index d94c97beb6..eafe8cc16c 100644
+--- a/cmake/aom_configure.cmake
++++ b/cmake/aom_configure.cmake
+@@ -428,8 +428,13 @@ else()
+   # Do not allow implicit vector type conversions on Clang builds (this is
+   # already the default on GCC builds).
+   if(CMAKE_C_COMPILER_ID MATCHES "Clang")
++    if(CMAKE_CXX_COMPILER_ID MATCHES "AppleClang" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL "12" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "13")
++      # Work around broken Xcode 12 SDK
++      add_compiler_flag_if_supported("-flax-vector-conversions=integer")
++    else()
+     # Clang 8.0.1 (in Cygwin) doesn't support -flax-vector-conversions=none.
+     add_compiler_flag_if_supported("-flax-vector-conversions=none")
++    endif()
+   endif()
+ endif()
+ 
+-- 
+2.52.0.windows.1
+
