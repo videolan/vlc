@@ -678,7 +678,7 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
     do
     {
         i_type = xml_ReaderNextNode( p_xml_reader, &psz_node );
-        if( i_type == XML_READER_ERROR )
+        if( i_type == XML_READER_ERROR || i_type == XML_READER_NONE )
             break;
 
         if( i_type == XML_READER_STARTELEM )
