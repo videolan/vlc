@@ -40,3 +40,17 @@ FOUNDATION_EXPORT NSString * _Nonnull const VLCLibraryDataTypesTestInputItemArtw
 VLCMediaLibraryMediaItem * _Nonnull VLCLibraryDataTypesTestMediaItemWithInputMetadata(
     vlc_ml_media_subtype_t subtype,
     NSDictionary<NSString *, id> * _Nullable metadata);
+
+VLCMediaLibraryMediaItem * _Nonnull VLCLibraryDataTypesTestMediaItemWithInputMetadataAndFileURLs(
+    vlc_ml_media_subtype_t subtype,
+    NSDictionary<NSString *, id> * _Nullable metadata,
+    NSArray<NSURL *> * _Nonnull fileURLs);
+
+void VLCLibraryDataTypesTestResetTrashState(void);
+void VLCLibraryDataTypesTestSetTrashFailure(BOOL shouldFail);
+void VLCLibraryDataTypesTestSetTrashFailureOnCall(NSUInteger callNumber);
+NSArray<NSURL *> * _Nonnull VLCLibraryDataTypesTestTrashedSourceURLs(void);
+NSArray<NSURL *> * _Nonnull VLCLibraryDataTypesTestTrashDestinationURLs(void);
+BOOL VLCLibraryDataTypesTestMoveItemToTrash(NSURL * _Nonnull url,
+                                            NSURL * _Nullable * _Nullable resultingURL,
+                                            NSError * _Nullable * _Nullable error);

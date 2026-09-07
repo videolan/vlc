@@ -619,6 +619,32 @@
     XCTAssertFalse(VLCInputItemTestDidReveal());
 }
 
+- (void)testFileBackedPlaylistMoveToTrashInvokesFileManager
+{
+    VLCLibraryDataTypesTestResetTrashState();
+    NSString * const path = [NSTemporaryDirectory() stringByAppendingPathComponent:
+                             @"vlc-datatypes-move-playlist-to-trash.m3u"];
+    XCTAssertTrue([[NSFileManager defaultManager] createFileAtPath:path
+                                                          contents:[NSData data]
+                                                        attributes:nil]);
+
+    struct vlc_ml_playlist_t playlistData = { 0 };
+    NSString * const fileMRL = [NSURL fileURLWithPath:path].absoluteString;
+    playlistData.psz_mrl = (char *)fileMRL.UTF8String;
+    VLCMediaLibraryPlaylist * const playlist =
+        [[VLCMediaLibraryPlaylist alloc] initWithPlaylist:&playlistData];
+
+    [playlist moveToTrash];
+
+    XCTAssertEqual(VLCLibraryDataTypesTestTrashedSourceURLs().count, (NSUInteger)1);
+    XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:path]);
+    XCTAssertEqual(VLCLibraryDataTypesTestTrashDestinationURLs().count, (NSUInteger)1);
+    XCTAssertTrue([[NSFileManager defaultManager]
+                   fileExistsAtPath:VLCLibraryDataTypesTestTrashDestinationURLs().firstObject.path]);
+    VLCLibraryDataTypesTestResetTrashState();
+    [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
+}
+
 - (void)testReadOnlyPlaylistRejectsAppendingMedia
 {
     struct vlc_ml_playlist_t playlistData = { 0 };
@@ -1044,6 +1070,187 @@
         [enumerated addObject:childItem];
     }];
     XCTAssertEqualObjects(enumerated, (@[ first, second ]));
+}
+
+- (void)testDummyItemMoveToTrashMovesChildMediaItems
+{
+    VLCInputItemTestResetAppKitState();
+    VLCLibraryDataTypesTestResetTrashState();
+    VLCMediaLibraryMediaItem * const child =
+        VLCLibraryDataTypesTestMediaItemWithInputMetadata(VLC_ML_MEDIA_SUBTYPE_MOVIE, nil);
+    NSURL * const sourceURL = child.files.firstObject.fileURL;
+    XCTAssertTrue([[NSFileManager defaultManager] createFileAtPath:sourceURL.path
+                                                           contents:[NSData data]
+                                                         attributes:nil]);
+    VLCMediaLibraryDummyItem * const item =
+        [[VLCMediaLibraryDummyItem alloc] initWithDisplayString:@"Collection"
+                                                 withMediaItems:@[child]];
+
+    [item moveToTrash];
+
+    XCTAssertEqualObjects(VLCLibraryDataTypesTestTrashedSourceURLs(), @[sourceURL]);
+    XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:sourceURL.path]);
+    XCTAssertEqual(VLCLibraryDataTypesTestTrashDestinationURLs().count, (NSUInteger)1);
+    XCTAssertTrue(VLCInputItemTestDidReload());
+    VLCLibraryDataTypesTestResetTrashState();
+    [[NSFileManager defaultManager] removeItemAtURL:sourceURL error:nil];
+}
+
+- (void)testDummyItemMoveToTrashMovesAllChildMediaItems
+{
+    VLCInputItemTestResetAppKitState();
+    VLCLibraryDataTypesTestResetTrashState();
+    NSURL * const firstURL = [NSURL fileURLWithPath:
+                              [NSTemporaryDirectory() stringByAppendingPathComponent:
+                               @"vlc-datatypes-first-child-file.mp4"]];
+    NSURL * const secondURL = [NSURL fileURLWithPath:
+                               [NSTemporaryDirectory() stringByAppendingPathComponent:
+                                @"vlc-datatypes-second-child-file.mp4"]];
+    XCTAssertTrue([[NSFileManager defaultManager] createFileAtPath:firstURL.path
+                                                              contents:[NSData data]
+                                                            attributes:nil]);
+    XCTAssertTrue([[NSFileManager defaultManager] createFileAtPath:secondURL.path
+                                                              contents:[NSData data]
+                                                            attributes:nil]);
+    VLCMediaLibraryMediaItem * const firstChild =
+        VLCLibraryDataTypesTestMediaItemWithInputMetadataAndFileURLs(
+            VLC_ML_MEDIA_SUBTYPE_MOVIE,
+            nil,
+            @[ firstURL ]);
+    VLCMediaLibraryMediaItem * const secondChild =
+        VLCLibraryDataTypesTestMediaItemWithInputMetadataAndFileURLs(
+            VLC_ML_MEDIA_SUBTYPE_MOVIE,
+            nil,
+            @[ secondURL ]);
+    VLCMediaLibraryDummyItem * const item =
+        [[VLCMediaLibraryDummyItem alloc] initWithDisplayString:@"Collection"
+                                                 withMediaItems:@[ firstChild, secondChild ]];
+
+    [item moveToTrash];
+
+    XCTAssertEqualObjects([NSSet setWithArray:VLCLibraryDataTypesTestTrashedSourceURLs()],
+                          ([NSSet setWithObjects:firstURL, secondURL, nil]));
+    XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:firstURL.path]);
+    XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:secondURL.path]);
+    XCTAssertEqual(VLCLibraryDataTypesTestTrashDestinationURLs().count, (NSUInteger)2);
+    XCTAssertTrue(VLCInputItemTestDidReload());
+    VLCLibraryDataTypesTestResetTrashState();
+    [[NSFileManager defaultManager] removeItemAtURL:firstURL error:nil];
+    [[NSFileManager defaultManager] removeItemAtURL:secondURL error:nil];
+}
+
+- (void)testMediaItemMoveToTrashTrashesFilesAndReloadsLibrary
+{
+    VLCInputItemTestResetAppKitState();
+    VLCLibraryDataTypesTestResetTrashState();
+    VLCMediaLibraryMediaItem * const item =
+        VLCLibraryDataTypesTestMediaItemWithInputMetadata(VLC_ML_MEDIA_SUBTYPE_MOVIE, nil);
+    NSURL * const sourceURL = item.files.firstObject.fileURL;
+    XCTAssertTrue([[NSFileManager defaultManager] createFileAtPath:sourceURL.path
+                                                           contents:[NSData data]
+                                                         attributes:nil]);
+
+    [item moveToTrash];
+
+    XCTAssertEqualObjects(VLCLibraryDataTypesTestTrashedSourceURLs(), @[sourceURL]);
+    XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:sourceURL.path]);
+    XCTAssertEqual(VLCLibraryDataTypesTestTrashDestinationURLs().count, (NSUInteger)1);
+    XCTAssertTrue(VLCInputItemTestDidReload());
+    VLCLibraryDataTypesTestResetTrashState();
+    [[NSFileManager defaultManager] removeItemAtURL:sourceURL error:nil];
+}
+
+- (void)testMediaItemMoveToTrashTrashesEveryFile
+{
+    VLCInputItemTestResetAppKitState();
+    VLCLibraryDataTypesTestResetTrashState();
+    NSURL * const firstURL = [NSURL fileURLWithPath:
+                              [NSTemporaryDirectory() stringByAppendingPathComponent:
+                               @"vlc-datatypes-first-media-file.mp4"]];
+    NSURL * const secondURL = [NSURL fileURLWithPath:
+                               [NSTemporaryDirectory() stringByAppendingPathComponent:
+                                @"vlc-datatypes-second-media-file.mp4"]];
+    XCTAssertTrue([[NSFileManager defaultManager] createFileAtPath:firstURL.path
+                                                              contents:[NSData data]
+                                                            attributes:nil]);
+    XCTAssertTrue([[NSFileManager defaultManager] createFileAtPath:secondURL.path
+                                                              contents:[NSData data]
+                                                            attributes:nil]);
+    VLCMediaLibraryMediaItem * const item =
+        VLCLibraryDataTypesTestMediaItemWithInputMetadataAndFileURLs(
+            VLC_ML_MEDIA_SUBTYPE_MOVIE,
+            nil,
+            @[ firstURL, secondURL ]);
+
+    [item moveToTrash];
+
+    XCTAssertEqualObjects([NSSet setWithArray:VLCLibraryDataTypesTestTrashedSourceURLs()],
+                          ([NSSet setWithObjects:firstURL, secondURL, nil]));
+    XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:firstURL.path]);
+    XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:secondURL.path]);
+    XCTAssertEqual(VLCLibraryDataTypesTestTrashDestinationURLs().count, (NSUInteger)2);
+    XCTAssertTrue(VLCInputItemTestDidReload());
+    VLCLibraryDataTypesTestResetTrashState();
+    [[NSFileManager defaultManager] removeItemAtURL:firstURL error:nil];
+    [[NSFileManager defaultManager] removeItemAtURL:secondURL error:nil];
+}
+
+- (void)testMediaItemMoveToTrashReloadsWhenTrashFails
+{
+    VLCInputItemTestResetAppKitState();
+    VLCLibraryDataTypesTestResetTrashState();
+    VLCLibraryDataTypesTestSetTrashFailure(YES);
+    VLCMediaLibraryMediaItem * const item =
+        VLCLibraryDataTypesTestMediaItemWithInputMetadata(VLC_ML_MEDIA_SUBTYPE_MOVIE, nil);
+    NSURL * const sourceURL = item.files.firstObject.fileURL;
+    XCTAssertTrue([[NSFileManager defaultManager] createFileAtPath:sourceURL.path
+                                                              contents:[NSData data]
+                                                            attributes:nil]);
+
+    [item moveToTrash];
+
+    XCTAssertEqualObjects(VLCLibraryDataTypesTestTrashedSourceURLs(), @[sourceURL]);
+    XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:sourceURL.path]);
+    XCTAssertEqual(VLCLibraryDataTypesTestTrashDestinationURLs().count, (NSUInteger)0);
+    XCTAssertTrue(VLCInputItemTestDidReload());
+    VLCLibraryDataTypesTestResetTrashState();
+    [[NSFileManager defaultManager] removeItemAtURL:sourceURL error:nil];
+}
+
+- (void)testMediaItemMoveToTrashContinuesAfterPartialFailure
+{
+    VLCInputItemTestResetAppKitState();
+    VLCLibraryDataTypesTestResetTrashState();
+    NSURL * const firstURL = [NSURL fileURLWithPath:
+                              [NSTemporaryDirectory() stringByAppendingPathComponent:
+                               @"vlc-datatypes-partial-first-file.mp4"]];
+    NSURL * const secondURL = [NSURL fileURLWithPath:
+                               [NSTemporaryDirectory() stringByAppendingPathComponent:
+                                @"vlc-datatypes-partial-second-file.mp4"]];
+    XCTAssertTrue([[NSFileManager defaultManager] createFileAtPath:firstURL.path
+                                                              contents:[NSData data]
+                                                            attributes:nil]);
+    XCTAssertTrue([[NSFileManager defaultManager] createFileAtPath:secondURL.path
+                                                              contents:[NSData data]
+                                                            attributes:nil]);
+    VLCMediaLibraryMediaItem * const item =
+        VLCLibraryDataTypesTestMediaItemWithInputMetadataAndFileURLs(
+            VLC_ML_MEDIA_SUBTYPE_MOVIE,
+            nil,
+            @[ firstURL, secondURL ]);
+    VLCLibraryDataTypesTestSetTrashFailureOnCall(2);
+
+    [item moveToTrash];
+
+    XCTAssertEqualObjects(VLCLibraryDataTypesTestTrashedSourceURLs(),
+                          (@[ firstURL, secondURL ]));
+    XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:firstURL.path]);
+    XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:secondURL.path]);
+    XCTAssertEqual(VLCLibraryDataTypesTestTrashDestinationURLs().count, (NSUInteger)1);
+    XCTAssertTrue(VLCInputItemTestDidReload());
+    VLCLibraryDataTypesTestResetTrashState();
+    [[NSFileManager defaultManager] removeItemAtURL:firstURL error:nil];
+    [[NSFileManager defaultManager] removeItemAtURL:secondURL error:nil];
 }
 
 @end

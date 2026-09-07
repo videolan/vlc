@@ -18,11 +18,41 @@
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "tests/VLCLibraryDataTypesIntegrationTestSupport.h"
+#import "tests/VLCLibraryDataTypesTestSupport.h"
+#import "tests/VLCInputItemTestSupport.h"
 
 @interface VLCLibraryDataTypesIntegrationTest : XCTestCase
 @end
 
 @implementation VLCLibraryDataTypesIntegrationTest
+
+- (NSArray<NSURL *> *)fileURLsForMediaItems:(NSArray<VLCMediaLibraryMediaItem *> *)mediaItems
+{
+    NSMutableArray<NSURL *> * const URLs = NSMutableArray.array;
+    for (VLCMediaLibraryMediaItem * const item in mediaItems) {
+        for (VLCMediaLibraryFile * const file in item.files) {
+            [URLs addObject:file.fileURL];
+        }
+    }
+    return URLs;
+}
+
+- (void)assertMediaItemsAreTrashed:(NSArray<VLCMediaLibraryMediaItem *> *)mediaItems
+{
+    NSArray<NSURL *> * const expectedURLs = [self fileURLsForMediaItems:mediaItems];
+    XCTAssertGreaterThan(expectedURLs.count, (NSUInteger)0);
+    XCTAssertEqualObjects([NSSet setWithArray:VLCLibraryDataTypesTestTrashedSourceURLs()],
+                          [NSSet setWithArray:expectedURLs]);
+    for (NSURL * const URL in expectedURLs) {
+        XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:URL.path]);
+    }
+    NSArray<NSURL *> * const destinationURLs =
+        VLCLibraryDataTypesTestTrashDestinationURLs();
+    XCTAssertEqual(destinationURLs.count, expectedURLs.count);
+    for (NSURL * const URL in destinationURLs) {
+        XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:URL.path]);
+    }
+}
 
 - (VLCMediaLibraryMediaItem *)integrationMediaItem
 {
@@ -40,6 +70,32 @@
     VLCMediaLibraryPlaylist * const playlist =
         [VLCMediaLibraryPlaylist playlistForLibraryID:playlistID];
     XCTAssertNotNil(playlist);
+    return playlist;
+}
+
+- (VLCMediaLibraryPlaylist *)playlistWithLibraryID:(int64_t)libraryID
+                                                MRL:(NSString *)MRL
+{
+    vlc_ml_playlist_list_t * const playlists =
+        vlc_ml_list_playlists(VLCLibraryDataTypesIntegrationMediaLibrary(),
+                              NULL,
+                              VLC_ML_PLAYLIST_TYPE_ALL);
+    XCTAssertTrue(playlists != NULL);
+
+    VLCMediaLibraryPlaylist *playlist = nil;
+    for (size_t index = 0; playlists != NULL && index < playlists->i_nb_items; ++index) {
+        if (playlists->p_items[index].i_id != libraryID) {
+            continue;
+        }
+
+        struct vlc_ml_playlist_t playlistData = playlists->p_items[index];
+        playlistData.psz_mrl = (char *)MRL.UTF8String;
+        playlist = [[VLCMediaLibraryPlaylist alloc] initWithPlaylist:&playlistData];
+        break;
+    }
+    if (playlists != NULL) {
+        vlc_ml_playlist_list_release(playlists);
+    }
     return playlist;
 }
 
@@ -116,6 +172,12 @@
 + (void)tearDown
 {
     VLCLibraryDataTypesIntegrationStop();
+    [super tearDown];
+}
+
+- (void)tearDown
+{
+    VLCLibraryDataTypesTestResetTrashState();
     [super tearDown];
 }
 
@@ -255,6 +317,71 @@
 
     XCTAssertEqual(group.libraryID, VLCLibraryDataTypesIntegrationGroupID());
     XCTAssertEqualObjects(group.displayString, @"Factory Show S01E01");
+}
+
+- (void)testArtistMoveToTrashMovesFetchedMediaItems
+{
+    VLCMediaLibraryArtist * const artist = [self factoryArtist];
+    NSArray<VLCMediaLibraryMediaItem *> * const mediaItems = artist.mediaItems;
+
+    VLCInputItemTestResetAppKitState();
+    VLCLibraryDataTypesTestResetTrashState();
+    [artist moveToTrash];
+
+    [self assertMediaItemsAreTrashed:mediaItems];
+    XCTAssertTrue(VLCInputItemTestDidReload());
+}
+
+- (void)testAlbumMoveToTrashMovesFetchedMediaItems
+{
+    VLCMediaLibraryAlbum * const album = [self factoryAlbum];
+    NSArray<VLCMediaLibraryMediaItem *> * const mediaItems = album.mediaItems;
+
+    VLCInputItemTestResetAppKitState();
+    VLCLibraryDataTypesTestResetTrashState();
+    [album moveToTrash];
+
+    [self assertMediaItemsAreTrashed:mediaItems];
+    XCTAssertTrue(VLCInputItemTestDidReload());
+}
+
+- (void)testGenreMoveToTrashMovesFetchedMediaItems
+{
+    VLCMediaLibraryGenre * const genre = [self factoryGenre];
+    NSArray<VLCMediaLibraryMediaItem *> * const mediaItems = genre.mediaItems;
+
+    VLCInputItemTestResetAppKitState();
+    VLCLibraryDataTypesTestResetTrashState();
+    [genre moveToTrash];
+
+    [self assertMediaItemsAreTrashed:mediaItems];
+    XCTAssertTrue(VLCInputItemTestDidReload());
+}
+
+- (void)testGroupMoveToTrashMovesFetchedMediaItems
+{
+    VLCMediaLibraryGroup * const group = [self factoryGroup];
+    NSArray<VLCMediaLibraryMediaItem *> * const mediaItems = group.mediaItems;
+
+    VLCInputItemTestResetAppKitState();
+    VLCLibraryDataTypesTestResetTrashState();
+    [group moveToTrash];
+
+    [self assertMediaItemsAreTrashed:mediaItems];
+    XCTAssertTrue(VLCInputItemTestDidReload());
+}
+
+- (void)testShowMoveToTrashMovesFetchedEpisodes
+{
+    VLCMediaLibraryShow * const show = [self factoryShow];
+    NSArray<VLCMediaLibraryMediaItem *> * const mediaItems = show.episodes;
+
+    VLCInputItemTestResetAppKitState();
+    VLCLibraryDataTypesTestResetTrashState();
+    [show moveToTrash];
+
+    [self assertMediaItemsAreTrashed:mediaItems];
+    XCTAssertTrue(VLCInputItemTestDidReload());
 }
 
 - (void)testArtistArtistsRelationshipContainsTheArtist
@@ -1173,6 +1300,71 @@
     vlc_ml_remove_stream(VLCLibraryDataTypesIntegrationMediaLibrary(), secondID);
     vlc_ml_remove_stream(VLCLibraryDataTypesIntegrationMediaLibrary(), thirdID);
 }
+
+- (void)testNonFileBackedPlaylistMoveToTrashDeletesPlaylist
+{
+    VLCMediaLibraryPlaylist * const playlist = [self integrationPlaylist];
+    const int64_t playlistID = playlist.libraryID;
+
+    [playlist moveToTrash];
+
+    XCTAssertNil([VLCMediaLibraryPlaylist playlistForLibraryID:playlistID]);
+}
+
+- (void)testMissingFileBackedPlaylistMoveToTrashDeletesPlaylist
+{
+    VLCMediaLibraryPlaylist * const createdPlaylist = [self integrationPlaylist];
+    const int64_t playlistID = createdPlaylist.libraryID;
+    VLCMediaLibraryPlaylist *playlist = nil;
+    NSString * const missingMRL = [NSURL fileURLWithPath:
+                                   [NSTemporaryDirectory() stringByAppendingPathComponent:
+                                    @"vlc-datatypes-missing-playlist.m3u"]].absoluteString;
+    playlist = [self playlistWithLibraryID:playlistID MRL:missingMRL];
+
+    XCTAssertNotNil(playlist);
+    [playlist moveToTrash];
+
+    XCTAssertNil([VLCMediaLibraryPlaylist playlistForLibraryID:playlistID]);
+}
+
+- (void)testNonFileMRLPlaylistMoveToTrashDeletesPlaylist
+{
+    VLCMediaLibraryPlaylist * const createdPlaylist = [self integrationPlaylist];
+    const int64_t playlistID = createdPlaylist.libraryID;
+    VLCMediaLibraryPlaylist * const playlist =
+        [self playlistWithLibraryID:playlistID MRL:@"mock://macosx-datatypes-playlist"];
+
+    XCTAssertNotNil(playlist);
+    [playlist moveToTrash];
+
+    XCTAssertNil([VLCMediaLibraryPlaylist playlistForLibraryID:playlistID]);
+}
+
+- (void)testFileBackedPlaylistMoveToTrashFailureDeletesPlaylist
+{
+    VLCMediaLibraryPlaylist * const createdPlaylist = [self integrationPlaylist];
+    const int64_t playlistID = createdPlaylist.libraryID;
+    NSString * const path = [NSTemporaryDirectory() stringByAppendingPathComponent:
+                             @"vlc-datatypes-failing-playlist.m3u"];
+    XCTAssertTrue([[NSFileManager defaultManager] createFileAtPath:path
+                                                              contents:[NSData data]
+                                                            attributes:nil]);
+    VLCMediaLibraryPlaylist * const playlist =
+        [self playlistWithLibraryID:playlistID
+                                MRL:[NSURL fileURLWithPath:path].absoluteString];
+
+    XCTAssertNotNil(playlist);
+    VLCLibraryDataTypesTestResetTrashState();
+    VLCLibraryDataTypesTestSetTrashFailure(YES);
+    [playlist moveToTrash];
+
+    XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:path]);
+    XCTAssertEqual(VLCLibraryDataTypesTestTrashDestinationURLs().count, (NSUInteger)0);
+    XCTAssertNil([VLCMediaLibraryPlaylist playlistForLibraryID:playlistID]);
+    VLCLibraryDataTypesTestResetTrashState();
+    [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
+}
+
 - (void)testDeletedPlaylistIsNotReturnedByFactory
 {
     VLCMediaLibraryPlaylist * const playlist = [self integrationPlaylist];

@@ -14,6 +14,143 @@
 #import "VLCLibraryDataTypesTestSupport.h"
 
 #import "library/VLCInputItem.h"
+#import <objc/runtime.h>
+
+@interface NSFileManager (VLCLibraryDataTypesTestSupport)
+- (BOOL)vlc_test_trashItemAtURL:(NSURL *)url
+                resultingItemURL:(NSURL **)resultingURL
+                           error:(NSError **)error;
+@end
+
+@implementation NSFileManager (VLCLibraryDataTypesTestSupport)
+
++ (void)load
+{
+    Method original = class_getInstanceMethod(self, @selector(trashItemAtURL:resultingItemURL:error:));
+    Method replacement = class_getInstanceMethod(self, @selector(vlc_test_trashItemAtURL:resultingItemURL:error:));
+    method_exchangeImplementations(original, replacement);
+}
+
+- (BOOL)vlc_test_trashItemAtURL:(NSURL *)url
+                resultingItemURL:(NSURL **)resultingURL
+                           error:(NSError **)error
+{
+    return VLCLibraryDataTypesTestMoveItemToTrash(url, resultingURL, error);
+}
+
+@end
+
+static NSMutableArray<NSURL *> *sTrashedSourceURLs;
+static NSMutableArray<NSURL *> *sTrashDestinationURLs;
+static NSMutableDictionary<NSURL *, NSURL *> *sTrashSourceForDestination;
+static NSUInteger sTrashCallCount;
+static NSUInteger sTrashFailureCall;
+
+static void VLCLibraryDataTypesTestEnsureTrashState(void)
+{
+    if (sTrashedSourceURLs == nil) {
+        sTrashedSourceURLs = NSMutableArray.array;
+        sTrashDestinationURLs = NSMutableArray.array;
+        sTrashSourceForDestination = NSMutableDictionary.dictionary;
+    }
+}
+
+void VLCLibraryDataTypesTestResetTrashState(void)
+{
+    VLCLibraryDataTypesTestEnsureTrashState();
+    for (NSURL * const destinationURL in sTrashDestinationURLs) {
+        NSURL * const sourceURL = sTrashSourceForDestination[destinationURL];
+        if ([[NSFileManager defaultManager] fileExistsAtPath:destinationURL.path]) {
+            [[NSFileManager defaultManager] moveItemAtURL:destinationURL
+                                                    toURL:sourceURL
+                                                    error:nil];
+        }
+    }
+    [sTrashedSourceURLs removeAllObjects];
+    [sTrashDestinationURLs removeAllObjects];
+    [sTrashSourceForDestination removeAllObjects];
+    sTrashCallCount = 0;
+    sTrashFailureCall = 0;
+}
+
+void VLCLibraryDataTypesTestSetTrashFailure(BOOL shouldFail)
+{
+    VLCLibraryDataTypesTestEnsureTrashState();
+    sTrashFailureCall = shouldFail ? 1 : 0;
+}
+
+void VLCLibraryDataTypesTestSetTrashFailureOnCall(NSUInteger callNumber)
+{
+    VLCLibraryDataTypesTestEnsureTrashState();
+    sTrashFailureCall = callNumber;
+}
+
+NSArray<NSURL *> *VLCLibraryDataTypesTestTrashedSourceURLs(void)
+{
+    VLCLibraryDataTypesTestEnsureTrashState();
+    return [sTrashedSourceURLs copy];
+}
+
+NSArray<NSURL *> *VLCLibraryDataTypesTestTrashDestinationURLs(void)
+{
+    VLCLibraryDataTypesTestEnsureTrashState();
+    return [sTrashDestinationURLs copy];
+}
+
+BOOL VLCLibraryDataTypesTestMoveItemToTrash(NSURL *url,
+                                            NSURL * _Nullable * _Nullable resultingURL,
+                                            NSError * _Nullable * _Nullable error)
+{
+    VLCLibraryDataTypesTestEnsureTrashState();
+    [sTrashedSourceURLs addObject:url];
+    sTrashCallCount++;
+
+    if (sTrashFailureCall != 0 && sTrashCallCount == sTrashFailureCall) {
+        if (resultingURL != NULL) {
+            *resultingURL = nil;
+        }
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain
+                                         code:NSFileWriteUnknownError
+                                     userInfo:nil];
+        }
+        return NO;
+    }
+
+    if (![[NSFileManager defaultManager] fileExistsAtPath:url.path]) {
+        if (resultingURL != NULL) {
+            *resultingURL = nil;
+        }
+        if (error != NULL) {
+            *error = nil;
+        }
+        return YES;
+    }
+
+    NSURL * const trashDirectoryURL =
+        [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:
+                                @"vlc-datatypes-test-trash"] isDirectory:YES];
+    [[NSFileManager defaultManager] createDirectoryAtURL:trashDirectoryURL
+                              withIntermediateDirectories:YES
+                                               attributes:nil
+                                                    error:nil];
+    NSURL * const destinationURL = [trashDirectoryURL URLByAppendingPathComponent:[NSUUID UUID].UUIDString];
+    NSError *moveError = nil;
+    const BOOL moved = [[NSFileManager defaultManager] moveItemAtURL:url
+                                                               toURL:destinationURL
+                                                               error:&moveError];
+    if (moved) {
+        [sTrashDestinationURLs addObject:destinationURL];
+        sTrashSourceForDestination[destinationURL] = url;
+    }
+    if (resultingURL != NULL) {
+        *resultingURL = moved ? destinationURL : nil;
+    }
+    if (error != NULL) {
+        *error = moveError;
+    }
+    return moved;
+}
 
 NSString * const VLCLibraryDataTypesTestInputItemNameKey = @"name";
 NSString * const VLCLibraryDataTypesTestInputItemTitleKey = @"title";
@@ -40,7 +177,8 @@ static VLCMediaLibraryMediaItem *VLCLibraryDataTypesTestMediaItemWithTypeAndSubt
     vlc_ml_media_type_t type,
     vlc_ml_media_subtype_t subtype,
     const char *title,
-    VLCInputItem * _Nullable inputItem);
+    VLCInputItem * _Nullable inputItem,
+    NSArray<NSURL *> * _Nullable fileURLs);
 
 @interface VLCLibraryDataTypesTestMediaItem : VLCMediaLibraryMediaItem
 @property (nonatomic, strong) VLCInputItem *testInputItem;
@@ -65,6 +203,7 @@ VLCMediaLibraryMediaItem *VLCLibraryDataTypesTestMediaItemWithEmptyTitle(vlc_ml_
     return VLCLibraryDataTypesTestMediaItemWithTypeAndSubtypeAndTitle(VLC_ML_MEDIA_TYPE_VIDEO,
                                                                        subtype,
                                                                        "",
+                                                                       nil,
                                                                        nil);
 }
 
@@ -74,6 +213,7 @@ VLCMediaLibraryMediaItem *VLCLibraryDataTypesTestMediaItemWithTypeAndSubtype(vlc
     return VLCLibraryDataTypesTestMediaItemWithTypeAndSubtypeAndTitle(type,
                                                                        subtype,
                                                                        "Media",
+                                                                       nil,
                                                                        nil);
 }
 
@@ -81,15 +221,23 @@ static VLCMediaLibraryMediaItem *VLCLibraryDataTypesTestMediaItemWithTypeAndSubt
     vlc_ml_media_type_t type,
     vlc_ml_media_subtype_t subtype,
     const char *title,
-    VLCInputItem * _Nullable inputItem)
+    VLCInputItem * _Nullable inputItem,
+    NSArray<NSURL *> * _Nullable fileURLs)
 {
+    NSArray<NSURL *> * const resolvedFileURLs = fileURLs.count > 0
+        ? fileURLs
+        : @[ [NSURL fileURLWithPath:@"/tmp/media.mp4"] ];
+    NSCAssert(resolvedFileURLs.count <= 2, @"Test fixture supports at most two files");
+
     struct TestFileList {
         size_t i_nb_items;
-        vlc_ml_file_t p_items[1];
+        vlc_ml_file_t p_items[2];
     } files = { 0 };
-    files.i_nb_items = 1;
-    files.p_items[0].psz_mrl = (char *)"file:///tmp/media.mp4";
-    files.p_items[0].i_type = VLC_ML_FILE_TYPE_MAIN;
+    files.i_nb_items = resolvedFileURLs.count;
+    for (NSUInteger index = 0; index < resolvedFileURLs.count; ++index) {
+        files.p_items[index].psz_mrl = (char *)resolvedFileURLs[index].absoluteString.UTF8String;
+        files.p_items[index].i_type = index == 0 ? VLC_ML_FILE_TYPE_MAIN : VLC_ML_FILE_TYPE_UNKNOWN;
+    }
 
     struct TestTrackList {
         size_t i_nb_items;
@@ -142,7 +290,7 @@ static VLCMediaLibraryMediaItem *VLCLibraryDataTypesTestMediaItemWithTypeAndSubt
     }
 
     VLCLibraryDataTypesTestMediaItem * const item =
-        [[VLCLibraryDataTypesTestMediaItem alloc]
+            [[VLCLibraryDataTypesTestMediaItem alloc]
             initWithMediaItem:&media
                       library:(vlc_medialibrary_t *)0x1];
     item.testInputItem = inputItem;
@@ -152,6 +300,16 @@ static VLCMediaLibraryMediaItem *VLCLibraryDataTypesTestMediaItemWithTypeAndSubt
 VLCMediaLibraryMediaItem *VLCLibraryDataTypesTestMediaItemWithInputMetadata(
     vlc_ml_media_subtype_t subtype,
     NSDictionary<NSString *, id> * _Nullable metadata)
+{
+    return VLCLibraryDataTypesTestMediaItemWithInputMetadataAndFileURLs(subtype,
+                                                                         metadata,
+                                                                         @[]);
+}
+
+VLCMediaLibraryMediaItem *VLCLibraryDataTypesTestMediaItemWithInputMetadataAndFileURLs(
+    vlc_ml_media_subtype_t subtype,
+    NSDictionary<NSString *, id> * _Nullable metadata,
+    NSArray<NSURL *> * _Nonnull fileURLs)
 {
     NSDictionary<NSString *, id> * const defaultMetadata = @{
         VLCLibraryDataTypesTestInputItemNameKey: @"Detail test item",
@@ -195,5 +353,6 @@ VLCMediaLibraryMediaItem *VLCLibraryDataTypesTestMediaItemWithInputMetadata(
     return VLCLibraryDataTypesTestMediaItemWithTypeAndSubtypeAndTitle(type,
                                                                        subtype,
                                                                        "Detail test item",
-                                                                       inputItem);
+                                                                       inputItem,
+                                                                       fileURLs);
 }

@@ -1095,26 +1095,25 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
         NSURL * const URL = [NSURL URLWithString:_MRL];
         if (URL == nil || !URL.isFileURL) {
             NSLog(@"Playlist %@ is not file-backed or is a dir (?)", self.displayString);
-            return;
-        }
-        NSFileManager * const fileManager = NSFileManager.defaultManager;
-        const BOOL fileExists = [fileManager fileExistsAtPath:URL.path];
-        
-        if (!fileExists) {
-            NSLog(@"Playlist file does not exist: %@", URL.path);
-            return;
-        }
-        
-        // This is a file-based playlist, move the file to trash
-        NSError *error = nil;
-        [fileManager trashItemAtURL:URL
-                    resultingItemURL:nil
-                                error:&error];
-        if (error) {
-            NSLog(@"Failed to move playlist file to trash: %@", error);
         } else {
-            NSLog(@"Successfully moved playlist file %@ to trash", URL.lastPathComponent);
-            return;
+            NSFileManager * const fileManager = NSFileManager.defaultManager;
+            const BOOL fileExists = [fileManager fileExistsAtPath:URL.path];
+
+            if (!fileExists) {
+                NSLog(@"Playlist file does not exist: %@", URL.path);
+            } else {
+                // This is a file-based playlist, move the file to trash
+                NSError *error = nil;
+                [fileManager trashItemAtURL:URL
+                            resultingItemURL:nil
+                                        error:&error];
+                if (error) {
+                    NSLog(@"Failed to move playlist file to trash: %@", error);
+                } else {
+                    NSLog(@"Successfully moved playlist file %@ to trash", URL.lastPathComponent);
+                    return;
+                }
+            }
         }
     }
     

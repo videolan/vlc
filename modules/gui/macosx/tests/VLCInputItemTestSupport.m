@@ -121,7 +121,6 @@ void VLCInputItemTestResetAppKitState(void)
     sArtistName = nil;
     sDidReveal = NO;
     sDidReload = NO;
-    sInterfaceThread = NULL;
 }
 
 BOOL VLCInputItemTestDidReveal(void)
