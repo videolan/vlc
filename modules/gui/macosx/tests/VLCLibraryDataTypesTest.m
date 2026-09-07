@@ -619,6 +619,46 @@
     XCTAssertFalse(VLCInputItemTestDidReveal());
 }
 
+- (void)testReadOnlyPlaylistRejectsAppendingMedia
+{
+    struct vlc_ml_playlist_t playlistData = { 0 };
+    playlistData.b_is_read_only = true;
+    VLCMediaLibraryPlaylist * const playlist =
+        [[VLCMediaLibraryPlaylist alloc] initWithPlaylist:&playlistData];
+    VLCMediaLibraryMediaItem * const item =
+        VLCLibraryDataTypesTestMediaItemWithSubtype(VLC_ML_MEDIA_SUBTYPE_MOVIE);
+
+    XCTAssertFalse([playlist appendMediaItems:@[item]]);
+}
+
+- (void)testWritablePlaylistRejectsAppendingNoMedia
+{
+    struct vlc_ml_playlist_t playlistData = { 0 };
+    VLCMediaLibraryPlaylist * const playlist =
+        [[VLCMediaLibraryPlaylist alloc] initWithPlaylist:&playlistData];
+
+    XCTAssertFalse([playlist appendMediaItems:@[]]);
+}
+
+- (void)testReadOnlyPlaylistRejectsRename
+{
+    struct vlc_ml_playlist_t playlistData = { 0 };
+    playlistData.b_is_read_only = true;
+    VLCMediaLibraryPlaylist * const playlist =
+        [[VLCMediaLibraryPlaylist alloc] initWithPlaylist:&playlistData];
+
+    XCTAssertFalse([playlist renameTo:@"Renamed playlist"]);
+}
+
+- (void)testPlaylistRejectsRenameToEmptyName
+{
+    struct vlc_ml_playlist_t playlistData = { 0 };
+    VLCMediaLibraryPlaylist * const playlist =
+        [[VLCMediaLibraryPlaylist alloc] initWithPlaylist:&playlistData];
+
+    XCTAssertFalse([playlist renameTo:@""]);
+}
+
 - (void)testMediaItemMapsCommonFields
 {
     VLCMediaLibraryMediaItem * const item =

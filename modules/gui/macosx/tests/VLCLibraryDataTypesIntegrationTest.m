@@ -985,6 +985,20 @@
     vlc_ml_playlist_delete(VLCLibraryDataTypesIntegrationMediaLibrary(), playlist.libraryID);
 }
 
+- (void)testPlaylistAppendInvalidatesCachedMediaItems
+{
+    VLCMediaLibraryPlaylist * const playlist = [self integrationPlaylist];
+    XCTAssertEqual(playlist.mediaItems.count, (NSUInteger)0);
+
+    VLCMediaLibraryMediaItem * const item = [self integrationMediaItem];
+    XCTAssertTrue([playlist appendMediaItems:@[item]]);
+
+    XCTAssertEqual(playlist.mediaItems.count, (NSUInteger)1);
+    XCTAssertEqual(playlist.mediaItems.firstObject.libraryID, item.libraryID);
+
+    vlc_ml_playlist_delete(VLCLibraryDataTypesIntegrationMediaLibrary(), playlist.libraryID);
+}
+
 - (void)testPlaylistRenamePersistsThroughMediaLibrary
 {
     VLCMediaLibraryPlaylist *playlist = [self integrationPlaylist];
@@ -1013,6 +1027,132 @@
     vlc_ml_playlist_delete(VLCLibraryDataTypesIntegrationMediaLibrary(), playlist.libraryID);
 }
 
+- (void)testPlaylistRemovalWithNoPositionsLeavesMediaUnchanged
+{
+    VLCMediaLibraryPlaylist * const playlist = [self integrationPlaylist];
+    VLCMediaLibraryMediaItem * const item = [self integrationMediaItem];
+    XCTAssertTrue([playlist appendMediaItems:@[item]]);
+    XCTAssertEqual(playlist.mediaItems.count, (NSUInteger)1);
+
+    [playlist removeMediaItemsAtPositions:@[]];
+
+    XCTAssertEqual(playlist.mediaItems.count, (NSUInteger)1);
+    XCTAssertEqual(playlist.mediaItems.firstObject.libraryID, item.libraryID);
+    vlc_ml_playlist_delete(VLCLibraryDataTypesIntegrationMediaLibrary(), playlist.libraryID);
+}
+
+- (void)testPlaylistRemovalSupportsUnsortedNonContiguousPositions
+{
+    const int64_t secondID =
+        VLCLibraryDataTypesIntegrationCreateExternalMedia("mock://macosx-datatypes-removal-2");
+    const int64_t thirdID =
+        VLCLibraryDataTypesIntegrationCreateExternalMedia("mock://macosx-datatypes-removal-3");
+    const int64_t fourthID =
+        VLCLibraryDataTypesIntegrationCreateExternalMedia("mock://macosx-datatypes-removal-4");
+    XCTAssertNotEqual(secondID, (int64_t)0);
+    XCTAssertNotEqual(thirdID, (int64_t)0);
+    XCTAssertNotEqual(fourthID, (int64_t)0);
+
+    VLCMediaLibraryPlaylist * const playlist = [self integrationPlaylist];
+    VLCMediaLibraryMediaItem * const first = [self integrationMediaItem];
+    VLCMediaLibraryMediaItem * const second = [VLCMediaLibraryMediaItem mediaItemForLibraryID:secondID];
+    VLCMediaLibraryMediaItem * const third = [VLCMediaLibraryMediaItem mediaItemForLibraryID:thirdID];
+    VLCMediaLibraryMediaItem * const fourth = [VLCMediaLibraryMediaItem mediaItemForLibraryID:fourthID];
+    NSArray<VLCMediaLibraryMediaItem *> * const items = @[first, second, third, fourth];
+    XCTAssertTrue([playlist appendMediaItems:items]);
+
+    [playlist removeMediaItemsAtPositions:@[@3, @1]];
+
+    VLCMediaLibraryPlaylist * const refreshedPlaylist =
+        [VLCMediaLibraryPlaylist playlistForLibraryID:playlist.libraryID];
+    XCTAssertEqual(refreshedPlaylist.mediaItems.count, (NSUInteger)2);
+    XCTAssertEqual(refreshedPlaylist.mediaItems[0].libraryID, first.libraryID);
+    XCTAssertEqual(refreshedPlaylist.mediaItems[1].libraryID, third.libraryID);
+
+    vlc_ml_playlist_delete(VLCLibraryDataTypesIntegrationMediaLibrary(), playlist.libraryID);
+    vlc_ml_remove_stream(VLCLibraryDataTypesIntegrationMediaLibrary(), secondID);
+    vlc_ml_remove_stream(VLCLibraryDataTypesIntegrationMediaLibrary(), thirdID);
+    vlc_ml_remove_stream(VLCLibraryDataTypesIntegrationMediaLibrary(), fourthID);
+}
+
+- (void)testPlaylistRemovalFoldsConsecutivePositions
+{
+    const int64_t secondID =
+        VLCLibraryDataTypesIntegrationCreateExternalMedia("mock://macosx-datatypes-consecutive-2");
+    const int64_t thirdID =
+        VLCLibraryDataTypesIntegrationCreateExternalMedia("mock://macosx-datatypes-consecutive-3");
+    const int64_t fourthID =
+        VLCLibraryDataTypesIntegrationCreateExternalMedia("mock://macosx-datatypes-consecutive-4");
+    XCTAssertNotEqual(secondID, (int64_t)0);
+    XCTAssertNotEqual(thirdID, (int64_t)0);
+    XCTAssertNotEqual(fourthID, (int64_t)0);
+
+    VLCMediaLibraryPlaylist * const playlist = [self integrationPlaylist];
+    VLCMediaLibraryMediaItem * const first = [self integrationMediaItem];
+    VLCMediaLibraryMediaItem * const second = [VLCMediaLibraryMediaItem mediaItemForLibraryID:secondID];
+    VLCMediaLibraryMediaItem * const third = [VLCMediaLibraryMediaItem mediaItemForLibraryID:thirdID];
+    VLCMediaLibraryMediaItem * const fourth = [VLCMediaLibraryMediaItem mediaItemForLibraryID:fourthID];
+    NSArray<VLCMediaLibraryMediaItem *> * const items = @[first, second, third, fourth];
+    XCTAssertTrue([playlist appendMediaItems:items]);
+
+    [playlist removeMediaItemsAtPositions:@[@1, @2]];
+
+    VLCMediaLibraryPlaylist * const refreshedPlaylist =
+        [VLCMediaLibraryPlaylist playlistForLibraryID:playlist.libraryID];
+    XCTAssertEqual(refreshedPlaylist.mediaItems.count, (NSUInteger)2);
+    XCTAssertEqual(refreshedPlaylist.mediaItems[0].libraryID, first.libraryID);
+    XCTAssertEqual(refreshedPlaylist.mediaItems[1].libraryID, fourth.libraryID);
+
+    vlc_ml_playlist_delete(VLCLibraryDataTypesIntegrationMediaLibrary(), playlist.libraryID);
+    vlc_ml_remove_stream(VLCLibraryDataTypesIntegrationMediaLibrary(), secondID);
+    vlc_ml_remove_stream(VLCLibraryDataTypesIntegrationMediaLibrary(), thirdID);
+    vlc_ml_remove_stream(VLCLibraryDataTypesIntegrationMediaLibrary(), fourthID);
+}
+
+- (void)testPlaylistRemovalIgnoresOutOfRangePositions
+{
+    VLCMediaLibraryPlaylist * const playlist = [self integrationPlaylist];
+    VLCMediaLibraryMediaItem * const item = [self integrationMediaItem];
+    XCTAssertTrue([playlist appendMediaItems:@[item]]);
+
+    [playlist removeMediaItemsAtPositions:@[@99]];
+
+    VLCMediaLibraryPlaylist * const refreshedPlaylist =
+        [VLCMediaLibraryPlaylist playlistForLibraryID:playlist.libraryID];
+    XCTAssertEqual(refreshedPlaylist.mediaItems.count, (NSUInteger)1);
+    XCTAssertEqual(refreshedPlaylist.mediaItems.firstObject.libraryID, item.libraryID);
+
+    vlc_ml_playlist_delete(VLCLibraryDataTypesIntegrationMediaLibrary(), playlist.libraryID);
+}
+
+- (void)testPlaylistRemovalTreatsDuplicatePositionsAsOneSelection
+{
+    const int64_t secondID =
+        VLCLibraryDataTypesIntegrationCreateExternalMedia("mock://macosx-datatypes-duplicate-2");
+    const int64_t thirdID =
+        VLCLibraryDataTypesIntegrationCreateExternalMedia("mock://macosx-datatypes-duplicate-3");
+    XCTAssertNotEqual(secondID, (int64_t)0);
+    XCTAssertNotEqual(thirdID, (int64_t)0);
+
+    VLCMediaLibraryPlaylist * const playlist = [self integrationPlaylist];
+    VLCMediaLibraryMediaItem * const first = [self integrationMediaItem];
+    VLCMediaLibraryMediaItem * const second = [VLCMediaLibraryMediaItem mediaItemForLibraryID:secondID];
+    VLCMediaLibraryMediaItem * const third = [VLCMediaLibraryMediaItem mediaItemForLibraryID:thirdID];
+    NSArray<VLCMediaLibraryMediaItem *> * const items = @[first, second, third];
+    XCTAssertTrue([playlist appendMediaItems:items]);
+
+    [playlist removeMediaItemsAtPositions:@[@1, @1]];
+
+    VLCMediaLibraryPlaylist * const refreshedPlaylist =
+        [VLCMediaLibraryPlaylist playlistForLibraryID:playlist.libraryID];
+    XCTAssertEqual(refreshedPlaylist.mediaItems.count, (NSUInteger)2);
+    XCTAssertEqual(refreshedPlaylist.mediaItems[0].libraryID, first.libraryID);
+    XCTAssertEqual(refreshedPlaylist.mediaItems[1].libraryID, third.libraryID);
+
+    vlc_ml_playlist_delete(VLCLibraryDataTypesIntegrationMediaLibrary(), playlist.libraryID);
+    vlc_ml_remove_stream(VLCLibraryDataTypesIntegrationMediaLibrary(), secondID);
+    vlc_ml_remove_stream(VLCLibraryDataTypesIntegrationMediaLibrary(), thirdID);
+}
 - (void)testDeletedPlaylistIsNotReturnedByFactory
 {
     VLCMediaLibraryPlaylist * const playlist = [self integrationPlaylist];
