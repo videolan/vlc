@@ -83,7 +83,6 @@ static void on_state_update(void *opaque, libvlc_downloader_task *task,
         status == libvlc_downloader_status_error)
     {
         sem_post(ctx->done_sem);
-        libvlc_downloader_task_release(task);
     }
 }
 
@@ -215,20 +214,25 @@ int main(int argc, const char **argv)
             .media = media,
         };
 
-        libvlc_downloader_task *task = libvlc_downloader_queue(downloader, &req, &cbs, &ctxs[i]);
+        libvlc_downloader_task *task = libvlc_downloader_task_new(downloader, &req, &cbs, &ctxs[i]);
 
         libvlc_media_release(media);
 
         if (task == NULL)
-        {
-            fprintf(stderr, "[req %d] failed to queue download for '%s'\n", i, url);
             continue;
-        }
 
-        fprintf(stdout, "[req %d, id=%p] queued: %s\n",
-                i, task, url);
-        fflush(stdout);
-        queued++;
+        if (libvlc_downloader_submit(downloader, task) == 0)
+        {
+            fprintf(stdout, "[req %d, id=%p] queued: %s\n",
+                    i, task, url);
+            fflush(stdout);
+            queued++;
+        }
+        else
+            fprintf(stderr, "[req %d] failed to queue download for '%s'\n", i, url);
+
+        /* Task isn't used anymore by the caller, so drop the reference right away. */
+        libvlc_downloader_task_release(task);
     }
 
     for (int i = 0; i < queued; ++i)

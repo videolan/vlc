@@ -46,12 +46,13 @@ typedef struct libvlc_downloader_request_t libvlc_downloader_request_t;
 /**
  * Opaque handle of a downloader task.
  *
- * Identifies a task request submitted via libvlc_downloader_queue().
+ * Identifies a task created by libvlc_downloader_task_new() and started with
+ * libvlc_downloader_submit().
  * It can be passed to libvlc_downloader_cancel() to cancel that request,
  * or to libvlc_downloader_set_pause() to pause/resume that request.
  *
- * \note Validity starts when libvlc_downloader_queue() returns a non-NULL handle
- * and ends with libvlc_downloader_task_release().
+ * \note Validity starts when libvlc_downloader_task_new() returns a non-NULL
+ * handle and ends with libvlc_downloader_task_release().
  */
 typedef struct libvlc_downloader_task libvlc_downloader_task;
 
@@ -101,7 +102,7 @@ struct libvlc_downloader_cbs
      * And avoid blocking operations in this callback as it is invoked with the internal lock held.
      *
      * \param opaque user data
-     * \param task opaque handle returned by libvlc_downloader_queue()
+     * \param task opaque handle returned by libvlc_downloader_task_new()
      * \param buf pointer to buffer (owned by downloader, only valid during callback)
      * \param len size of buffer
      * \param position total number of bytes read by the downloader so far
@@ -135,7 +136,7 @@ struct libvlc_downloader_cbs
      * And avoid blocking operations in this callback as it is invoked with the internal lock held.
      *
      * \param opaque user data
-     * \param task opaque handle returned by libvlc_downloader_queue()
+     * \param task opaque handle returned by libvlc_downloader_task_new()
      * \param status download status
      */
     void (*on_state_update)(void *opaque, libvlc_downloader_task *task,
@@ -148,7 +149,7 @@ struct libvlc_downloader_cbs
      * available since version 0
      *
      * \param opaque user data
-     * \param task opaque handle returned by libvlc_downloader_queue()
+     * \param task opaque handle returned by libvlc_downloader_task_new()
      * \param subitems media list of subitems (owned by LibVLC)
      */
     void (*on_subitems)(void *opaque, libvlc_downloader_task *task,
@@ -161,7 +162,7 @@ struct libvlc_downloader_cbs
      * available since version 0
      *
      * \param opaque user data
-     * \param task opaque handle returned by libvlc_downloader_queue()
+     * \param task opaque handle returned by libvlc_downloader_task_new()
      * \param slaves array of libvlc_media_slave_t* (owned by LibVLC)
      * \param count number of slaves
      */
@@ -234,7 +235,30 @@ LIBVLC_API libvlc_downloader_t *
 libvlc_downloader_new(libvlc_instance_t *inst, const struct libvlc_downloader_cfg *cfg);
 
 /**
- * Download a media asynchronously.
+ * Create a media download task.
+ *
+ * This prepares a task handle for downloading a media. Nothing runs and no
+ * callback can fire until the handle is passed to
+ * libvlc_downloader_submit().
+ *
+ * \param downloader downloader instance
+ * \param req a pointer to a valid request struct
+ * \param cbs a pointer to a valid callbacks struct. The pointed struct
+ * must be kept alive (and not modified) by the caller until libvlc_downloader_cbs.on_state_update()
+ * is called for the returned task handle with a terminal state (finished/cancelled/error).
+ * \param cbs_opaque opaque pointer for callbacks
+ * \return NULL in case of error, or a task handle owned by the caller. It must
+ * be released with libvlc_downloader_task_release(), whether or not it is
+ * submitted.
+ *
+ * \version LibVLC 4.0.0 or later
+ */
+LIBVLC_API libvlc_downloader_task *
+libvlc_downloader_task_new(libvlc_downloader_t *downloader, const libvlc_downloader_request_t *req,
+                           const struct libvlc_downloader_cbs *cbs, void *cbs_opaque);
+
+/**
+ * Start a task created by libvlc_downloader_task_new()
  *
  * - The downloader first parses the media.
  *
@@ -248,29 +272,32 @@ libvlc_downloader_new(libvlc_instance_t *inst, const struct libvlc_downloader_cf
  *
  * - If the media is a file type with finite size, the download starts in a separate thread.
  *
- * \param downloader downloader instance
- * \param req a pointer to a valid request struct
- * \param cbs a pointer to a valid callbacks struct. The pointed struct
- * must be kept alive (and not modified) by the caller until libvlc_downloader_cbs.on_state_update()
- * is called for the returned task handle with a terminal state (finished/cancelled/error).
- * \param cbs_opaque opaque pointer for callbacks
- * \return NULL in case of error, or a valid handle if the request was
- * scheduled for downloading.
+ * On success the task is scheduled and the callbacks are guaranteed to be called
+ * and the task will eventually report a terminal state (finished/cancelled/error).
+ * That callback may run even before this function returns.
  *
- * \note No callbacks will be invoked if the return value is NULL.
+ * \note On failure no callback is invoked. The caller keeps its reference and
+ * may submit the task again.
+ *
+ * \note A task may be submitted at most once, and may only be re-submitted if
+ * the previous attempt failed. Submitting does not transfer the caller's
+ * reference. It keeps owning the handle and must release it.
+ *
+ * \param downloader the downloader the task was created from
+ * \param task a task that has not yet been successfully submitted
+ * \return 0 on success, -1 on error
  *
  * \version LibVLC 4.0.0 or later
  */
-LIBVLC_API libvlc_downloader_task *
-libvlc_downloader_queue(libvlc_downloader_t *downloader, const libvlc_downloader_request_t *req,
-                        const struct libvlc_downloader_cbs *cbs, void *cbs_opaque);
+LIBVLC_API int
+libvlc_downloader_submit(libvlc_downloader_t *downloader, libvlc_downloader_task *task);
 
 /**
  * Cancel an ongoing download.
  *
  * \param downloader downloader instance
- * \param task a downloader task returned by libvlc_downloader_queue(), 
- * or NULL to cancel all requests.
+ * \param task a downloader task returned by libvlc_downloader_task_new(),
+ * or NULL to cancel all submitted requests.
  *
  * \return the number of requests cancelled
  *
@@ -282,7 +309,8 @@ libvlc_downloader_queue(libvlc_downloader_t *downloader, const libvlc_downloader
  *   with the cancelled state.
  *
  * - If the request is already in a terminated state (finished, cancelled, or error),
- *   the call is a no-op and no callback will be invoked.
+ *   or if it was never submitted, the call is a no-op and no callback will be
+ *   invoked.
  *
  * \version LibVLC 4.0.0 or later
  */
@@ -292,13 +320,19 @@ LIBVLC_API size_t libvlc_downloader_cancel(libvlc_downloader_t *downloader, libv
  * Toggle pause/resume for the download.
  *
  * \param downloader downloader instance
- * \param task a valid downloader task returned by libvlc_downloader_queue()
+ * \param task a valid downloader task returned by libvlc_downloader_task_new()
  * \param paused true to pause, false to resume
  *
  * \note This API is valid only when the download is in pending/running/paused state.
  * And the on_state_update callback with paused/running state will be called only during these
  * state changes. Else, for finished/cancelled/error states, it's a no-op and
  * no callback will be called.
+ *
+ * Pausing a pending task (including one not submitted yet) does not
+ * pause parsing. The on_subitems and on_slaves callbacks are still invoked,
+ * if available. If the download starts, the paused state is reported before
+ * any data is read (without a prior running state), and nothing is downloaded
+ * until the task is resumed.
  *
  * \version LibVLC 4.0.0 or later
  */
@@ -320,7 +354,7 @@ LIBVLC_API void libvlc_downloader_destroy(libvlc_downloader_t *downloader);
 /**
  * Get the media associated with the downloader request handle.
  *
- * \param task opaque handle returned by libvlc_downloader_queue()
+ * \param task opaque handle returned by libvlc_downloader_task_new()
  * \return the media associated with the request handle.
  *
  * \note The returned media is held by the task, it must not be
@@ -337,7 +371,8 @@ libvlc_downloader_task_get_media(libvlc_downloader_task *task);
  * \param task the downloader task handle
  *
  * \note
- * - The task handle is retained when returned by libvlc_downloader_queue().
+ * - The libvlc_downloader_task_new() call transfers the ownership of the task
+ *   handle to the caller. It must be released whether or not it was submitted.
  *
  * - Mandatory to call to avoid memory leaks.
  *

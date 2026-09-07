@@ -189,6 +189,7 @@ static ptrdiff_t on_buffer(void *opaque, libvlc_downloader_task *task, const uin
 
 static void on_state_update(void *opaque, libvlc_downloader_task *task, libvlc_downloader_status_t status)
 {
+    (void)task;
     struct test_ctx_t *ctx = opaque;
     ctx->state_counts[status]++;
     if (status == libvlc_downloader_status_paused)
@@ -196,10 +197,7 @@ static void on_state_update(void *opaque, libvlc_downloader_task *task, libvlc_d
     if (status == libvlc_downloader_status_finished ||
         status == libvlc_downloader_status_cancelled ||
         status == libvlc_downloader_status_error)
-    {
         vlc_sem_post(&ctx->terminated_sem);
-        libvlc_downloader_task_release(task);
-    }
 }
 
 static void reset_ctx(struct test_ctx_t *ctx)
@@ -248,12 +246,23 @@ static void test_basic_download(libvlc_instance_t *vlc)
         .media = media2,
     };
 
-    libvlc_downloader_task *task1 = libvlc_downloader_queue(downloader, &req1, &cbs, &ctx1);
-    libvlc_downloader_task *task2 = libvlc_downloader_queue(downloader, &req2, &cbs, &ctx2);
+    libvlc_downloader_task *task1 = libvlc_downloader_task_new(downloader, &req1, &cbs, &ctx1);
+    libvlc_downloader_task *task2 = libvlc_downloader_task_new(downloader, &req2, &cbs, &ctx2);
 
     assert(task1 != NULL);
     assert(task2 != NULL);
     assert(task1 != task2);
+
+    /* a task that is never submitted, no callback may fire, cancel is a
+       no-op and releasing it must free it */
+    struct test_ctx_t ctx3;
+    reset_ctx(&ctx3);
+    libvlc_downloader_task *task3 = libvlc_downloader_task_new(downloader, &req1, &cbs, &ctx3);
+    assert(task3 != NULL);
+    assert(libvlc_downloader_cancel(downloader, task3) == 0);
+
+    assert(libvlc_downloader_submit(downloader, task1) == 0);
+    assert(libvlc_downloader_submit(downloader, task2) == 0);
 
     /* wait for both downloads to reach a terminal state */
     vlc_sem_wait(&ctx1.terminated_sem);
@@ -275,6 +284,13 @@ static void test_basic_download(libvlc_instance_t *vlc)
     assert(ctx1.total_bytes == TEST_TOTAL_BYTES);
     assert(ctx2.total_bytes == TEST_TOTAL_BYTES);
 
+    /* the unsubmitted task never ran */
+    assert(ctx3.state_counts[libvlc_downloader_status_running] == 0);
+    assert(ctx3.buffer_cb_calls == 0);
+
+    libvlc_downloader_task_release(task1);
+    libvlc_downloader_task_release(task2);
+    libvlc_downloader_task_release(task3);
     libvlc_downloader_destroy(downloader);
     libvlc_media_release(media1);
     libvlc_media_release(media2);
@@ -302,8 +318,9 @@ static void test_pause_resume(libvlc_instance_t *vlc)
         .media = media,
     };
 
-    libvlc_downloader_task *task = libvlc_downloader_queue(downloader, &req, &cbs, &ctx);
+    libvlc_downloader_task *task = libvlc_downloader_task_new(downloader, &req, &cbs, &ctx);
     assert(task != NULL);
+    assert(libvlc_downloader_submit(downloader, task) == 0);
 
     /* wait for a couple of buffer callbacks before pausing */
     for (int i = 0; i < 2; ++i)
@@ -330,6 +347,7 @@ static void test_pause_resume(libvlc_instance_t *vlc)
     assert(ctx.buffer_data_ok);
     assert(ctx.total_bytes == TEST_TOTAL_BYTES);
 
+    libvlc_downloader_task_release(task);
     libvlc_downloader_destroy(downloader);
     libvlc_media_release(media);
 }
@@ -356,8 +374,9 @@ static void test_cancel_download(libvlc_instance_t *vlc)
         .media = media,
     };
 
-    libvlc_downloader_task *task = libvlc_downloader_queue(downloader, &req, &cbs, &ctx);
+    libvlc_downloader_task *task = libvlc_downloader_task_new(downloader, &req, &cbs, &ctx);
     assert(task != NULL);
+    assert(libvlc_downloader_submit(downloader, task) == 0);
 
     int progress_for_cancel = 2; /* cancel after 2 calls of buffer callback */
 
@@ -372,6 +391,7 @@ static void test_cancel_download(libvlc_instance_t *vlc)
 
     assert(ctx.state_counts[libvlc_downloader_status_cancelled] == 1);
 
+    libvlc_downloader_task_release(task);
     libvlc_downloader_destroy(downloader);
     libvlc_media_release(media);
 }
@@ -399,6 +419,7 @@ static void partial_ctx_init(struct partial_ctx_t *ctx)
 static void partial_on_state(void *opaque, libvlc_downloader_task *task,
                              libvlc_downloader_status_t status)
 {
+    (void)task;
     struct partial_ctx_t *ctx = opaque;
     ctx->state_counts[status]++;
     if (status == libvlc_downloader_status_paused)
@@ -406,10 +427,7 @@ static void partial_on_state(void *opaque, libvlc_downloader_task *task,
     if (status == libvlc_downloader_status_finished ||
         status == libvlc_downloader_status_cancelled ||
         status == libvlc_downloader_status_error)
-    {
         vlc_sem_post(&ctx->terminated_sem);
-        libvlc_downloader_task_release(task);
-    }
 }
 
 static ptrdiff_t partial_on_buffer(void *opaque, libvlc_downloader_task *task,
@@ -464,8 +482,9 @@ static void test_partial_read(libvlc_instance_t *vlc)
         .media = media,
     };
 
-    libvlc_downloader_task *task = libvlc_downloader_queue(downloader, &req, &cbs, &ctx);
+    libvlc_downloader_task *task = libvlc_downloader_task_new(downloader, &req, &cbs, &ctx);
     assert(task != NULL);
+    assert(libvlc_downloader_submit(downloader, task) == 0);
 
     /* wait for the first (partial-accept) callback, then for auto-pause */
     vlc_sem_wait(&ctx.first_buffer_sem);
@@ -486,6 +505,7 @@ static void test_partial_read(libvlc_instance_t *vlc)
     size_t expected_residual = ctx.first_len - (ctx.first_len / 2);
     assert(ctx.second_len == expected_residual);
 
+    libvlc_downloader_task_release(task);
     libvlc_downloader_destroy(downloader);
     libvlc_media_release(media);
 }
