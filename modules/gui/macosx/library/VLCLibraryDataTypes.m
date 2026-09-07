@@ -1150,6 +1150,9 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     NSUInteger rangeLen = 1;
     for (NSUInteger i = 1; i < sorted.count; i++) {
         const NSUInteger pos = sorted[i].unsignedIntegerValue;
+        if (pos == rangeStart + rangeLen - 1) {
+            continue;
+        }
         if (pos == rangeStart + rangeLen) {
             rangeLen++;
             continue;
