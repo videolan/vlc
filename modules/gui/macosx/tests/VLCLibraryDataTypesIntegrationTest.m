@@ -658,16 +658,70 @@
     XCTAssertEqualObjects(inputItem.MRL, @"mock://macosx-datatypes-integration");
 }
 
+- (void)testMediaItemInitializerMapsPersistedMedia
+{
+    vlc_ml_media_t * const media =
+        vlc_ml_get_media(VLCLibraryDataTypesIntegrationMediaLibrary(),
+                         VLCLibraryDataTypesIntegrationMediaID());
+    XCTAssertNotEqual(media, (vlc_ml_media_t *)NULL);
+    if (media == NULL) {
+        return;
+    }
+
+    VLCMediaLibraryMediaItem * const item =
+        [[VLCMediaLibraryMediaItem alloc] initWithMediaItem:media];
+    vlc_ml_media_release(media);
+
+    XCTAssertNotNil(item);
+    XCTAssertEqual(item.libraryID, VLCLibraryDataTypesIntegrationMediaID());
+    XCTAssertEqualObjects(item.inputItem.MRL, @"mock://macosx-datatypes-integration");
+}
+
 - (void)testStreamURLInitializerCreatesPersistedStream
 {
     NSURL * const url = [NSURL URLWithString:@"mock://macosx-datatypes-stream"];
     VLCMediaLibraryMediaItem * const item = [[VLCMediaLibraryMediaItem alloc] initWithStreamURL:url];
+
+    XCTAssertNotNil(item);
+    XCTAssertGreaterThan(item.libraryID, (int64_t)0);
 
     VLCMediaLibraryMediaItem * const refreshedItem =
         [VLCMediaLibraryMediaItem mediaItemForLibraryID:item.libraryID];
     XCTAssertNotNil(refreshedItem);
     XCTAssertEqualObjects(refreshedItem.inputItem.MRL, url.absoluteString);
     XCTAssertEqual(vlc_ml_remove_stream(VLCLibraryDataTypesIntegrationMediaLibrary(), item.libraryID), VLC_SUCCESS);
+}
+
+- (void)testStreamURLInitializerRejectsNilURL
+{
+    id const nilURL = nil;
+
+    XCTAssertNil([[VLCMediaLibraryMediaItem alloc] initWithStreamURL:nilURL]);
+}
+
+- (void)testExternalURLInitializerCreatesPersistedMediaItem
+{
+    NSURL * const url = [NSURL URLWithString:@"mock://macosx-datatypes-external-url"];
+    VLCMediaLibraryMediaItem * const item = [[VLCMediaLibraryMediaItem alloc] initWithExternalURL:url];
+
+    XCTAssertNotNil(item);
+    XCTAssertGreaterThan(item.libraryID, (int64_t)0);
+
+    VLCMediaLibraryMediaItem * const refreshedItem =
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:item.libraryID];
+    XCTAssertNotNil(refreshedItem);
+    XCTAssertNotNil(refreshedItem.inputItem);
+    XCTAssertEqualObjects(refreshedItem.inputItem.MRL, url.absoluteString);
+
+    XCTAssertEqual(vlc_ml_remove_stream(VLCLibraryDataTypesIntegrationMediaLibrary(), item.libraryID), VLC_SUCCESS);
+    XCTAssertNil([VLCMediaLibraryMediaItem mediaItemForLibraryID:item.libraryID]);
+}
+
+- (void)testExternalURLInitializerRejectsNilURL
+{
+    id const nilURL = nil;
+
+    XCTAssertNil([[VLCMediaLibraryMediaItem alloc] initWithExternalURL:nilURL]);
 }
 
 - (void)testMediaItemRatingRoundTripsThroughMediaLibrary
