@@ -565,6 +565,7 @@ opengl_init_swizzle(struct vlc_gl_sampler *sampler,
                 assert(sampler->tex_count == 1);
                 break;
             case VLC_CODEC_VUYX:
+            case VLC_CODEC_VUYA:
                 swizzle_per_tex[0] = "bgr";
                 break;
             case VLC_CODEC_Y410:
