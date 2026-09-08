@@ -119,6 +119,24 @@
     return episode;
 }
 
+- (VLCMediaLibraryMovie *)factoryMovie
+{
+    XCTAssertTrue(VLCLibraryDataTypesIntegrationPrepareMovieFixture());
+    vlc_ml_media_t * const media =
+        vlc_ml_get_media(VLCLibraryDataTypesIntegrationMediaLibrary(),
+                         VLCLibraryDataTypesIntegrationFactoryMovieMediaID());
+    XCTAssertNotEqual(media, (vlc_ml_media_t *)NULL);
+    if (media == NULL) {
+        return nil;
+    }
+
+    VLCMediaLibraryMovie * const movie =
+        [[VLCMediaLibraryMovie alloc] initWithMediaItem:media];
+    vlc_ml_media_release(media);
+    XCTAssertNotNil(movie);
+    return movie;
+}
+
 - (VLCMediaLibraryAlbum *)factoryAlbum
 {
     VLCMediaLibraryMediaItem * const track = [self factoryAudioTrack];
@@ -593,6 +611,84 @@
     VLCMediaLibraryGroup * const group = [self factoryGroup];
 
     XCTAssertEqual(group.firstMediaItem.libraryID, group.mediaItems.firstObject.libraryID);
+}
+
+- (void)testMovieMediaItemsRelationshipContainsThePersistedMovie
+{
+    VLCMediaLibraryMovie * const movie = [self factoryMovie];
+    NSArray<VLCMediaLibraryMediaItem *> * const mediaItems = movie.mediaItems;
+
+    XCTAssertEqual(mediaItems.count, (NSUInteger)1);
+    VLCMediaLibraryMediaItem * const mediaItem = mediaItems.firstObject;
+    XCTAssertEqual(mediaItem.libraryID, movie.libraryID);
+
+    NSURL * const movieURL = [NSURL URLWithString:mediaItem.inputItem.MRL];
+    XCTAssertEqualObjects(movieURL.scheme, @"file");
+    XCTAssertEqualObjects(movieURL.lastPathComponent, @"Factory Movie.mp4");
+    XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:movieURL.path]);
+}
+
+- (void)testMovieFirstMediaItemMatchesItsMediaItemsRelationship
+{
+    VLCMediaLibraryMovie * const movie = [self factoryMovie];
+
+    XCTAssertEqual(movie.firstMediaItem.libraryID, movie.mediaItems.firstObject.libraryID);
+}
+
+- (void)testMovieMediaItemHasMovieSubtypeAndEntity
+{
+    VLCMediaLibraryMovie * const movie = [self factoryMovie];
+    VLCMediaLibraryMediaItem * const mediaItem = movie.mediaItems.firstObject;
+
+    XCTAssertEqual(mediaItem.mediaSubType, VLC_ML_MEDIA_SUBTYPE_MOVIE);
+    XCTAssertNotNil(mediaItem.movie);
+    XCTAssertEqual(mediaItem.movie.libraryID, movie.libraryID);
+}
+
+- (void)testMovieMapsPersistedSummaryAndIMDbID
+{
+    VLCMediaLibraryMovie * const movie = [self factoryMovie];
+
+    XCTAssertEqualObjects(movie.summary, @"Factory movie summary");
+    XCTAssertEqualObjects(movie.imdbID, @"tt1234567");
+}
+
+- (void)testMovieFavoritePersistsThroughMediaLibrary
+{
+    VLCMediaLibraryMovie * movie = [self factoryMovie];
+    const int64_t movieID = movie.libraryID;
+
+    XCTAssertEqual([movie setFavorite:YES], VLC_SUCCESS);
+    movie = [self factoryMovie];
+    XCTAssertEqual(movie.libraryID, movieID);
+    XCTAssertTrue(movie.favorited);
+
+    XCTAssertEqual([movie toggleFavorite], VLC_SUCCESS);
+    movie = [self factoryMovie];
+    XCTAssertFalse(movie.favorited);
+}
+
+- (void)testMovieRevealInFinderUsesItsMediaItem
+{
+    VLCMediaLibraryMovie * const movie = [self factoryMovie];
+
+    VLCInputItemTestResetAppKitState();
+    [movie revealInFinder];
+
+    XCTAssertTrue(VLCInputItemTestDidReveal());
+}
+
+- (void)testMovieMoveToTrashMovesItsMediaItem
+{
+    VLCMediaLibraryMovie * const movie = [self factoryMovie];
+    NSArray<VLCMediaLibraryMediaItem *> * const mediaItems = movie.mediaItems;
+
+    VLCInputItemTestResetAppKitState();
+    VLCLibraryDataTypesTestResetTrashState();
+    [movie moveToTrash];
+
+    [self assertMediaItemsAreTrashed:mediaItems];
+    XCTAssertTrue(VLCInputItemTestDidReload());
 }
 
 - (void)testShowEpisodePrimaryDetailUsesShowName
