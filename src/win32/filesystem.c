@@ -38,6 +38,7 @@
 #include <winsock2.h>
 #include <direct.h>
 #include <unistd.h>
+#include <stdckdint.h>
 
 #include <vlc_common.h>
 #include <vlc_charset.h>
@@ -379,6 +380,44 @@ void vlc_rewinddir( vlc_DIR *wdir )
     }
 }
 
+#define FILETIME_UNIX_EPOCH_TICKS UINT64_C(116444736000000000)
+#define FILETIME_TICKS_PER_SECOND INT64_C(10000000)
+
+static int filetime_to_time_t(const FILETIME *ft, time_t *result)
+{
+    ULARGE_INTEGER ticks = {
+        .HighPart = ft->dwHighDateTime,
+        .LowPart  = ft->dwLowDateTime,
+    };
+
+    int64_t delta, seconds;
+
+    if (ckd_sub(&delta, ticks.QuadPart, FILETIME_UNIX_EPOCH_TICKS))
+    {
+        errno = EOVERFLOW;
+        return -1;
+    }
+
+    seconds = delta / FILETIME_TICKS_PER_SECOND;
+
+    if ( unlikely(delta < 0 && delta % FILETIME_TICKS_PER_SECOND != 0) )
+    {
+        if (ckd_sub(&seconds, seconds, INT64_C(1)))
+        {
+            errno = EOVERFLOW;
+            return -1;
+        }
+    }
+
+    // ensure the value fits in the result
+    if ( unlikely(ckd_add(result, seconds, 0)) ) {
+        errno = EOVERFLOW;
+        return -1;
+    }
+
+    return 0;
+}
+
 int vlc_stat (const char *filename, struct stat *buf)
 {
     wchar_t *wpath = widen_path (filename);
@@ -389,8 +428,49 @@ int vlc_stat (const char *filename, struct stat *buf)
                    "Mismatched struct stat definition.");
 
     int ret = _wstati64 (wpath, buf);
+    if ( ret != 0 )
+    {
+        free (wpath);
+        return ret;
+    }
+
+    // _wstati64() can give different st_mtime values for the same file if it
+    // was created in a different Daylight Saving Time as the current time.
+    // This is not the case in UCRT builds.
+    // GetFileAttributesExW() doesn't have this problem.
+    WIN32_FILE_ATTRIBUTE_DATA fad;
+    BOOL res = GetFileAttributesExW( wpath, GetFileExInfoStandard, &fad );
     free (wpath);
-    return ret;
+    if ( unlikely(!res) )
+    {
+        DWORD error = GetLastError();
+
+        switch (error) {
+            case ERROR_FILE_NOT_FOUND:
+            case ERROR_PATH_NOT_FOUND:
+            case ERROR_INVALID_NAME:
+                errno = ENOENT;
+                break;
+
+            case ERROR_ACCESS_DENIED:
+            case ERROR_SHARING_VIOLATION:
+                errno = EACCES;
+                break;
+
+            default:
+                errno = EIO;
+                break;
+        }
+
+        return -1;
+    }
+
+    if (filetime_to_time_t(&fad.ftCreationTime,   &buf->st_ctime) ||
+        filetime_to_time_t(&fad.ftLastAccessTime, &buf->st_atime) ||
+        filetime_to_time_t(&fad.ftLastWriteTime,  &buf->st_mtime))
+        return -1;
+
+    return 0;
 }
 
 int vlc_lstat (const char *filename, struct stat *buf)
