@@ -37,6 +37,7 @@
 #endif
 
 #define __EVEN( x ) (((x) + 1) & ~1)
+#define AVI_MAX_DEPTH 32
 
 static vlc_fourcc_t GetFOURCC( const uint8_t *p_buff )
 {
@@ -59,11 +60,11 @@ static uint64_t AVI_ChunkEnd( const avi_chunk_t *p_ck )
  *
  ****************************************************************************/
 static int AVI_ChunkReadCommon( stream_t *s, avi_chunk_t *p_chk,
-                                const avi_chunk_t *p_father )
+                                const avi_chunk_t *p_father, unsigned i_depth )
 {
     const uint8_t *p_peek;
 
-    AVI_ChunkInit( p_chk );
+    AVI_ChunkInit( p_chk, i_depth );
 
     const uint64_t i_pos = vlc_stream_Tell( s );
     if( vlc_stream_Peek( s, &p_peek, 8 ) < 8 )
@@ -127,7 +128,7 @@ static int AVI_NextChunk( stream_t *s, avi_chunk_t *p_chk )
 
     if( !p_chk )
     {
-        if( AVI_ChunkReadCommon( s, &chk, NULL ) )
+        if( AVI_ChunkReadCommon( s, &chk, NULL, 0 ) )
         {
             return VLC_EGENERIC;
         }
@@ -991,13 +992,17 @@ int  AVI_ChunkRead( stream_t *s, avi_chunk_t *p_chk, avi_chunk_t *p_father )
 {
     int i_index;
 
+    unsigned i_depth = p_father ? p_father->common.i_depth + 1 : 0;
+    if( i_depth >= AVI_MAX_DEPTH )
+        return VLC_EGENERIC;
+
     if( !p_chk )
     {
         msg_Warn( s, "cannot read null chunk" );
         return VLC_EGENERIC;
     }
 
-    if( AVI_ChunkReadCommon( s, p_chk, p_father ) )
+    if( AVI_ChunkReadCommon( s, p_chk, p_father, i_depth ) )
         return VLC_EGENERIC;
 
     if( p_chk->common.i_chunk_fourcc == VLC_FOURCC( 0, 0, 0, 0 ) )
@@ -1061,14 +1066,15 @@ void AVI_ChunkClean( stream_t *s,
         msg_Warn( s, "unknown chunk: %4.4s (not unloaded)",
                 (char*)&p_chk->common.i_chunk_fourcc );
     }
-    AVI_ChunkInit( p_chk );
+    AVI_ChunkInit( p_chk, 0 );
 
     return;
 }
 
-void AVI_ChunkInit( avi_chunk_t *p_chk )
+void AVI_ChunkInit( avi_chunk_t *p_chk, unsigned i_depth )
 {
     memset( p_chk, 0, sizeof(*p_chk) );
+    p_chk->common.i_depth = i_depth;
 }
 
 static void AVI_ChunkDumpDebug_level( vlc_object_t *p_obj,
@@ -1129,6 +1135,7 @@ int AVI_ChunkReadRoot( stream_t *s, avi_chunk_t *p_root )
     p_list->p_father = NULL;
     p_list->p_next  = NULL;
     p_list->p_first = NULL;
+    p_list->i_depth = 0;
 
     p_list->i_type = VLC_FOURCC( 'r', 'o', 'o', 't' );
 

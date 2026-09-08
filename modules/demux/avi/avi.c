@@ -3076,7 +3076,7 @@ static void AVI_ExtractSubtitle( demux_t *p_demux,
 
     p_indx = AVI_ChunkFind( p_strl, AVIFOURCC_indx, 0, false );
     avi_chunk_t ck;
-    AVI_ChunkInit( &ck );
+    AVI_ChunkInit( &ck, p_strl->i_depth + 1 );
     int64_t  i_position;
     unsigned i_size;
     if( p_indx )

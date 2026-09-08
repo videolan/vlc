@@ -48,7 +48,8 @@ typedef union avi_chunk_u avi_chunk_t;
     uint64_t i_chunk_pos;          \
     avi_chunk_t *p_next;           \
     avi_chunk_t *p_father;         \
-    avi_chunk_t *p_first;
+    avi_chunk_t *p_first; \
+    unsigned i_depth;
 
 #define AVI_CHUNK( p_chk ) (avi_chunk_t*)(p_chk)
 
@@ -256,7 +257,7 @@ int     AVI_ChunkRead( stream_t *,
                        avi_chunk_t *p_chk,
                        avi_chunk_t *p_father );
 void    AVI_ChunkClean( stream_t *, avi_chunk_t * );
-void    AVI_ChunkInit( avi_chunk_t * );
+void    AVI_ChunkInit( avi_chunk_t *, unsigned );
 
 int     AVI_ChunkCount_( avi_chunk_t *, vlc_fourcc_t, bool );
 void   *AVI_ChunkFind_ ( avi_chunk_t *, vlc_fourcc_t, int, bool );
