@@ -216,7 +216,6 @@ static HRESULT StartDeferred(aout_stream_t *s, vlc_tick_t date)
 
 static HRESULT Play(aout_stream_t *s, block_t *block, vlc_tick_t date)
 {
-    (void) date;
     aout_stream_sys_t *sys = s->sys;
     void *pv;
     HRESULT hr;
@@ -226,7 +225,8 @@ static HRESULT Play(aout_stream_t *s, block_t *block, vlc_tick_t date)
         hr = E_FAIL;
         goto out;
     }
-    else if (sys->started_state == STARTED_STATE_INIT)
+    /* Partial-block retries have no date: keep the already scheduled start. */
+    else if (sys->started_state == STARTED_STATE_INIT && date != VLC_TICK_INVALID)
     {
         hr = StartDeferred(s, date);
         if (FAILED(hr))
