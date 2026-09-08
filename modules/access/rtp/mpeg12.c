@@ -180,6 +180,7 @@ static void rtp_mpa_decode(struct vlc_rtp_pt *pt, void *data, block_t *block,
         block_t *frame = block_Alloc(fh.i_frame_size);
         if (likely(frame != NULL)) {
             assert(block->p_next == NULL); /* Only one block to copy from */
+            assert(block->i_buffer >= frame->i_buffer);
             memcpy(frame->p_buffer, block->p_buffer, frame->i_buffer);
             frame->i_flags = block->i_flags;
             frame->i_pts = block->i_pts;
@@ -192,6 +193,7 @@ static void rtp_mpa_decode(struct vlc_rtp_pt *pt, void *data, block_t *block,
         block->p_buffer += fh.i_frame_size;
         block->i_buffer -= fh.i_frame_size;
         block->i_pts = VLC_TICK_INVALID;
+        sys->offset -= fh.i_frame_size;
     }
     return;
 
