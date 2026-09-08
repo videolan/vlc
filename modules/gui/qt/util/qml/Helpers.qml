@@ -79,6 +79,10 @@ QtObject {
         return Math.floor(a / b) * b
     }
 
+    function alignRound(a : real, b : int) : int {
+        return Math.round(a / b) * b
+    }
+
     // Currently only supports .25, .5, .75
     function denominatorForFloat(number : real) : int {
         const fraction = number % 1
