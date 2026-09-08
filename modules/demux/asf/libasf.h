@@ -33,6 +33,7 @@
 
 #define ASF_OBJECT_COMMON          \
     int          i_type;           \
+    unsigned     i_level; \
     vlc_guid_t       i_object_id;      \
     uint64_t     i_object_size;    \
     uint64_t     i_object_pos;     \

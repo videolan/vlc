@@ -36,6 +36,8 @@
 # define ASF_DEBUG 1
 #endif
 
+#define ASF_MAX_DEPTH 32
+
 /* Helpers:
  * They ensure that invalid reads will not create problems.
  * They are expansion safe
@@ -106,12 +108,14 @@ static char *AsfObjectHelperReadString( const uint8_t *p_peek, size_t i_peek, ui
  *
  ****************************************************************************/
 static int ASF_ReadObject( stream_t *, asf_object_t *,  asf_object_t * );
+static int ASF_ReadObjectExpDepth( stream_t *, asf_object_t *,
+                                   asf_object_t *, unsigned );
 static void ASF_ParentObject( asf_object_t *p_father, asf_object_t *p_obj );
 
 /****************************************************************************
  *
  ****************************************************************************/
-static int ASF_ReadObjectCommon( stream_t *s, asf_object_t *p_obj )
+static int ASF_ReadObjectCommon( stream_t *s, asf_object_t *p_obj, unsigned i_level )
 {
     asf_object_common_t *p_common = &p_obj->common;
     const uint8_t *p_peek;
@@ -123,6 +127,7 @@ static int ASF_ReadObjectCommon( stream_t *s, asf_object_t *p_obj )
     p_common->i_object_size = GetQWLE( p_peek + 16 );
     p_common->i_object_pos  = vlc_stream_Tell( s );
     p_common->p_next = NULL;
+    p_common->i_level = i_level;
 
 #ifdef ASF_DEBUG
     msg_Dbg( s,
@@ -146,7 +151,7 @@ static int ASF_NextObject( stream_t *s, asf_object_t *p_obj, uint64_t i_boundary
 
     if( p_obj == NULL )
     {
-        if( ASF_ReadObjectCommon( s, &obj ) )
+        if( ASF_ReadObjectCommon( s, &obj, 0 ) )
             return VLC_EGENERIC;
 
         p_obj = &obj;
@@ -1015,7 +1020,7 @@ static int ASF_ReadObject_extended_stream_properties( stream_t *s,
         }
 
         asf_object_t *p_sp = malloc( sizeof( asf_object_t ) );
-        if( !p_sp || ASF_ReadObject( s, p_sp, NULL ) )
+        if( !p_sp || ASF_ReadObjectExpDepth( s, p_sp, NULL, p_obj->common.i_level + 1 ) )
         {
             free( p_sp );
         }
@@ -1623,14 +1628,25 @@ static const struct ASF_Object_Function_entry * ASF_GetObject_Function( const vl
 static int ASF_ReadObject( stream_t *s, asf_object_t *p_obj,
                            asf_object_t *p_father )
 {
+    unsigned i_depth = p_father ? p_father->common.i_level + 1: 0;
+
+    return ASF_ReadObjectExpDepth( s, p_obj, p_father, i_depth );
+}
+
+static int ASF_ReadObjectExpDepth( stream_t *s, asf_object_t *p_obj,
+                                   asf_object_t *p_father, unsigned i_depth )
+{
     int i_result = VLC_SUCCESS;
 
     if( !p_obj )
         return VLC_SUCCESS;
 
+    if( i_depth >= ASF_MAX_DEPTH )
+        return VLC_EGENERIC;
+
     memset( p_obj, 0, sizeof( *p_obj ) );
 
-    if( ASF_ReadObjectCommon( s, p_obj ) )
+    if( ASF_ReadObjectCommon( s, p_obj, i_depth ) )
     {
         msg_Warn( s, "cannot read one asf object at %"PRIu64, vlc_stream_Tell(s) );
         return VLC_EGENERIC;
@@ -1813,6 +1829,7 @@ asf_object_root_t *ASF_ReadObjectRoot( stream_t *s, int b_seekable )
     memcpy( &p_root->i_object_id, &vlc_object_root_guid, sizeof( vlc_guid_t ) );
     p_root->i_object_pos = vlc_stream_Tell( s );
     p_root->i_object_size = 0;
+    p_root->i_level = 0;
     p_root->p_first = NULL;
     p_root->p_last  = NULL;
     p_root->p_next  = NULL;
