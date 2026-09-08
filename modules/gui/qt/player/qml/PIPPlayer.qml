@@ -16,6 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick
+import QtQuick.Window
 import QtQuick.Templates as T
 
 import VLC.MainInterface
@@ -27,15 +28,27 @@ import VLC.Util
 
 T.Control {
     id: root
-    width: Math.round(VLCStyle.dp(320, VLCStyle.scale))
-    height: Math.round(VLCStyle.dp(180, VLCStyle.scale))
+    width: Helpers.alignRound(320, _alignNumber)
+    height: Helpers.alignRound(180, _alignNumber)
+
+    // Default size is always aligned, this only
+    // controls position alignment. Note that
+    // setting this may make dragging less smooth,
+    // depending on how big is the denominator
+    // for the fractional DPR (the bigger, the
+    // worse). See `Helpers::denominatorForFloat()`.
+    property bool pixelAlignedForDPR: !MainCtx.videoSurfaceCanHaveFractionalPosition
 
     transform: Translate {
         x: (root.x !== targetX) ? (targetX - root.x) : 0.0
         y: (root.y !== targetY) ? (targetY - root.y) : 0.0
 
-        readonly property real targetX: MainCtx.videoSurfaceCanHaveFractionalPosition ? root.x : Math.round(root.x)
-        readonly property real targetY: MainCtx.videoSurfaceCanHaveFractionalPosition ? root.y : Math.round(root.y)
+        readonly property real targetX: root.pixelAlignedForDPR ? Helpers.alignRound(root.x, root._alignNumber)
+                                                                : (MainCtx.videoSurfaceCanHaveFractionalPosition ? root.x
+                                                                                                                 : Math.round(root.x))
+        readonly property real targetY: root.pixelAlignedForDPR ? Helpers.alignRound(root.y, root._alignNumber)
+                                                                : (MainCtx.videoSurfaceCanHaveFractionalPosition ? root.y
+                                                                                                                 : Math.round(root.y))
     }
 
     objectName: "pip window"
@@ -53,6 +66,17 @@ T.Control {
     Accessible.role: Accessible.Graphic
     Accessible.focusable: false
     Accessible.name: qsTr("video content")
+
+    property real _eDPR: MainCtx.effectiveDevicePixelRatio(Window.window) || 1.0
+    readonly property int _alignNumber: pixelAlignedForDPR ? Helpers.denominatorForFloat(_eDPR) : 1
+
+    Connections {
+        target: MainCtx
+
+        function onIntfDevicePixelRatioChanged() {
+            root._eDPR = MainCtx.effectiveDevicePixelRatio(root.Window.window) || 1.0
+        }
+    }
 
     Drag.active: dragHandler.active
 
