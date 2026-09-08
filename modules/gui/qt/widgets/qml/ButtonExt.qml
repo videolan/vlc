@@ -82,7 +82,7 @@ T.Button {
 
     // Tooltip
 
-    T.ToolTip.visible: (T.ToolTip.text && (!showText || label.implicitWidth > label.width) && (hovered || visualFocus))
+    T.ToolTip.visible: (T.ToolTip.text && (!showText || (root.contentItem?.label && root.contentItem.label.implicitWidth > root.contentItem.label.width)) && (hovered || visualFocus))
 
     T.ToolTip.delay: VLCStyle.delayToolTipAppear
 
@@ -180,6 +180,8 @@ T.Button {
     }
 
     contentItem: RowLayout {
+        property alias label: label
+
         spacing: 0
 
         Item {

@@ -61,6 +61,8 @@ ButtonExt {
     contentItem: RowLayout {
         property alias menuIndicatorButton: menuIndicator
 
+        property alias label: label
+
         spacing: 0
 
         Item {
@@ -134,6 +136,10 @@ ButtonExt {
             rightInset: topInset
 
             Accessible.name: qsTr("More options")
+
+            T.ToolTip.text: menuIndicator.Accessible.name
+            T.ToolTip.delay: VLCStyle.delayToolTipAppear
+            T.ToolTip.visible: menuIndicator.hovered || menuIndicator.visualFocus
 
             Navigation.parentItem: root
 
