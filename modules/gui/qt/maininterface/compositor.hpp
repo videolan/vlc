@@ -146,6 +146,10 @@ public:
     // The following method should return true if surface updates can be threaded:
     virtual bool canDoThreadedSurfaceUpdates() const { return false; };
 
+    // The following method should return true if the fractional position is
+    // respected as is:
+    virtual bool supportsFractionalPositioning() const { return false; }
+
 protected:
     void commonSetupVoutWindow(vlc_window_t* p_wnd, VoutDestroyCb destroyCb);
     void commonWindowEnable();
