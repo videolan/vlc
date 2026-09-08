@@ -30,6 +30,14 @@ T.Control {
     width: Math.round(VLCStyle.dp(320, VLCStyle.scale))
     height: Math.round(VLCStyle.dp(180, VLCStyle.scale))
 
+    transform: Translate {
+        x: (root.x !== targetX) ? (targetX - root.x) : 0.0
+        y: (root.y !== targetY) ? (targetY - root.y) : 0.0
+
+        readonly property real targetX: MainCtx.videoSurfaceCanHaveFractionalPosition ? root.x : Math.round(root.x)
+        readonly property real targetY: MainCtx.videoSurfaceCanHaveFractionalPosition ? root.y : Math.round(root.y)
+    }
+
     objectName: "pip window"
 
     property real dragXMin: 0
