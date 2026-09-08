@@ -1051,6 +1051,17 @@ QWindow *MainCtx::intfMainWindow() const
         return nullptr;
 }
 
+bool MainCtx::videoSurfaceCanHaveFractionalPosition() const
+{
+    assert(p_intf->p_compositor);
+    if (p_intf->p_compositor->type() == vlc::Compositor::DummyCompositor)
+        return true; // Does not matter, there is no video embedding in this case.
+
+    // We can avoid dynamic cast here, since we early return if the type is not `CompositorVideo`:
+    const auto videoCompositor = static_cast<vlc::CompositorVideo*>(p_intf->p_compositor.get());
+    return videoCompositor->supportsFractionalPositioning();
+}
+
 QVariant MainCtx::settingValue(const QString &key, const QVariant &defaultValue) const
 {
     return settings->value(key, defaultValue);
