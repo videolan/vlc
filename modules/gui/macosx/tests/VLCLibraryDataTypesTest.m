@@ -14,6 +14,7 @@
 #import <XCTest/XCTest.h>
 
 #import "library/VLCLibraryDataTypes.h"
+#import "library/VLCInputItem.h"
 #import "tests/VLCLibraryDataTypesTestSupport.h"
 #import "tests/VLCInputItemTestSupport.h"
 
@@ -617,6 +618,90 @@
         [[VLCMediaLibraryPlaylist alloc] initWithPlaylist:&playlistData];
     [playlist revealInFinder];
     XCTAssertFalse(VLCInputItemTestDidReveal());
+}
+
+- (void)testPlaylistRevealInFinderWithMalformedMRLDoesNothing
+{
+    VLCInputItemTestResetAppKitState();
+    struct vlc_ml_playlist_t playlistData = { 0 };
+    playlistData.psz_mrl = (char *)"http://[invalid";
+    VLCMediaLibraryPlaylist * const playlist =
+        [[VLCMediaLibraryPlaylist alloc] initWithPlaylist:&playlistData];
+
+    [playlist revealInFinder];
+
+    XCTAssertFalse(VLCInputItemTestDidReveal());
+    XCTAssertEqual(VLCInputItemTestRevealedURLs().count, (NSUInteger)0);
+}
+
+- (void)testMediaItemRevealInFinderSelectsFirstFile
+{
+    VLCInputItemTestResetAppKitState();
+    NSURL * const firstURL = [NSURL fileURLWithPath:
+                              [NSTemporaryDirectory() stringByAppendingPathComponent:
+                               @"vlc-datatypes-reveal-first-file.mp4"]];
+    NSURL * const secondURL = [NSURL fileURLWithPath:
+                               [NSTemporaryDirectory() stringByAppendingPathComponent:
+                                @"vlc-datatypes-reveal-second-file.mp4"]];
+    VLCMediaLibraryMediaItem * const item =
+        VLCLibraryDataTypesTestMediaItemWithInputMetadataAndFileURLs(
+            VLC_ML_MEDIA_SUBTYPE_MOVIE,
+            nil,
+            @[ firstURL, secondURL ]);
+
+    [item revealInFinder];
+
+    XCTAssertTrue(VLCInputItemTestDidReveal());
+    XCTAssertEqualObjects(VLCInputItemTestRevealedURLs(), @[firstURL]);
+}
+
+- (void)testMediaItemRevealInFinderWithoutFilesDoesNothing
+{
+    VLCInputItemTestResetAppKitState();
+    VLCMediaLibraryMediaItem * const item =
+        VLCLibraryDataTypesTestMediaItemWithInputMetadataAndFileURLs(
+            VLC_ML_MEDIA_SUBTYPE_MOVIE,
+            nil,
+            @[]);
+
+    [item revealInFinder];
+
+    XCTAssertFalse(VLCInputItemTestDidReveal());
+    XCTAssertEqual(VLCInputItemTestRevealedURLs().count, (NSUInteger)0);
+}
+
+- (void)testDummyItemRevealInFinderUsesFirstChildFile
+{
+    VLCInputItemTestResetAppKitState();
+    NSURL * const childURL = [NSURL fileURLWithPath:
+                              [NSTemporaryDirectory() stringByAppendingPathComponent:
+                               @"vlc-datatypes-dummy-reveal-file.mp4"]];
+    VLCMediaLibraryMediaItem * const child =
+        VLCLibraryDataTypesTestMediaItemWithInputMetadataAndFileURLs(
+            VLC_ML_MEDIA_SUBTYPE_MOVIE,
+            nil,
+            @[ childURL ]);
+    VLCMediaLibraryDummyItem * const item =
+        [[VLCMediaLibraryDummyItem alloc] initWithDisplayString:@"Collection"
+                                                 withMediaItems:@[child]];
+
+    [item revealInFinder];
+
+    XCTAssertTrue(VLCInputItemTestDidReveal());
+    XCTAssertEqualObjects(VLCInputItemTestRevealedURLs(), @[childURL]);
+}
+
+- (void)testEmptyDummyItemRevealInFinderDoesNothing
+{
+    VLCInputItemTestResetAppKitState();
+    VLCMediaLibraryDummyItem * const item =
+        [[VLCMediaLibraryDummyItem alloc] initWithDisplayString:@"Collection"
+                                                 withMediaItems:@[]];
+
+    [item revealInFinder];
+
+    XCTAssertFalse(VLCInputItemTestDidReveal());
+    XCTAssertEqual(VLCInputItemTestRevealedURLs().count, (NSUInteger)0);
 }
 
 - (void)testFileBackedPlaylistMoveToTrashInvokesFileManager

@@ -22,6 +22,7 @@ static NSImage *sQuickLookImage;
 static NSImage *sWorkspaceImage;
 static NSString *sArtistName;
 static BOOL sDidReveal;
+static NSMutableArray<NSURL *> *sRevealedURLs;
 static BOOL sDidReload;
 static intf_thread_t *sInterfaceThread;
 
@@ -120,12 +121,18 @@ void VLCInputItemTestResetAppKitState(void)
     sWorkspaceImage = nil;
     sArtistName = nil;
     sDidReveal = NO;
+    sRevealedURLs = NSMutableArray.array;
     sDidReload = NO;
 }
 
 BOOL VLCInputItemTestDidReveal(void)
 {
     return sDidReveal;
+}
+
+NSArray<NSURL *> *VLCInputItemTestRevealedURLs(void)
+{
+    return [sRevealedURLs copy] ?: @[];
 }
 
 BOOL VLCInputItemTestDidReload(void)
@@ -151,9 +158,10 @@ BOOL VLCInputItemTestDidReload(void)
     return sWorkspaceImage;
 }
 
-- (void)activateFileViewerSelectingURLs:(NSArray<NSURL *> * __unused)fileURLs
+- (void)activateFileViewerSelectingURLs:(NSArray<NSURL *> *)fileURLs
 {
     sDidReveal = YES;
+    [sRevealedURLs addObjectsFromArray:fileURLs];
 }
 
 @end

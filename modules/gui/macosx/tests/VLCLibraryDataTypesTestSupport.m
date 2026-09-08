@@ -224,7 +224,7 @@ static VLCMediaLibraryMediaItem *VLCLibraryDataTypesTestMediaItemWithTypeAndSubt
     VLCInputItem * _Nullable inputItem,
     NSArray<NSURL *> * _Nullable fileURLs)
 {
-    NSArray<NSURL *> * const resolvedFileURLs = fileURLs.count > 0
+    NSArray<NSURL *> * const resolvedFileURLs = fileURLs != nil
         ? fileURLs
         : @[ [NSURL fileURLWithPath:@"/tmp/media.mp4"] ];
     NSCAssert(resolvedFileURLs.count <= 2, @"Test fixture supports at most two files");
@@ -303,13 +303,13 @@ VLCMediaLibraryMediaItem *VLCLibraryDataTypesTestMediaItemWithInputMetadata(
 {
     return VLCLibraryDataTypesTestMediaItemWithInputMetadataAndFileURLs(subtype,
                                                                          metadata,
-                                                                         @[]);
+                                                                         nil);
 }
 
 VLCMediaLibraryMediaItem *VLCLibraryDataTypesTestMediaItemWithInputMetadataAndFileURLs(
     vlc_ml_media_subtype_t subtype,
     NSDictionary<NSString *, id> * _Nullable metadata,
-    NSArray<NSURL *> * _Nonnull fileURLs)
+    NSArray<NSURL *> * _Nullable fileURLs)
 {
     NSDictionary<NSString *, id> * const defaultMetadata = @{
         VLCLibraryDataTypesTestInputItemNameKey: @"Detail test item",

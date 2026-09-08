@@ -44,7 +44,7 @@ VLCMediaLibraryMediaItem * _Nonnull VLCLibraryDataTypesTestMediaItemWithInputMet
 VLCMediaLibraryMediaItem * _Nonnull VLCLibraryDataTypesTestMediaItemWithInputMetadataAndFileURLs(
     vlc_ml_media_subtype_t subtype,
     NSDictionary<NSString *, id> * _Nullable metadata,
-    NSArray<NSURL *> * _Nonnull fileURLs);
+    NSArray<NSURL *> * _Nullable fileURLs);
 
 void VLCLibraryDataTypesTestResetTrashState(void);
 void VLCLibraryDataTypesTestSetTrashFailure(BOOL shouldFail);

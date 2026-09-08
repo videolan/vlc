@@ -18,4 +18,5 @@ void VLCInputItemTestSetArtistName(NSString * _Nullable artistName);
 void VLCInputItemTestSetInterface(intf_thread_t * _Nullable interfaceThread);
 void VLCInputItemTestResetAppKitState(void);
 BOOL VLCInputItemTestDidReveal(void);
+NSArray<NSURL *> * _Nonnull VLCInputItemTestRevealedURLs(void);
 BOOL VLCInputItemTestDidReload(void);
