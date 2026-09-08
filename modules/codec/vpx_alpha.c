@@ -186,8 +186,8 @@ static int SetupCPU(decoder_t *bdec)
         return VLC_SUCCESS;
 
 error:
-    while (i-- > 0)
-        picture_Release(pics[i]);
+    while (i > 0)
+        picture_Release(pics[--i]);
     return VLC_EGENERIC;
 }
 
