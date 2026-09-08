@@ -1269,7 +1269,7 @@ static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
         speex_bits_reset( &p_sys->bits );
 
         p_block->i_length = vlc_tick_from_samples(
-            p_sys->i_frame_length * p_sys->header.frames_per_packet,
+            p_sys->i_frame_length * (vlc_tick_t)p_sys->header.frames_per_packet,
             p_enc->fmt_in.audio.i_rate );
 
         p_block->i_dts = p_block->i_pts = i_pts;
