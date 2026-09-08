@@ -543,7 +543,7 @@ interop_yuv_base_init(struct vlc_gl_interop *interop,
     {
         if (desc->fcc == VLC_CODEC_VUYA)
         {
-            interop->tex_count = 2;
+            interop->tex_count = 1;
             interop->texs[0] = (struct vlc_gl_tex_cfg) {
                 { 1, 1 }, { 1, 1 },
                 GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE
