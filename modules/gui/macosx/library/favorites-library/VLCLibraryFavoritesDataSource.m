@@ -276,6 +276,10 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
     }
 
     [_collectionViewFlowLayout resetLayout];
+    NSSet<NSIndexPath *> * const selectedIndexPaths = self.collectionView.selectionIndexPaths;
+    if (selectedIndexPaths.count > 0) {
+        [self.collectionView deselectItemsAtIndexPaths:selectedIndexPaths];
+    }
 
     _favoriteVideoMediaArray = [self.libraryModel listOfFavoriteVideoMedia];
     _favoriteAudioMediaArray = [self.libraryModel listOfFavoriteAudioMedia];
@@ -514,7 +518,8 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
                                            forIndexPath:indexPath];
         
         const id<VLCMediaLibraryItemProtocol> item = [self libraryItemAtIndexPath:indexPath forCollectionView:collectionView];
-        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:self.currentParentType];
+        const VLCMediaLibraryParentGroupType parentType = [self parentTypeForSection:section];
+        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:parentType];
 
         mediaItemSupplementaryDetailView.representedItem = representedItem;
         mediaItemSupplementaryDetailView.selectedItem = [collectionView itemAtIndexPath:indexPath];
