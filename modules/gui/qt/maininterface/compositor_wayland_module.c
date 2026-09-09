@@ -171,7 +171,7 @@ static void CommitScale(struct qtwayland_t* obj)
                 if (likely(sys->compositor_interface_version >= 3))
                 {
                     wl_surface_set_buffer_scale(sys->video_surface, 1);
-                    wl_surface_commit(sys->video_surface);
+                    // `CommitSize()` call below will commit the surface.
                 }
 
                 // Started using viewport, commit size so that viewport destination is set:
