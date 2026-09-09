@@ -27,11 +27,11 @@ Widgets.SplitButton {
     text: qsTr("Open File")
 
     model: [
-        qsTr("Open Multiple Files"),
-        qsTr("Open Directory"),
-        qsTr("Open Disc"),
-        qsTr("Open Network Stream"),
-        qsTr("Open Capture Device"),
+        { text: qsTr("Open Multiple Files"), icon_svg: ":/menu/file.svg" },
+        { text: qsTr("Open Directory"), icon_svg: ":/menu/folder.svg" },
+        { text: qsTr("Open Disc"), icon_svg: ":/menu/disc.svg" },
+        { text: qsTr("Open Network Stream"), icon_svg: ":/menu/network.svg" },
+        { text: qsTr("Open Capture Device"), icon_svg: ":/menu/capture-card.svg" },
         qsTr("Open Location from clipboard"),
     ]
 
