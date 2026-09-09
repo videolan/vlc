@@ -242,14 +242,14 @@ struct ModelEntry
         PathIterator it, const PathIterator& end,
         OutIterator out) const
     {
-        size_t index = *it;
         if (it == end) {
             *out = urinode;
             return;
-        } else {
-            *out = urinode;
-            children[index].getUri(++it, end, ++out);
         }
+
+        size_t index = *it;
+        *out = urinode;
+        children[index].getUri(++it, end, ++out);
     }
 };
 
