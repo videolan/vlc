@@ -39,7 +39,7 @@ typedef struct qtwayland_t
     void (*disable)(struct qtwayland_t*);
     void (*move)(struct qtwayland_t*, int x, int y, bool commitSurface);
     void (*resize)(struct qtwayland_t*, size_t width, size_t height, bool commitSurface);
-    void (*rescale)(struct qtwayland_t*, double scale);
+    void (*rescale)(struct qtwayland_t*, double scale, bool commitSurface);
 
     void (*commitSurface)(struct qtwayland_t*);
 

@@ -148,7 +148,7 @@ static void SetScale(struct qtwayland_t* obj, double scale)
         sys->fractional_scale = true;
 }
 
-static void CommitScale(struct qtwayland_t* obj)
+static void CommitScale(struct qtwayland_t* obj, bool commitSurface)
 {
     assert(obj);
     qtwayland_priv_t* const sys = (qtwayland_priv_t*)obj->p_sys;
@@ -175,7 +175,7 @@ static void CommitScale(struct qtwayland_t* obj)
                 }
 
                 // Started using viewport, commit size so that viewport destination is set:
-                CommitSize(obj, true);
+                CommitSize(obj, commitSurface);
             }
         }
         else
@@ -187,7 +187,8 @@ static void CommitScale(struct qtwayland_t* obj)
             if (sys->compositor_interface_version >= 3)
             {
                 wl_surface_set_buffer_scale(sys->video_surface, sys->buffer_scale);
-                wl_surface_commit(sys->video_surface);
+                if (commitSurface)
+                    wl_surface_commit(sys->video_surface);
             }
             else
             {
@@ -206,7 +207,8 @@ static void CommitScale(struct qtwayland_t* obj)
             if (sys->compositor_interface_version >= 3)
             {
                 wl_surface_set_buffer_scale(sys->video_surface, sys->buffer_scale);
-                wl_surface_commit(sys->video_surface);
+                if (commitSurface)
+                    wl_surface_commit(sys->video_surface);
             }
             else
             {
@@ -240,7 +242,7 @@ static int SetupVoutWindow(qtwayland_t* obj, vlc_window_t* wnd)
     if (!sys->video_surface)
         return VLC_EGENERIC;
 
-    CommitScale(obj);
+    CommitScale(obj, true);
 
     struct wl_region* region = wl_compositor_create_region(sys->compositor);
     if (!region)
@@ -342,7 +344,7 @@ static void Resize(struct qtwayland_t* obj, size_t width, size_t height, bool co
 }
 
 
-static void Rescale(struct qtwayland_t* obj, double scale)
+static void Rescale(struct qtwayland_t* obj, double scale, bool commitSurface)
 {
     assert(obj);
     qtwayland_priv_t* sys = (qtwayland_priv_t*)obj->p_sys;
@@ -363,7 +365,7 @@ static void Rescale(struct qtwayland_t* obj, double scale)
     }
 
     if (commitNecessary)
-        CommitScale(obj);
+        CommitScale(obj, commitSurface);
 }
 
 static void CommitSurface(struct qtwayland_t* obj)
