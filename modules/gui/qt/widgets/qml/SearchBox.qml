@@ -163,6 +163,11 @@ FocusScope {
 
             closePolicy: Popup.NoAutoClose
 
+            Binding on closePolicy {
+                when: textField.text.length === 0
+                value: Popup.CloseOnPressOutside
+            }
+
             height: 0
             visible: (height > 0)
 
@@ -171,6 +176,7 @@ FocusScope {
             }
 
             onClosed: {
+                root.retract()
                 textField.focus = false
                 focus = false
                 iconButton.focus = true
