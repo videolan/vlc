@@ -54,6 +54,7 @@
     NSHashTable<NSMenuItem*> *_localInputItemRequiringMenuItems;
     NSHashTable<NSMenuItem*> *_folderInputItemRequiringMenuItems;
 
+    NSMenuItem *_revealItem;
     NSMenuItem *_deleteItem;
     NSMenuItem *_removeFromPlaylistItem;
     NSMenuItem *_informationItem;
@@ -89,8 +90,8 @@
     NSMenuItem *addItem = [[NSMenuItem alloc] initWithTitle:_NS("Add Media Folder...") action:@selector(addMedia:) keyEquivalent:@""];
     addItem.target = self;
 
-    NSMenuItem *revealItem = [[NSMenuItem alloc] initWithTitle:_NS("Reveal in Finder") action:@selector(revealInFinder:) keyEquivalent:@""];
-    revealItem.target = self;
+    _revealItem = [[NSMenuItem alloc] initWithTitle:_NS("Reveal in Finder") action:@selector(revealInFinder:) keyEquivalent:@""];
+    _revealItem.target = self;
 
     _deleteItem = [[NSMenuItem alloc] initWithTitle:_NS("Move to Trash") action:@selector(moveToTrash:) keyEquivalent:@""];
     _deleteItem.target = self;
@@ -134,7 +135,7 @@
     [self.favoriteItem vlc_setActionImageWithSystemSymbolName:@"heart"];
     [bookmarkItem vlc_setActionImageWithSystemSymbolName:@"bookmark"];
     [addToLibraryItem vlc_setActionImageWithSystemSymbolName:@"plus.rectangle.on.folder"];
-    [revealItem vlc_setActionImageWithSystemSymbolName:@"folder"];
+    [_revealItem vlc_setActionImageWithSystemSymbolName:@"folder"];
     [_deleteItem vlc_setActionImageWithSystemSymbolName:@"trash"];
     [markUnseenItem vlc_setActionImageWithSystemSymbolName:@"eye.slash"];
     [_informationItem vlc_setActionImageWithSystemSymbolName:@"info.circle"];
@@ -149,7 +150,7 @@
         self.favoriteItem,
         bookmarkItem,
         addToLibraryItem,
-        revealItem,
+        _revealItem,
         _removeFromPlaylistItem,
         _deleteItem,
         markUnseenItem,
@@ -163,7 +164,7 @@
     [_mediaItemRequiringMenuItems addObject:appendItem];
     [_mediaItemRequiringMenuItems addObject:_addToPlaylistItem];
     [_mediaItemRequiringMenuItems addObject:self.favoriteItem];
-    [_mediaItemRequiringMenuItems addObject:revealItem];
+    [_mediaItemRequiringMenuItems addObject:_revealItem];
     [_mediaItemRequiringMenuItems addObject:_deleteItem];
     [_mediaItemRequiringMenuItems addObject:_informationItem];
 
@@ -175,7 +176,7 @@
     [_inputItemRequiringMenuItems addObject:appendItem];
 
     _localInputItemRequiringMenuItems = [NSHashTable weakObjectsHashTable];
-    [_localInputItemRequiringMenuItems addObject:revealItem];
+    [_localInputItemRequiringMenuItems addObject:_revealItem];
     [_localInputItemRequiringMenuItems addObject:_deleteItem];
 
     _folderInputItemRequiringMenuItems = [NSHashTable weakObjectsHashTable];
@@ -202,6 +203,19 @@
     return item.mediaItems.count > 0;
 }
 
+- (BOOL)representedItemsCanBeRevealedInFinder
+{
+    for (VLCLibraryRepresentedItem * const representedItem in self.representedItems) {
+        id<VLCMediaLibraryItemProtocol> const item = representedItem.item;
+        if ([item isKindOfClass:VLCMediaLibraryPlaylist.class] &&
+            ((VLCMediaLibraryPlaylist *)item).MRL.length == 0) {
+            return NO;
+        }
+    }
+
+    return self.representedItems.count > 0;
+}
+
 - (void)updateMenuItems
 {
     VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
@@ -219,6 +233,7 @@
         [self menuItems:_folderInputItemRequiringMenuItems setHidden:YES];
         [self menuItems:_recentsMediaItemRequiringMenuItems setHidden:YES];
         [self menuItems:_mediaItemRequiringMenuItems setHidden:NO];
+        _revealItem.hidden = NO;
         self.favoriteItem.hidden = isFavoritesSegment;
         return;
     }
@@ -228,6 +243,7 @@
         [self menuItems:_localInputItemRequiringMenuItems setHidden:YES];
         [self menuItems:_folderInputItemRequiringMenuItems setHidden:YES];
         [self menuItems:_mediaItemRequiringMenuItems setHidden:NO];
+        _revealItem.hidden = ![self representedItemsCanBeRevealedInFinder];
 
         BOOL allInPlaylist = YES;
         for (VLCLibraryRepresentedItem * const item in self.representedItems) {
@@ -335,6 +351,10 @@
         }
 
         return NO;
+    }
+
+    if (menuItem == _revealItem && self.representedItems.count > 0) {
+        return [self representedItemsCanBeRevealedInFinder];
     }
 
     return YES;
