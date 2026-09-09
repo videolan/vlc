@@ -142,6 +142,7 @@ static void tc_nvdec_gl_close(struct vlc_gl_interop *interop)
 {
     converter_sys_t *p_sys = interop->priv;
     vlc_decoder_device_Release(p_sys->device);
+    free(p_sys);
 }
 
 static int Open(struct vlc_gl_interop *interop)
@@ -153,7 +154,7 @@ static int Open(struct vlc_gl_interop *interop)
     if (device == NULL || device->type != VLC_DECODER_DEVICE_NVDEC)
         return VLC_EGENERIC;
 
-    converter_sys_t *p_sys = vlc_obj_malloc(VLC_OBJECT(interop), sizeof(*p_sys));
+    converter_sys_t *p_sys = malloc(sizeof(*p_sys));
     if (unlikely(p_sys == NULL))
     {
         vlc_decoder_device_Release(device);
