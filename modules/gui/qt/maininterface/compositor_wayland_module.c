@@ -372,10 +372,11 @@ static void CommitSurface(struct qtwayland_t* obj)
     qtwayland_priv_t* sys = (qtwayland_priv_t*)obj->p_sys;
     assert(sys);
 
-    if (!sys->video_surface)
+    if (!sys->video_surface || !sys->interface_surface)
         return;
 
     wl_surface_commit(sys->video_surface);
+    wl_surface_commit(sys->interface_surface);
 }
 
 static void Close(qtwayland_t* obj)
