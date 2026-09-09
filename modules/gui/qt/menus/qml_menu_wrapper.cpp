@@ -77,11 +77,33 @@ void StringListMenu::popup(const QPoint &point, const QVariantList &stringList)
 
     for (int i = 0; i != stringList.size(); ++i)
     {
-        const auto str = stringList[i].toString();
-        m->addAction(str, this, [this, i, str]()
+        const QVariant& variant = stringList[i];
+        QString str;
+        QString icon;
+
+        if (variant.typeId() == QMetaType::QString)
         {
-            emit selected(i, str);
-        });
+            str = variant.toString();
+        }
+        else
+        {
+            assert(variant.typeId() == QMetaType::QVariantMap);
+            const auto variantMap = variant.toMap();
+
+            str = variantMap[QStringLiteral("text")].toString();
+            icon = variantMap[QStringLiteral("icon_svg")].toString();
+        }
+
+        const auto action = m->addAction(str, this, [this, i, str]()
+                                         {
+                                             emit selected(i, str);
+                                         });
+
+        if (!icon.isEmpty())
+        {
+            assert(action);
+            action->setIcon(ColorizedSvgIcon::colorizedIconForWidget(icon, m));
+        }
     }
 
     m->popup(point);
