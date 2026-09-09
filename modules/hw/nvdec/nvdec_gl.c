@@ -184,10 +184,7 @@ static int Open(struct vlc_gl_interop *interop)
     unsigned int device_count;
     result = CALL_CUDA(cuGLGetDevices, &device_count, &cuDecDevice, 1, CU_GL_DEVICE_LIST_ALL);
     if (result < 0)
-    {
-        vlc_decoder_device_Release(device);
-        return result;
-    }
+        goto error;
 
     CUdevice cuConverterDevice;
     CALL_CUDA(cuCtxPushCurrent, devsys->cuCtx);
@@ -198,10 +195,7 @@ static int Open(struct vlc_gl_interop *interop)
     {
         result = CALL_CUDA(cuCtxCreate, &p_sys->cuConverterCtx, 0, cuConverterDevice);
         if (result != VLC_SUCCESS)
-        {
-            vlc_decoder_device_Release(device);
-            return result;
-        }
+            goto error;
     }
 
     /* The pictures are uploaded upside-down */
@@ -211,8 +205,8 @@ static int Open(struct vlc_gl_interop *interop)
     const vlc_chroma_description_t *desc = vlc_fourcc_GetChromaDescription(render_chroma);
     if (desc == NULL)
     {
-        vlc_decoder_device_Release(device);
-        return VLC_EGENERIC;
+        result = VLC_EGENERIC;
+        goto error;
     }
     p_sys->pixel_size = desc->pixel_size;
     switch (render_chroma)
@@ -293,6 +287,14 @@ static int Open(struct vlc_gl_interop *interop)
     interop->priv = p_sys;
 
     return VLC_SUCCESS;
+
+error:
+    if (p_sys->cuConverterCtx)
+        CALL_CUDA(cuCtxDestroy, p_sys->cuConverterCtx);
+
+    free(p_sys);
+    vlc_decoder_device_Release(device);
+    return result;
 }
 
 vlc_module_begin ()
