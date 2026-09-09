@@ -18,6 +18,122 @@
 #import "tests/VLCLibraryDataTypesTestSupport.h"
 #import "tests/VLCInputItemTestSupport.h"
 
+@interface VLCLibraryDataTypesTestAlbum : VLCMediaLibraryAlbum
+@property (nonatomic, copy) NSArray<VLCMediaLibraryMediaItem *> *relationshipMediaItems;
+@end
+
+@implementation VLCLibraryDataTypesTestAlbum
+
+- (NSArray<VLCMediaLibraryMediaItem *> *)mediaItems
+{
+    return self.relationshipMediaItems;
+}
+
+@end
+
+@interface VLCLibraryDataTypesTestArtist : VLCMediaLibraryArtist
+@property (nonatomic, copy) NSArray<VLCMediaLibraryAlbum *> *relationshipAlbums;
+@end
+
+@implementation VLCLibraryDataTypesTestArtist
+
+- (NSArray<VLCMediaLibraryAlbum *> *)albums
+{
+    return self.relationshipAlbums;
+}
+
+@end
+
+@interface VLCLibraryDataTypesTestGenre : VLCMediaLibraryGenre
+@property (nonatomic, copy) NSArray<VLCMediaLibraryArtist *> *relationshipArtists;
+@property (nonatomic, copy) NSArray<VLCMediaLibraryAlbum *> *relationshipAlbums;
+@property (nonatomic, copy) NSArray<VLCMediaLibraryMediaItem *> *relationshipMediaItems;
+@end
+
+@implementation VLCLibraryDataTypesTestGenre
+
+- (NSArray<VLCMediaLibraryArtist *> *)artists
+{
+    return self.relationshipArtists;
+}
+
+- (NSArray<VLCMediaLibraryAlbum *> *)albums
+{
+    return self.relationshipAlbums;
+}
+
+- (NSArray<VLCMediaLibraryMediaItem *> *)mediaItems
+{
+    return self.relationshipMediaItems;
+}
+
+@end
+
+@interface VLCLibraryDataTypesTestShow : VLCMediaLibraryShow
+@property (nonatomic, copy) NSArray<VLCMediaLibraryMediaItem *> *relationshipEpisodes;
+@end
+
+@implementation VLCLibraryDataTypesTestShow
+
+- (NSArray<VLCMediaLibraryMediaItem *> *)episodes
+{
+    return self.relationshipEpisodes;
+}
+
+@end
+
+@interface VLCLibraryDataTypesTestGroup : VLCMediaLibraryGroup
+@property (nonatomic, copy) NSArray<VLCMediaLibraryMediaItem *> *relationshipMediaItems;
+@end
+
+@implementation VLCLibraryDataTypesTestGroup
+
+- (NSArray<VLCMediaLibraryMediaItem *> *)mediaItems
+{
+    return self.relationshipMediaItems;
+}
+
+@end
+
+@interface VLCLibraryDataTypesTestRelationshipMediaItem : VLCMediaLibraryMediaItem
+@property (nonatomic) int64_t relationshipID;
+@end
+
+@implementation VLCLibraryDataTypesTestRelationshipMediaItem
+
+- (int64_t)libraryID
+{
+    return self.relationshipID;
+}
+
+@end
+
+@interface VLCLibraryDataTypesTestFavoriteMediaItem : VLCMediaLibraryMediaItem
+@property (nonatomic) BOOL testFavorited;
+@end
+
+@implementation VLCLibraryDataTypesTestFavoriteMediaItem
+
+- (BOOL)favorited
+{
+    return self.testFavorited;
+}
+
+- (int)setFavorite:(BOOL)favorite
+{
+    self.testFavorited = favorite;
+    return VLC_SUCCESS;
+}
+
+@end
+
+@interface VLCMediaLibraryGenre (VLCLibraryDataTypesTestPrivate)
+- (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem *item))mediaItemBlock
+                          orderedBy:(int)mediaItemParentType;
+- (void)enumerateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem *item, BOOL *stop))mediaItemBlock
+                            orderedBy:(int)mediaItemParentType;
+@end
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wnonnull"
 
@@ -25,6 +141,53 @@
 @end
 
 @implementation VLCLibraryDataTypesTest
+
+- (VLCMediaLibraryMediaItem *)relationshipMediaItemWithID:(int64_t)libraryID
+{
+    VLCLibraryDataTypesTestRelationshipMediaItem * const item =
+        [VLCLibraryDataTypesTestRelationshipMediaItem new];
+    item.relationshipID = libraryID;
+    return item;
+}
+
+- (VLCLibraryDataTypesTestArtist *)artistWithMultipleAlbums
+{
+    VLCMediaLibraryMediaItem * const first = [self relationshipMediaItemWithID:1];
+    VLCMediaLibraryMediaItem * const second = [self relationshipMediaItemWithID:2];
+    VLCMediaLibraryMediaItem * const third = [self relationshipMediaItemWithID:3];
+
+    VLCLibraryDataTypesTestAlbum * const firstAlbum = [VLCLibraryDataTypesTestAlbum new];
+    firstAlbum.relationshipMediaItems = @[first, second];
+    VLCLibraryDataTypesTestAlbum * const secondAlbum = [VLCLibraryDataTypesTestAlbum new];
+    secondAlbum.relationshipMediaItems = @[third];
+
+    VLCLibraryDataTypesTestArtist * const artist = [VLCLibraryDataTypesTestArtist new];
+    artist.relationshipAlbums = @[firstAlbum, secondAlbum];
+    return artist;
+}
+
+- (VLCLibraryDataTypesTestGenre *)genreWithMultipleParentRelationships
+{
+    VLCMediaLibraryMediaItem * const first = [self relationshipMediaItemWithID:1];
+    VLCMediaLibraryMediaItem * const second = [self relationshipMediaItemWithID:2];
+    VLCMediaLibraryMediaItem * const third = [self relationshipMediaItemWithID:3];
+
+    VLCLibraryDataTypesTestAlbum * const firstAlbum = [VLCLibraryDataTypesTestAlbum new];
+    firstAlbum.relationshipMediaItems = @[first, second];
+    VLCLibraryDataTypesTestAlbum * const secondAlbum = [VLCLibraryDataTypesTestAlbum new];
+    secondAlbum.relationshipMediaItems = @[third];
+
+    VLCLibraryDataTypesTestArtist * const firstArtist = [VLCLibraryDataTypesTestArtist new];
+    firstArtist.relationshipAlbums = @[firstAlbum];
+    VLCLibraryDataTypesTestArtist * const secondArtist = [VLCLibraryDataTypesTestArtist new];
+    secondArtist.relationshipAlbums = @[secondAlbum];
+
+    VLCLibraryDataTypesTestGenre * const genre = [VLCLibraryDataTypesTestGenre new];
+    genre.relationshipMediaItems = @[first, third, second];
+    genre.relationshipAlbums = @[firstAlbum, secondAlbum];
+    genre.relationshipArtists = @[firstArtist, secondArtist];
+    return genre;
+}
 
 - (void)testFileMapsFields
 {
@@ -291,6 +454,156 @@
     VLCMediaLibraryGenre * const genre =
         [[VLCMediaLibraryGenre alloc] initWithGenre:&genreData];
     XCTAssertEqualObjects(genre.durationString, @"1 song");
+}
+
+- (void)testArtistEnumerationTraversesMultipleAlbums
+{
+    VLCLibraryDataTypesTestArtist * const artist = [self artistWithMultipleAlbums];
+    NSMutableArray<VLCMediaLibraryMediaItem *> * const enumerated = NSMutableArray.array;
+
+    [artist enumerateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * const item,
+                                           BOOL * const __unused stop) {
+        [enumerated addObject:item];
+    }];
+
+    XCTAssertEqualObjects(enumerated,
+                          (@[ artist.relationshipAlbums[0].mediaItems[0],
+                              artist.relationshipAlbums[0].mediaItems[1],
+                              artist.relationshipAlbums[1].mediaItems[0] ]));
+}
+
+- (void)testArtistEnumerationStopsAcrossMultipleAlbums
+{
+    VLCLibraryDataTypesTestArtist * const artist = [self artistWithMultipleAlbums];
+    __block NSUInteger enumeratedCount = 0;
+
+    [artist enumerateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * const __unused item,
+                                           BOOL * const stop) {
+        enumeratedCount++;
+        *stop = YES;
+    }];
+
+    XCTAssertEqual(enumeratedCount, (NSUInteger)1);
+}
+
+- (void)testGenreDefaultEnumerationUsesAlbumOrdering
+{
+    VLCLibraryDataTypesTestGenre * const genre = [self genreWithMultipleParentRelationships];
+    NSMutableArray<VLCMediaLibraryMediaItem *> * const enumerated = NSMutableArray.array;
+
+    [genre enumerateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * const item,
+                                          BOOL * const __unused stop) {
+        [enumerated addObject:item];
+    }];
+
+    XCTAssertEqualObjects(enumerated,
+                          (@[ genre.relationshipAlbums[0].mediaItems[0],
+                              genre.relationshipAlbums[0].mediaItems[1],
+                              genre.relationshipAlbums[1].mediaItems[0] ]));
+}
+
+- (void)testGenreAlbumEnumerationTraversesAlbumsInOrder
+{
+    VLCLibraryDataTypesTestGenre * const genre = [self genreWithMultipleParentRelationships];
+    NSMutableArray<VLCMediaLibraryMediaItem *> * const enumerated = NSMutableArray.array;
+
+    [genre iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * const item) {
+        [enumerated addObject:item];
+    } orderedBy:VLC_ML_PARENT_ALBUM];
+
+    XCTAssertEqualObjects(enumerated,
+                          (@[ genre.relationshipAlbums[0].mediaItems[0],
+                              genre.relationshipAlbums[0].mediaItems[1],
+                              genre.relationshipAlbums[1].mediaItems[0] ]));
+}
+
+- (void)testGenreArtistEnumerationTraversesArtistsInOrder
+{
+    VLCLibraryDataTypesTestGenre * const genre = [self genreWithMultipleParentRelationships];
+    NSMutableArray<VLCMediaLibraryMediaItem *> * const enumerated = NSMutableArray.array;
+
+    [genre iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * const item) {
+        [enumerated addObject:item];
+    } orderedBy:VLC_ML_PARENT_ARTIST];
+
+    XCTAssertEqualObjects(enumerated,
+                          (@[ genre.relationshipArtists[0].albums[0].mediaItems[0],
+                              genre.relationshipArtists[0].albums[0].mediaItems[1],
+                              genre.relationshipArtists[1].albums[0].mediaItems[0] ]));
+}
+
+- (void)testGenreEnumerationStopsThroughNestedRelationships
+{
+    VLCLibraryDataTypesTestGenre * const genre = [self genreWithMultipleParentRelationships];
+    __block NSUInteger enumeratedCount = 0;
+
+    [genre enumerateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * const __unused item,
+                                          BOOL * const stop) {
+        enumeratedCount++;
+        *stop = YES;
+    } orderedBy:VLC_ML_PARENT_ALBUM];
+
+    XCTAssertEqual(enumeratedCount, (NSUInteger)1);
+}
+
+- (void)testShowFavoriteIsTrueWhenEveryEpisodeIsFavorited
+{
+    VLCLibraryDataTypesTestFavoriteMediaItem * const first =
+        [VLCLibraryDataTypesTestFavoriteMediaItem new];
+    first.testFavorited = YES;
+    VLCLibraryDataTypesTestFavoriteMediaItem * const second =
+        [VLCLibraryDataTypesTestFavoriteMediaItem new];
+    second.testFavorited = YES;
+
+    VLCLibraryDataTypesTestShow * const show = [VLCLibraryDataTypesTestShow new];
+    show.relationshipEpisodes = @[first, second];
+
+    XCTAssertTrue(show.favorited);
+}
+
+- (void)testShowFavoriteIsFalseWhenEpisodesAreMixed
+{
+    VLCLibraryDataTypesTestFavoriteMediaItem * const first =
+        [VLCLibraryDataTypesTestFavoriteMediaItem new];
+    first.testFavorited = YES;
+    VLCLibraryDataTypesTestFavoriteMediaItem * const second =
+        [VLCLibraryDataTypesTestFavoriteMediaItem new];
+    second.testFavorited = NO;
+
+    VLCLibraryDataTypesTestShow * const show = [VLCLibraryDataTypesTestShow new];
+    show.relationshipEpisodes = @[first, second];
+
+    XCTAssertFalse(show.favorited);
+}
+
+- (void)testGroupFavoriteIsTrueWhenEveryMediaItemIsFavorited
+{
+    VLCLibraryDataTypesTestFavoriteMediaItem * const first =
+        [VLCLibraryDataTypesTestFavoriteMediaItem new];
+    first.testFavorited = YES;
+    VLCLibraryDataTypesTestFavoriteMediaItem * const second =
+        [VLCLibraryDataTypesTestFavoriteMediaItem new];
+    second.testFavorited = YES;
+
+    VLCLibraryDataTypesTestGroup * const group = [VLCLibraryDataTypesTestGroup new];
+    group.relationshipMediaItems = @[first, second];
+
+    XCTAssertTrue(group.favorited);
+}
+
+- (void)testGroupFavoriteIsFalseWhenMediaItemsAreMixed
+{
+    VLCLibraryDataTypesTestFavoriteMediaItem * const first =
+        [VLCLibraryDataTypesTestFavoriteMediaItem new];
+    first.testFavorited = YES;
+    VLCLibraryDataTypesTestFavoriteMediaItem * const second =
+        [VLCLibraryDataTypesTestFavoriteMediaItem new];
+    second.testFavorited = NO;
+
+    VLCLibraryDataTypesTestGroup * const group = [VLCLibraryDataTypesTestGroup new];
+    group.relationshipMediaItems = @[first, second];
+
+    XCTAssertFalse(group.favorited);
 }
 
 - (void)testAlbumProperties
