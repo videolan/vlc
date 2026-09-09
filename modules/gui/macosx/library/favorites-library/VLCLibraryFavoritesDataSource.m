@@ -518,6 +518,10 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
                                            forIndexPath:indexPath];
         
         const id<VLCMediaLibraryItemProtocol> item = [self libraryItemAtIndexPath:indexPath forCollectionView:collectionView];
+        if (item == nil || item.firstMediaItem == nil) {
+            return nil;
+        }
+
         const VLCMediaLibraryParentGroupType parentType = [self parentTypeForSection:section];
         VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:parentType];
 
