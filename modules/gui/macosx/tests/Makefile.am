@@ -62,7 +62,8 @@ VLCMacOSXTests_LDFLAGS = \
 
 VLCMacOSXTests_LDADD = \
 	$(top_builddir)/lib/libvlc.la \
-	$(top_builddir)/src/libvlccore.la
+	$(top_builddir)/src/libvlccore.la \
+	-lsqlite3
 
 VLCMacOSXTests_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(OBJCLD) \
