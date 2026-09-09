@@ -941,7 +941,7 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
 
     int track_subcodes = CD_ROM_SUBCODE_NONE;
 
-    while( fgets( line, 1024, cuefile ) && p_toc->i_tracks < INT_MAX-1 )
+    while( fgets( line, 1024, cuefile ) && p_toc->i_tracks < 99 )
     {
         /* look for a TRACK line */
         unsigned track_num;
