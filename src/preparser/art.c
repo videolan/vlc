@@ -329,7 +329,6 @@ static int ArtCacheWriteUriToFile( vlc_object_t *obj, const char *psz_file,
         ret = VLC_EGENERIC;
     }
 
-    bool b_found = false;
     fclose( f );
     return ret;
 }
