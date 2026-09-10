@@ -36,6 +36,13 @@ DEPS_librist += gnutls $(DEPS_gnutls)
 LIBRIST_CONF += -Duse_nettle=true -Duse_mbedtls=false
 endif
 
+ifdef HAVE_WIN32
+ifndef HAVE_WINSTORE
+# librist doesn't support XP but we can compile the module to run on Vista+
+LIBRIST_CONF += -Dc_args="$(CFLAGS) -D_WIN32_WINNT=0x0600"
+endif
+endif
+
 $(TARBALLS)/librist-$(LIBRIST_VERSION).tar.gz:
 	$(call download_pkg,$(LIBRIST_URL),librist)
 
