@@ -250,7 +250,7 @@ vlc_gl_sub_renderer_Delete(struct vlc_gl_sub_renderer *sr)
     for (unsigned i = 0; i < sr->region_count; ++i)
     {
         if (sr->regions[i].texture)
-            sr->vt->DeleteTextures(1, &sr->regions[i].texture);
+            vlc_gl_interop_DeleteTextures(sr->interop, &sr->regions[i].texture);
     }
     free(sr->regions);
 
