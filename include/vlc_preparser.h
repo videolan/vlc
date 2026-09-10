@@ -463,6 +463,10 @@ vlc_preparser_Submit( vlc_preparser_t *preparser, vlc_preparser_req *req );
  * - When a request is cancelled, the `on_ended` callback will be triggered
  *   with -EINTR status.
  *
+ * - That callback may run synchronously, on the thread calling this function,
+ *   if the request had not started yet. The caller must be careful not to hold
+ *   any lock that the callback needs, or it will deadlock against itself.
+ *
  * - If the request is already in a terminated state (finished, cancelled or
  *   error), or if it was never submitted, the call is a no-op and no callback
  *   will be invoked.
