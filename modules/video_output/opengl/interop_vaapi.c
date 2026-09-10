@@ -389,6 +389,25 @@ GetChromaVaFourcc(vlc_fourcc_t opaque_chroma, int *va_fourcc,
     }
 }
 
+/**
+ * Whether we can allocate the textures at the requested precision
+ */
+static bool
+CanAllocateTexture(struct vlc_gl_interop *interop)
+{
+    for (unsigned i = 0; i < interop->tex_count; ++i)
+    {
+        const struct vlc_gl_tex_cfg *tex = &interop->texs[i];
+
+        if (tex->type == GL_UNSIGNED_SHORT &&
+            vlc_gl_interop_GetTexFormatSize(interop, GL_TEXTURE_2D, tex->format,
+                                            tex->internal, tex->type) != 16)
+            return false;
+    }
+
+    return true;
+}
+
 static int
 Open(struct vlc_gl_interop *interop)
 {
@@ -439,10 +458,6 @@ Open(struct vlc_gl_interop *interop)
             break;
         case VLC_CODEC_VAAPI_420_10BPP: /* VLC_CODEC_P010 */
         case VLC_CODEC_VAAPI_420_12BPP: /* VLC_CODEC_P012 */
-            if (vlc_gl_interop_GetTexFormatSize(interop, GL_TEXTURE_2D, GL_RG,
-                                                GL_RG16, GL_UNSIGNED_SHORT) != 16)
-                goto error;
-
             interop->tex_count = 2;
             interop->texs[0] = (struct vlc_gl_tex_cfg) {
                 .w = {1, 1},
@@ -503,6 +518,9 @@ Open(struct vlc_gl_interop *interop)
         default:
             vlc_assert_unreachable();
     }
+
+    if (!CanAllocateTexture(interop))
+        goto error;
 
     if (vaegl_init_fourcc(priv, va_fourcc))
         goto error;
