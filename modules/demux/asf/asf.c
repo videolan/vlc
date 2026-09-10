@@ -446,7 +446,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     demux_sys_t *p_sys = p_demux->p_sys;
     vlc_meta_t  *p_meta;
     vlc_tick_t  i64;
-    int         i;
     double      f, *pf;
 
     switch( i_query )
@@ -481,7 +480,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     case DEMUX_SET_ES:
     {
-        i = va_arg( args, int );
+        int i = va_arg( args, int );
         int i_ret;
         if ( i >= 0 )
         {
