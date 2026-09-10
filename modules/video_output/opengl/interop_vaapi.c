@@ -180,7 +180,7 @@ tc_vaegl_update(const struct vlc_gl_interop *interop, uint32_t textures[],
 
     VADRMPRIMESurfaceDescriptor va_surface_descriptor;
     EGLImageKHR egl_images[3] = { };
-    bool release_image = false, release_buffer_info = false;
+    bool release_image = false;
     unsigned num_planes = 0;
 
     {
@@ -194,7 +194,6 @@ tc_vaegl_update(const struct vlc_gl_interop *interop, uint32_t textures[],
                                       &va_surface_descriptor))
         goto error;
     release_image = true;
-    release_buffer_info = true;
 
     num_planes = va_surface_descriptor.num_layers;
     for (unsigned i = 0; i < num_planes; ++i)
@@ -233,11 +232,8 @@ tc_vaegl_update(const struct vlc_gl_interop *interop, uint32_t textures[],
 error:
     if (release_image)
     {
-        if (release_buffer_info)
-        {
-            for (unsigned i = 0; i < va_surface_descriptor.num_objects; ++i)
-                close(va_surface_descriptor.objects[i].fd);
-        }
+        for (unsigned i = 0; i < va_surface_descriptor.num_objects; ++i)
+            close(va_surface_descriptor.objects[i].fd);
 
         for (unsigned i = 0; i < 3 && egl_images[i] != NULL; ++i)
             vaegl_image_destroy(interop, egl_images[i]);
