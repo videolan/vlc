@@ -23,6 +23,12 @@ egl_dep = dependency('egl', required: false)
 
 # Declared here so it's available in opengl subdir for egl_display_gbm
 drm_dep = dependency('libdrm', version: '>= 2.4.83', required: get_option('drm'))
+drm_includes = declare_dependency()
+if drm_dep.found()
+    drm_includes = declare_dependency(dependencies: drm_dep.partial_dependency(
+                                          includes: true, compile_args: true),
+                                      compile_args: '-DHAVE_LIBDRM=1')
+endif
 
 # Declared here, as it's used by both the libplacebo and wayland subfolders
 vulkan_dep = dependency('vulkan', version: '>= 1.0.26', required: get_option('vulkan'))

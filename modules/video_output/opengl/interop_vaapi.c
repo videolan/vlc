@@ -28,6 +28,12 @@
 #include <EGL/eglext.h>
 #include <va/va_drmcommon.h>
 
+#ifndef HAVE_LIBDRM 
+# include <drm/drm_fourcc.h>
+#else
+# include <drm_fourcc.h>
+#endif
+
 #include <vlc_common.h>
 #include <vlc_window.h>
 #include <vlc_codec.h>
@@ -46,13 +52,6 @@ typedef void *GLeglImageOES;
 typedef void (*PFNGLEGLIMAGETARGETTEXTURE2DOESPROC)(GLenum target, GLeglImageOES image);
 #endif
 
-#define DRM_FORMAT_MOD_VENDOR_NONE    0
-#define DRM_FORMAT_RESERVED           ((1ULL << 56) - 1)
-
-#define fourcc_mod_code(vendor, val) \
-        ((((EGLuint64KHR)DRM_FORMAT_MOD_VENDOR_## vendor) << 56) | ((val) & 0x00ffffffffffffffULL))
-
-#define DRM_FORMAT_MOD_INVALID  fourcc_mod_code(NONE, DRM_FORMAT_RESERVED)
 
 /* From max number of plane in libva and DRM */
 #define INTEROP_MAX_PLANES 4
@@ -138,22 +137,26 @@ vaegl_init_fourcc(struct priv *priv, unsigned va_fourcc)
     switch (va_fourcc)
     {
         case VA_FOURCC_NV12:
-            priv->drm_fourccs[0] = VLC_FOURCC('R', '8', ' ', ' ');
-            priv->drm_fourccs[1] = VLC_FOURCC('G', 'R', '8', '8');
+            priv->drm_fourccs[0] = DRM_FORMAT_R8;
+            priv->drm_fourccs[1] = DRM_FORMAT_GR88;
             break;
         case VA_FOURCC_P010:
         case VA_FOURCC_P012:
-            priv->drm_fourccs[0] = VLC_FOURCC('R', '1', '6', ' ');
-            priv->drm_fourccs[1] = VLC_FOURCC('G', 'R', '3', '2');
+            priv->drm_fourccs[0] = DRM_FORMAT_R16;
+            priv->drm_fourccs[1] = DRM_FORMAT_GR1616;
             break;
         case VA_FOURCC_Y210:
         case VA_FOURCC_Y212:
-            priv->drm_fourccs[0] = VLC_FOURCC('A', 'B', '4', '8');
+            priv->drm_fourccs[0] = DRM_FORMAT_ABGR16161616;
             break;
         case VA_FOURCC_XYUV:
+            priv->drm_fourccs[0] = DRM_FORMAT_XYUV8888;
+            break;
         case VA_FOURCC_Y410:
+            priv->drm_fourccs[0] = DRM_FORMAT_Y410;
+            break;
         case VA_FOURCC_Y412:
-            priv->drm_fourccs[0] = va_fourcc;
+            priv->drm_fourccs[0] = DRM_FORMAT_Y412;
             break;
         default: return VLC_EGENERIC;
     }
