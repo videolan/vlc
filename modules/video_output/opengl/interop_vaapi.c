@@ -56,6 +56,26 @@ typedef void (*PFNGLEGLIMAGETARGETTEXTURE2DOESPROC)(GLenum target, GLeglImageOES
 /* From max number of plane in libva and DRM */
 #define INTEROP_MAX_PLANES 4
 
+/**
+ * It maps the formats from the DRM infrastructure to the attributes 
+ * expected by OpenGL to allocate textures.
+ */
+static const struct {
+    uint32_t drm_fourcc;
+    int32_t internal;
+    uint32_t format, type;
+} plane_tex_cfgs[] = {
+    { DRM_FORMAT_R8,           GL_RED,      GL_RED,  GL_UNSIGNED_BYTE },
+    { DRM_FORMAT_GR88,         GL_RG,       GL_RG,   GL_UNSIGNED_BYTE },
+    { DRM_FORMAT_R16,          GL_R16,      GL_RED,  GL_UNSIGNED_SHORT },
+    { DRM_FORMAT_GR1616,       GL_RG16,     GL_RG,   GL_UNSIGNED_SHORT },
+    { DRM_FORMAT_ABGR16161616, GL_RGBA16,   GL_RGBA, GL_UNSIGNED_SHORT },
+    { DRM_FORMAT_XYUV8888,     GL_RGBA,     GL_RGBA, GL_UNSIGNED_BYTE },
+    { DRM_FORMAT_Y412,         GL_RGBA16,   GL_RGBA, GL_UNSIGNED_SHORT },
+    { DRM_FORMAT_Y410,         GL_RGB10_A2, GL_RGBA,
+      GL_UNSIGNED_INT_2_10_10_10_REV },
+};
+
 struct plane_format
 {
     uint32_t drm_fourcc;
@@ -412,6 +432,46 @@ DescribeChroma(vlc_fourcc_t chroma, unsigned *va_fourcc,
 }
 
 /**
+ * Setup the interop texture sampling infos from the input frame format.
+ */
+static int
+ConfigureTextures(struct vlc_gl_interop *interop,
+                  const struct frame_format *format)
+{
+    if (format->plane_count > ARRAY_SIZE(interop->texs))
+        return VLC_EGENERIC;
+
+    for (size_t i = 0; i < format->plane_count; i++)
+    {
+        const struct plane_format *plane = &format->planes[i];
+        const size_t cfg = ARRAY_SIZE(plane_tex_cfgs);
+        size_t j;
+
+        for (j = 0; j < cfg; j++)
+            if (plane_tex_cfgs[j].drm_fourcc == plane->drm_fourcc)
+                break;
+
+        if (j == cfg)
+        {
+            msg_Dbg(interop->gl, "no texture for a %4.4s plane",
+                    (const char *)&plane->drm_fourcc);
+            return VLC_EGENERIC;
+        }
+
+        interop->texs[i] = (struct vlc_gl_tex_cfg) {
+            .w = plane->width,
+            .h = plane->height,
+            .internal = plane_tex_cfgs[j].internal,
+            .format = plane_tex_cfgs[j].format,
+            .type = plane_tex_cfgs[j].type,
+        };
+    }
+
+    interop->tex_count = (unsigned)format->plane_count;
+    return VLC_SUCCESS;
+}
+
+/**
  * Whether we can allocate the textures at the requested precision
  */
 static bool
@@ -456,88 +516,8 @@ Open(struct vlc_gl_interop *interop)
                        &priv->format) != VLC_SUCCESS)
         goto error;
 
-    switch (interop->fmt_in.i_chroma)
-    {
-        case VLC_CODEC_VAAPI_420: /* VLC_CODEC_NV12 */
-            interop->tex_count = 2;
-            interop->texs[0] = (struct vlc_gl_tex_cfg) {
-                .w = {1, 1},
-                .h = {1, 1},
-                .internal = GL_RED,
-                .format = GL_RED,
-                .type = GL_UNSIGNED_BYTE,
-            };
-            interop->texs[1] = (struct vlc_gl_tex_cfg) {
-                .w = {1, 2},
-                .h = {1, 2},
-                .internal = GL_RG,
-                .format = GL_RG,
-                .type = GL_UNSIGNED_BYTE,
-            };
-
-            break;
-        case VLC_CODEC_VAAPI_420_10BPP: /* VLC_CODEC_P010 */
-        case VLC_CODEC_VAAPI_420_12BPP: /* VLC_CODEC_P012 */
-            interop->tex_count = 2;
-            interop->texs[0] = (struct vlc_gl_tex_cfg) {
-                .w = {1, 1},
-                .h = {1, 1},
-                .internal = GL_R16,
-                .format = GL_RED,
-                .type = GL_UNSIGNED_SHORT,
-            };
-            interop->texs[1] = (struct vlc_gl_tex_cfg) {
-                .w = {1, 2},
-                .h = {1, 2},
-                .internal = GL_RG16,
-                .format = GL_RG,
-                .type = GL_UNSIGNED_SHORT,
-            };
-            break;
-        case VLC_CODEC_VAAPI_422_10BPP: /* VLC_CODEC_Y210 */
-        case VLC_CODEC_VAAPI_422_12BPP: /* VLC_CODEC_Y212 */
-            interop->tex_count = 1;
-            interop->texs[0] = (struct vlc_gl_tex_cfg) {
-                .w = {1, 2},
-                .h = {1, 1},
-                .internal = GL_RGBA16,
-                .format = GL_RGBA,
-                .type = GL_UNSIGNED_SHORT,
-            };
-            break;
-        case VLC_CODEC_VAAPI_444: /* VLC_CODEC_VUYX */
-            interop->tex_count = 1;
-            interop->texs[0] = (struct vlc_gl_tex_cfg) {
-                .w = {1, 1},
-                .h = {1, 1},
-                .internal = GL_RGBA,
-                .format = GL_RGBA,
-                .type = GL_UNSIGNED_BYTE,
-            };
-            break;
-        case VLC_CODEC_VAAPI_444_10BPP: /* VLC_CODEC_Y410 */
-            interop->tex_count = 1;
-            interop->texs[0] = (struct vlc_gl_tex_cfg) {
-                .w = {1, 1},
-                .h = {1, 1},
-                .internal = GL_RGB10_A2,
-                .format = GL_RGBA,
-                .type = GL_UNSIGNED_INT_2_10_10_10_REV,
-            };
-            break;
-        case VLC_CODEC_VAAPI_444_12BPP: /* VLC_CODEC_Y412 */
-            interop->tex_count = 1;
-            interop->texs[0] = (struct vlc_gl_tex_cfg) {
-                .w = {1, 1},
-                .h = {1, 1},
-                .internal = GL_RGBA16,
-                .format = GL_RGBA,
-                .type = GL_UNSIGNED_SHORT,
-            };
-            break;
-        default:
-            vlc_assert_unreachable();
-    }
+    if (ConfigureTextures(interop, &priv->format) != VLC_SUCCESS)
+        goto error;
 
     if (!CanAllocateTexture(interop))
         goto error;
