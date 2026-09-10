@@ -587,9 +587,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_ENOMEM;
         }
 
-        for( int i = 0; i < p_sys->i_seekpoints; i++ )
+        for( int sp_id = 0; sp_id < p_sys->i_seekpoints; sp_id++ )
         {
-            seekpoint_t *p_sp = vlc_seekpoint_Duplicate( p_sys->pp_seekpoints[i] );
+            seekpoint_t *p_sp = vlc_seekpoint_Duplicate( p_sys->pp_seekpoints[sp_id] );
             if( unlikely(!p_sp) )
                 break;
             TAB_APPEND( p_title->i_seekpoint, p_title->seekpoint, p_sp );
