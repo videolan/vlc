@@ -373,6 +373,8 @@ struct cea708_text_row_t
     uint8_t lastcol;
 };
 
+static const cea708_pen_style_t cea708_default_pen_styles[CEA708_PREDEFINED_STYLES];
+
 static void cea708_text_row_Delete( cea708_text_row_t *p_row )
 {
     free( p_row );
@@ -386,6 +388,8 @@ static cea708_text_row_t * cea708_text_row_New( void )
         p_row->firstcol = CEA708_WINDOW_MAX_COLS;
         p_row->lastcol = 0;
         memset(p_row->characters, 0, 4 * CEA708_WINDOW_MAX_COLS);
+        for( size_t i = 0; i < ARRAY_SIZE(p_row->styles); i++ )
+            p_row->styles[i] = cea708_default_pen_styles[0];
     }
     return p_row;
 }
