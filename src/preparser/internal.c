@@ -182,11 +182,14 @@ PreparserRequestNew(struct preparser_sys *preparser, void (*run)(void *), input_
 }
 
 static void
-PreparserAddTask(struct preparser_sys *preparser, struct vlc_preparser_req *req)
+PreparserSubmitTask(struct preparser_sys *preparser,
+                    struct vlc_preparser_req *req,
+                    vlc_executor_t *executor)
 {
-    vlc_mutex_lock(&preparser->lock);
     struct vlc_preparser_req_owner *req_owner = preparser_req_get_owner(req);
+    vlc_mutex_lock(&preparser->lock);
     vlc_list_append(&req_owner->node, &preparser->submitted_tasks);
+    vlc_executor_Submit(executor, &req_owner->runnable);
     vlc_mutex_unlock(&preparser->lock);
 }
 
@@ -835,15 +838,13 @@ preparser_Submit( void *opaque, struct vlc_preparser_req *req )
                               VLC_PREPARSER_TYPE_THUMBNAIL_TO_FILES))
     {
         assert(preparser->thumbnailer != NULL);
-        PreparserAddTask(preparser, req);
-        vlc_executor_Submit(preparser->thumbnailer, &req_owner->runnable);
+        PreparserSubmitTask(preparser, req, preparser->thumbnailer);
         return VLC_SUCCESS;
     }
 
     if (preparser->parser != NULL)
     {
-        PreparserAddTask(preparser, req);
-        vlc_executor_Submit(preparser->parser, &req_owner->runnable);
+        PreparserSubmitTask(preparser, req, preparser->parser);
         return VLC_SUCCESS;
     }
 
