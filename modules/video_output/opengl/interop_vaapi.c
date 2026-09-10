@@ -81,14 +81,9 @@ struct priv
 
     struct {
         picture_t *                 pic;
-#if VA_CHECK_VERSION(1, 1, 0)
         /* VADRMPRIMESurfaceDescriptor carries modifier information
          * (GPU tiling, compression, etc...) */
         VADRMPRIMESurfaceDescriptor va_surface_descriptor;
-#else
-        VAImage                     va_image;
-        VABufferInfo                va_buffer_info;
-#endif
         unsigned                    num_planes;
         void *                      egl_images[3];
     } last;
@@ -129,13 +124,8 @@ vaegl_release_last_pic(const struct vlc_gl_interop *interop, struct priv *priv)
     for (unsigned i = 0; i < priv->last.num_planes; ++i)
         vaegl_image_destroy(interop, priv->last.egl_images[i]);
 
-#if VA_CHECK_VERSION(1, 1, 0)
     for (unsigned i = 0; i < priv->last.va_surface_descriptor.num_objects; ++i)
         close(priv->last.va_surface_descriptor.objects[i].fd);
-#else
-    vlc_vaapi_ReleaseBufferHandle(o, priv->vadpy, priv->last.va_image.buf);
-    vlc_vaapi_DestroyImage(o, priv->vadpy, priv->last.va_image.image_id);
-#endif
 
     picture_Release(priv->last.pic);
 }
@@ -180,11 +170,7 @@ tc_vaegl_update(const struct vlc_gl_interop *interop, uint32_t textures[],
 
     if (pic == priv->last.pic)
     {
-#if VA_CHECK_VERSION(1, 1, 0)
         for (unsigned i = 0; i < priv->last.va_surface_descriptor.num_layers; ++i)
-#else
-        for (unsigned i = 0; i < priv->last.va_image.num_planes; ++i)
-#endif
         {
             priv->gl.BindTexture(interop->tex_target, textures[i]);
             priv->glEGLImageTargetTexture2DOES(interop->tex_target, priv->last.egl_images[i]);
@@ -192,17 +178,11 @@ tc_vaegl_update(const struct vlc_gl_interop *interop, uint32_t textures[],
         return VLC_SUCCESS;
     }
 
-#if VA_CHECK_VERSION(1, 1, 0)
     VADRMPRIMESurfaceDescriptor va_surface_descriptor;
-#else
-    VAImage va_image;
-    VABufferInfo va_buffer_info;
-#endif
     EGLImageKHR egl_images[3] = { };
     bool release_image = false, release_buffer_info = false;
     unsigned num_planes = 0;
 
-#if VA_CHECK_VERSION(1, 1, 0)
     {
         VAStatus s = vaSyncSurface(priv->vadpy, vlc_vaapi_PicGetSurface(pic));
         if (s != VA_STATUS_SUCCESS) // non-fatal. ex: VA_STATUS_ERROR_DECODING_ERROR
@@ -214,24 +194,8 @@ tc_vaegl_update(const struct vlc_gl_interop *interop, uint32_t textures[],
                                       &va_surface_descriptor))
         goto error;
     release_image = true;
-#else
-    if (vlc_vaapi_DeriveImage(o, priv->vadpy, vlc_vaapi_PicGetSurface(pic),
-                              &va_image))
-        goto error;
-    release_image = true;
-
-    assert(va_image.format.fourcc == priv->fourcc);
-
-    va_buffer_info = (VABufferInfo) {
-        .mem_type = VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME
-    };
-    if (vlc_vaapi_AcquireBufferHandle(o, priv->vadpy, va_image.buf,
-                                      &va_buffer_info))
-        goto error;
-#endif
     release_buffer_info = true;
 
-#if VA_CHECK_VERSION(1, 1, 0)
     num_planes = va_surface_descriptor.num_layers;
     for (unsigned i = 0; i < num_planes; ++i)
     {
@@ -247,19 +211,6 @@ tc_vaegl_update(const struct vlc_gl_interop *interop, uint32_t textures[],
         if (egl_images[i] == NULL)
             goto error;
     }
-#else
-    num_planes = va_image.num_planes;
-    for (unsigned i = 0; i < num_planes; ++i)
-    {
-        egl_images[i] =
-            vaegl_image_create(interop, tex_width[i], tex_height[i],
-                               priv->drm_fourccs[i], va_buffer_info.handle,
-                               va_image.offsets[i], va_image.pitches[i],
-                               DRM_FORMAT_MOD_INVALID);
-        if (egl_images[i] == NULL)
-            goto error;
-    }
-#endif
 
     for (size_t i = 0; i < num_planes; ++i)
     {
@@ -271,12 +222,7 @@ tc_vaegl_update(const struct vlc_gl_interop *interop, uint32_t textures[],
         vaegl_release_last_pic(interop, priv);
     priv->last.pic = picture_Hold(pic);
 
-#if VA_CHECK_VERSION(1, 1, 0)
     priv->last.va_surface_descriptor = va_surface_descriptor;
-#else
-    priv->last.va_image = va_image;
-    priv->last.va_buffer_info = va_buffer_info;
-#endif
     priv->last.num_planes = num_planes;
 
     for (unsigned i = 0; i < num_planes; ++i)
@@ -289,20 +235,12 @@ error:
     {
         if (release_buffer_info)
         {
-#if VA_CHECK_VERSION(1, 1, 0)
             for (unsigned i = 0; i < va_surface_descriptor.num_objects; ++i)
                 close(va_surface_descriptor.objects[i].fd);
-#else
-            vlc_vaapi_ReleaseBufferHandle(o, priv->vadpy, va_image.buf);
-#endif
         }
 
         for (unsigned i = 0; i < 3 && egl_images[i] != NULL; ++i)
             vaegl_image_destroy(interop, egl_images[i]);
-
-#if !VA_CHECK_VERSION(1, 1, 0)
-        vlc_vaapi_DestroyImage(o, priv->vadpy, va_image.image_id);
-#endif
     }
     return VLC_EGENERIC;
 }
@@ -365,16 +303,13 @@ tc_va_check_derive_image(const struct vlc_gl_interop *interop)
     if (!pool)
         return VLC_EGENERIC;
 
-    int ret;
-
-#if VA_CHECK_VERSION(1, 1, 0)
     VADRMPRIMESurfaceDescriptor desc;
 
-    ret = vlc_vaapi_ExportSurfaceHandle(o, priv->vadpy, va_surface_ids[0],
-                                        VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME_2,
-                                        VA_EXPORT_SURFACE_READ_ONLY |
-                                        VA_EXPORT_SURFACE_SEPARATE_LAYERS,
-                                        &desc);
+    int ret = vlc_vaapi_ExportSurfaceHandle(o, priv->vadpy, va_surface_ids[0],
+                                            VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME_2,
+                                            VA_EXPORT_SURFACE_READ_ONLY |
+                                            VA_EXPORT_SURFACE_SEPARATE_LAYERS,
+                                            &desc);
     if (ret != VLC_SUCCESS)
         goto done;
 
@@ -409,50 +344,6 @@ tc_va_check_derive_image(const struct vlc_gl_interop *interop)
 done_desc:
     for (unsigned i = 0; i < desc.num_objects; ++i)
         close(desc.objects[i].fd);
-    goto done;
-#else
-    VAImage va_image = { .image_id = VA_INVALID_ID };
-    ret = vlc_vaapi_DeriveImage(o, priv->vadpy, va_surface_ids[0],
-                                &va_image);
-    if (ret != VLC_SUCCESS)
-        goto done;
-    assert(va_image.format.fourcc == priv->fourcc);
-
-    VABufferInfo va_buffer_info = (VABufferInfo) {
-        .mem_type = VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME
-    };
-    ret = vlc_vaapi_AcquireBufferHandle(o, priv->vadpy, va_image.buf,
-                                        &va_buffer_info);
-    if (ret != VLC_SUCCESS)
-        goto done_derive;
-
-    for (unsigned i = 0; i < interop->tex_count; ++i)
-    {
-        EGLint w = (va_image.width * interop->texs[i].w.num) / interop->texs[i].w.den;
-        EGLint h = (va_image.height * interop->texs[i].h.num) / interop->texs[i].h.den;
-        EGLImageKHR egl_image =
-            vaegl_image_create(interop, w, h, priv->drm_fourccs[i], va_buffer_info.handle,
-                               va_image.offsets[i], va_image.pitches[i],
-                               DRM_FORMAT_MOD_INVALID);
-        if (egl_image == NULL)
-        {
-            msg_Warn(o, "Can't create Image KHR: kernel too old ?");
-            ret = VLC_EGENERIC;
-            goto done_derive;
-        }
-        vaegl_image_destroy(interop, egl_image);
-    }
-
-    ret = VLC_SUCCESS;
-
-done_derive:
-    if (va_image.image_id != VA_INVALID_ID)
-    {
-        if (va_image.buf != VA_INVALID_ID)
-            vlc_vaapi_ReleaseBufferHandle(o, priv->vadpy, va_image.buf);
-        vlc_vaapi_DestroyImage(o, priv->vadpy, va_image.image_id);
-    }
-#endif
 
 done:
     picture_pool_Release(pool);
