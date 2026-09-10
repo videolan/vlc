@@ -85,6 +85,7 @@ struct vlc_preparser_req_owner
     atomic_bool interrupted;
 
     struct vlc_runnable runnable; /**< to be passed to the executor */
+    vlc_executor_t *executor; /**< executor the runnable was last submitted to */
 
     struct vlc_list node; /**< node of vlc_preparser_t.submitted_tasks */
 
@@ -173,12 +174,21 @@ PreparserRequestNew(struct preparser_sys *preparser, void (*run)(void *), input_
 
     req_owner->runnable.run = run;
     req_owner->runnable.userdata = &req_owner->req;
+    req_owner->executor = NULL;
     if (options & VLC_PREPARSER_TYPE_THUMBNAIL_TO_FILES)
         req_owner->i11e_ctx = vlc_interrupt_create();
     else
         req_owner->i11e_ctx = NULL;
 
     return &req_owner->req;
+}
+
+static void
+PreparserQueueTaskLocked(struct vlc_preparser_req_owner *req_owner,
+                         vlc_executor_t *executor)
+{
+    req_owner->executor = executor;
+    vlc_executor_Submit(executor, &req_owner->runnable);
 }
 
 static void
@@ -189,7 +199,7 @@ PreparserSubmitTask(struct preparser_sys *preparser,
     struct vlc_preparser_req_owner *req_owner = preparser_req_get_owner(req);
     vlc_mutex_lock(&preparser->lock);
     vlc_list_append(&req_owner->node, &preparser->submitted_tasks);
-    vlc_executor_Submit(executor, &req_owner->runnable);
+    PreparserQueueTaskLocked(req_owner, executor);
     vlc_mutex_unlock(&preparser->lock);
 }
 
@@ -761,6 +771,7 @@ preparser_req_NewThumbnailToFiles( void *opaque, input_item_t *item,
     struct preparser_sys *preparser = opaque;
 
     assert(preparser->thumbnailer != NULL);
+    assert(preparser->thumbnailer_to_files != NULL);
     assert(cbs != NULL && cbs->on_ended != NULL);
     assert(outputs != NULL && output_count > 0);
 
@@ -872,29 +883,10 @@ static size_t preparser_Cancel( void *opaque, vlc_preparser_req *req )
         {
             count++;
 
-            bool canceled;
-            if (req_itr->options & VLC_PREPARSER_TYPE_PARSE)
-            {
-                assert(preparser->parser != NULL);
-                canceled = vlc_executor_Cancel(preparser->parser,
-                                               &req_itr->runnable);
-            }
-            else if (req_itr->options & (VLC_PREPARSER_TYPE_THUMBNAIL |
-                                         VLC_PREPARSER_TYPE_THUMBNAIL_TO_FILES))
-            {
-                assert(preparser->thumbnailer != NULL);
-                canceled = vlc_executor_Cancel(preparser->thumbnailer,
-                                               &req_itr->runnable);
-                if (!canceled &&
-                    req_itr->options & VLC_PREPARSER_TYPE_THUMBNAIL_TO_FILES)
-                {
-                    assert(preparser->thumbnailer_to_files != NULL);
-                    canceled = vlc_executor_Cancel(preparser->thumbnailer_to_files,
-                                                   &req_itr->runnable);
-                }
-            }
-            else /* TODO: the fetcher should be cancellable too */
-                canceled = false;
+            /* TODO: the fetcher should be cancellable too */
+            bool canceled = req_itr->executor != NULL &&
+                            vlc_executor_Cancel(req_itr->executor,
+                                                &req_itr->runnable);
 
             if (canceled)
             {
