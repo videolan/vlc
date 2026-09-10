@@ -53,7 +53,6 @@ variables:
 .variables-macos-x86_64: &variables-macos-x86_64
         VLC_PATH: /Users/videolanci/sandbox/bin
         VLC_FORCE_KERNELVERSION: 18
-        VLC_SDK_PATH: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
         HOST_ARCH: x86_64
         SHORTARCH: intel64
         TRIPLET: $HOST_ARCH-apple-darwin$VLC_FORCE_KERNELVERSION
@@ -61,7 +60,6 @@ variables:
 .variables-macos-arm64: &variables-macos-arm64
         VLC_PATH: /Users/videolanci/sandbox/bin
         VLC_FORCE_KERNELVERSION: 19
-        VLC_SDK_PATH: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
         HOST_ARCH: aarch64
         SHORTARCH: arm64
         TRIPLET: $HOST_ARCH-apple-darwin$VLC_FORCE_KERNELVERSION
@@ -520,7 +518,7 @@ release-snap:
         fi
         export PATH="${VLC_PATH}:$PATH"
         mkdir build && cd build
-        ../extras/package/macosx/build.sh $EXTRA_BUILD_FLAGS -a $HOST_ARCH -k $VLC_SDK_PATH $NIGHTLY_EXTRA_BUILD_FLAGS
+        ../extras/package/macosx/build.sh $EXTRA_BUILD_FLAGS -a $HOST_ARCH $NIGHTLY_EXTRA_BUILD_FLAGS
 
 macos-x86_64:
     extends: .macos-common
