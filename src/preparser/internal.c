@@ -548,14 +548,18 @@ ThumbnailerRun(void *userdata)
         goto error;
     }
 
+    bool timeout = false;
     if (deadline == VLC_TICK_INVALID)
         vlc_sem_wait(&req_owner->preparse_ended);
     else
-    {
-        if (vlc_sem_timedwait(&req_owner->preparse_ended, deadline))
-            req_owner->preparse_status = VLC_ETIMEOUT;
-    }
+        timeout = vlc_sem_timedwait(&req_owner->preparse_ended, deadline) != 0;
 
+    /* tear the input thread down before reading what it produced to avoid races */
+    input_Stop(input);
+    input_Close(input);
+
+    if (timeout)
+        req_owner->preparse_status = VLC_ETIMEOUT;
     if (atomic_load(&req_owner->interrupted))
         req_owner->preparse_status = -EINTR;
 
@@ -597,9 +601,6 @@ ThumbnailerRun(void *userdata)
 
     if (pic)
         picture_Release(pic);
-
-    input_Stop(input);
-    input_Close(input);
 
 error:
     if (req_owner != NULL)
