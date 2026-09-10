@@ -18,6 +18,7 @@
 import QtQuick
 
 import VLC.Widgets as Widgets
+import VLC.Style
 import VLC.Dialogs
 import VLC.Util
 
@@ -25,6 +26,9 @@ Widgets.SplitButton {
     id: root
 
     text: qsTr("Open File")
+
+    iconTxt: VLCIcons.ic_fluent_folder_open_24_regular
+    iconSize: VLCStyle.fontSize_xxlarge
 
     model: [
         { text: qsTr("Open Multiple Files"), icon_svg: ":/menu/file.svg" },
