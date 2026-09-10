@@ -591,13 +591,9 @@ ThumbnailerRun(void *userdata)
     {
         assert(req_owner->options & VLC_PREPARSER_TYPE_THUMBNAIL_TO_FILES);
 
-        if (req_owner->preparse_status != VLC_SUCCESS)
-        {
-            PreparserRemoveTask(preparser, req);
-            req_owner->cbs.thumbnailer_to_files->on_ended(req, req_owner->preparse_status,
-                                                          NULL, 0, req_owner->userdata);
-        }
-        else
+        bool queued = false;
+
+        if (req_owner->preparse_status == VLC_SUCCESS)
         {
             /* Export the thumbnail to several files via a new executor in
              * order to not slow down the current thread doing picture
@@ -605,10 +601,31 @@ ThumbnailerRun(void *userdata)
 
             assert(pic != NULL);
 
-            req_owner->runnable.run = ThumbnailerToFilesRun;
-            vlc_executor_Submit(preparser->thumbnailer_to_files, &req_owner->runnable);
+            /* the request stays published while its runnable moves to
+               another executor. Re-queue it under the lock so that a
+               concurrent cancel never targets the executor it just left. */
+            vlc_mutex_lock(&preparser->lock);
+            if (atomic_load(&req_owner->interrupted))
+                req_owner->preparse_status = -EINTR;
+            else
+            {
+                req_owner->runnable.run = ThumbnailerToFilesRun;
+                PreparserQueueTaskLocked(req_owner, preparser->thumbnailer_to_files);
+                queued = true;
+            }
+            vlc_mutex_unlock(&preparser->lock);
+        }
+
+        if (queued)
+        {
             pic = NULL;
             req_owner = NULL;
+        }
+        else
+        {
+            PreparserRemoveTask(preparser, req);
+            req_owner->cbs.thumbnailer_to_files->on_ended(req, req_owner->preparse_status,
+                                                          NULL, 0, req_owner->userdata);
         }
     }
 
