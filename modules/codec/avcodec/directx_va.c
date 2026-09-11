@@ -188,10 +188,10 @@ DEFINE_GUID(DXVA_ModeAV1_VLD_12bit_Profile2_420, 0x2d80bed6, 0x9cac, 0x4835, 0x9
 
 #ifndef FF_DXVA_WORKAROUND_GONE
 #define DEF_DXVA_MODE(name, guid, bitdepth, chroma_w, chroma_h, avcodecid, profiles, workaround) \
-    { name, guid, bitdepth, { chroma_w, chroma_h }, avcodecid, profiles, workaround }
+    { name, guid, bitdepth, 3, { chroma_w, chroma_h }, avcodecid, profiles, workaround }
 #else
 #define DEF_DXVA_MODE(name, guid, bitdepth, chroma_w, chroma_h, avcodecid, profiles, workaround) \
-    { name, guid, bitdepth, { chroma_w, chroma_h }, avcodecid, profiles }
+    { name, guid, bitdepth, 3, { chroma_w, chroma_h }, avcodecid, profiles }
 #endif
 
 #define DEF_DXVA_MODE_420_8B(name, guid, avcodecid, profiles) \
@@ -491,6 +491,14 @@ static const directx_va_mode_t * FindVideoServiceConversion(vlc_va_t *va, const 
         }
         if ( !is_supported )
             continue;
+
+        if (desc && desc->nb_components &&
+            desc->nb_components != mode->nb_components)
+        {
+            msg_Warn( va, "Unsupported %d components for %s ",
+                    desc->nb_components, mode->name );
+            continue;
+        }
 
         int src_bit_depth = (desc && desc->nb_components) ? desc->comp[0].depth : 8;
         if (src_bit_depth != mode->bit_depth)

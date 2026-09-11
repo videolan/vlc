@@ -57,6 +57,7 @@ typedef struct {
     const char   *name;
     const GUID   *guid;
     int           bit_depth;
+    uint8_t       nb_components; // 1 for monochrome, 3 for YUV
     struct {
         uint8_t log2_chroma_w;
         uint8_t log2_chroma_h;
