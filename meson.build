@@ -206,23 +206,6 @@ else
     foundation_dep = []
 endif
 
-# Gettext
-if get_option('nls').allowed()
-    intl_dep = dependency('intl', required: false)
-    if not intl_dep.found()
-        # check in contribs
-        intl_dep = cc.find_library('intl', dirs: contrib_libdir, required: get_option('nls'))
-    endif
-    if intl_dep.found()
-        cdata.set('HAVE_GETTEXT', 1)
-        cdata.set('ENABLE_NLS', 1)
-
-        subdir('po')
-    endif
-else
-    intl_dep = declare_dependency()
-endif
-
 # Domain name i18n support via GNU libidn
 idn_dep = dependency('libidn', required: false)
 if idn_dep.found()
@@ -1030,7 +1013,6 @@ vlc_pkg_suffix = meson.project_name().to_lower()
 
 sysdatadir_path = prefix_path / get_option('datadir')
 pkgdatadir_path = sysdatadir_path / vlc_pkg_suffix
-localedir_path = prefix_path / get_option('localedir')
 if host_system == 'windows'
     libdir_path = prefix_path
     pkglibdir_path = libdir_path / vlc_pkg_suffix
@@ -1041,6 +1023,7 @@ if host_system == 'windows'
     libexecdir_path = prefix_path
     pkglibexecdir_path = prefix_path
     vlccore_lib_path = prefix_path / 'sdk/lib'
+    localedir_path = prefix_path / 'locale'
 else
     libdir_path = prefix_path / get_option('libdir')
     pkglibdir_path = libdir_path / vlc_pkg_suffix
@@ -1051,6 +1034,7 @@ else
     libexecdir_path = prefix_path / get_option('libexecdir')
     pkglibexecdir_path = libexecdir_path / vlc_pkg_suffix
     vlccore_lib_path = prefix_path / 'lib' / vlc_pkg_suffix
+    localedir_path = prefix_path / get_option('localedir')
 endif
 
 cdata.set_quoted('LIBDIR', libdir_path)
@@ -1060,6 +1044,23 @@ cdata.set_quoted('PKGLIBEXECDIR', pkglibexecdir_path)
 cdata.set_quoted('SYSDATADIR', sysdatadir_path)
 cdata.set_quoted('PKGDATADIR', pkgdatadir_path)
 cdata.set_quoted('LOCALEDIR', localedir_path)
+
+# Gettext
+if get_option('nls').allowed()
+    intl_dep = dependency('intl', required: false)
+    if not intl_dep.found()
+        # check in contribs
+        intl_dep = cc.find_library('intl', dirs: contrib_libdir, required: get_option('nls'))
+    endif
+    if intl_dep.found()
+        cdata.set('HAVE_GETTEXT', 1)
+        cdata.set('ENABLE_NLS', 1)
+
+        subdir('po')
+    endif
+else
+    intl_dep = declare_dependency()
+endif
 
 gen_vlc_about = find_program('buildsystem/gen-vlc-about.py')
 vlc_about = custom_target('vlc_about.h',

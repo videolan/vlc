@@ -15,4 +15,5 @@ i18n.gettext(vlc_package_name,
 		'--keyword=_PNS:1c,2',
 		'--add-comments=xgettext:',
 		'--from-code=UTF-8',
-	])
+	],
+	install_dir: localedir_path)
