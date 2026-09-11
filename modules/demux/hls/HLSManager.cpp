@@ -75,6 +75,7 @@ bool HLSManager::isHTTPLiveStreaming(stream_t *s)
             "ALLOW-CACHE",
             "ENDLIST",
             "STREAM-INF",
+            "MEDIA",
             "DISCONTINUITY",
             "VERSION"
         };
