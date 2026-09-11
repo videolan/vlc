@@ -135,7 +135,7 @@ static char *DxDescribe(vlc_va_sys_t *);
 static int DxCreateVideoService(vlc_va_t *);
 static void DxDestroyVideoService(vlc_va_t *);
 static int DxGetInputList(vlc_va_t *, input_list_t *);
-static int DxSetupOutput(vlc_va_t *, const GUID *, int surface_width, int surface_height);
+static int DxSetupOutput(vlc_va_t *, const GUID *, int bit_depth, int surface_width, int surface_height);
 
 static int DxCreateDecoderSurfaces(vlc_va_t *, int codec_id,
                                    const video_format_t *fmt, unsigned *surface_count);
@@ -556,10 +556,7 @@ static int DxGetInputList(vlc_va_t *va, input_list_t *p_list)
     return VLC_SUCCESS;
 }
 
-extern const GUID DXVA_ModeHEVC_VLD_Main10;
-extern const GUID DXVA_ModeVP9_VLD_10bit_Profile2;
-
-static int DxSetupOutput(vlc_va_t *va, const GUID *input, int surface_width, int surface_height)
+static int DxSetupOutput(vlc_va_t *va, const GUID *input, int bit_depth, int surface_width, int surface_height)
 {
     vlc_va_sys_t *sys = va->sys;
     directx_sys_t *dx_sys = &sys->dx_sys;
@@ -588,7 +585,7 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, int surface_width, int
     int idx = 0;
     if ( sys->render != DXGI_FORMAT_UNKNOWN )
         processorInput[idx++] = sys->render;
-    if (IsEqualGUID(input, &DXVA_ModeHEVC_VLD_Main10) || IsEqualGUID(input, &DXVA_ModeVP9_VLD_10bit_Profile2))
+    if (bit_depth == 10)
         processorInput[idx++] = DXGI_FORMAT_P010;
     processorInput[idx++] = DXGI_FORMAT_NV12;
     processorInput[idx++] = DXGI_FORMAT_420_OPAQUE;

@@ -508,7 +508,7 @@ static int FindVideoServiceConversion(vlc_va_t *va, directx_sys_t *dx_sys,
 
         /* */
         msg_Dbg(va, "Trying to use '%s' as input", mode->name);
-        if (dx_sys->pf_setup_output(va, mode->guid, surface_width, surface_height)==VLC_SUCCESS)
+        if (dx_sys->pf_setup_output(va, mode->guid, mode->bit_depth, surface_width, surface_height)==VLC_SUCCESS)
         {
             dx_sys->input = *mode->guid;
             err = VLC_SUCCESS;
