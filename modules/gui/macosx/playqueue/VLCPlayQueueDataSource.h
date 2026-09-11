@@ -35,6 +35,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, nonatomic) NSTextField *counterTextField;
 
 - (void)prepareForUse;
+- (void)playQueueItemsInsertedAtIndex:(NSUInteger)index count:(NSUInteger)count;
+- (void)playQueueItemsUpdatedAtIndex:(NSUInteger)index count:(NSUInteger)count;
 - (void)playQueueUpdated;
 - (void)scrollToCurrentPlayQueueItem;
 

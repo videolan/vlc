@@ -324,7 +324,7 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 {
     [_playQueueModel addItems:items atIndex:insertionIndex count:numberOfItems];
 
-    [_playQueueDataSource playQueueUpdated];
+    [_playQueueDataSource playQueueItemsInsertedAtIndex:insertionIndex count:numberOfItems];
     [_defaultNotificationCenter postNotificationName:VLCPlayQueueItemsAdded object:self];
 }
 
@@ -356,7 +356,7 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
     }
     vlc_playlist_Unlock(_p_playlist);
 
-    [_playQueueDataSource playQueueUpdated];
+    [_playQueueDataSource playQueueItemsUpdatedAtIndex:firstUpdatedIndex count:numberOfItems];
 
 }
 

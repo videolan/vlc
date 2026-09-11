@@ -110,6 +110,35 @@ static NSString *VLCPlayQueueCellIdentifier = @"VLCPlayQueueCellIdentifier";
     [_tableView reloadData];
 }
 
+- (void)playQueueItemsInsertedAtIndex:(NSUInteger)index count:(NSUInteger)count
+{
+    const NSUInteger numberOfPlayQueueItems = _playQueueModel.numberOfPlayQueueItems;
+    self.dragDropView.hidden = numberOfPlayQueueItems > 0 ? YES : NO;
+    self.counterTextField.stringValue = [NSString stringWithFormat:@"%lu", numberOfPlayQueueItems];
+
+    if (count == 0) {
+        return;
+    }
+
+    NSAssert(index <= numberOfPlayQueueItems - count,
+             @"Inserted play queue rows must be within the model bounds");
+    NSIndexSet * const indexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(index, count)];
+    [_tableView insertRowsAtIndexes:indexes withAnimation:NSTableViewAnimationEffectNone];
+}
+
+- (void)playQueueItemsUpdatedAtIndex:(NSUInteger)index count:(NSUInteger)count
+{
+    if (count == 0) {
+        return;
+    }
+
+    const NSUInteger numberOfPlayQueueItems = _playQueueModel.numberOfPlayQueueItems;
+    NSAssert(index <= numberOfPlayQueueItems - count,
+             @"Updated play queue rows must be within the model bounds");
+    NSIndexSet * const indexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(index, count)];
+    [_tableView reloadDataForRowIndexes:indexes columnIndexes:[NSIndexSet indexSetWithIndex:0]];
+}
+
 - (id<NSPasteboardWriting>)tableView:(NSTableView *)tableView pasteboardWriterForRow:(NSInteger)row
 {
     NSPasteboardItem * const pboardItem = [[NSPasteboardItem alloc] init];
