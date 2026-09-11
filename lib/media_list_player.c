@@ -37,6 +37,7 @@
 
 #include <vlc_common.h>
 #include <vlc_atomic.h>
+#include <vlc_vector.h>
 
 #include "libvlc_internal.h"
 
@@ -343,6 +344,75 @@ find_next_media_locked(libvlc_media_list_player_t * p_mlp)
     return md;
 }
 
+static bool
+path_equals(const libvlc_media_list_path_t a, const libvlc_media_list_path_t b)
+{
+    int depth = libvlc_media_list_path_depth(a);
+    return depth == libvlc_media_list_path_depth(b)
+        && memcmp(a, b, depth * sizeof(*a)) == 0;
+}
+
+typedef struct VLC_VECTOR(libvlc_media_t *) media_vector_t;
+
+/**************************************************************************
+ *       append_next_media_locked (private)
+ *
+ * Append the media following p_mlp->current_playing_item_path to
+ * following, in playback order, until the end of the list or until
+ * reaching stop_path. current_playing_item_path is used as the cursor and
+ * is left NULL or pointing to stop_path.
+ *
+ * Playlist lock must be held.
+ **************************************************************************/
+static void
+append_next_media_locked(libvlc_media_list_player_t * p_mlp,
+                         media_vector_t *following,
+                         const libvlc_media_list_path_t stop_path)
+{
+    for (;;)
+    {
+        libvlc_media_list_path_t path = get_next_path(p_mlp, false);
+        free(p_mlp->current_playing_item_path);
+        p_mlp->current_playing_item_path = path;
+
+        if (path == NULL || (stop_path != NULL && path_equals(path, stop_path)))
+            return;
+
+        libvlc_media_t *md = libvlc_media_list_item_at_path(p_mlp->p_mlist, path);
+        if (md != NULL && !vlc_vector_push(following, md))
+            libvlc_media_release(md);
+    }
+}
+
+/**************************************************************************
+ *       get_following_media_locked (private)
+ *
+ * Collect the media that would play after p_mlp->current_playing_item_path,
+ * in playback order, wrapping around in loop mode.
+ *
+ * Playlist lock must be held.
+ **************************************************************************/
+static void
+get_following_media_locked(libvlc_media_list_player_t * p_mlp,
+                           media_vector_t *following)
+{
+    libvlc_media_list_path_t current = p_mlp->current_playing_item_path;
+
+    p_mlp->current_playing_item_path = libvlc_media_list_path_copy(current);
+    append_next_media_locked(p_mlp, following, NULL);
+
+    if (p_mlp->e_playback_mode == libvlc_playback_mode_loop)
+    {
+        /* Start over from the first item, up to the current one */
+        free(p_mlp->current_playing_item_path);
+        p_mlp->current_playing_item_path = NULL;
+        append_next_media_locked(p_mlp, following, current);
+    }
+
+    free(p_mlp->current_playing_item_path);
+    p_mlp->current_playing_item_path = current;
+}
+
 static void
 internal_player_media_changed(vlc_player_t *player, input_item_t *new_media,
                               void *opaque)
@@ -481,16 +551,87 @@ void libvlc_media_list_player_set_media_list(libvlc_media_list_player_t * p_mlp,
     assert (p_mlist);
 
     lock(p_mlp);
+
+    libvlc_media_t *p_current_media = p_mlp->current_playing_item_path
+        ? libvlc_media_player_get_media(p_mlp->p_mi) : NULL;
+
+    /* If the current media isn't part of the new list, playback continues
+     * with the first media that followed it in the old list and is part of
+     * the new one: collect them before the old list goes away. */
+    media_vector_t following = VLC_VECTOR_INITIALIZER;
+    if (p_current_media)
+    {
+        libvlc_media_list_lock(p_mlist);
+        libvlc_media_list_path_t path =
+            libvlc_media_list_path_of_item(p_mlist, p_current_media);
+        libvlc_media_list_unlock(p_mlist);
+
+        if (path == NULL)
+        {
+            libvlc_media_list_lock(p_mlp->p_mlist);
+            get_following_media_locked(p_mlp, &following);
+            libvlc_media_list_unlock(p_mlp->p_mlist);
+        }
+        free(path);
+    }
+
     if (p_mlp->p_mlist)
         libvlc_media_list_release(p_mlp->p_mlist);
     libvlc_media_list_retain(p_mlist);
 
     p_mlp->p_mlist = p_mlist;
-    if (libvlc_media_player_is_playing(p_mlp->p_mi))
+
+    if (p_current_media)
     {
-        stop(p_mlp);
-        set_relative_playlist_position_and_play(p_mlp, true);
+        libvlc_media_list_lock(p_mlp->p_mlist);
+
+        libvlc_media_t *p_following_media = NULL;
+        libvlc_media_list_path_t path =
+            libvlc_media_list_path_of_item(p_mlp->p_mlist, p_current_media);
+        for (size_t i = 0; path == NULL && i < following.size; i++)
+        {
+            p_following_media = following.data[i];
+            path = libvlc_media_list_path_of_item(p_mlp->p_mlist,
+                                                  p_following_media);
+        }
+
+        free(p_mlp->current_playing_item_path);
+        p_mlp->current_playing_item_path = path;
+
+        if (path == NULL)
+        {
+            /* Nothing left to play from the new list */
+            libvlc_media_list_unlock(p_mlp->p_mlist);
+            stop(p_mlp);
+        }
+        else if (p_following_media == NULL)
+        {
+            /* The current media keeps playing, queue its new next media */
+            libvlc_media_t *md = find_next_media_locked(p_mlp);
+
+            libvlc_media_list_unlock(p_mlp->p_mlist);
+
+            libvlc_media_player_set_next_media(p_mlp->p_mi, md);
+            libvlc_media_release(md);
+        }
+        else
+        {
+            /* The current media was removed, switch to its follower */
+            libvlc_media_list_unlock(p_mlp->p_mlist);
+
+            bool b_playing = libvlc_media_player_is_playing(p_mlp->p_mi);
+            libvlc_media_player_set_media(p_mlp->p_mi, p_following_media);
+            if (b_playing)
+                libvlc_media_player_play(p_mlp->p_mi);
+        }
+
+        libvlc_media_release(p_current_media);
     }
+
+    libvlc_media_t *md;
+    vlc_vector_foreach(md, &following)
+        libvlc_media_release(md);
+    vlc_vector_destroy(&following);
 
     unlock(p_mlp);
 }

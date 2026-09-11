@@ -111,8 +111,16 @@ LIBVLC_API libvlc_media_player_t *
 /**
  * Set the media list associated with the player
  *
+ * If the current media is part of the new list, it keeps playing and the
+ * playback continues from its position in the new list. Otherwise, the
+ * playback switches to the first media that followed it in the previous
+ * list and is part of the new one, or stops if there is none.
+ *
  * \param p_mlp media list player instance
  * \param p_mlist list of media
+ *
+ * \note the caller must not hold p_mlist's lock
+ *       (libvlc_media_list_lock()) when calling this function.
  */
 LIBVLC_API void
     libvlc_media_list_player_set_media_list(
