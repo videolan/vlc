@@ -382,12 +382,13 @@ endif
 # in the modules folder, not in gui/qt/ subfolder as
 # vlc-static would not find it there.
 if get_option('qt').allowed() and qt6_dep.found()
+    enable_qt_check = host_system not in ['windows', 'os/2', 'ios', 'tvos', 'visionos']
     executable('vlc-qt-check',
         files('gui/qt/vlc-qt-check.cpp'),
         dependencies: [qt6_dep, qt_extra_deps],
         include_directories: [vlc_include_dirs],
-        build_by_default: true,
-        install: true,
+        build_by_default: enable_qt_check,
+        install: enable_qt_check,
         install_dir: pkglibexecdir_path,
         c_args : qt_extra_flags,
         cpp_args : qt_extra_flags,
