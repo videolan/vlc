@@ -65,6 +65,9 @@ Misc:
 Lua:
  * Remove broken youtube.lua plugin
 
+Windows:
+ * Fix slow startup on Windows when Daylight Saving Time changes (#29685)
+
 Contrib:
  * Update libarchive to 3.8.8
  * Update libass to 0.17.5
