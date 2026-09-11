@@ -820,6 +820,11 @@ option('v4l2',
        value: 'auto',
        description: 'Video4Linux2 support')
 
+option('nsis',
+       type: 'feature',
+       value: 'disabled',
+       description: 'Generate NSIS files to create Windows installer')
+
 # TODO: Missing rpi-omxil
 # TODO: Missing gst-decode
 # TODO: Missing libva
