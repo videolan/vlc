@@ -116,6 +116,8 @@ PreparserRequestDelete(struct vlc_preparser_req *req)
     for (size_t i = 0; i < req_owner->output_count; ++i)
         free(req_owner->outputs[i].file_path);
     free(req_owner->outputs);
+    if (req_owner->pic != NULL)
+        picture_Release(req_owner->pic);
     if (req_owner->i11e_ctx != NULL)
         vlc_interrupt_destroy(req_owner->i11e_ctx);
     free(req_owner);
@@ -494,6 +496,7 @@ error:
     else
         req_owner->cbs.thumbnailer_to_files->on_ended(req, req_owner->preparse_status,
                                                       NULL, 0, req_owner->userdata);
+    req_owner->pic = NULL;
     picture_Release(pic);
     vlc_preparser_req_Release(req);
     free(result_array);
@@ -630,7 +633,10 @@ ThumbnailerRun(void *userdata)
     }
 
     if (pic)
+    {
+        req_owner->pic = NULL;
         picture_Release(pic);
+    }
 
 error:
     if (req_owner != NULL)
