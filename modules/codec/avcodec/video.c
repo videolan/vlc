@@ -899,6 +899,8 @@ static int ExtractAV1Profile(AVCodecContext *p_context, const es_format_t *fmt_i
     int tier;
     AV1_get_profile_level(sequence_hdr, &p_sys->profile, &p_sys->level, &tier);
 
+    p_context->profile = p_sys->profile;
+
     AV1_release_sequence_header(sequence_hdr);
 
     return VLC_SUCCESS;
