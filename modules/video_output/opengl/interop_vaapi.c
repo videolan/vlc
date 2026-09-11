@@ -246,10 +246,6 @@ tc_vaegl_update(const struct vlc_gl_interop *interop, uint32_t textures[],
                                va_surface_descriptor.objects[obj_idx].drm_format_modifier);
         if (egl_images[i] == NULL)
             goto error;
-
-        priv->gl.BindTexture(interop->tex_target, textures[i]);
-
-        priv->glEGLImageTargetTexture2DOES(interop->tex_target, egl_images[i]);
     }
 #else
     num_planes = va_image.num_planes;
@@ -262,16 +258,19 @@ tc_vaegl_update(const struct vlc_gl_interop *interop, uint32_t textures[],
                                DRM_FORMAT_MOD_INVALID);
         if (egl_images[i] == NULL)
             goto error;
-
-        priv->gl.BindTexture(interop->tex_target, textures[i]);
-
-        priv->glEGLImageTargetTexture2DOES(interop->tex_target, egl_images[i]);
     }
 #endif
+
+    for (size_t i = 0; i < num_planes; ++i)
+    {
+        priv->gl.BindTexture(interop->tex_target, textures[i]);
+        priv->glEGLImageTargetTexture2DOES(interop->tex_target, egl_images[i]);
+    }
 
     if (priv->last.pic != NULL)
         vaegl_release_last_pic(interop, priv);
     priv->last.pic = picture_Hold(pic);
+
 #if VA_CHECK_VERSION(1, 1, 0)
     priv->last.va_surface_descriptor = va_surface_descriptor;
 #else
