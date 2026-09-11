@@ -75,8 +75,8 @@ static BOOL VLCLibraryDataTypesIntegrationMediaMatchesMRL(const vlc_ml_media_t *
 static BOOL VLCLibraryDataTypesIntegrationSetMovieMetadata(int64_t mediaID)
 {
     /* The VLC medialibrary bridge exposes movie fields as read-only. Seed the
-     * scanner-created entity's persisted values so the wrapper conversion is
-     * tested with non-empty movie metadata as well. */
+     * persisted media and movie rows so the wrapper conversion is tested with
+     * a real video-typed movie and non-empty metadata. */
     NSString * const databasePath =
         [sUserDataPath stringByAppendingPathComponent:@"ml/ml.db"];
     sqlite3 *database = NULL;
@@ -92,14 +92,46 @@ static BOOL VLCLibraryDataTypesIntegrationSetMovieMetadata(int64_t mediaID)
 
     sqlite3_busy_timeout(database, 5000);
     sqlite3_stmt *statement = NULL;
-    const char * const query =
-        "UPDATE Movie SET summary = ?, imdb_id = ? WHERE media_id = ?";
-    BOOL success = sqlite3_prepare_v2(database, query, -1, &statement, NULL) == SQLITE_OK;
+    BOOL success = sqlite3_prepare_v2(database,
+                                      "UPDATE Media SET type = ?, subtype = ? "
+                                      "WHERE id_media = ?",
+                                      -1,
+                                      &statement,
+                                      NULL) == SQLITE_OK;
     if (success) {
-        sqlite3_bind_text(statement, 1, "Factory movie summary", -1, SQLITE_STATIC);
-        sqlite3_bind_text(statement, 2, "tt1234567", -1, SQLITE_STATIC);
+        sqlite3_bind_int(statement, 1, VLC_ML_MEDIA_TYPE_VIDEO);
+        sqlite3_bind_int(statement, 2, VLC_ML_MEDIA_SUBTYPE_MOVIE);
         sqlite3_bind_int64(statement, 3, mediaID);
-        success = sqlite3_step(statement) == SQLITE_DONE && sqlite3_changes(database) == 1;
+        success = sqlite3_step(statement) == SQLITE_DONE;
+    }
+    sqlite3_finalize(statement);
+
+    if (success) {
+        success = sqlite3_prepare_v2(database,
+                                      "DELETE FROM Movie WHERE media_id = ?",
+                                      -1,
+                                      &statement,
+                                      NULL) == SQLITE_OK;
+    }
+    if (success) {
+        sqlite3_bind_int64(statement, 1, mediaID);
+        success = sqlite3_step(statement) == SQLITE_DONE;
+    }
+    sqlite3_finalize(statement);
+
+    if (success) {
+        success = sqlite3_prepare_v2(database,
+                                      "INSERT INTO Movie (media_id, summary, imdb_id) "
+                                      "VALUES (?, ?, ?)",
+                                      -1,
+                                      &statement,
+                                      NULL) == SQLITE_OK;
+    }
+    if (success) {
+        sqlite3_bind_int64(statement, 1, mediaID);
+        sqlite3_bind_text(statement, 2, "Factory movie summary", -1, SQLITE_STATIC);
+        sqlite3_bind_text(statement, 3, "tt1234567", -1, SQLITE_STATIC);
+        success = sqlite3_step(statement) == SQLITE_DONE;
     }
     sqlite3_finalize(statement);
     sqlite3_close(database);
@@ -512,23 +544,29 @@ BOOL VLCLibraryDataTypesIntegrationPrepareMovieFixture(void)
     }
 
     NSString * const movieMRL = [NSURL fileURLWithPath:moviePath].absoluteString;
-    if (!VLCLibraryDataTypesIntegrationWaitForMediaAdded(
-            [NSURL fileURLWithPath:fixtureDirectory].absoluteString,
-            @[movieMRL])) {
+    vlc_ml_media_t * const externalMedia =
+        vlc_ml_new_external_media(sMediaLibrary, movieMRL.UTF8String);
+    if (externalMedia == NULL) {
+        return NO;
+    }
+    sFactoryMovieMediaID = externalMedia->i_id;
+    vlc_ml_media_release(externalMedia);
+
+    if (!VLCLibraryDataTypesIntegrationSetMovieMetadata(sFactoryMovieMediaID)) {
+        sFactoryMovieMediaID = 0;
         return NO;
     }
 
-    vlc_ml_media_t * const media =
-        vlc_ml_get_media_by_mrl(sMediaLibrary, movieMRL.UTF8String);
-    if (media == NULL || media->i_subtype != VLC_ML_MEDIA_SUBTYPE_MOVIE) {
-        if (media != NULL) {
-            vlc_ml_media_release(media);
-        }
-        return NO;
+    vlc_ml_media_t * const movie =
+        vlc_ml_get_media(sMediaLibrary, sFactoryMovieMediaID);
+    const BOOL isMovie = movie != NULL && movie->i_subtype == VLC_ML_MEDIA_SUBTYPE_MOVIE;
+    if (movie != NULL) {
+        vlc_ml_media_release(movie);
     }
-    sFactoryMovieMediaID = media->i_id;
-    vlc_ml_media_release(media);
-    return VLCLibraryDataTypesIntegrationSetMovieMetadata(sFactoryMovieMediaID);
+    if (!isMovie) {
+        sFactoryMovieMediaID = 0;
+    }
+    return isMovie;
 }
 
 int64_t VLCLibraryDataTypesIntegrationFactoryAudioMediaID(void)
