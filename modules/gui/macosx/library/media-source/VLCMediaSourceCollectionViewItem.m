@@ -169,10 +169,6 @@ NSString *VLCMediaSourceCollectionViewItemIdentifier = @"VLCMediaSourceCollectio
         [self openContextMenu:event];
         return;
     }
-    if (event.modifierFlags & (NSEventModifierFlagShift | NSEventModifierFlagCommand)) {
-        self.selected = !self.selected;
-        return;
-    }
     [super mouseDown:event];
 }
 
