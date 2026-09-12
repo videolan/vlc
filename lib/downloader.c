@@ -342,7 +342,13 @@ static void notify_subitems(const struct libvlc_downloader_cbs *cbs, void *cbs_o
     if (mlist == NULL)
         return;
 
-    cbs->on_subitems(cbs_opaque, task, mlist);
+    libvlc_media_list_lock(mlist);
+    int count = libvlc_media_list_count(mlist);
+    libvlc_media_list_unlock(mlist);
+
+    if (count > 0)
+        cbs->on_subitems(cbs_opaque, task, mlist);
+
     libvlc_media_list_release(mlist);
 }
 
