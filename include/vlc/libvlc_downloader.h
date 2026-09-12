@@ -148,6 +148,9 @@ struct libvlc_downloader_cbs
      * \note Optional (can be NULL),
      * available since version 0
      *
+     * \warning Do not call any libvlc_downloader_* API from within this callback.
+     * Only libvlc_downloader_task_* APIs may be called on the provided task handle.
+     *
      * \param opaque user data
      * \param task opaque handle returned by libvlc_downloader_task_new()
      * \param subitems media list of subitems (owned by LibVLC)
@@ -160,6 +163,9 @@ struct libvlc_downloader_cbs
      *
      * \note Optional (can be NULL),
      * available since version 0
+     *
+     * \warning Do not call any libvlc_downloader_* API from within this callback.
+     * Only libvlc_downloader_task_* APIs may be called on the provided task handle.
      *
      * \param opaque user data
      * \param task opaque handle returned by libvlc_downloader_task_new()
@@ -188,8 +194,9 @@ struct libvlc_downloader_request_t
      *
      * - Only finite-size media are allowed to download.
      *
-     * - If the media is a playlist or directory, the user will be notified of the
-     *   subitems via the on_subitems callback and the download will not proceed.
+     * - If the media is a playlist or directory, the download will not proceed
+     *   and the task terminates with the error state. If it has subitems, the
+     *   user is notified of them via the on_subitems callback before that.
      *
      * - If the media is a livestream or unknown type, the download will error out.
      */
