@@ -138,6 +138,7 @@ NSString * const VLCLibraryModelDiscoveryFailed = @"VLCLibraryModelDiscoveryFail
 @property (readwrite, nonatomic) NSArray *cachedListOfMonitoredFolders;
 @property (readwrite, nonatomic) NSArray *cachedMediaTitles;
 
+- (instancetype)initWithoutMediaLibrary;
 - (void)resetCachedListOfRecentMedia;
 - (void)resetCachedListOfRecentAudioMedia;
 - (void)resetCachedListOfArtists;
@@ -326,7 +327,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     return modelIndexNumber.longLongValue;
 }
 
-- (instancetype)initWithLibrary:(vlc_medialibrary_t *)library
+- (instancetype)initWithoutMediaLibrary
 {
     self = [super init];
     if (self) {
@@ -335,8 +336,6 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         _sortDescending = NO;
         _filterString = @"";
         _recentMediaLimit = 20;
-        _p_mediaLibrary = library;
-        _p_eventCallback = vlc_ml_event_register_callback(_p_mediaLibrary, libraryCallback, (__bridge void *)self);
 
         // Concurrent queues allow multiple readers while using barrier flags for exclusive writes,
         // providing better performance than serial queues while maintaining thread safety
@@ -356,6 +355,16 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
                                        selector:@selector(applicationWillTerminate:)
                                            name:NSApplicationWillTerminateNotification
                                          object:nil];
+    }
+    return self;
+}
+
+- (instancetype)initWithLibrary:(vlc_medialibrary_t *)library
+{
+    self = [self initWithoutMediaLibrary];
+    if (self) {
+        _p_mediaLibrary = library;
+        _p_eventCallback = vlc_ml_event_register_callback(_p_mediaLibrary, libraryCallback, (__bridge void *)self);
 
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
             vlc_ml_query_params_t queryParameters = vlc_ml_query_params_create();
