@@ -45,6 +45,15 @@
     return self;
 }
 
+- (instancetype)initWithCoder:(NSCoder *)coder
+{
+    self = [super initWithCoder:coder];
+    if (self) {
+        self.drawBorder = YES;
+    }
+    return self;
+}
+
 - (void)enablePlayQueueItems
 {
     [self setupDragRecognition];
