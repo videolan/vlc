@@ -1189,9 +1189,11 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     }
 
     NSURL * const URL = [NSURL URLWithString:_MRL];
-    if (URL) {
-        [NSWorkspace.sharedWorkspace activateFileViewerSelectingURLs:@[URL]];
+    if (URL == nil || !URL.isFileURL) {
+        return;
     }
+
+    [NSWorkspace.sharedWorkspace activateFileViewerSelectingURLs:@[URL]];
 }
 
 - (int)setFavorite:(BOOL)favorite
