@@ -456,7 +456,7 @@ vlc_modules += {
 # sid
 sid_dep = dependency('libsidplay2', required: get_option('sid'))
 if cpp.check_header('sidplay/builders/resid.h', dependencies: sid_dep)
-resid_dep = cpp.find_library('resid-builder', dirs: contrib_libdir)
+resid_dep = cpp.find_library('resid-builder', dirs: contrib_libdir, required: get_option('sid'))
 vlc_modules += {
     'name' : 'sid',
     'sources' : files('sid.cpp'),
