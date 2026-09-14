@@ -125,15 +125,15 @@ struct priv
 };
 
 static EGLImageKHR
-vaegl_image_create(const struct vlc_gl_interop *interop, EGLint w, EGLint h,
-                   EGLint fourcc, EGLint fd, EGLint offset, EGLint pitch,
-                   EGLuint64KHR modifier)
+CreatePlaneImage(const struct vlc_gl_interop *interop, EGLint w, EGLint h,
+                 uint32_t drm_fourcc, EGLint fd, EGLint offset, EGLint pitch,
+                 EGLuint64KHR modifier)
 {
     struct priv *priv = interop->priv;
     const EGLint attribs[] = {
         EGL_WIDTH, w,
         EGL_HEIGHT, h,
-        EGL_LINUX_DRM_FOURCC_EXT, fourcc,
+        EGL_LINUX_DRM_FOURCC_EXT, (EGLint)drm_fourcc,
         EGL_DMA_BUF_PLANE0_FD_EXT, fd,
         EGL_DMA_BUF_PLANE0_OFFSET_EXT, offset,
         EGL_DMA_BUF_PLANE0_PITCH_EXT, pitch,
@@ -147,17 +147,12 @@ vaegl_image_create(const struct vlc_gl_interop *interop, EGLint w, EGLint h,
 }
 
 static void
-vaegl_image_destroy(const struct vlc_gl_interop *interop, EGLImageKHR image)
+ReleaseLastPicture(const struct vlc_gl_interop *interop)
 {
     struct priv *priv = interop->priv;
-    priv->egl.destroyImageKHR(priv->egl.display, image);
-}
 
-static void
-vaegl_release_last_pic(const struct vlc_gl_interop *interop, struct priv *priv)
-{
     for (unsigned i = 0; i < priv->last.num_planes; ++i)
-        vaegl_image_destroy(interop, priv->last.egl_images[i]);
+        priv->egl.destroyImageKHR(priv->egl.display, priv->last.egl_images[i]);
 
     for (unsigned i = 0; i < priv->last.va_surface_descriptor.num_objects; ++i)
         close(priv->last.va_surface_descriptor.objects[i].fd);
@@ -206,12 +201,12 @@ tc_vaegl_update(const struct vlc_gl_interop *interop, uint32_t textures[],
         unsigned obj_idx = va_surface_descriptor.layers[i].object_index[0];
 
         egl_images[i] =
-            vaegl_image_create(interop, tex_width[i], tex_height[i],
-                               priv->format.planes[i].drm_fourcc,
-                               va_surface_descriptor.objects[obj_idx].fd,
-                               va_surface_descriptor.layers[i].offset[0],
-                               va_surface_descriptor.layers[i].pitch[0],
-                               va_surface_descriptor.objects[obj_idx].drm_format_modifier);
+            CreatePlaneImage(interop, tex_width[i], tex_height[i],
+                             priv->format.planes[i].drm_fourcc,
+                             va_surface_descriptor.objects[obj_idx].fd,
+                             va_surface_descriptor.layers[i].offset[0],
+                             va_surface_descriptor.layers[i].pitch[0],
+                             va_surface_descriptor.objects[obj_idx].drm_format_modifier);
         if (egl_images[i] == NULL)
             goto error;
     }
@@ -223,7 +218,7 @@ tc_vaegl_update(const struct vlc_gl_interop *interop, uint32_t textures[],
     }
 
     if (priv->last.pic != NULL)
-        vaegl_release_last_pic(interop, priv);
+        ReleaseLastPicture(interop);
     priv->last.pic = picture_Hold(pic);
 
     priv->last.va_surface_descriptor = va_surface_descriptor;
@@ -236,7 +231,7 @@ tc_vaegl_update(const struct vlc_gl_interop *interop, uint32_t textures[],
 
 error:
     for (unsigned i = 0; i < INTEROP_MAX_PLANES && egl_images[i] != NULL; ++i)
-        vaegl_image_destroy(interop, egl_images[i]);
+        priv->egl.destroyImageKHR(priv->egl.display, egl_images[i]);
 
     for (unsigned i = 0; i < va_surface_descriptor.num_objects; ++i)
         close(va_surface_descriptor.objects[i].fd);
@@ -250,7 +245,7 @@ Close(struct vlc_gl_interop *interop)
     struct priv *priv = interop->priv;
 
     if (priv->last.pic != NULL)
-        vaegl_release_last_pic(interop, priv);
+        ReleaseLastPicture(interop);
 
     free(priv);
 }
@@ -325,17 +320,17 @@ tc_va_check_derive_image(const struct vlc_gl_interop *interop)
         EGLint w = (desc.width * interop->texs[i].w.num) / interop->texs[i].w.den;
         EGLint h = (desc.height * interop->texs[i].h.num) / interop->texs[i].h.den;
         EGLImageKHR egl_image =
-            vaegl_image_create(interop, w, h, priv->format.planes[i].drm_fourcc,
-                               desc.objects[obj_idx].fd,
-                               desc.layers[i].offset[0], desc.layers[i].pitch[0],
-                               desc.objects[obj_idx].drm_format_modifier);
+            CreatePlaneImage(interop, w, h, priv->format.planes[i].drm_fourcc,
+                             desc.objects[obj_idx].fd,
+                             desc.layers[i].offset[0], desc.layers[i].pitch[0],
+                             desc.objects[obj_idx].drm_format_modifier);
         if (egl_image == NULL)
         {
             msg_Warn(o, "Can't create Image KHR: kernel too old ?");
             ret = VLC_EGENERIC;
             goto done_desc;
         }
-        vaegl_image_destroy(interop, egl_image);
+        priv->egl.destroyImageKHR(priv->egl.display, egl_image);
     }
 
     ret = VLC_SUCCESS;
