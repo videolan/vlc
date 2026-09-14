@@ -123,6 +123,11 @@ static int vlc_kill(pid_t pid, int signum)
 struct ytdl_playlist {
     struct json_object json;
     stream_t *source;
+    struct {
+        es_out_t out;
+        es_out_t *target;
+        const char *lang;
+    } esout;
 };
 
 static bool FormatHasManifest(const struct json_object *fmt)
@@ -307,6 +312,76 @@ static const struct json_object *PickFormat(stream_t *s,
 
      return best_fmt;
 }
+
+static bool LanguageMatch(const char *a, const char *b)
+{
+    size_t len = strcspn(a, "-_");
+
+    return len > 0 && strcspn(b, "-_") == len
+        && vlc_ascii_strncasecmp(a, b, len) == 0;
+}
+
+static es_out_id_t *EsOutAdd(es_out_t *out, input_source_t *in,
+                             const es_format_t *fmt)
+{
+    struct ytdl_playlist *sys = container_of(out, struct ytdl_playlist,
+                                             esout.out);
+    es_out_t *target = sys->esout.target;
+
+    if (sys->esout.lang != NULL && fmt->i_cat == AUDIO_ES
+     && fmt->i_priority == ES_PRIORITY_SELECTABLE_MIN
+     && fmt->psz_language != NULL
+     && LanguageMatch(fmt->psz_language, sys->esout.lang)) {
+        es_format_t copy = *fmt;
+
+        /* Prefer the tracks in the language selected by yt-dlp */
+        copy.i_priority = ES_PRIORITY_SELECTABLE_MIN + 1;
+        return target->cbs->add(target, in, &copy);
+    }
+
+    return target->cbs->add(target, in, fmt);
+}
+
+static int EsOutSend(es_out_t *out, es_out_id_t *id, block_t *block)
+{
+    struct ytdl_playlist *sys = container_of(out, struct ytdl_playlist,
+                                             esout.out);
+    es_out_t *target = sys->esout.target;
+
+    return target->cbs->send(target, id, block);
+}
+
+static void EsOutDel(es_out_t *out, es_out_id_t *id)
+{
+    struct ytdl_playlist *sys = container_of(out, struct ytdl_playlist,
+                                             esout.out);
+    es_out_t *target = sys->esout.target;
+
+    target->cbs->del(target, id);
+}
+
+static int EsOutControl(es_out_t *out, input_source_t *in, int query,
+                        va_list args)
+{
+    struct ytdl_playlist *sys = container_of(out, struct ytdl_playlist,
+                                             esout.out);
+    es_out_t *target = sys->esout.target;
+
+    return target->cbs->control(target, in, query, args);
+}
+
+static void EsOutDestroy(es_out_t *out)
+{
+    (void) out;
+}
+
+static const struct es_out_callbacks ytdl_esout_cbs = {
+    .add = EsOutAdd,
+    .send = EsOutSend,
+    .del = EsOutDel,
+    .control = EsOutControl,
+    .destroy = EsOutDestroy,
+};
 
 static const char *PickArt(const struct json_object *entry)
 {
@@ -544,8 +619,16 @@ static int OpenCommon(vlc_object_t *obj, const char *src_url)
         const char *url = FormatURL(fmt);
 
         if (url != NULL) {
+            sys->esout.out.cbs = &ytdl_esout_cbs;
+            sys->esout.target = s->out;
+            /* Language of the format yt-dlp would itself select */
+            sys->esout.lang = json_get_str(&sys->json, "language");
+
+            if (sys->esout.lang != NULL)
+                msg_Dbg(s, "preferred audio language: %s", sys->esout.lang);
+
             var_Create(obj, "ytdl", VLC_VAR_BOOL);
-            demux = vlc_demux_NewURL(obj, url, s->out);
+            demux = vlc_demux_NewURL(obj, url, &sys->esout.out);
 
             if (demux == NULL)
                 msg_Err(s, "cannot open URL: %s", url);
