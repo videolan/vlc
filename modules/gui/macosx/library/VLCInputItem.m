@@ -42,6 +42,8 @@ NSString * const VLCInputItemCommonDataDifferingFlagString = @"<differing>";
     input_item_parser_id_t *_p_parserID;
 }
 
+- (nullable NSURL *)localFileURL;
+
 - (void)parsingEnded:(int)status;
 - (void)subTreeAdded:(input_item_node_t *)p_node;
 
@@ -487,13 +489,23 @@ static const struct input_item_parser_cbs_t parserCallbacks =
     }];
 }
 
-- (void)moveToTrash
+- (nullable NSURL *)localFileURL
 {
     if (self.isStream) {
-        return;
+        return nil;
     }
 
-    NSURL * const pathUrl = [NSURL URLWithString:self.path];
+    NSString * const path = self.path;
+    if (path.length == 0) {
+        return nil;
+    }
+
+    return [NSURL fileURLWithPath:path];
+}
+
+- (void)moveToTrash
+{
+    NSURL * const pathUrl = self.localFileURL;
     if (pathUrl == nil) {
         return;
     }
@@ -508,11 +520,7 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
 - (void)revealInFinder
 {
-    if (self.isStream) {
-        return;
-    }
-
-    NSURL *pathUrl = [NSURL URLWithString:self.path];
+    NSURL * const pathUrl = self.localFileURL;
     if (pathUrl == nil) {
         return;
     }
