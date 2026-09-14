@@ -1074,6 +1074,14 @@ vlc_about = custom_target('vlc_about.h',
                                    '@INPUT2@',
                                    '@OUTPUT@'])
 
+if host_system == 'windows'
+    windows_rc = import('windows')
+    # not quoted values
+    rc_conf = cdata
+    rc_conf.set('VERSION', vlc_version)
+    rc_conf.set('COPYRIGHT_YEARS', vlc_copyright_years)
+endif
+
 # Enable stream outputs
 if get_option('stream_outputs')
     cdata.set('ENABLE_SOUT', 1)

@@ -396,6 +396,24 @@ if get_option('qt').allowed() and qt6_dep.found()
     )
 endif
 
+win_extra_sources = []
+if host_system == 'windows'
+    module_rc = configure_file(
+        input: 'module.rc.in',
+        output: 'module.rc',
+        configuration: rc_conf,
+        install: false,
+    )
+    win_extra_sources += windows_rc.compile_resources(
+        module_rc,
+        include_directories: [
+            vlc_src_root / 'share',
+            vlc_src_root / 'extras/package/win32',
+        ],
+        implicit_include_directories: true,
+    )
+endif
+
 #
 # Common module handling code
 #
@@ -468,7 +486,7 @@ foreach module : vlc_modules
 
     vlc_plugin = library(
         module['name'] + '_plugin',
-        module['sources'],
+        module['sources'] + win_extra_sources,
         link_with: [module.get('link_with', []), vlc_libcompat],
         link_args: module.get('link_args', []),
         link_depends: module.get('link_depends', []),

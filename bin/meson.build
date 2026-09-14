@@ -22,8 +22,27 @@ if build_vlc and (host_system != 'darwin' or have_osx) and not have_win_store an
         endif
     endif
 
+    vlc_win_extra = []
+    if host_system == 'windows'
+        vlc_rc = configure_file(
+            input: 'vlc_win32_rc.rc.in',
+            output: 'vlc_win32_rc.rc',
+            configuration: rc_conf,
+            install: false,
+        )
+        vlc_win_extra = windows_rc.compile_resources(
+            vlc_rc,
+            include_directories: [
+                vlc_src_root / 'share/icons',
+                vlc_src_root / 'extras/package/win32',
+            ],
+            implicit_include_directories: true,
+            depend_files: files('../extras/package/win32/vlc.exe.manifest'),
+        )
+    endif
+
     executable('vlc',
-        vlc_sources,
+        vlc_sources + vlc_win_extra,
         link_with: [libvlc, libvlccore],
         include_directories: [vlc_include_dirs],
         dependencies: vlc_deps,
@@ -46,7 +65,7 @@ if build_vlc and (host_system != 'darwin' or have_osx) and not have_win_store an
     )
 
     vlc_cache_gen_dep = executable('vlc-cache-gen',
-        ['cachegen.c'],
+        ['cachegen.c'] + vlc_win_extra,
         link_with: [vlc_libcompat, libvlc],
         include_directories: [vlc_include_dirs],
         install: true,
@@ -72,7 +91,7 @@ if build_vlc and (host_system != 'darwin' or have_osx) and not have_win_store an
     ]
 
     executable('vlc-preparser',
-        vlc_preparser_sources,
+        vlc_preparser_sources + vlc_win_extra,
         link_with: [libvlc, libvlccore, vlc_libcompat],
         include_directories: [vlc_include_dirs],
         dependencies: vlc_deps,
@@ -82,7 +101,7 @@ if build_vlc and (host_system != 'darwin' or have_osx) and not have_win_store an
     )
 
     vlc_preparser_static_dep = executable('vlc-preparser-static',
-        vlc_preparser_sources,
+        vlc_preparser_sources + vlc_win_extra,
         link_with: [libvlc, libvlccore, vlc_libcompat],
         include_directories: [vlc_include_dirs],
         dependencies: vlc_deps,

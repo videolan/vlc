@@ -480,6 +480,25 @@ if get_option('update-check').allowed()
     libvlccore_deps += gcrypt_dep
 endif
 
+if host_system == 'windows'
+    libvlccore_rc = configure_file(
+        input: 'libvlccore_win32_rc.rc.in',
+        output: 'libvlccore_win32_rc.rc',
+        configuration: rc_conf,
+        install: false,
+    )
+    libvlccore_sources += windows_rc.compile_resources(
+        libvlccore_rc,
+        include_directories: [
+            vlc_src_root / 'share',
+            vlc_src_root / 'extras/package/win32',
+        ],
+        implicit_include_directories: true,
+        depend_files: files('../extras/package/win32/libvlccore.dll.manifest'),
+    )
+endif
+
+
 libvlccore = library(
     'vlccore',
     libvlccore_sources, vlc_about, fourcc, rev_target,
