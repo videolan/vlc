@@ -50,6 +50,10 @@ endif
 	## Copy libs
 	mkdir -p $@/Contents/MacOS/lib
 	find $(prefix)/lib -name 'libvlc*.dylib' -maxdepth 1 -exec cp -a {} $@/Contents/MacOS/lib \;
+	## Workaround for macOS 10.7: CFNetwork only exists as part of CoreServices framework
+	if test "$(host_cpu)" = "x86_64"; then \
+		find $@/Contents/MacOS/lib -name 'libvlccore*.dylib' -maxdepth 1 -type f -exec install_name_tool -change /System/Library/Frameworks/CFNetwork.framework/Versions/A/CFNetwork /System/Library/Frameworks/CoreServices.framework/Versions/A/CoreServices {} \; ; \
+	fi
 	## Copy plugins
 	mkdir -p $@/Contents/MacOS/plugins
 	find $(prefix)/lib/vlc/plugins -name 'lib*_plugin.dylib' -maxdepth 3 -exec cp -a {} $@/Contents/MacOS/plugins \;
