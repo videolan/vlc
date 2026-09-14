@@ -125,6 +125,26 @@ struct ytdl_playlist {
     stream_t *source;
 };
 
+static bool FormatHasManifest(const struct json_object *fmt)
+{
+    const char *protocol = json_get_str(fmt, "protocol");
+
+    if (protocol == NULL || json_get_str(fmt, "manifest_url") == NULL)
+        return false;
+
+    return strncmp(protocol, "m3u8", 4) == 0 /* HLS */
+        || strcmp(protocol, "http_dash_segments") == 0 /* DASH */
+        || strcmp(protocol, "ism") == 0; /* Smooth Streaming */
+}
+
+static const char *FormatURL(const struct json_object *fmt)
+{
+    if (FormatHasManifest(fmt))
+        return json_get_str(fmt, "manifest_url");
+
+    return json_get_str(fmt, "url");
+}
+
 static int CompareFormats(const struct json_object *f_a,
                           const struct json_object *f_b, double pref_height)
 {
@@ -259,7 +279,7 @@ static int ReadItem(stream_t *s, input_item_node_t *node,
     if (fmt == NULL)
         return VLC_EGENERIC;
 
-    const char *url = json_get_str(fmt, "url");
+    const char *url = FormatURL(fmt);
 
     if (url == NULL)
         return VLC_EGENERIC;
@@ -450,7 +470,7 @@ static int OpenCommon(vlc_object_t *obj, const char *src_url)
     stream_t *demux = NULL;
 
     if (fmt != NULL) {
-        const char *url = json_get_str(fmt, "url");
+        const char *url = FormatURL(fmt);
 
         if (url != NULL) {
             var_Create(obj, "ytdl", VLC_VAR_BOOL);
