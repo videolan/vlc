@@ -149,6 +149,14 @@ static int CompareFormats(const struct json_object *f_a,
     if (has_video_a != has_video_b)
         return has_video_a ? +1 : -1;
 
+    /* Prefer the original audio language over dubs */
+    double lang_a = json_get_num(f_a, "language_preference");
+    double lang_b = json_get_num(f_b, "language_preference");
+    if (isgreater(lang_a, lang_b))
+        return +1;
+    if (isgreater(lang_b, lang_a))
+        return -1;
+
     if (islessequal(h_a, pref_height)) {
         if (!islessequal(h_b, pref_height))
             return +1;
