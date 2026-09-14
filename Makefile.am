@@ -40,6 +40,7 @@ AM_DISTCHECK_CONFIGURE_FLAGS = \
 	--disable-fribidi \
 	--with-kde-solid='$${datadir}/kde4/apps'
 
+ACLOCAL_AMFLAGS = -I m4
 AUTOMAKE_OPTIONS = \
 	1.11 \
 	-Wall \
