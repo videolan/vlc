@@ -81,8 +81,8 @@
 #endif
 
 #ifndef NDEBUG
-# define UPDATE_VLC_STATUS_URL "http://update-test.videolan.org/vlc/status-win-x86"
-# define UPDATE_VLC_STATUS_SURL "https://update-test.videolan.org/vlc/status-win-x86"
+# define UPDATE_VLC_STATUS_URL "http://update-test.videolan.org/vlc/status" UPDATE_OS_SUFFIX
+# define UPDATE_VLC_STATUS_SURL "https://update-test.videolan.org/vlc/status" UPDATE_OS_SUFFIX
 #else
 # define UPDATE_VLC_STATUS_URL "http://update.videolan.org/vlc/status" UPDATE_OS_SUFFIX
 # define UPDATE_VLC_STATUS_SURL "https://update.videolan.org/vlc/status" UPDATE_OS_SUFFIX
