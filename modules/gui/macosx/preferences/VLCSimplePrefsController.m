@@ -140,6 +140,7 @@ static NSString* VLCHotkeysSettingToolbarIdentifier = @"Hotkeys Settings Item Id
 {
     VLCLibraryController *_libraryController;
     VLCLibraryModel *_libraryModel;
+    NSArray<VLCMediaLibraryEntryPoint *> *_cachedFolderList;
 }
 
 @property (readwrite, weak) NSTableView *libraryFolderTableView;
@@ -1554,6 +1555,7 @@ static inline void save_string_list(intf_thread_t * __unused p_intf, id object, 
     if (self) {
         _libraryController = VLCMain.sharedInstance.libraryController;
         _libraryModel = _libraryController.libraryModel;
+        _cachedFolderList = _libraryModel.listOfMonitoredFolders ?: @[];
 
         NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
         [notificationCenter addObserver:self
@@ -1571,7 +1573,29 @@ static inline void save_string_list(intf_thread_t * __unused p_intf, id object, 
 
 - (void)listOfMonitoredFoldersUpdated:(NSNotification *)aNotification
 {
+    _cachedFolderList = _libraryModel.listOfMonitoredFolders ?: @[];
     [self.libraryFolderTableView reloadData];
+    [self updateFolderButtonState];
+}
+
+- (nullable VLCMediaLibraryEntryPoint *)selectedEntryPoint
+{
+    const NSInteger selectedRow = self.libraryFolderTableView.selectedRow;
+    if (selectedRow < 0 || (NSUInteger)selectedRow >= _cachedFolderList.count) {
+        return nil;
+    }
+    return _cachedFolderList[(NSUInteger)selectedRow];
+}
+
+- (void)updateFolderButtonState
+{
+    VLCMediaLibraryEntryPoint * const entryPoint = [self selectedEntryPoint];
+    if (entryPoint == nil) {
+        self.banFolderButton.enabled = self.removeFolderButton.enabled = self.reloadFolderButton.enabled = NO;
+        return;
+    }
+    self.banFolderButton.enabled = self.removeFolderButton.enabled = self.reloadFolderButton.enabled = YES;
+    [self.banFolderButton setTitle:entryPoint.isBanned ? _NS("Unban Folder") : _NS("Ban Folder")];
 }
 
 - (IBAction)addFolder:(id)sender
@@ -1596,7 +1620,10 @@ static inline void save_string_list(intf_thread_t * __unused p_intf, id object, 
 
 - (IBAction)banFolder:(id)sender
 {
-    VLCMediaLibraryEntryPoint *entryPoint = _libraryModel.listOfMonitoredFolders[self.libraryFolderTableView.selectedRow];
+    VLCMediaLibraryEntryPoint * const entryPoint = [self selectedEntryPoint];
+    if (entryPoint == nil) {
+        return;
+    }
     if (entryPoint.isBanned) {
         [_libraryController unbanFolderWithFileURL:[NSURL URLWithString:entryPoint.MRL]];
     } else {
@@ -1606,24 +1633,34 @@ static inline void save_string_list(intf_thread_t * __unused p_intf, id object, 
 
 - (IBAction)removeFolder:(id)sender
 {
-    VLCMediaLibraryEntryPoint *entryPoint = _libraryModel.listOfMonitoredFolders[self.libraryFolderTableView.selectedRow];
+    VLCMediaLibraryEntryPoint * const entryPoint = [self selectedEntryPoint];
+    if (entryPoint == nil) {
+        return;
+    }
     [_libraryController removeFolderWithFileURL:[NSURL URLWithString:entryPoint.MRL]];
 }
 
 - (IBAction)reloadFolder:(id)sender
 {
-    VLCMediaLibraryEntryPoint * const entryPoint = _libraryModel.listOfMonitoredFolders[self.libraryFolderTableView.selectedRow];
+    VLCMediaLibraryEntryPoint * const entryPoint = [self selectedEntryPoint];
+    if (entryPoint == nil) {
+        return;
+    }
     [_libraryController reloadFolderWithFileURL:[NSURL URLWithString:entryPoint.MRL]];
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-    return _libraryModel.listOfMonitoredFolders.count;
+    return _cachedFolderList.count;
 }
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-    VLCMediaLibraryEntryPoint *entryPoint = _libraryModel.listOfMonitoredFolders[row];
+    if (row < 0 || (NSUInteger)row >= _cachedFolderList.count) {
+        return @"";
+    }
+
+    VLCMediaLibraryEntryPoint * const entryPoint = _cachedFolderList[(NSUInteger)row];
     if (tableColumn == self.nameTableColumn) {
         return [entryPoint.decodedMRL lastPathComponent];
     } else if (tableColumn == self.presentTableColumn) {
@@ -1637,14 +1674,7 @@ static inline void save_string_list(intf_thread_t * __unused p_intf, id object, 
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
 {
-    NSInteger selectedRow = self.libraryFolderTableView.selectedRow;
-    if (selectedRow == -1) {
-        self.banFolderButton.enabled = self.removeFolderButton.enabled = self.reloadFolderButton.enabled = NO;
-        return;
-    }
-    self.banFolderButton.enabled = self.removeFolderButton.enabled = self.reloadFolderButton.enabled = YES;
-    VLCMediaLibraryEntryPoint * const entryPoint = _libraryModel.listOfMonitoredFolders[selectedRow];
-    [self.banFolderButton setTitle:entryPoint.isBanned ? _NS("Unban Folder") : _NS("Ban Folder")];
+    [self updateFolderButtonState];
 }
 
 @end
