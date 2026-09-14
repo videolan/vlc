@@ -424,6 +424,26 @@ endif
 # array is then iterated over and a library is defined for each
 # entry with the needed build definition for a VLC plugin.
 #
+
+# A plugin is loaded with dlopen() and libvlccore only looks up its entry
+# points by name, so nothing else may be exported. The autotools build gets
+# this from libtool's -export-symbols-regex ^vlc_entry; here the first export
+# mechanism accepted by the linker is used:
+#  - a version script (GNU ld, gold, lld, mold),
+#  - -exported_symbol, which takes wildcards too (ld64, ld64.lld).
+# On Windows and OS/2, the entry points are declared with __declspec(dllexport)
+# (DLL_SYMBOL in vlc_plugin.h), which already disables the automatic export of
+# every other symbol.
+vlc_plugin_link_args = []
+vlc_plugin_link_depends = []
+vlc_plugin_version_script = meson.current_source_dir() / 'vlc_plugin.map'
+if cc.has_link_argument('-Wl,--version-script=' + vlc_plugin_version_script)
+    vlc_plugin_link_args += '-Wl,--version-script=' + vlc_plugin_version_script
+    vlc_plugin_link_depends += files('vlc_plugin.map')
+elif cc.has_link_argument('-Wl,-exported_symbol,_vlc_entry*')
+    vlc_plugin_link_args += '-Wl,-exported_symbol,_vlc_entry*'
+endif
+
 vlc_plugins_targets = {}
 vlc_plugins_targets_array = []
 vlc_plugins_manifest = {}
@@ -498,8 +518,8 @@ foreach module : vlc_modules
         module['name'] + '_plugin',
         module['sources'] + win_extra_sources,
         link_with: [module.get('link_with', []), vlc_libcompat],
-        link_args: [module.get('link_args', []), symbolic_linkargs, gc_sections_linkargs],
-        link_depends: module.get('link_depends', []),
+        link_args: [module.get('link_args', []), symbolic_linkargs, gc_sections_linkargs, vlc_plugin_link_args],
+        link_depends: [module.get('link_depends', []), vlc_plugin_link_depends],
         include_directories: [module.get('include_directories', []), vlc_include_dirs],
         dependencies: [module.get('dependencies', []), libvlccore_dep],
         c_args: [module.get('c_args', []), common_args],
@@ -604,8 +624,8 @@ if get_option('rust').enabled()
             # `module_cargo` is an archive file everything is exported so nothing is really.
             link_whole: module_cargo,
             link_with: module.get('link_with', []),
-            link_args: [module.get('link_args', []), rust_common_link_args],
-            link_depends: module.get('link_depends', []),
+            link_args: [module.get('link_args', []), rust_common_link_args, vlc_plugin_link_args],
+            link_depends: [module.get('link_depends', []), vlc_plugin_link_depends],
             dependencies: [module.get('dependencies', []), libvlccore_dep],
             build_by_default: true,
         )
