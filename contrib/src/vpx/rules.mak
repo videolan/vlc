@@ -160,6 +160,8 @@ ifneq ($(call apple_clang_at_least, 13), true)
 # arm_neon.h broken on Apple Clang 12
 VPX_CONF += --disable-neon-dotprod
 endif
+endif
+ifdef HAVE_MACOSX
 VPX_LDFLAGS := -L$(MACOSX_SDK)/usr/lib -isysroot $(MACOSX_SDK) -mmacosx-version-min=10.7
 endif
 VPX_LDFLAGS += -arch $(PLATFORM_SHORT_ARCH)
