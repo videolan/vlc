@@ -561,7 +561,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
                                      i_display_height * tk->fmt.video.i_visible_width, 0);
                         break;
                     case 3: // display aspect ratio
-                        vlc_ureduce( &tk->fmt.video.i_sar_num, &tk->fmt.video.i_sar_den,
+                        vlc_ureduce( &tk->fmt.video.i_sar_den, &tk->fmt.video.i_sar_num,
                                      i_display_height * tk->fmt.video.i_visible_width,
                                      i_display_width * tk->fmt.video.i_visible_height, 0);
                         break;
