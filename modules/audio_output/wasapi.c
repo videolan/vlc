@@ -822,9 +822,14 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
 
             /* Render Ambisonics on the native mix format */
             hr = IAudioClient_GetMixFormat(sys->client, &pwf_mix);
-            if (FAILED(hr) || vlc_FromWave(pwf_mix, &fmt))
+            if (FAILED(hr))
             {
                 msg_Dbg(s, "failed to use mix format");
+                vlc_ToWave(pwfe, &fmt); /* failed, fallback to default */
+            }
+            else if (vlc_FromWave(pwf_mix, &fmt))
+            {
+                msg_Dbg(s, "unsupported mix format");
                 LogWaveFormat(vlc_object_logger(s), pwf_mix);
                 vlc_ToWave(pwfe, &fmt); /* failed, fallback to default */
             }
