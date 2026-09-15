@@ -195,7 +195,7 @@ endif
 srt_dep = dependency('srt', version: '>=1.3.0', required: get_option('srt'))
 
 # libRist
-librist_dep = dependency('librist', required: get_option('rist'))
+librist_dep = dependency('librist', version: '>= 0.2.1', required: get_option('rist'))
 
 # MTP
 mtp_dep = dependency('libmtp', version: '>=1.0.0', required: get_option('mtp'))
