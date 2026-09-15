@@ -105,7 +105,8 @@ parts:
          --prefix=/usr \
          --enable-merge-ffmpeg \
          --enable-extra-checks \
-         --disable-pipewire
+         --disable-pipewire \
+         --disable-sndio
 
       make -j ${CRAFT_PARALLEL_BUILD_COUNT}
       make install DESTDIR="${CRAFT_PART_INSTALL}"
@@ -322,7 +323,6 @@ parts:
       - libsamplerate0
       - libsecret-1-0
       - libshout3
-      - libsndio7.0
       - libsoxr0
       - libspatialaudio0
       - libspeex1
