@@ -229,6 +229,16 @@ T.Control {
                 id: loader
                 required property var modelData
                 property TableRowDelegate item: null
+
+                onItemChanged: {
+                    if (item) {
+                        // `TableViewDelegateExt` uses the last sub-delegate that declares property `artworkTextureProvider`:
+                        if (item.artworkTextureProvider !== undefined) {
+                            delegate.artworkTextureProvider = Qt.binding(() => loader.item?.artworkTextureProvider ?? null)
+                        }
+                    }
+                }
+
                 width: {
                     if (!!modelData.size)
                         return modelData.size * delegate.fixedColumnWidth
@@ -271,8 +281,6 @@ T.Control {
                     } else {
                         loader.item = incubator.object
                     }
-
-                    delegate.artworkTextureProvider = Qt.binding(() => loader?.item?.artworkTextureProvider ?? null)
                 }
                 Component.onDestruction: {
                     item?.destroy()
