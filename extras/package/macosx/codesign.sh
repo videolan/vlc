@@ -110,11 +110,15 @@ find VLC.app/Contents/Frameworks -type f -name "*.txt" -exec rm '{}' \;
 
 info "Signing frameworks"
 
-sign "VLC.app/Contents/Frameworks/Growl.framework/Versions/A" "com.growl.growlframework"
+if [ -e "VLC.app/Contents/Frameworks/Growl.framework" ]; then
+    sign "VLC.app/Contents/Frameworks/Growl.framework/Versions/A" "com.growl.growlframework"
+fi
 
-sign "VLC.app/Contents/Frameworks/Sparkle.framework/Versions/A/Resources/Autoupdate.app/Contents/MacOS/fileop"
-sign "VLC.app/Contents/Frameworks/Sparkle.framework/Resources/Autoupdate.app"
-sign "VLC.app/Contents/Frameworks/Sparkle.framework/Versions/A"
+if [ -e "VLC.app/Contents/Frameworks/Sparkle.framework" ]; then
+    sign "VLC.app/Contents/Frameworks/Sparkle.framework/Versions/A/Resources/Autoupdate.app/Contents/MacOS/fileop"
+    sign "VLC.app/Contents/Frameworks/Sparkle.framework/Resources/Autoupdate.app"
+    sign "VLC.app/Contents/Frameworks/Sparkle.framework/Versions/A"
+fi
 
 if [ -e "VLC.app/Contents/Frameworks/Breakpad.framework" ]; then
     sign "VLC.app/Contents/Frameworks/Breakpad.framework/Resources/breakpadUtilities.dylib"
@@ -192,11 +196,16 @@ if [ -e "VLC.app/Contents/Frameworks/Breakpad.framework" ]; then
     codesign --verify -vv VLC.app/Contents/Frameworks/Breakpad.framework
 fi
 
-codesign --verify -vv VLC.app/Contents/Frameworks/Growl.framework
-codesign --verify -vv VLC.app/Contents/Frameworks/Sparkle.framework
+if [ -e "VLC.app/Contents/Frameworks/Growl.framework" ]; then
+    codesign --verify -vv VLC.app/Contents/Frameworks/Growl.framework
+fi
 
-info "Validating autoupdate app"
-codesign --verify -vv VLC.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Resources/Autoupdate.app
+if [ -e "VLC.app/Contents/Frameworks/Sparkle.framework" ]; then
+    codesign --verify -vv VLC.app/Contents/Frameworks/Sparkle.framework
+
+    info "Validating autoupdate app"
+    codesign --verify -vv VLC.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Resources/Autoupdate.app
+fi
 
 info "Validating complete bundle"
 codesign --verify --deep --strict --verbose=4 VLC.app
