@@ -218,7 +218,10 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
     ofrms.num_frms = 1;
     ofrms.frm[0].imgb = GetImage(p_dec);
     if (ofrms.frm[0].imgb == NULL)
+    {
+        block_Release(p_block);
         return VLCDEC_ECRITICAL; // no more memory ?
+    }
 
     bitb.addr = p_block->p_buffer;
     bitb.ssize = p_block->i_buffer;
@@ -228,6 +231,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
     {
         msg_Err( p_dec, "decoding error %d", err );
         ofrms.frm[0].imgb->release(ofrms.frm[0].imgb);
+        block_Release(p_block);
         return VLCDEC_ECRITICAL;
     }
 
@@ -240,6 +244,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
 
         decoder_QueueVideo( p_dec, decoded );
     }
+    block_Release(p_block);
     for (int i=0; i<stats.aui.num_frms; i++)
     {
         ofrms.frm[i].imgb->release(ofrms.frm[i].imgb);
