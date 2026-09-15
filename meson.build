@@ -335,6 +335,8 @@ else
     have_osx = false
 endif
 
+vlc_lib_versioning = host_system not in ['windows', 'os/2'] and not have_ios and not have_tvos
+
 #
 # Windows and MinGW checks
 #

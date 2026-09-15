@@ -42,6 +42,10 @@ if host_system == 'windows'
     )
 endif
 
+libvlc_kwargs = {}
+if vlc_lib_versioning
+    libvlc_kwargs += {'version': libvlc_abi_version}
+endif
 
 libvlc = library('vlc',
     libvlc_sources, rev_target,
@@ -51,6 +55,7 @@ libvlc = library('vlc',
     dependencies: [libvlccore_dep, m_lib, threads_dep],
     install: true,
     install_dir: libdir_path,
+    kwargs: libvlc_kwargs,
 )
 
 # Publicly exported dependency object. Used when libvlc is wrapped in a meson
