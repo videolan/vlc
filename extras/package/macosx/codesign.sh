@@ -147,7 +147,8 @@ do
     sign "$i"
 done
 
-info "Signing the executable"
+info "Signing the executables"
+sign "VLC.app/Contents/MacOS/vlc-preparser"
 sign "VLC.app"
 
 
