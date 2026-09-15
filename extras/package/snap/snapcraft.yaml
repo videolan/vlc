@@ -45,8 +45,16 @@ apps:
       - removable-media
       - screen-inhibit-control
       - udisks2
+      - alsa
     slots:
       - mpris
+
+layout:
+  /usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/alsa-lib:
+    bind: $SNAP/usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/alsa-lib
+  /usr/share/alsa:
+    bind: $SNAP/usr/share/alsa
+
 parts:
   vlc:
     source: .
@@ -272,6 +280,7 @@ parts:
       - libarchive13
       - libaribb24-0
       - libasound2t64
+      - libasound2-plugins
       - libass9
       - libatk1.0-0
       - libavcodec60
