@@ -61,6 +61,7 @@ EXTRA_DIST += \
 	extras/tools/SHA512SUMS \
 	extras/tools/automake-clang.patch \
 	extras/tools/automake-disable-documentation.patch \
+	extras/tools/gettext-no-iconv.patch \
 	extras/tools/libtool-2.4.7-bitcode.patch \
 	extras/tools/libtool-2.4.7-lpthread.patch \
 	extras/tools/libtool-2.6.2-embed-bitcode.patch \
