@@ -1671,7 +1671,8 @@ static int parse_master(demux_t *p_demux)
     uint32_t i_map_size = U32_AT(&mst_buf[20]);  /* size of bitmask, in bytes */
     uint32_t i = U32_AT(&mst_buf[28]);   /* size of SEQ table, in bytes */
 
-    if( i_save_pos + 32 + i > p_sys->i_stream_size )
+    /* Check seek index size, if any */
+    if( p_sys->i_stream_size && (i_save_pos + 32 + i > p_sys->i_stream_size) )
         return VLC_EGENERIC;
 
     if(i_map_size > UINT32_MAX / 8)
