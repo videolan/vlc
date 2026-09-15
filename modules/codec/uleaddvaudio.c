@@ -112,7 +112,6 @@ static block_t *DecodeBlock(decoder_t *dec, block_t *block)
         }
     }
 done:
-    block_Release(block);
     return output;
 }
 
@@ -124,6 +123,7 @@ static int DecodeAudio(decoder_t *dec, block_t *block)
     block_t *out;
     while ((out = DecodeBlock(dec, block)) != NULL)
         decoder_QueueAudio(dec,out);
+    block_Release(block);
     return VLCDEC_SUCCESS;
 }
 
