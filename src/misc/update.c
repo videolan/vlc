@@ -72,7 +72,10 @@
  * Remaining text is a required description of the update
  */
 
-#if defined( _WIN64 )
+
+#if defined( _WIN32 ) && ( defined( __aarch64__ ) || defined( _M_ARM64 ) )
+# define UPDATE_OS_SUFFIX "-win-arm64"
+#elif defined( _WIN64 )
 # define UPDATE_OS_SUFFIX "-win-x64"
 #elif defined( _WIN32 )
 # define UPDATE_OS_SUFFIX "-win-x86"
