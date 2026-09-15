@@ -69,7 +69,8 @@ endif
 	fi
 	find $@ -type d -exec chmod ugo+rx '{}' \;
 	find $@ -type f -exec chmod ugo+r '{}' \;
-
+	## Ad-hoc sign the bundle
+	$(srcdir)/extras/package/macosx/codesign.sh -i -
 
 package-macosx: VLC.app
 	rm -f "$(top_builddir)/vlc-$(VERSION).dmg"
