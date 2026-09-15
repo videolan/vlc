@@ -333,7 +333,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         QToolButton *recordButton = new QToolButton;
         setupButton( recordButton );
         recordButton->setCheckable( true );
-        connect( recordButton, &QToolButton::toggled, toolbarActionsMapper, QOverload<>::of(&QSignalMapper::map) );
+        connect( recordButton, &QToolButton::clicked, toolbarActionsMapper, QOverload<>::of(&QSignalMapper::map) );
         toolbarActionsMapper->setMapping( recordButton, RECORD_ACTION );
         connect( THEMIM->getIM(), &InputManager::recordingStateChanged, recordButton, &QToolButton::setChecked );
         BUTTON_SET_BAR(  recordButton );
