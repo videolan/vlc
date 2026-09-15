@@ -344,6 +344,8 @@ int OpenAPVDecoder(vlc_object_t *o)
     dec->fmt_out.i_codec = FindVlcChroma(profile_idc, bit_depth_minus8, chroma_format_idc);
     dec->fmt_out.video.i_chroma = dec->fmt_out.i_codec;
 
+    dec->p_sys = sys;
+
     if (decoder_UpdateVideoOutput(dec, NULL) != 0)
     {
         msg_Err(o, "decoder_UpdateVideoOutput failed");
@@ -358,8 +360,6 @@ int OpenAPVDecoder(vlc_object_t *o)
             break;
         }
     }
-
-    dec->p_sys = sys;
 
     dec->pf_decode = Decode;
 
