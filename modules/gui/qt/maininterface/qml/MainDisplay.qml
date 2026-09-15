@@ -608,7 +608,7 @@ FocusScope {
                 if ((sidebar.state !== 'expanded') && item.expandable) {
                     // TODO: Investigate opening the menu on hover, if
                     //       we switch to `Popup.Item` type of menus.
-                    const mappedPos = mapToGlobal(item.x + item.width, item.y)
+                    const mappedPos = item.mapToGlobal(item.width, 0)
                     navigationBarContextMenu.popup(item.index, mappedPos, !item.hovered)
 
                     return
