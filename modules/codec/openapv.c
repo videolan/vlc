@@ -182,11 +182,11 @@ static oapv_imgb_t *GetImage( decoder_t *p_dec )
     for (int i = 0; i < pic->i_planes; i++)
     {
         imgb->w[i] = pic->p[i].i_visible_pitch / pic->p[i].i_pixel_pitch;
-        imgb->h[i] = pic->p[i].i_visible_lines / pic->p[i].i_pixel_pitch;
+        imgb->h[i] = pic->p[i].i_visible_lines;
 
         imgb->aw[i] = pic->p[i].i_pitch / pic->p[i].i_pixel_pitch;
         imgb->s[i] = pic->p[i].i_pitch;
-        imgb->ah[i] = pic->p[i].i_lines / pic->p[i].i_pixel_pitch;
+        imgb->ah[i] = pic->p[i].i_lines;
         imgb->e[i] = pic->p[i].i_lines;
         imgb->bsize[i] = imgb->s[i] * imgb->e[i];
         imgb->a[i] = pic->p[i].p_pixels;
