@@ -134,13 +134,13 @@ void event_thread_t::SetPci(const uint8_t *data, size_t size)
         bs_skip(&bs, 2);
         btn.x_end    = bs_read(&bs, 10);
 
-        bs_skip(&bs, 2);
-        btn.up = bs_read(&bs, 6);
-
         btn.auto_action_mode = bs_read(&bs, 2);
         btn.y_start = bs_read(&bs, 10);
         bs_skip(&bs, 2);
         btn.y_end   = bs_read(&bs, 10);
+
+        bs_skip(&bs, 2);
+        btn.up = bs_read(&bs, 6);
 
         bs_skip(&bs, 2);
         btn.down    = bs_read(&bs, 6);
