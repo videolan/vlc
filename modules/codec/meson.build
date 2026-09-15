@@ -158,7 +158,7 @@ vlc_modules += {
 }
 
 openapv_dep = dependency('oapv',
-                              version: '>= 0.2',
+                              version: '>= 0.3',
                               required: get_option('openapv'))
 vlc_modules += {
     'name' : 'openapv',
