@@ -87,6 +87,8 @@ endif
 	fi
 	find $@ -type d -exec chmod ugo+rx '{}' \;
 	find $@ -type f -exec chmod ugo+r '{}' \;
+	## Ad-hoc sign the bundle
+	VLC_LIB_PATH="$@/Contents/Frameworks" "$(srcdir)/extras/package/macosx/codesign.sh" -i -
 
 package-macosx-sdk: macos-install
 	rm -f "$(top_builddir)/vlc-macos-sdk-$(VERSION).tar.gz"
