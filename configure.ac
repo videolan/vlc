@@ -2959,7 +2959,7 @@ PKG_ENABLE_MODULES_VLC([DAALA], [], [daaladec daalaenc], [experimental daala cod
 dnl
 dnl  OpenAPV decoder plugin
 dnl
-PKG_ENABLE_MODULES_VLC([OPENAPV], [], [oapv >= 0.2], [OpenAPV decoder], [auto])
+PKG_ENABLE_MODULES_VLC([OPENAPV], [], [oapv >= 0.3], [OpenAPV decoder], [auto])
 
 dnl
 dnl  PNG decoder module
