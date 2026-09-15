@@ -172,7 +172,9 @@ static void EmptyRelease( update_t *p_update )
  */
 static bool GetUpdateFile( update_t *p_update )
 {
-#if defined(_WIN64)
+#if defined(_WIN32) && (defined(__aarch64__) || defined(_M_ARM64))
+    static const char url[] = UPDATE_VLC_STATUS_URL "-win-arm64";
+#elif defined(_WIN64)
     static const char url[] = UPDATE_VLC_STATUS_URL "-win-x64";
 #elif defined(_WIN32)
     static const char *urls[] = {
