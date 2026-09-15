@@ -145,6 +145,7 @@ static int Open( vlc_object_t * p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
+    p_demux->p_sys = p_sys;
     p_sys->i_position = 0;
 
     p_sys->reader.read = ReaderRead;
@@ -158,7 +159,10 @@ static int Open( vlc_object_t * p_this )
     /* Load info */
     mpc_streaminfo_init( &p_sys->info );
     if( mpc_streaminfo_read( &p_sys->info, &p_sys->reader ) != ERROR_CODE_OK )
-        goto error;
+    {
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
 
     /* */
     mpc_decoder_setup( &p_sys->decoder, &p_sys->reader );
@@ -175,7 +179,6 @@ static int Open( vlc_object_t * p_this )
     /* Fill p_demux fields */
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
-    p_demux->p_sys = p_sys;
 
     /* */
 #ifndef MPC_FIXED_POINT
