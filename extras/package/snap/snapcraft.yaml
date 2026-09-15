@@ -45,6 +45,7 @@ apps:
       - removable-media
       - screen-inhibit-control
       - udisks2
+      - jack1
       - alsa
     slots:
       - mpris
