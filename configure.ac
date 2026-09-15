@@ -4655,6 +4655,16 @@ dnl  MacOS X gui module
 dnl
 AC_ARG_ENABLE([macosx],
   AS_HELP_STRING([--enable-macosx], [Mac OS X gui support (default enabled on Mac OS X)]))
+AC_ARG_ENABLE([macosx-ui-shaders],
+  AS_HELP_STRING([--disable-macosx-ui-shaders], [macOS UI Metal shaders (default: enabled if macOS UI is enabled)]),
+  [],
+  [
+    AS_IF([test -z "$enable_macosx"], [
+      AS_IF([test "${SYS}" = "darwin"], [enable_macosx_ui_shaders = "yes"])
+    ], [
+      enable_macosx_ui_shaders="$enable_macosx"
+    ])
+])
 enable_macosx_xctests="no"
 if test "${enable_macosx}" != "no" -a "${SYS}" = "darwin"
 then
@@ -4680,41 +4690,54 @@ then
   ])
 
   dnl
-  dnl If possible, use xcrun to find the right metal tool
+  dnl MacOS X gui module metal shaders
   dnl
 
-  AS_IF([test ! "${XCRUN}" = "no"], [
-    AC_MSG_CHECKING([for metal (using xcrun)])
-    METAL="$(eval $XCRUN --toolchain metal -f metal 2>/dev/null || eval $XCRUN -f metal 2>/dev/null || echo no)"
-    AC_MSG_RESULT([${METAL}])
-  ], [
-    AC_MSG_WARN([Looking for tools without using xcrun])
-  ])
+  AS_IF([test "${enable_macosx_ui_shaders}" != "no"], [
+    dnl Find Metal, first try xcrun, fallback to normal lookup
+    AS_IF([test ! "${XCRUN}" = "no"], [
+      AC_MSG_CHECKING([for metal (using xcrun)])
+      METAL="$(eval $XCRUN --toolchain metal -f metal 2>/dev/null || eval $XCRUN -f metal 2>/dev/null || echo no)"
+      AC_MSG_RESULT([${METAL}])
+    ], [
+      AC_MSG_WARN([Looking for tools without using xcrun])
+    ])
 
-  AS_IF([test "${METAL}" = "no"], [
-    AC_PATH_PROG(METAL, [metal], [no])
     AS_IF([test "${METAL}" = "no"], [
-      AC_MSG_ERROR([metal was not found, but is required for --enable-macosx])
+      AC_PATH_PROG([METAL], [metal], [no])
+      AS_IF([test "${METAL}" = "no"], [
+        AS_IF([test "${enable_macosx_ui_shaders}" = "yes"], [
+          AC_MSG_ERROR([metal was not found, required for macosx-ui-shaders])
+        ], [
+          AC_MSG_WARN([metal was not found, macosx-ui-shaders will be disabled])
+        ])
+        enable_macosx_ui_shaders="no"
+      ])
     ])
-  ])
 
-  dnl
-  dnl If possible, use xcrun to find the right metallib tool
-  dnl
+    dnl Find metallib, first try xcrun, fallback to normal lookup
+    AS_IF([test ! "${XCRUN}" = "no"], [
+      AC_MSG_CHECKING([for metallib (using xcrun)])
+      METALLIB="$(eval $XCRUN --toolchain metal -f metallib 2>/dev/null || eval $XCRUN -f metallib 2>/dev/null || echo no)"
+      AC_MSG_RESULT([${METALLIB}])
+    ], [
+      AC_MSG_WARN([Looking for tools without using xcrun])
+    ])
 
-  AS_IF([test ! "${XCRUN}" = "no"], [
-    AC_MSG_CHECKING([for metallib (using xcrun)])
-    METALLIB="$(eval $XCRUN --toolchain metal -f metallib 2>/dev/null || eval $XCRUN -f metallib 2>/dev/null || echo no)"
-    AC_MSG_RESULT([${METALLIB}])
-  ], [
-    AC_MSG_WARN([Looking for tools without using xcrun])
-  ])
-
-  AS_IF([test "${METALLIB}" = "no"], [
-    AC_PATH_PROG(METALLIB, [metallib], [no])
     AS_IF([test "${METALLIB}" = "no"], [
-      AC_MSG_ERROR([metallib was not found, but is required for --enable-macosx, try xcodebuild -downloadComponent MetalToolchain])
+      AC_PATH_PROG([METALLIB], [metallib], [no])
+      AS_IF([test "${METALLIB}" = "no"], [
+        AS_IF([test "${enable_macosx_ui_shaders}" = "yes"], [
+          AC_MSG_ERROR([metallib was not found, required for macosx-ui-shaders, try disabling or install it with: xcodebuild -downloadComponent MetalToolchain])
+        ], [
+          AC_MSG_WARN([metallib was not found, macosx-ui-shaders will be disabled])
+        ])
+        enable_macosx_ui_shaders="no"
+      ])
     ])
+  ])
+  AS_IF([test "${enable_macosx_ui_shaders}" != "no"], [
+    AC_DEFINE([ENABLE_MACOSX_UI_SHADERS], [1], [Define to 1 if macOS UI Metal shaders are enabled.])
   ])
 
   dnl
@@ -4761,24 +4784,8 @@ then
       enable_macosx_xctests="yes"
     ])
   ])
-
-  dnl
-  dnl  MacOS X gui module metal shaders
-  dnl
-  _enable_macosx_ui_shaders_default="yes"
-
-  AC_ARG_ENABLE([macosx-ui-shaders],
-    AS_HELP_STRING([--disable-macosx-ui-shaders], [Disable macOS UI Metal shaders (default: enabled if macOS UI is active)]),
-    [], [enable_macosx_ui_shaders="${_enable_macosx_ui_shaders_default}"]
-  )
-
-  if test "${enable_macosx_ui_shaders}" != "no"
-  then
-    dnl Tool checks for metal and metallib are already performed above if enable_macosx is true.
-    dnl We assume they are found if we reach this point and shaders are enabled.
-    AC_DEFINE([ENABLE_MACOSX_UI_SHADERS], [1], [Define to 1 if macOS UI Metal shaders are enabled.])
-  fi
 fi
+
 AM_CONDITIONAL([ENABLE_MACOSX_UI_SHADERS], [test "${enable_macosx_ui_shaders}" != "no" -a "${enable_macosx}" != "no" -a "${SYS}" = "darwin"])
 AM_CONDITIONAL([ENABLE_MACOSX_UI], [test "$enable_macosx" != "no" -a "${SYS}" = "darwin"])
 AM_CONDITIONAL([ENABLE_MACOSX_XCTESTS], [test "${enable_macosx_xctests}" = "yes"])
