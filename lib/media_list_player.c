@@ -64,6 +64,7 @@ struct libvlc_media_list_player_t
     vlc_mutex_t                 object_lock;
     /* Protect access to this structure and from callback execution. */
     vlc_mutex_t                 mp_callback_lock;
+    vlc_mutex_t                 media_player_lock;
     vlc_cond_t                  seek_pending;
     libvlc_media_list_path_t    current_playing_item_path;
     libvlc_media_t *            p_current_playing_item;
@@ -494,6 +495,7 @@ libvlc_media_list_player_new(libvlc_instance_t * p_instance)
     p_mlp->seek_offset = 0;
     vlc_mutex_init(&p_mlp->object_lock);
     vlc_mutex_init(&p_mlp->mp_callback_lock);
+    vlc_mutex_init(&p_mlp->media_player_lock);
     vlc_cond_init(&p_mlp->seek_pending);
     libvlc_event_manager_init(&p_mlp->event_manager, p_mlp);
 
@@ -514,6 +516,7 @@ libvlc_media_list_player_new(libvlc_instance_t * p_instance)
 error:
     libvlc_event_manager_destroy(&p_mlp->event_manager);
     vlc_cond_destroy(&p_mlp->seek_pending);
+    vlc_mutex_destroy(&p_mlp->media_player_lock);
     vlc_mutex_destroy(&p_mlp->mp_callback_lock);
     vlc_mutex_destroy(&p_mlp->object_lock);
     free(p_mlp);
@@ -557,6 +560,7 @@ void libvlc_media_list_player_release(libvlc_media_list_player_t * p_mlp)
 
     libvlc_event_manager_destroy(&p_mlp->event_manager);
     vlc_cond_destroy(&p_mlp->seek_pending);
+    vlc_mutex_destroy(&p_mlp->media_player_lock);
     vlc_mutex_destroy(&p_mlp->mp_callback_lock);
     vlc_mutex_destroy(&p_mlp->object_lock);
 
@@ -598,8 +602,10 @@ void libvlc_media_list_player_set_media_player(libvlc_media_list_player_t * p_ml
 
     lock(p_mlp);
     uninstall_media_player_observer(p_mlp);
+    vlc_mutex_lock(&p_mlp->media_player_lock);
     p_oldmi = p_mlp->p_mi;
     p_mlp->p_mi = p_mi;
+    vlc_mutex_unlock(&p_mlp->media_player_lock);
     install_media_player_observer(p_mlp);
     unlock(p_mlp);
 
@@ -611,10 +617,10 @@ void libvlc_media_list_player_set_media_player(libvlc_media_list_player_t * p_ml
  **************************************************************************/
 libvlc_media_player_t * libvlc_media_list_player_get_media_player(libvlc_media_list_player_t * p_mlp)
 {
-    lock(p_mlp);
+    vlc_mutex_lock(&p_mlp->media_player_lock);
     libvlc_media_player_t *p_mi = p_mlp->p_mi;
     libvlc_media_player_retain(p_mi);
-    unlock(p_mlp);
+    vlc_mutex_unlock(&p_mlp->media_player_lock);
     return p_mi;
 }
 
