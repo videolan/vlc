@@ -3105,14 +3105,15 @@ static void AVI_ExtractSubtitle( demux_t *p_demux,
     char *psz_description = NULL;
     avi_chunk_indx_t *p_indx = NULL;
 
-    if( !p_sys->b_seekable )
-        goto exit;
-
-    p_indx = AVI_ChunkFind( p_strl, AVIFOURCC_indx, 0, false );
     avi_chunk_t ck;
     AVI_ChunkInit( &ck );
     int64_t  i_position;
     unsigned i_size;
+
+    if( !p_sys->b_seekable )
+        goto exit;
+
+    p_indx = AVI_ChunkFind( p_strl, AVIFOURCC_indx, 0, false );
     if( p_indx )
     {
         if( p_indx->i_indextype == AVI_INDEX_OF_INDEXES &&
