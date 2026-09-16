@@ -1,5 +1,5 @@
 # Persian translation
-# Copyright (C) 2023 VideoLAN
+# Copyright (C) 2026 VideoLAN
 # This file is distributed under the same license as the vlc package.
 #
 # Translators:
@@ -14,25 +14,26 @@
 # MM, 2016
 # Pouriya <pouriya.he@ymail.com>, 2014
 # ropy <ropy.nf@gmail.com>, 2014
-# Goudarz Jafari <goudarz.jafari@gmail.com>, 2017
+# Goudarz Jafari <goudarz.jafari@gmail.com>, 2017,2025
 # Na Mira <ota_co@yahoo.com>, 2017
 # maryam mahmoudi gharaiee <mmahmudi2000@gmail.com>, 2019
 # mohammad rahmani <mohammadrahmani2o0@gmail.com>, 2019
 # hossein.hunter <helalfarimani@gmail.com>, 2021
 # Eshagh <ase.mugem@gmail.com>, 2021
+# Michał Trzebiatowski <michtrz@gmail.com>, 2018
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22-rc1\n"
+"Project-Id-Version: vlc 3.0.24-beta1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2026-06-28 16:08+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: Goudarz Jafari <goudarz.jafari@gmail.com>, 2025\n"
 "Language-Team: Persian (https://app.transifex.com/yaron/teams/16553/fa/)\n"
-"Language: fa\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: fa\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: include/vlc_common.h:1055
@@ -1036,24 +1037,20 @@ msgid "Decoded format"
 msgstr "قالب کدگشایی شده"
 
 #: src/input/es_out.c:3207
-#, fuzzy
 msgid "Decoded channels"
-msgstr "کانال‌های صدا"
+msgstr ""
 
 #: src/input/es_out.c:3212
-#, fuzzy
 msgid "Decoded sample rate"
-msgstr "نرخ نمونهٔ صدا"
+msgstr ""
 
 #: src/input/es_out.c:3219
-#, fuzzy
 msgid "Decoded bits per sample"
-msgstr "بیت بر نمونه"
+msgstr ""
 
 #: src/input/es_out.c:3224
-#, fuzzy
 msgid "Decoded Bitrate"
-msgstr "قالب کدگشایی شده"
+msgstr ""
 
 #: src/input/es_out.c:3237
 msgid "Track replay gain"
@@ -7830,9 +7827,8 @@ msgid "Bitmask"
 msgstr ""
 
 #: modules/access/rist.c:313
-#, fuzzy
 msgid "Virtual Destination Port Filter"
-msgstr "پرونده مقصد:"
+msgstr ""
 
 #: modules/access/rist.c:315
 msgid ""
@@ -8125,9 +8121,8 @@ msgid "SFTP port number to use on the server"
 msgstr ""
 
 #: modules/access/sftp.c:61
-#, fuzzy
 msgid "Private key file"
-msgstr "پرونده کلید AES"
+msgstr ""
 
 #: modules/access/sftp.c:62
 msgid ""
@@ -8272,9 +8267,8 @@ msgid "Password for stream encryption"
 msgstr ""
 
 #: modules/access/srt.c:566
-#, fuzzy
 msgid "SRT Stream ID"
-msgstr "جریان %d"
+msgstr ""
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -9112,18 +9106,16 @@ msgid "Source port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:272
-#, fuzzy
 msgid "Virtual Destination Port"
-msgstr "مقصد"
+msgstr ""
 
 #: modules/access_output/rist.c:274
 msgid "Destination port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:281
-#, fuzzy
 msgid "Multipeer mode"
-msgstr "حالت استریو"
+msgstr ""
 
 #: modules/access_output/rist.c:283
 msgid ""
@@ -9132,14 +9124,12 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Duplicate"
-msgstr "برنامه"
+msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Load balanced"
-msgstr "بالانس رنگ قرمز"
+msgstr ""
 
 #: modules/access_output/rist.c:294
 msgid "RIST stream output"
@@ -12201,7 +12191,6 @@ msgstr ""
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -19128,19 +19117,16 @@ msgid "This module outputs the stream using the RIST protocol (TR06)."
 msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:186
-#, fuzzy
 msgid "Destination Address"
-msgstr "مقصد"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:191
-#, fuzzy
 msgid "Destination Port"
-msgstr "مقصد"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:201
-#, fuzzy
 msgid "Stream Name"
-msgstr "نام جریان"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:237
 msgid "This module outputs the transcoded stream to a network via HTTP."
@@ -28133,15 +28119,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "مدیریت فهرست رسانه"
-
-#~ msgid "16 bytes"
-#~ msgstr "16 بایت"
-
-#~ msgid "24 bytes"
-#~ msgstr "24 بایت"
-
-#~ msgid "32 bytes"
-#~ msgstr "32 بایت"
-
-#~ msgid "Key: "
-#~ msgstr "کلید:"
