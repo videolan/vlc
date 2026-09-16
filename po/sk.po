@@ -1,21 +1,23 @@
 # Slovak translation
-# Copyright (C) 2025 VideoLAN
+# Copyright (C) 2026 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
 # Marián Hikaník <podnety@mojepreklady.net>, 2014-2025
+# Michał Trzebiatowski <michtrz@gmail.com>, 2018
+# Marián Hikaník, 2026
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22\n"
+"Project-Id-Version: vlc 3.0.24-beta1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2026-06-28 16:08+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
-"Last-Translator: Marián Hikaník, 2025\n"
+"Last-Translator: Marián Hikaník, 2026\n"
 "Language-Team: Slovak (https://app.transifex.com/yaron/teams/16553/sk/)\n"
-"Language: sk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: sk\n"
 "Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n "
 ">= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);\n"
 
@@ -2473,7 +2475,7 @@ msgstr ""
 
 #: src/libvlc-module.c:483
 msgid "Key press events"
-msgstr "Udalosti pri stlačení klávesy"
+msgstr "Udalosti pri stlačení klávesu"
 
 #: src/libvlc-module.c:485
 msgid "This enables VLC hotkeys from the (non-embedded) video window."
@@ -4045,7 +4047,8 @@ msgstr "Zobrazovanie na celú obrazovku"
 
 #: src/libvlc-module.c:1227
 msgid "Select the hotkey to use to swap fullscreen state."
-msgstr "Vyberte si kláves na prepínanie zobrazenia na celú obrazovku."
+msgstr ""
+"Vyberte si klávesovú skratku na prepínanie zobrazenia na celú obrazovku."
 
 #: src/libvlc-module.c:1228
 msgid "Exit fullscreen"
@@ -4053,7 +4056,8 @@ msgstr "Ukončiť zobrazovanie na celú obrazovku"
 
 #: src/libvlc-module.c:1229
 msgid "Select the hotkey to use to exit fullscreen state."
-msgstr "Vyberte si kláves na ukončenie prehrávania na celú obrazovku."
+msgstr ""
+"Vyberte si klávesovú skratku na ukončenie prehrávania na celú obrazovku."
 
 #: src/libvlc-module.c:1230 modules/gui/macosx/VLCFSPanelController.m:122
 msgid "Play/Pause"
@@ -4061,7 +4065,7 @@ msgstr "Prehrať/Pozastaviť"
 
 #: src/libvlc-module.c:1231
 msgid "Select the hotkey to use to swap paused state."
-msgstr "Vyberte si kláves na prepínanie stavu pozastavenia."
+msgstr "Vyberte si klávesovú skratku na prepínanie stavu pozastavenia."
 
 #: src/libvlc-module.c:1232
 msgid "Pause only"
@@ -4069,7 +4073,7 @@ msgstr "Len pozastaviť"
 
 #: src/libvlc-module.c:1233
 msgid "Select the hotkey to use to pause."
-msgstr "Vyberte si kláves na pozastavenie prehrávania."
+msgstr "Vyberte si klávesovú skratku na pozastavenie prehrávania."
 
 #: src/libvlc-module.c:1234
 msgid "Play only"
@@ -4077,7 +4081,7 @@ msgstr "Len prehrať"
 
 #: src/libvlc-module.c:1235
 msgid "Select the hotkey to use to play."
-msgstr "Vyberte si kláves na spustenie prehrávania."
+msgstr "Vyberte si klávesovú skratku na spustenie prehrávania."
 
 #: src/libvlc-module.c:1236 modules/gui/macosx/VLCMainMenu.m:393
 #: modules/gui/qt/components/controller.hpp:108
@@ -4087,7 +4091,7 @@ msgstr "Rýchlejšie"
 
 #: src/libvlc-module.c:1237 src/libvlc-module.c:1243
 msgid "Select the hotkey to use for fast forward playback."
-msgstr "Vyberte si kláves na zrýchlenie prehrávania smerom dopredu."
+msgstr "Vyberte si klávesovú skratku na zrýchlenie prehrávania dopredu."
 
 #: src/libvlc-module.c:1238 modules/gui/macosx/VLCMainMenu.m:391
 #: modules/gui/qt/components/controller.hpp:108
@@ -4097,7 +4101,7 @@ msgstr "Pomalšie"
 
 #: src/libvlc-module.c:1239 src/libvlc-module.c:1245
 msgid "Select the hotkey to use for slow motion playback."
-msgstr "Vyberte si kláves na spomalenie prehrávania."
+msgstr "Vyberte si klávesovú skratku na spomalenie prehrávania."
 
 #: src/libvlc-module.c:1240
 msgid "Normal rate"
@@ -4106,7 +4110,7 @@ msgstr "Normálna rýchlosť"
 #: src/libvlc-module.c:1241
 msgid "Select the hotkey to set the playback rate back to normal."
 msgstr ""
-"Vyberte si kláves na nastavenie rýchlosti prehrávania na normálnu hodnotu."
+"Vyberte si klávesovú skratku na nastavenie normálnej rýchlosti prehrávania."
 
 #: src/libvlc-module.c:1242 modules/gui/qt/menus.cpp:889
 msgid "Faster (fine)"
@@ -4130,7 +4134,8 @@ msgstr "Ďalej"
 
 #: src/libvlc-module.c:1247
 msgid "Select the hotkey to use to skip to the next item in the playlist."
-msgstr "Vyberte si kláves na preskočenie na ďalšiu položku v playliste."
+msgstr ""
+"Vyberte si klávesovú skratku na preskočenie na ďalšiu položku v playliste."
 
 #: src/libvlc-module.c:1248 modules/control/hotkeys.c:414
 #: modules/gui/macosx/VLCControlsBarCommon.m:193
@@ -4144,7 +4149,8 @@ msgstr "Dozadu"
 
 #: src/libvlc-module.c:1249
 msgid "Select the hotkey to use to skip to the previous item in the playlist."
-msgstr "Vyberte si kláves na návrat k predchádzajúcej položke v playliste."
+msgstr ""
+"Vyberte si klávesovú skratku na návrat k predchádzajúcej položke v playliste."
 
 #: src/libvlc-module.c:1250 modules/gui/macosx/VLCMainMenu.m:386
 #: modules/gui/macosx/VLCMainMenu.m:498 modules/gui/macosx/VLCMainMenu.m:505
@@ -4156,7 +4162,7 @@ msgstr "Stop"
 
 #: src/libvlc-module.c:1251
 msgid "Select the hotkey to stop playback."
-msgstr "Vyberte si kláves na zastavenie prehrávania."
+msgstr "Vyberte si klávesovú skratku na zastavenie prehrávania."
 
 #: src/libvlc-module.c:1252 modules/gui/macosx/VLCControlsBarCommon.m:92
 #: modules/gui/macosx/VLCFSPanelController.m:143
@@ -4170,7 +4176,7 @@ msgstr "Pozícia"
 
 #: src/libvlc-module.c:1253
 msgid "Select the hotkey to display the position."
-msgstr "Vyberte si kláves na zobrazenie pozície."
+msgstr "Vyberte si klávesovú skratku na zobrazenie pozície."
 
 #: src/libvlc-module.c:1255
 msgid "Very short backwards jump"
@@ -4178,7 +4184,7 @@ msgstr "Veľmi krátky skok späť"
 
 #: src/libvlc-module.c:1257
 msgid "Select the hotkey to make a very short backwards jump."
-msgstr "Vyberte si kláves na preskočenie o veľmi malý kúsok dozadu."
+msgstr "Vyberte si klávesovú skratku na veľmi malé preskočenie dozadu."
 
 #: src/libvlc-module.c:1258
 msgid "Short backwards jump"
@@ -4186,7 +4192,7 @@ msgstr "Krátky skok späť"
 
 #: src/libvlc-module.c:1260
 msgid "Select the hotkey to make a short backwards jump."
-msgstr "Vyberte si kláves na preskočenie o kúsok dozadu."
+msgstr "Vyberte si klávesovú skratku na krátke preskočenie dozadu."
 
 #: src/libvlc-module.c:1261
 msgid "Medium backwards jump"
@@ -4194,7 +4200,7 @@ msgstr "Väčší skok späť"
 
 #: src/libvlc-module.c:1263
 msgid "Select the hotkey to make a medium backwards jump."
-msgstr "Vyberte si kláves na preskočenie dozadu (stredný skok)."
+msgstr "Vyberte si klávesovú skratku na stredne veľké preskočenie dozadu."
 
 #: src/libvlc-module.c:1264
 msgid "Long backwards jump"
@@ -4202,7 +4208,7 @@ msgstr "Dlhý skok späť"
 
 #: src/libvlc-module.c:1266
 msgid "Select the hotkey to make a long backwards jump."
-msgstr "Vyberte si kláves na preskočenie o veľký kus dozadu."
+msgstr "Vyberte si klávesovú skratku na veľké preskočenie dozadu."
 
 #: src/libvlc-module.c:1268
 msgid "Very short forward jump"
@@ -4210,7 +4216,7 @@ msgstr "Veľmi krátky skok dopredu"
 
 #: src/libvlc-module.c:1270
 msgid "Select the hotkey to make a very short forward jump."
-msgstr "Vyberte si kláves na preskočenie o veľmi malý kúsok dopredu."
+msgstr "Vyberte si klávesovú skratku na veľmi malé preskočenie dopredu."
 
 #: src/libvlc-module.c:1271
 msgid "Short forward jump"
@@ -4218,7 +4224,7 @@ msgstr "Krátky skok dopredu"
 
 #: src/libvlc-module.c:1273
 msgid "Select the hotkey to make a short forward jump."
-msgstr "Vyberte si kláves na preskočenie o kúsok dopredu."
+msgstr "Vyberte si klávesovú skratku na krátke preskočenie dopredu."
 
 #: src/libvlc-module.c:1274
 msgid "Medium forward jump"
@@ -4226,7 +4232,7 @@ msgstr "Väčší skok dopredu"
 
 #: src/libvlc-module.c:1276
 msgid "Select the hotkey to make a medium forward jump."
-msgstr "Vyberte si kláves na preskočenie dopredu (stredný skok)."
+msgstr "Vyberte si kláves na stredne veľké preskočenie dopredu."
 
 #: src/libvlc-module.c:1277
 msgid "Long forward jump"
@@ -4234,7 +4240,7 @@ msgstr "Dlhý skok dopredu"
 
 #: src/libvlc-module.c:1279
 msgid "Select the hotkey to make a long forward jump."
-msgstr "Vyberte si kláves na preskočenie o veľký kus dopredu."
+msgstr "Vyberte si klávesovú skratku na veľké preskočenie dopredu."
 
 #: src/libvlc-module.c:1280 modules/control/hotkeys.c:599
 msgid "Next frame"
@@ -4242,7 +4248,7 @@ msgstr "Ďalšia snímka"
 
 #: src/libvlc-module.c:1282
 msgid "Select the hotkey to got to the next video frame."
-msgstr "Vyberte si kláves na prechod na ďalšiu snímku videa."
+msgstr "Vyberte si klávesovú skratku na prechod na ďalšiu snímku videa."
 
 #: src/libvlc-module.c:1284
 msgid "Very short jump length"
@@ -4286,7 +4292,7 @@ msgstr "Koniec"
 
 #: src/libvlc-module.c:1294
 msgid "Select the hotkey to quit the application."
-msgstr "Vyberte si kláves na ukončenie programu."
+msgstr "Vyberte si klávesovú skratku na ukončenie programu."
 
 #: src/libvlc-module.c:1295
 msgid "Navigate up"
@@ -8239,15 +8245,17 @@ msgid "Bitmask"
 msgstr "Bitová maska"
 
 #: modules/access/rist.c:313
-#, fuzzy
 msgid "Virtual Destination Port Filter"
-msgstr "Cieľový súbor:"
+msgstr "Filter pre virtuálny cieľový port"
 
 #: modules/access/rist.c:315
 msgid ""
 "Destination port to be used inside the reduced-mode of the main profile to "
 "filter incoming data. Use zero to allow all."
 msgstr ""
+"Cieľový port, ktorý sa použije v rámci redukovaného režimu hlavného profilu, "
+"na filtrovanie prichádzajúcich údajov. Všetky porty povolíte zadaním hodnoty "
+"nula."
 
 #: modules/access/rist.c:321 modules/access_output/rist.c:293
 msgid "RIST"
@@ -8263,14 +8271,13 @@ msgstr ""
 "Maximálny výkyv pre demultiplexovanie/dekódovanie RIST (štandardne 5 ms)"
 
 #: modules/access/rist.c:328
-#, fuzzy
 msgid ""
 "This controls the maximum jitter that will be passed to the demux/decode "
 "chain. The lower the value, the more CPU cycles the module will consume"
 msgstr ""
-"Týmto sa nastavuje maximálny výkyv, ktorý sa odovzdá do demultiplexovacieho/"
-"dekódovacieho reťazca. Čím je hodnota nižšia, tým viac cyklov CPU spotrebuje "
-"algoritmus"
+"Týmto nastavením sa ovláda maximálne rozkolísanie, ktoré sa prenesie do "
+"reťazca na demultiplexovanie/dekódovanie. Čím nižšia je hodnota, tým viac "
+"cyklov CPU spotrebuje modul."
 
 #: modules/access/rist.c:332
 msgid "RIST nack type, 0 = range, 1 = bitmask. Default is range"
@@ -8567,9 +8574,8 @@ msgid "SFTP port number to use on the server"
 msgstr "SFTP - číslo portu, ktorý sa použije na serveri"
 
 #: modules/access/sftp.c:61
-#, fuzzy
 msgid "Private key file"
-msgstr "Súbor s kľúčom AES"
+msgstr "Súbor s privátnym kľúčom"
 
 #: modules/access/sftp.c:62
 msgid ""
@@ -8577,6 +8583,10 @@ msgid ""
 "assumed to be in the same directory with '.pub' appended. If unset, standard "
 "key paths will be attempted (e.g. '~/.ssh/id_rsa')."
 msgstr ""
+"Súbor s privátnym kľúčom používaným pre overovanie SSH pomocou verejného "
+"kľúča. Súbor s privátnym kľúčom sa predpokladá v rovnakom priečinku s "
+"koncovkou '.pub'. Ak nie je nastavený, prebehne pokus o štandardné cesty "
+"kľúča (ako napríklad '~/.ssh/id_rsa')."
 
 #: modules/access/sftp.c:68
 msgid "SFTP input"
@@ -8723,9 +8733,8 @@ msgid "Password for stream encryption"
 msgstr "Heslo pre šifrovanie streamu"
 
 #: modules/access/srt.c:566
-#, fuzzy
 msgid "SRT Stream ID"
-msgstr "ID streamu pre SRT"
+msgstr "ID streamu SRT"
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -9589,50 +9598,51 @@ msgstr "LiveHTTP"
 
 #: modules/access_output/rist.c:268
 msgid "Virtual Source Port"
-msgstr ""
+msgstr "Virtuálny zdrojový port"
 
 #: modules/access_output/rist.c:270
 msgid "Source port to be used inside the reduced-mode of the main profile"
 msgstr ""
+"Zdrojový port, ktorý sa má použiť v rámci redukovaného režimu hlavného "
+"profilu"
 
 #: modules/access_output/rist.c:272
-#, fuzzy
 msgid "Virtual Destination Port"
-msgstr "Cieľ streamu"
+msgstr "Virtuálny cieľový port"
 
 #: modules/access_output/rist.c:274
 msgid "Destination port to be used inside the reduced-mode of the main profile"
 msgstr ""
+"Cieľový port, ktorý sa má použiť v rámci redukovaného režimu hlavného profilu"
 
 #: modules/access_output/rist.c:281
-#, fuzzy
 msgid "Multipeer mode"
-msgstr "Multiplexér"
+msgstr "Režim komunikácie viacerých zariadení (multipeer)"
 
 #: modules/access_output/rist.c:283
 msgid ""
 "This allows you to select between duplicate or load balanced modes when "
 "sending data to multiple peers (several network paths)"
 msgstr ""
+"Pomocou tohto nastavenia môžete vyberať medzi režimami duplikovania lebo "
+"vyváženého načítania pri odosielaní údajov viacerým zariadeniam (po "
+"niekoľkých sieťových cestách)"
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Duplicate"
-msgstr "Program"
+msgstr "Duplikovať"
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Load balanced"
-msgstr "Vyváženie červenej farby"
+msgstr "Načítať vyvážené"
 
 #: modules/access_output/rist.c:294
 msgid "RIST stream output"
 msgstr "Výstup streamu RIST"
 
 #: modules/access_output/rist.c:299
-#, fuzzy
 msgid "RIST target payload size (bytes)"
-msgstr "Veľkosť cieľového paketu RIST (v bajtoch)"
+msgstr "RIST - cieľová veľkosť užitočných údajov (v bajtoch)"
 
 #: modules/access_output/shout.c:64
 #: modules/gui/qt/components/sout/sout_widgets.cpp:438
@@ -12982,7 +12992,6 @@ msgstr "Dekodér textových titulkov"
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -14378,12 +14387,12 @@ msgstr "Rozhranie pre ovládanie gest myšou"
 #: modules/control/globalhotkeys/xcb.c:50
 #: modules/gui/qt/components/preferences_widgets.cpp:1141
 msgid "Global Hotkeys"
-msgstr "Všeobecné klávesové skratky"
+msgstr "Globálne klávesové skratky"
 
 #: modules/control/globalhotkeys/win32.c:50
 #: modules/control/globalhotkeys/xcb.c:53
 msgid "Global Hotkeys interface"
-msgstr "Rozhranie všeobecných klávesových skratiek"
+msgstr "Rozhranie globálnych klávesových skratiek"
 
 #: modules/control/hotkeys.c:100
 #: modules/gui/macosx/VLCSimplePrefsController.m:251
@@ -15316,7 +15325,7 @@ msgstr "Analyzátor súboru"
 
 #: modules/demux/dirac.c:41
 msgid "Value to adjust dts by"
-msgstr "Hodnota prispôsobenia dts o"
+msgstr "Hodnota na úpravu dts o"
 
 #: modules/demux/dirac.c:54
 msgid "Dirac video demuxer"
@@ -18405,7 +18414,7 @@ msgid ""
 "Press new keys for\n"
 "\"%@\""
 msgstr ""
-"Stlačte novú klávesy pre\n"
+"Stlačte nové klávesy pre\n"
 "\"%@\""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:1462
@@ -20093,9 +20102,8 @@ msgid ""
 "Select or double click an action to change the associated hotkey. Use delete "
 "key to remove hotkeys."
 msgstr ""
-"Vyberte alebo dvakrát kliknite na akciu, pri ktorej chcete zmeniť asociovanú "
-"klávesovú skratku. Pre odstránenie klávesových skratiek použite tlačidlo "
-"Nenast."
+"Ak chcete zmeniť klávesovú skratku pre akciu, vyberte akciu a dvakrát na ňu "
+"kliknite. Na odstránenie klávesových skratiek použite Delete."
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1136
 msgid "in"
@@ -20132,43 +20140,40 @@ msgid ""
 "Delete key to remove."
 msgstr ""
 "Zmenu vykonáte dvojkliknutím.\n"
-"Pre odstránenie stlačte klávesu Delete."
+"Pre odstránenie stlačte Delete."
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1405
-#, fuzzy
 msgid "Global Hotkey change"
-msgstr "Zmena klávesovej skratky"
+msgstr "Zmena globálnej klávesovej skratky"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1406
 msgid "Hotkey change"
 msgstr "Zmena klávesovej skratky"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1410
-#, fuzzy
 msgid "Press the new key or combination for <b>%1</b>"
-msgstr "Stlačte novú klávesu alebo kombináciu pre "
+msgstr "Stlačte nový kláves alebo kombináciu pre <b>%1</b>"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1419
 msgid "Assign"
 msgstr "Prideliť"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1455
-#, fuzzy
 msgid "Warning: this key or combination is already assigned to \"<b>%1</b>\""
-msgstr "Varovanie: táto klávesa alebo kombinácia je už pridelená akcii "
+msgstr ""
+"Varovanie: tento kláves alebo kombinácia je už pridelená pre  \"<b>%1</b>\""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1467
 msgid "Warning: <b>%1</b> is already an application menu shortcut"
 msgstr "Upozornenie: <b>%1</b> už je odkazom v menu s aplikáciami"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1490
-#, fuzzy
 msgid "Key or combination: <b>%1</b>"
-msgstr "Klávesa alebo kombinácia: "
+msgstr "Kláves alebo kombinácia: <b>%1</b>"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1498
 msgid "Key: <b>%1</b>"
-msgstr ""
+msgstr "Kláves: <b>%1</b>"
 
 #: modules/gui/qt/components/simple_preferences.cpp:256
 #: modules/gui/qt/components/simple_preferences.cpp:636
@@ -20334,24 +20339,19 @@ msgstr ""
 "Kontajnery (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:184
-#, fuzzy
 msgid "This module outputs the stream using the RIST protocol (TR06)."
 msgstr ""
-"Tento modul umožňuje výstup prekódovaného streamu do siete pomocou protokolu "
-"mms."
+"Tento modul zabezpečuje výstup streamu s použitím protokolu RIST (TR06)."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:186
-#, fuzzy
 msgid "Destination Address"
-msgstr "Cieľová koncovka"
+msgstr "Cieľová adresa"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:191
-#, fuzzy
 msgid "Destination Port"
-msgstr "Cieľ"
+msgstr "Cieľový port"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:201
-#, fuzzy
 msgid "Stream Name"
 msgstr "Názov streamu"
 
@@ -24707,11 +24707,11 @@ msgstr ""
 
 #: modules/spu/remoteosd.c:95
 msgid "Key events"
-msgstr "Udalosti vyvolané klávesou"
+msgstr "Udalosti vyvolané klávesom"
 
 #: modules/spu/remoteosd.c:97
 msgid "Send key events to VNC host."
-msgstr "Odoslať udalosti vyvolané klávesou hostiteľovi VNC."
+msgstr "Odoslať udalosti vyvolané klávesom hostiteľovi VNC."
 
 #: modules/spu/remoteosd.c:99
 msgid "Alpha transparency value (default 255)"
@@ -30010,385 +30010,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Zoznam správcov médií"
-
-#~ msgid "RIST maximum packet size (bytes)"
-#~ msgstr "RIST – maximálna veľkosť paketu (v bajtoch)"
-
-#~ msgid "RIST latency (ms)"
-#~ msgstr "Latencia RIST (ms)"
-
-#~ msgid "RIST nack retry interval (ms)"
-#~ msgstr "RIST nack - interval opakovania (ms)"
-
-#~ msgid "RIST reorder buffer (ms)"
-#~ msgstr "Vyrovnávacia pamäť RIST pre nové usporiadanie (ms)"
-
-#~ msgid "RIST maximum retry count"
-#~ msgstr "RIST - maximálny počet opakovaní"
-
-#~ msgid "Disable NACK output packets"
-#~ msgstr "Deaktivovať výstupné pakety NACK"
-
-#~ msgid "Use this to disable packet recovery"
-#~ msgstr "Túto voľbu použite na deaktivovanie obnovovania paketov"
-
-#~ msgid "Do not check for a valid rtcp message from the encoder"
-#~ msgstr "Nepreverovať platnú RTCP-správu z kodéra"
-
-#~ msgid ""
-#~ "Send nack messages even when we have not confirmed that the encoder is on "
-#~ "our local network."
-#~ msgstr ""
-#~ "Odosielať správy Nack aj v prípade, že sme nepotvrdili, že sa kodér "
-#~ "nachádza v našej lokálnej sieti."
-
-#~ msgid "16 bytes"
-#~ msgstr "16 bajtov"
-
-#~ msgid "24 bytes"
-#~ msgstr "24 bajtov"
-
-#~ msgid "32 bytes"
-#~ msgstr "32 bajtov"
-
-#~ msgid "RIST data output caching size (ms)"
-#~ msgstr "Veľkosť vyrovnávacej pamäte dátového výstupu RIST (ms)"
-
-#~ msgid ""
-#~ "Having this cache will guarantee that the packets going out are delivered "
-#~ "at a spacing determined by the chain timestamps thus ensuring a near "
-#~ "jitter free output. Be aware that this setting will also add to the "
-#~ "overall latency of the stream."
-#~ msgstr ""
-#~ "Ak je dostupná táto vyrovnávacia pamäť, zabezpečí sa tým, že vychádzajúce "
-#~ "pakety budú dodávané v odstupe určenom časovou pečiatkou v reťazci. Tým "
-#~ "sa zabezpečí výstup bez výkyvov. Pamätajte prosím na to, že toto "
-#~ "nastavenie prispieva aj k celkovej latencii dátového toku (streamu)."
-
-#~ msgid "RIST retry-buffer queue size (ms)"
-#~ msgstr "Veľkosť frontu vyrovnávacej pamäte RIST pre opakovanie (ms)"
-
-#~ msgid ""
-#~ "This must match the buffer size (latency) configured on the server side. "
-#~ "If you are not sure, leave the default of 0 which will set it the maximum "
-#~ "value and will use about 100MB of RAM"
-#~ msgstr ""
-#~ "Táto hodnota musí byť v zhode s veľkosťou vyrovnávacej pamäte "
-#~ "(latenciou), ktorá je nastavená na strane servera. Ak si nie ste istí "
-#~ "presnou hodnotou, ponechajte predvolenú hodnotu 0. Tým sa nastaví "
-#~ "maximálna hodnota a použije sa cca 100 MB RAM."
-
-#~ msgid "SSRC used in RTP output (default is random, i.e. 0)"
-#~ msgstr ""
-#~ "SSRC (zdroj synchronizácie) použitý vo výstupe RTP (predvolená hodnota = "
-#~ "náhodne, t. j. 0)"
-
-#~ msgid ""
-#~ "Use this setting to specify a known SSRC for the RTP header. This is only "
-#~ "useful if your receiver acts on it. When using VLC as receiver, it is not."
-#~ msgstr ""
-#~ "Použite toto nastavenie na určenie známeho zdroja synchronizácie (SSRC) "
-#~ "pre hlavičku RTP. Je to užitočné iba ak váš prijímač vplýva na túto "
-#~ "hodnotu. Ak použijete ako prijímač program VLC, nejde o takýto prípad."
-
-#~ msgid ""
-#~ "This Stream name will be sent to the receiver using the rist RTCP channel"
-#~ msgstr "Takýto názov streamu sa odošle prijímaču cez kanál RTCP"
-
-#~ msgid "4:2:0"
-#~ msgstr "4:2:0"
-
-#~ msgid "4:2:2"
-#~ msgstr "4:2:2"
-
-#~ msgid "4:4:4"
-#~ msgstr "4:4:4"
-
-#~ msgid "Rate control method"
-#~ msgstr "Metóda kontroly rýchlosti"
-
-#~ msgid "Method used to encode the video sequence"
-#~ msgstr "Metóda použitá na kódovanie sekvencie videa"
-
-#~ msgid "Constant noise threshold mode"
-#~ msgstr "Režim hraničného konštantného šumu"
-
-#~ msgid "Constant bitrate mode (CBR)"
-#~ msgstr "Konštantná bitová rýchlosť (CBR)"
-
-#~ msgid "Low Delay mode"
-#~ msgstr "Režim malého oneskorenia"
-
-#~ msgid "Lossless mode"
-#~ msgstr "Bezstratový režim"
-
-#~ msgid "Constant lambda mode"
-#~ msgstr "Režim Constant lambda"
-
-#~ msgid "Constant error mode"
-#~ msgstr "Konštantný chybový režim"
-
-#~ msgid "Constant quality mode"
-#~ msgstr "Režim konštantnej kvality"
-
-#~ msgid "GOP structure"
-#~ msgstr "Štruktúra GOP"
-
-#~ msgid "GOP structure used to encode the video sequence"
-#~ msgstr "Štruktúra GOP, použitá na kódovanie sekvencie videa"
-
-#~ msgid ""
-#~ "No fixed gop structure. A picture can be intra or inter and refer to "
-#~ "previous or future pictures."
-#~ msgstr ""
-#~ "Žiadna fixná štruktúra gop. Obrázok môže byť intra alebo inter a "
-#~ "odkazovať na predchádzajúce alebo nasledujúce obrázky."
-
-#~ msgid "I-frame only sequence"
-#~ msgstr "Len sekvencia I-snímky"
-
-#~ msgid "Inter pictures refere to previous pictures only"
-#~ msgstr "Obrázky typu Inter odkazujú len na predchádzajúce obrázky"
-
-#~ msgid "Inter pictures can refer to previous or future pictures"
-#~ msgstr "Obrázky typu Inter môžu odkazovať aj na budúce obrázky"
-
-#~ msgid "Constant quality factor"
-#~ msgstr "Faktor konštantnej kvality"
-
-#~ msgid "Quality factor to use in constant quality mode"
-#~ msgstr "Faktor kvality, ktorý sa použije v režime konštantnej kvality"
-
-#~ msgid "Noise Threshold"
-#~ msgstr "Hranica šumu"
-
-#~ msgid "Noise threshold to use in constant noise threshold mode"
-#~ msgstr "Hranica šumu, ktorá sa použije v režime konštantného šumu"
-
-#~ msgid "CBR bitrate (kbps)"
-#~ msgstr "Konštantný (CBR) dátový tok (kbps)"
-
-#~ msgid "Target bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr "Cieľový dátový tok pri kódovaní v režime konštantného dátového toku"
-
-#~ msgid "Maximum bitrate (kbps)"
-#~ msgstr "Maximálny dátový tok (kbps)"
-
-#~ msgid "Maximum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "Maximálny dátový tok v kbps pri kódovaní v režime konštantného dátového "
-#~ "toku"
-
-#~ msgid "Minimum bitrate (kbps)"
-#~ msgstr "Minimálny dátový tok (kbps)"
-
-#~ msgid "Minimum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "Minimálny dátový tok v kbps pri kódovaní v režime konštantného dátového "
-#~ "toku"
-
-#~ msgid "GOP length"
-#~ msgstr "Dĺžka GOP"
-
-#~ msgid ""
-#~ "Number of pictures between successive sequence headers i.e. length of the "
-#~ "group of pictures"
-#~ msgstr ""
-#~ "Počet obrázkov medzi nasledujúcimi záhlaviami sekvencie, napríklad dĺžka "
-#~ "skupiny obrázkov"
-
-#~ msgid "Prefilter"
-#~ msgstr "Predbežné filtrovanie"
-
-#~ msgid "Enable adaptive prefiltering"
-#~ msgstr "Zapnúť adaptívne predbežné filtrovanie"
-
-#~ msgid "No pre-filtering"
-#~ msgstr "Žiadne predbežné filtrovanie"
-
-#~ msgid "Centre Weighted Median"
-#~ msgstr "Medián, vyvážený v strede"
-
-#~ msgid "Gaussian Low Pass Filter"
-#~ msgstr "Low Pass filter Gaussian"
-
-#~ msgid "Add Noise"
-#~ msgstr "Pridať šum"
-
-#~ msgid "Gaussian Adaptive Low Pass Filter"
-#~ msgstr "Adaptívny Low Pass filter Gaussian"
-
-#~ msgid "Low Pass Filter"
-#~ msgstr "Filter Low Pass"
-
-#~ msgid "Amount of prefiltering"
-#~ msgstr "Intenzita predfiltrovania"
-
-#~ msgid "Higher value implies more prefiltering"
-#~ msgstr "Väčšia hodnota znamená viac predfiltrovania"
-
-#~ msgid "Picture coding mode"
-#~ msgstr "Režim kódovania obrázkov"
-
-#~ msgid ""
-#~ "Field coding is where interlaced fields are coded separately as opposed "
-#~ "to a pseudo-progressive frame"
-#~ msgstr ""
-#~ "Kódovanie polí sa vykonáva tam, kde sa prekladané polia kódujú oddelene "
-#~ "ako protichodné voči pseudo-progresívnej snímke"
-
-#~ msgid "auto - let encoder decide based upon input (Best)"
-#~ msgstr "auto - nechať kodér rozhodnúť podľa vstupu (najlepšia voľba)"
-
-#~ msgid "force coding frame as single picture"
-#~ msgstr "vynútiť si kódovanie snímky ako jedného obrázku"
-
-#~ msgid "force coding frame as separate interlaced fields"
-#~ msgstr "vynútiť si kódovanie snímky ako oddelene prekladané polia"
-
-#~ msgid "Size of motion compensation blocks"
-#~ msgstr "Šírka blokov pre kompenzáciu pohybu"
-
-#~ msgid "automatic - let encoder decide based upon input (Best)"
-#~ msgstr "automatic - nechať kodér rozhodnúť podľa vstupu (najlepšia voľba)"
-
-#~ msgid "small - use small motion compensation blocks"
-#~ msgstr "malé - použiť malé bloky pre kompenzáciu pohybu"
-
-#~ msgid "medium - use medium motion compensation blocks"
-#~ msgstr "stredné - použiť stredne veľké bloky pre kompenzáciu pohybu"
-
-#~ msgid "large - use large motion compensation blocks"
-#~ msgstr "veľké - použiť veľké bloky pre kompenzáciu pohybu"
-
-#~ msgid "Overlap of motion compensation blocks"
-#~ msgstr "Prekrývanie blokov pre kompenzáciu pohybu"
-
-#~ msgid "none - Motion compensation blocks do not overlap"
-#~ msgstr "žiadne - bloky pre kompenzáciu pohybu sa neprekrývajú"
-
-#~ msgid "partial - Motion compensation blocks only partially overlap"
-#~ msgstr "čiastočne - bloky pre kompenzáciu pohybu s čiastočným prekrývaním"
-
-#~ msgid "full - Motion compensation blocks fully overlap"
-#~ msgstr "úplné - bloky pre kompenzáciu pohybu sa úplne prekrývajú"
-
-#~ msgid "Motion Vector precision"
-#~ msgstr "Presnosť vektora pohybu"
-
-#~ msgid "Motion Vector precision in pels"
-#~ msgstr "Presnosť vektora pohybu (v jednotkách pels)"
-
-#~ msgid "Three component motion estimation"
-#~ msgstr "Trojzložkové odhadovanie pohybu"
-
-#~ msgid "Use chroma as part of the motion estimation process"
-#~ msgstr "Použiť farebnú sýtosť ako súčasť pri odhadovaní pohybu"
-
-#~ msgid "Intra picture DWT filter"
-#~ msgstr "DWT filter intra snímkov"
-
-#~ msgid "Inter picture DWT filter"
-#~ msgstr "DWT filter snímkov inter"
-
-#~ msgid "Number of DWT iterations"
-#~ msgstr "Počet iterácií DWT"
-
-#~ msgid "Also known as DWT levels"
-#~ msgstr "Toto nastavenie je známe aj ako tzv. úrovne DWT"
-
-#~ msgid "Enable multiple quantizers"
-#~ msgstr "Zapnúť viacnásobné kvantizéry"
-
-#~ msgid "Enable multiple quantizers per subband (one per codeblock)"
-#~ msgstr ""
-#~ "Zapnúť viacnásobné kvantizéry na jedno subpásmo (jeden na blok kódu)"
-
-#~ msgid "Disable arithmetic coding"
-#~ msgstr "Zablokovať aritmetické kódovanie"
-
-#~ msgid "Use variable length codes instead, useful for very high bitrates"
-#~ msgstr ""
-#~ "Namiesto toho použiť kódy s variabilnou dĺžkou - užitočné najmä pri veľmi "
-#~ "veľkých dátových tokoch"
-
-#~ msgid "perceptual weighting method"
-#~ msgstr "Metóda optického útlmu"
-
-#~ msgid "perceptual distance"
-#~ msgstr "Optická vzdialenosť"
-
-#~ msgid "perceptual distance to calculate perceptual weight"
-#~ msgstr "Optická vzdialenosť pre výpočet optickej váhy"
-
-#~ msgid "Horizontal slices per frame"
-#~ msgstr "Horizontálne pruhy na snímok"
-
-#~ msgid "Number of horizontal slices per frame in low delay mode"
-#~ msgstr "Počet horizontálnych pruhov na snímok v režime s malým oneskorením"
-
-#~ msgid "Vertical slices per frame"
-#~ msgstr "Vertikálne pruhy na snímok"
-
-#~ msgid "Number of vertical slices per frame in low delay mode"
-#~ msgstr "Počet vertikálnych pruhov na snímok v režime s malým oneskorením"
-
-#~ msgid "Size of code blocks in each subband"
-#~ msgstr "Veľkosť blokov kódu v každom sub-pásme"
-
-#~ msgid "small - use small code blocks"
-#~ msgstr "malé - použiť malé bloky kódu"
-
-#~ msgid "medium - use medium sized code blocks"
-#~ msgstr "stredné - použiť bloky kódu strednej veľkosti"
-
-#~ msgid "large - use large code blocks"
-#~ msgstr "veľké - použiť veľké bloky kódu"
-
-#~ msgid "full - One code block per subband"
-#~ msgstr "plne - jeden blok kódu na jedno sub-pásmo"
-
-#~ msgid "Enable hierarchical Motion Estimation"
-#~ msgstr "Zapnúť hierarchické odhadovanie pohybu"
-
-#~ msgid "Number of levels of downsampling"
-#~ msgstr "Počet úrovní prevzorkovania nadol"
-
-#~ msgid ""
-#~ "Number of levels of downsampling in hierarchical motion estimation mode"
-#~ msgstr ""
-#~ "Počet úrovní prevzorkovania nadol v režime hierarchického odhadovania "
-#~ "pohybu"
-
-#~ msgid "Enable Global Motion Estimation"
-#~ msgstr "Zapnúť všeobecné odhadovanie pohybu"
-
-#~ msgid "Enable Phase Correlation Estimation"
-#~ msgstr "Zapnúť odhadovanie korelácie fázy"
-
-#~ msgid "Enable Scene Change Detection"
-#~ msgstr "Zapnúť detekciu zmeny scény"
-
-#~ msgid "Force Profile"
-#~ msgstr "Vynútenie profilu"
-
-#~ msgid "VC2 Low Delay Profile"
-#~ msgstr "Profil VC2 pre nízke oneskorenie"
-
-#~ msgid "VC2 Simple Profile"
-#~ msgstr "Jednoduchý profil VC2"
-
-#~ msgid "VC2 Main Profile"
-#~ msgstr "Hlavný profil VC2"
-
-#~ msgid "Main Profile"
-#~ msgstr "Hlavný profil"
-
-#~ msgid "Dirac video decoder using libschroedinger"
-#~ msgstr "Dekodér videa Dirac s použitím libschroedinger"
-
-#~ msgid "Dirac video encoder using libschroedinger"
-#~ msgstr "Kodér videa Dirac s použitím libschroedinger"
-
-#~ msgid "Key: "
-#~ msgstr "Kľúč: "
