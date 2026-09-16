@@ -1,5 +1,5 @@
 # Latvian translation
-# Copyright (C) 2023 VideoLAN
+# Copyright (C) 2026 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -7,24 +7,26 @@
 # Arnis Lupiks, 2014
 # Baiba Bērziņa <baibabeerzinnaa@gmail.com>, 2015
 # Dāvis Mosāns, 2014
-# Ingmārs Dīriņš <melhiors14@gmail.com>, 2016-2022
+# Ingmārs Dīriņš <melhiors14@gmail.com>, 2016-2023
 # Jānis-Marks Gailis <jeanmarc.gailis@gmail.com>, 2013-2014
 # Kristaps Ancāns <kristaps.ancans@gmail.com>, 2013
 # Ojārs Spriņķis <ojars.sprinkis@inbox.lv>, 2014-2021
 # Rūdolfs Mazurs <rudolfs.mazurs@gmail.com>, 2014
 # Andrejs Pavars <andrejs.pavars@gmail.com>, 2017
+# Michał Trzebiatowski <michtrz@gmail.com>, 2017
+# Ojārs Spriņķis, 2024
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22-rc1\n"
+"Project-Id-Version: vlc 3.0.24-beta1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2026-06-28 16:08+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: Ojārs Spriņķis, 2024\n"
 "Language-Team: Latvian (https://app.transifex.com/yaron/teams/16553/lv/)\n"
-"Language: lv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: lv\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : "
 "2);\n"
 
@@ -1081,24 +1083,20 @@ msgid "Decoded format"
 msgstr "Atkodētais formāts"
 
 #: src/input/es_out.c:3207
-#, fuzzy
 msgid "Decoded channels"
-msgstr "Audio kanāli"
+msgstr ""
 
 #: src/input/es_out.c:3212
-#, fuzzy
 msgid "Decoded sample rate"
-msgstr "Audio diskretizācijas frekvence"
+msgstr ""
 
 #: src/input/es_out.c:3219
-#, fuzzy
 msgid "Decoded bits per sample"
-msgstr "Audio biti uz nolasi"
+msgstr ""
 
 #: src/input/es_out.c:3224
-#, fuzzy
 msgid "Decoded Bitrate"
-msgstr "Atkodētais formāts"
+msgstr ""
 
 #: src/input/es_out.c:3237
 msgid "Track replay gain"
@@ -8191,9 +8189,8 @@ msgid "Bitmask"
 msgstr "Bitmaska"
 
 #: modules/access/rist.c:313
-#, fuzzy
 msgid "Virtual Destination Port Filter"
-msgstr "Galamērķa datne:"
+msgstr ""
 
 #: modules/access/rist.c:315
 msgid ""
@@ -8215,13 +8212,10 @@ msgstr ""
 "RIST demultipleksēšanas/atkodēšanas maksimālā trīce (noklusējums ir 5 ms)"
 
 #: modules/access/rist.c:328
-#, fuzzy
 msgid ""
 "This controls the maximum jitter that will be passed to the demux/decode "
 "chain. The lower the value, the more CPU cycles the module will consume"
 msgstr ""
-"Šis kontrolē maksimālo trīci, kura tiks padota demultipleksēšanas/"
-"atkodēšanas ķēdei. Jo mazāka vērtība, jo vairāk CPU ciklu algoritms patērēs"
 
 #: modules/access/rist.c:332
 msgid "RIST nack type, 0 = range, 1 = bitmask. Default is range"
@@ -8512,9 +8506,8 @@ msgid "SFTP port number to use on the server"
 msgstr "SFTP porta numurs, kuru lietot uz servera"
 
 #: modules/access/sftp.c:61
-#, fuzzy
 msgid "Private key file"
-msgstr "AES atslēgas datne"
+msgstr ""
 
 #: modules/access/sftp.c:62
 msgid ""
@@ -8665,9 +8658,8 @@ msgid "Password for stream encryption"
 msgstr "Parole straumju šifrēšanai"
 
 #: modules/access/srt.c:566
-#, fuzzy
 msgid "SRT Stream ID"
-msgstr "SRT straumju izvade"
+msgstr ""
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -9536,18 +9528,16 @@ msgid "Source port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:272
-#, fuzzy
 msgid "Virtual Destination Port"
-msgstr "Straumes galamērķis"
+msgstr ""
 
 #: modules/access_output/rist.c:274
 msgid "Destination port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:281
-#, fuzzy
 msgid "Multipeer mode"
-msgstr "Multipleksors"
+msgstr ""
 
 #: modules/access_output/rist.c:283
 msgid ""
@@ -9556,23 +9546,20 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Duplicate"
-msgstr "Lietotne"
+msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Load balanced"
-msgstr "Sarkanā balanss"
+msgstr ""
 
 #: modules/access_output/rist.c:294
 msgid "RIST stream output"
 msgstr "RIST straumes izvade"
 
 #: modules/access_output/rist.c:299
-#, fuzzy
 msgid "RIST target payload size (bytes)"
-msgstr "RIST mērķa paketes izmērs (baiti)"
+msgstr ""
 
 #: modules/access_output/shout.c:64
 #: modules/gui/qt/components/sout/sout_widgets.cpp:438
@@ -12897,7 +12884,6 @@ msgstr "Teksta subtitru atkodētājs"
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -15214,11 +15200,11 @@ msgstr "Datņu izmetējs"
 
 #: modules/demux/dirac.c:41
 msgid "Value to adjust dts by"
-msgstr "Vērtība, ar kuru pielāgot dts"
+msgstr ""
 
 #: modules/demux/dirac.c:54
 msgid "Dirac video demuxer"
-msgstr "Dirac video demultipleksors"
+msgstr ""
 
 #: modules/demux/directory.c:94
 msgid "Directory import"
@@ -20017,36 +20003,32 @@ msgstr ""
 "Taustiņš \"Delete\", lai noņemtu."
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1405
-#, fuzzy
 msgid "Global Hotkey change"
-msgstr "Karsto taustiņu maiņa"
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1406
 msgid "Hotkey change"
 msgstr "Karsto taustiņu maiņa"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1410
-#, fuzzy
 msgid "Press the new key or combination for <b>%1</b>"
-msgstr "Nospiediet jaunu taustiņu vai kombināciju priekš "
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1419
 msgid "Assign"
 msgstr "Piešķirt"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1455
-#, fuzzy
 msgid "Warning: this key or combination is already assigned to \"<b>%1</b>\""
-msgstr "Brīdinājums: šis taustiņš vai kombinācija jau ir piešķirta pie "
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1467
 msgid "Warning: <b>%1</b> is already an application menu shortcut"
 msgstr "Brīdinājums: <b>%1</b> jau ir lietotnes izvēlnes saīsne"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1490
-#, fuzzy
 msgid "Key or combination: <b>%1</b>"
-msgstr "Taustiņš vai kombinācija: "
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1498
 msgid "Key: <b>%1</b>"
@@ -20215,24 +20197,20 @@ msgstr ""
 "Konteineri (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:184
-#, fuzzy
 msgid "This module outputs the stream using the RIST protocol (TR06)."
-msgstr "Šis modulis izvada pārkodēto straumi uz tīklu caur mms protokolu."
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:186
-#, fuzzy
 msgid "Destination Address"
-msgstr "Galamērķa priedēklis"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:191
-#, fuzzy
 msgid "Destination Port"
-msgstr "Galamērķis"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:201
-#, fuzzy
 msgid "Stream Name"
-msgstr "Straumes nosaukums"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:237
 msgid "This module outputs the transcoded stream to a network via HTTP."
@@ -23740,7 +23718,7 @@ msgstr "Kopēšanas paketizētājs"
 
 #: modules/packetizer/dirac.c:87
 msgid "Dirac packetizer"
-msgstr "Dirac paketizētājs"
+msgstr ""
 
 #: modules/packetizer/dts.c:47
 msgid "DTS audio packetizer"
@@ -29784,385 +29762,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Mediju pārvaldnieka saraksts"
-
-#~ msgid "RIST maximum packet size (bytes)"
-#~ msgstr "RIST maksimālais paketes izmērs (baiti)"
-
-#~ msgid "RIST latency (ms)"
-#~ msgstr "RIST latentums (ms)"
-
-#~ msgid "RIST nack retry interval (ms)"
-#~ msgstr "RIST negatīvo apliecinājumu atkārtoto mēģinājumu intervāls (ms)"
-
-#~ msgid "RIST reorder buffer (ms)"
-#~ msgstr "RIST pārkārtošanas buferis (ms)"
-
-#~ msgid "RIST maximum retry count"
-#~ msgstr "RIST maksimālais atkārtoto mēģinājumu skaits"
-
-#~ msgid "Disable NACK output packets"
-#~ msgstr "Izslēgt NACK izvades paketes"
-
-#~ msgid "Use this to disable packet recovery"
-#~ msgstr "Lietojiet šo, lai izslēgtu pakešu atkopšanu"
-
-#~ msgid "Do not check for a valid rtcp message from the encoder"
-#~ msgstr "Nepārbaudīt derīga RTCP ziņojuma saņemšanu no kodētāja"
-
-#~ msgid ""
-#~ "Send nack messages even when we have not confirmed that the encoder is on "
-#~ "our local network."
-#~ msgstr ""
-#~ "Sūtīt negatīvā apliecinājuma ziņojumus pat tad, ja nav apstiprināts, ka "
-#~ "kodētājs ir lokālajā tīklā."
-
-#~ msgid "16 bytes"
-#~ msgstr "16 baiti"
-
-#~ msgid "24 bytes"
-#~ msgstr "24 baiti"
-
-#~ msgid "32 bytes"
-#~ msgstr "32 baiti"
-
-#~ msgid "RIST data output caching size (ms)"
-#~ msgstr "RIST datu izvades kešdarbes izmērs (ms)"
-
-#~ msgid ""
-#~ "Having this cache will guarantee that the packets going out are delivered "
-#~ "at a spacing determined by the chain timestamps thus ensuring a near "
-#~ "jitter free output. Be aware that this setting will also add to the "
-#~ "overall latency of the stream."
-#~ msgstr ""
-#~ "Šīs kešatmiņas esamība garantēs, ka izejošās paketes tiek piegādātas ar "
-#~ "ķēdes laika zīmogu noteikto intervālu, tādējādi nodrošinot no trīces "
-#~ "gandrīz brīvu izvadi. Ņemiet vērā, ka šis iestatījums palielinās arī "
-#~ "kopējo straumes latentumu."
-
-#~ msgid "RIST retry-buffer queue size (ms)"
-#~ msgstr "RIST atkārtoto mēģinājumu bufera rindas izmērs (ms)"
-
-#~ msgid ""
-#~ "This must match the buffer size (latency) configured on the server side. "
-#~ "If you are not sure, leave the default of 0 which will set it the maximum "
-#~ "value and will use about 100MB of RAM"
-#~ msgstr ""
-#~ "Šim jāsakrīt ar servera pusē konfigurēto bufera izmēru (latentumu). Ja "
-#~ "neesat pārliecināts, atstājiet noklusējuma 0, kas iestatīs tam maksimālo "
-#~ "vērtību un lietos apmēram 100MB RAM."
-
-#~ msgid "SSRC used in RTP output (default is random, i.e. 0)"
-#~ msgstr "RTP izvadē lietotais SSRC (noklusējums ir nejaušs, t.i. 0)"
-
-#~ msgid ""
-#~ "Use this setting to specify a known SSRC for the RTP header. This is only "
-#~ "useful if your receiver acts on it. When using VLC as receiver, it is not."
-#~ msgstr ""
-#~ "Lietojiet šo iestatījumu, lai RTP galvenei norādītu zināmu "
-#~ "sinhronizācijas avotu (SSRC). Tas ir lietderīgi tikai, ja jūsu uztvērējs "
-#~ "darbojas uz šī avota. Kad kā uztvērēju lieto VLC, tas nav lietderīgi."
-
-#~ msgid ""
-#~ "This Stream name will be sent to the receiver using the rist RTCP channel"
-#~ msgstr ""
-#~ "Šis straumes nosaukums tiks nosūtīts saņēmējam, lietojot RIST RTCP kanālu"
-
-#~ msgid "4:2:0"
-#~ msgstr "4:2:0"
-
-#~ msgid "4:2:2"
-#~ msgstr "4:2:2"
-
-#~ msgid "4:4:4"
-#~ msgstr "4:4:4"
-
-#~ msgid "Rate control method"
-#~ msgstr "Ātruma kontroles metode"
-
-#~ msgid "Method used to encode the video sequence"
-#~ msgstr "Metode, lietota, lai iekodētu video secību"
-
-#~ msgid "Constant noise threshold mode"
-#~ msgstr "Konstanta trokšņa sliekšņa režīms"
-
-#~ msgid "Constant bitrate mode (CBR)"
-#~ msgstr "Konstantas bitu pārraides ātruma režīms (CBR)"
-
-#~ msgid "Low Delay mode"
-#~ msgstr "Zemas aiztures režīms"
-
-#~ msgid "Lossless mode"
-#~ msgstr "Bezzudumu režīms"
-
-#~ msgid "Constant lambda mode"
-#~ msgstr "Konstantas lambdas režīms"
-
-#~ msgid "Constant error mode"
-#~ msgstr "Konstantas kļūdas režīms"
-
-#~ msgid "Constant quality mode"
-#~ msgstr "Konstantas kvalitātes režīms"
-
-#~ msgid "GOP structure"
-#~ msgstr "Bilžu grupas struktūra"
-
-#~ msgid "GOP structure used to encode the video sequence"
-#~ msgstr "Bilžu grupas struktūra, lietota, lai iekodētu video secību"
-
-#~ msgid ""
-#~ "No fixed gop structure. A picture can be intra or inter and refer to "
-#~ "previous or future pictures."
-#~ msgstr ""
-#~ "Nav fiksēta bilžu grupas struktūra. Bilde var būt iekšējā vai starpējā un "
-#~ "atsaukties uz iepriekšējām vai turpmākajām bildēm."
-
-#~ msgid "I-frame only sequence"
-#~ msgstr "Secība tikai no I-kadriem"
-
-#~ msgid "Inter pictures refere to previous pictures only"
-#~ msgstr "Starpējās bildes saistas tikai ar iepriekšējo kadru"
-
-#~ msgid "Inter pictures can refer to previous or future pictures"
-#~ msgstr "Starpējās bildes var atsaukties uz iepriekšējo vai turpmāko bildi"
-
-#~ msgid "Constant quality factor"
-#~ msgstr "Konstantas kvalitātes koeficients"
-
-#~ msgid "Quality factor to use in constant quality mode"
-#~ msgstr "Kvalitātes koeficients, kuru lietot konstantas kvalitātes režīmā"
-
-#~ msgid "Noise Threshold"
-#~ msgstr "Trokšņa slieksnis"
-
-#~ msgid "Noise threshold to use in constant noise threshold mode"
-#~ msgstr "Trokšņa slieksnis, kuru lietot konstanta trokšņa sliekšņa režīmā"
-
-#~ msgid "CBR bitrate (kbps)"
-#~ msgstr "CBR bitu pārraides ātrums (kb/s)"
-
-#~ msgid "Target bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "Mērķa bitu pārraides ātrums kb/s, kad iekodējas konstanta bitu pārraides "
-#~ "ātruma režīmā"
-
-#~ msgid "Maximum bitrate (kbps)"
-#~ msgstr "Maksimālais bitu pārraides ātrums (kb/s)"
-
-#~ msgid "Maximum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "Maksimālais bitu pārraides ātrums kb/s, kad iekodējas konstanta bitu "
-#~ "pārraides ātruma režīmā"
-
-#~ msgid "Minimum bitrate (kbps)"
-#~ msgstr "Minimālais bitu pārraides ātrums (kb/s)"
-
-#~ msgid "Minimum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "Minimālais bitu pārraides ātrums kb/s, kad iekodējas konstanta bitu "
-#~ "pārraides ātruma režīmā"
-
-#~ msgid "GOP length"
-#~ msgstr "Bilžu grupas garums"
-
-#~ msgid ""
-#~ "Number of pictures between successive sequence headers i.e. length of the "
-#~ "group of pictures"
-#~ msgstr ""
-#~ "Bilžu skaits starp sekojošām secības galvenēm, t.i. bilžu grupas garums"
-
-#~ msgid "Prefilter"
-#~ msgstr "Pirmsfiltrēšana"
-
-#~ msgid "Enable adaptive prefiltering"
-#~ msgstr "Ieslēgt adaptīvo pirmsfiltrēšanu"
-
-#~ msgid "No pre-filtering"
-#~ msgstr "Nav pirmsfiltrēšanas"
-
-#~ msgid "Centre Weighted Median"
-#~ msgstr "Centrēt svērto meridiānu"
-
-#~ msgid "Gaussian Low Pass Filter"
-#~ msgstr "Gausa zemas cauriešanas filtrs"
-
-#~ msgid "Add Noise"
-#~ msgstr "Pievienot troksni"
-
-#~ msgid "Gaussian Adaptive Low Pass Filter"
-#~ msgstr "Gausa adaptīvais zemas cauriešanas filtrs"
-
-#~ msgid "Low Pass Filter"
-#~ msgstr "Zemas cauriešanas filtrs"
-
-#~ msgid "Amount of prefiltering"
-#~ msgstr "Pirmsfiltrēšanas daudzums"
-
-#~ msgid "Higher value implies more prefiltering"
-#~ msgstr "Augstāka vērtība nozīmē vairāk priekšfiltrēšanas"
-
-#~ msgid "Picture coding mode"
-#~ msgstr "Bildes kodēšanas režīms"
-
-#~ msgid ""
-#~ "Field coding is where interlaced fields are coded separately as opposed "
-#~ "to a pseudo-progressive frame"
-#~ msgstr ""
-#~ "Lauka kodēšana ir, kur lauki ar rindpārleci tiek kodēti atsevišķi, "
-#~ "pretstatā pseido-progresīvajam kadram"
-
-#~ msgid "auto - let encoder decide based upon input (Best)"
-#~ msgstr ""
-#~ "automātiski - ļaut iekodētājam izlemt, bāzējoties uz ievadi (Labākais)"
-
-#~ msgid "force coding frame as single picture"
-#~ msgstr "piespiest kodēt kadru kā vienu bildi"
-
-#~ msgid "force coding frame as separate interlaced fields"
-#~ msgstr "piespiest kodēt kadru kā atsevišķus laukus ar rindpārleci"
-
-#~ msgid "Size of motion compensation blocks"
-#~ msgstr "Kustības kompensācijas bloku izmērs"
-
-#~ msgid "automatic - let encoder decide based upon input (Best)"
-#~ msgstr ""
-#~ "automātiski - ļaut iekodētājam izlemt, bāzējoties uz ievadi (Labākais)"
-
-#~ msgid "small - use small motion compensation blocks"
-#~ msgstr "mazs - lietot mazus kustības kompensācijas blokus"
-
-#~ msgid "medium - use medium motion compensation blocks"
-#~ msgstr "vidējs - lietot vidējus kustības kompensācijas blokus"
-
-#~ msgid "large - use large motion compensation blocks"
-#~ msgstr "liels - lietot lielus kustības kompensācijas blokus"
-
-#~ msgid "Overlap of motion compensation blocks"
-#~ msgstr "Kustības kompensācijas bloku pārklāšanās"
-
-#~ msgid "none - Motion compensation blocks do not overlap"
-#~ msgstr "nekāds - Kustības kompensācijas bloki nepārklājas"
-
-#~ msgid "partial - Motion compensation blocks only partially overlap"
-#~ msgstr "daļējs - Kustības kompensācijas bloki tikai daļēji pārklājas"
-
-#~ msgid "full - Motion compensation blocks fully overlap"
-#~ msgstr "pilns - Kustības kompensācijas bloki pilnībā pārklājas"
-
-#~ msgid "Motion Vector precision"
-#~ msgstr "Kustības vektora precizitāte"
-
-#~ msgid "Motion Vector precision in pels"
-#~ msgstr "Kustības vektora precizitāte pelos"
-
-#~ msgid "Three component motion estimation"
-#~ msgstr "Trīs komponentu kustības novērtējums"
-
-#~ msgid "Use chroma as part of the motion estimation process"
-#~ msgstr "Lietot krāsainību kā daļu no kustību novērtēšanas procesa"
-
-#~ msgid "Intra picture DWT filter"
-#~ msgstr "Iekšējās bildes DWT filtrs"
-
-#~ msgid "Inter picture DWT filter"
-#~ msgstr "Starpējās bildes DWT filtrs"
-
-#~ msgid "Number of DWT iterations"
-#~ msgstr "DWT iterāciju skaits"
-
-#~ msgid "Also known as DWT levels"
-#~ msgstr "Vēl zināmi kā DWT līmeņi"
-
-#~ msgid "Enable multiple quantizers"
-#~ msgstr "Ieslēgt vairākus kvantizētājus"
-
-#~ msgid "Enable multiple quantizers per subband (one per codeblock)"
-#~ msgstr "Ieslēgt vairākus kvantizētājus uz apakšjoslu (vienu uz koda bloku)"
-
-#~ msgid "Disable arithmetic coding"
-#~ msgstr "Izslēgt aritmētisko kodēšanu"
-
-#~ msgid "Use variable length codes instead, useful for very high bitrates"
-#~ msgstr ""
-#~ "Tā vietā lietot garuma kodus, noderīgi ļoti augstiem bitu pārraides "
-#~ "ātrumiem"
-
-#~ msgid "perceptual weighting method"
-#~ msgstr "uztveršanas svēršanas metode"
-
-#~ msgid "perceptual distance"
-#~ msgstr "uztveršanas attālums"
-
-#~ msgid "perceptual distance to calculate perceptual weight"
-#~ msgstr "uztveršanas attālums, lai aprēķinātu uztveršanas svaru"
-
-#~ msgid "Horizontal slices per frame"
-#~ msgstr "Horizontālās šķēles uz kadru"
-
-#~ msgid "Number of horizontal slices per frame in low delay mode"
-#~ msgstr "Horizontālo šķēļu skaits uz kadru zemas aiztures režīmā"
-
-#~ msgid "Vertical slices per frame"
-#~ msgstr "Vertikālās šķēles uz kadru"
-
-#~ msgid "Number of vertical slices per frame in low delay mode"
-#~ msgstr "Vertikālo šķēļu skaits uz kadru zemas aiztures režīmā"
-
-#~ msgid "Size of code blocks in each subband"
-#~ msgstr "Koda bloku izmērs katrā apakšjoslā"
-
-#~ msgid "small - use small code blocks"
-#~ msgstr "mazs - lietot mazus koda blokus"
-
-#~ msgid "medium - use medium sized code blocks"
-#~ msgstr "vidējs - lietot vidēja izmēra koda blokus"
-
-#~ msgid "large - use large code blocks"
-#~ msgstr "liels - lietot lielus koda blokus"
-
-#~ msgid "full - One code block per subband"
-#~ msgstr "pilns - Viens koda bloks uz apakšjoslu"
-
-#~ msgid "Enable hierarchical Motion Estimation"
-#~ msgstr "Ieslēgt hierarhisko kustības novērtēšanu"
-
-#~ msgid "Number of levels of downsampling"
-#~ msgstr "Nolašu samazināšanas līmeņu skaits"
-
-#~ msgid ""
-#~ "Number of levels of downsampling in hierarchical motion estimation mode"
-#~ msgstr ""
-#~ "Nolašu samazināšanas līmeņu skaits hierarhiskā kustības novērtēšanas "
-#~ "režīmā"
-
-#~ msgid "Enable Global Motion Estimation"
-#~ msgstr "Ieslēgt globālo kustības novērtēšanu"
-
-#~ msgid "Enable Phase Correlation Estimation"
-#~ msgstr "Ieslēgt fāzes korelācijas novērtēšanu"
-
-#~ msgid "Enable Scene Change Detection"
-#~ msgstr "Ieslēgt ainas maiņas noteikšanu"
-
-#~ msgid "Force Profile"
-#~ msgstr "Piespiest profilu"
-
-#~ msgid "VC2 Low Delay Profile"
-#~ msgstr "VC2 zemas aiztures profils"
-
-#~ msgid "VC2 Simple Profile"
-#~ msgstr "VC2 vienkāršs profils"
-
-#~ msgid "VC2 Main Profile"
-#~ msgstr "VC2 galvenais profils"
-
-#~ msgid "Main Profile"
-#~ msgstr "Galvenais profils"
-
-#~ msgid "Dirac video decoder using libschroedinger"
-#~ msgstr "Dirac video atkodētājs, lietojot libschroedinger"
-
-#~ msgid "Dirac video encoder using libschroedinger"
-#~ msgstr "Dirac video iekodētājs, lietojot libschroedinger"
-
-#~ msgid "Key: "
-#~ msgstr "Atslēga: "
