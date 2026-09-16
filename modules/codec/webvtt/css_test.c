@@ -425,6 +425,55 @@ error:
     return 1;
 }
 
+static int test_important_and_operators(void)
+{
+    const char *css =
+        "values {"
+        "  important-compact: red!important;"
+        "  important-spaced: blue ! important;"
+        "  slash: 1 / 2;"
+        "  comma: foo, bar;"
+        "}\n";
+
+    PARSE_CSS("test_important_and_operators");
+
+    CHECK("important and operators");
+    EXPECT(rule && rule->b_valid);
+
+    const vlc_css_declaration_t *decl = rule->p_declarations;
+
+    EXPECT(decl && !strcmp(decl->psz_property, "important-compact"));
+    EXPECT(decl->expr && decl->expr->i_count == 1);
+    EXPECT(decl->expr->seq[0].term.type == TYPE_IDENTIFIER);
+    EXPECT(!strcmp(decl->expr->seq[0].term.psz, "red"));
+
+    decl = decl->p_next;
+    EXPECT(decl && !strcmp(decl->psz_property, "important-spaced"));
+    EXPECT(decl->expr && decl->expr->i_count == 1);
+    EXPECT(decl->expr->seq[0].term.type == TYPE_IDENTIFIER);
+    EXPECT(!strcmp(decl->expr->seq[0].term.psz, "blue"));
+
+    decl = decl->p_next;
+    EXPECT(decl && !strcmp(decl->psz_property, "slash"));
+    EXPECT(decl->expr && decl->expr->i_count == 2);
+    EXPECT(decl->expr->seq[1].op == '/');
+
+    decl = decl->p_next;
+    EXPECT(decl && !strcmp(decl->psz_property, "comma"));
+    EXPECT(decl->expr && decl->expr->i_count == 2);
+    EXPECT(decl->expr->seq[1].op == ',');
+
+    EXPECT(!decl->p_next);
+
+    vlc_css_parser_Clean(&p);
+    return 0;
+
+error:
+    vlc_css_parser_Clean(&p);
+    return 1;
+}
+
+
 static int test_error_cases(void)
 {
     const char *css =
@@ -476,5 +525,6 @@ int main(void)
            test_pseudo_selectors() ||
            test_combinators() ||
            test_values() ||
+           test_important_and_operators() ||
            test_error_cases();
 }

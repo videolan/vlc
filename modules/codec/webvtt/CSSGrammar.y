@@ -78,7 +78,7 @@ static void yyerror(yyscan_t scanner, vlc_css_parser_t *p, const char *msg)
 
 %}
 
-%expect 7
+%expect 5
 
 %nonassoc LOWEST_PREC
 
@@ -743,14 +743,14 @@ expr:
         if( !vlc_css_expression_AddTerm( $1, ' ', $2 ) )
             YYNOMEM;
     }
-    | expr operator maybe_space term {
+    | expr operator term {
         if( !$1 )
         {
             $$ = NULL;
             YYERROR;
         }
         $$ = $1;
-        if( !vlc_css_expression_AddTerm( $1, '/', $4 ) )
+        if( !vlc_css_expression_AddTerm( $1, $2, $3 ) )
             YYNOMEM;
     }
   ;
