@@ -1655,6 +1655,9 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
             return p_ogg->i_streams ? VLC_SUCCESS : VLC_EGENERIC;
         }
 
+        if( unlikely(p_ogg->i_declared_streams == INT_MAX) )
+            return VLC_EGENERIC;
+
          /* New BOS, so new stream */
         p_ogg->i_declared_streams++;
 
