@@ -1,5 +1,5 @@
 # Estonian translation
-# Copyright (C) 2023 VideoLAN
+# Copyright (C) 2026 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -13,21 +13,22 @@
 # Mihkel Tõnnov <mihhkel@gmail.com>, 2018
 # Mattias Põldaru <mahfiaz@gmail.com>, 2019
 # Andres Traks <andres.traks@gmail.com>, 2021
-# Priit Jõerüüt <transifex@joeruut.com>, 2021
-# Erlend <debcf78e@opayq.com>, 2022
+# Priit Jõerüüt <transifex@joeruut.com>, 2021,2026
+# Erlend <debcf78e@opayq.com>, 2022,2024
 # Priit Uring, 2022
+# Michał Trzebiatowski <michtrz@gmail.com>, 2017
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22-rc1\n"
+"Project-Id-Version: vlc 3.0.24-beta1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2026-06-28 16:08+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
-"Last-Translator: Priit Jõerüüt <transifex@joeruut.com>, 2025\n"
+"Last-Translator: Priit Jõerüüt <transifex@joeruut.com>, 2026\n"
 "Language-Team: Estonian (https://app.transifex.com/yaron/teams/16553/et/)\n"
-"Language: et\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: et\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: include/vlc_common.h:1055
@@ -37,7 +38,7 @@ msgid ""
 "see the file named COPYING for details.\n"
 "Written by the VideoLAN team; see the AUTHORS file.\n"
 msgstr ""
-"See programm tuleb ILMA IGASUGUSE GARANTIITA, määral, mis on seadusega "
+"See programm on saadaval ILMA IGASUGUSE GARANTIITA, määral, mis on seadusega "
 "lubatud.\n"
 "Võid programmi levitada vastavalt GNU Üldisele Avalikule Litsentsile;\n"
 "lisainfo saamiseks vaata faili nimega COPYING.\n"
@@ -1070,24 +1071,20 @@ msgid "Decoded format"
 msgstr "Dekodeeritud vorming"
 
 #: src/input/es_out.c:3207
-#, fuzzy
 msgid "Decoded channels"
-msgstr "Audio kanalid"
+msgstr "Dekodeeritud kanalid"
 
 #: src/input/es_out.c:3212
-#, fuzzy
 msgid "Decoded sample rate"
-msgstr "Audio diskreetimissagedus"
+msgstr "Dekodeeritud diskreetimissagedus"
 
 #: src/input/es_out.c:3219
-#, fuzzy
 msgid "Decoded bits per sample"
-msgstr "Audio bitte diskreedi kohta"
+msgstr "Dekodeeritud bitte diskreedi kohta"
 
 #: src/input/es_out.c:3224
-#, fuzzy
 msgid "Decoded Bitrate"
-msgstr "Dekodeeritud vorming"
+msgstr "Dekodeeritud bitikiirus"
 
 #: src/input/es_out.c:3237
 msgid "Track replay gain"
@@ -3881,7 +3878,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1209
 msgid "These settings are the global VLC key bindings, known as \"hotkeys\"."
-msgstr "Need sätted on globaalsed VLC klahviseosed e kiirklahvid."
+msgstr "Need seadistused on globaalsed VLC klahviseosed e kiirklahvid."
 
 #: src/libvlc-module.c:1214 modules/gui/macosx/VLCMain+OldPrefs.m:120
 msgid "Ignore"
@@ -6275,11 +6272,11 @@ msgstr "[cdda:][seade][@[rada]]"
 
 #: modules/access/cdda.c:1023
 msgid "Musicbrainz Server"
-msgstr ""
+msgstr "Musicbrainzi server"
 
 #: modules/access/cdda.c:1024
 msgid "Address of the musicbrainz server to use."
-msgstr ""
+msgstr "Kasutatava Musicbrainzi serveri aadress."
 
 #: modules/access/cdda.c:1026
 msgid "CDDB Server"
@@ -7972,9 +7969,8 @@ msgid "Bitmask"
 msgstr ""
 
 #: modules/access/rist.c:313
-#, fuzzy
 msgid "Virtual Destination Port Filter"
-msgstr "Sihtfail:"
+msgstr ""
 
 #: modules/access/rist.c:315
 msgid ""
@@ -8274,9 +8270,8 @@ msgid "SFTP port number to use on the server"
 msgstr "Serveril kasutatav SFTP pordi number"
 
 #: modules/access/sftp.c:61
-#, fuzzy
 msgid "Private key file"
-msgstr "Loo uus profiil"
+msgstr ""
 
 #: modules/access/sftp.c:62
 msgid ""
@@ -8421,9 +8416,8 @@ msgid "Password for stream encryption"
 msgstr "Salasõna voogedastuse krüptimiseks"
 
 #: modules/access/srt.c:566
-#, fuzzy
 msgid "SRT Stream ID"
-msgstr "Voog %d"
+msgstr ""
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -9265,18 +9259,16 @@ msgid "Source port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:272
-#, fuzzy
 msgid "Virtual Destination Port"
-msgstr "Voo sihtkoht"
+msgstr ""
 
 #: modules/access_output/rist.c:274
 msgid "Destination port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:281
-#, fuzzy
 msgid "Multipeer mode"
-msgstr "Multiplekser"
+msgstr ""
 
 #: modules/access_output/rist.c:283
 msgid ""
@@ -9285,14 +9277,12 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Duplicate"
-msgstr "Rakendus"
+msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Load balanced"
-msgstr "Punase tasakaal"
+msgstr ""
 
 #: modules/access_output/rist.c:294
 msgid "RIST stream output"
@@ -9397,15 +9387,15 @@ msgstr ""
 
 #: modules/access_output/srt.c:471
 msgid "SRT maximum payload size (bytes)"
-msgstr ""
+msgstr "SRT maksimaalne sisu maht (baitides)"
 
 #: modules/access_output/srt.c:475
 msgid "SRT maximum bandwidth ceiling (bytes)"
-msgstr ""
+msgstr "SRT maksimaalse ribalaiuse ülempiir (baitides)"
 
 #: modules/access_output/srt.c:480
 msgid " SRT Stream ID"
-msgstr ""
+msgstr " SRT voo tunnus"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -9873,7 +9863,7 @@ msgstr "Filtreeri heli kaks korda. See toodab intensiivsema efekti."
 
 #: modules/audio_filter/equalizer.c:76
 msgid "Global gain"
-msgstr "Globaalne tundlikkus"
+msgstr "Üldine tundlikkus"
 
 #: modules/audio_filter/equalizer.c:77
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:220
@@ -10532,7 +10522,7 @@ msgstr "Väljalülitatud"
 
 #: modules/audio_output/mmdevice.c:1517
 msgid "Enabled (AC3/DTS only)"
-msgstr "Kasutusel (vaid AC3/DTS)"
+msgstr "Kasutusel (vaid AC3/DTS puhul)"
 
 #: modules/audio_output/mmdevice.c:1518
 msgid "Enabled"
@@ -11283,7 +11273,7 @@ msgstr ""
 
 #: modules/codec/dav1d.c:56
 msgid "All Layers"
-msgstr ""
+msgstr "Kõik edastuskihid"
 
 #: modules/codec/dav1d.c:57
 msgid "Whether or not to display all spatial layers, default false"
@@ -12484,7 +12474,6 @@ msgstr "Teksti subtiitrite dekooder"
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -13766,12 +13755,12 @@ msgstr "Hiire viipekäskude kontrolli liides"
 #: modules/control/globalhotkeys/xcb.c:50
 #: modules/gui/qt/components/preferences_widgets.cpp:1141
 msgid "Global Hotkeys"
-msgstr "Globaalsed kiirklahvid"
+msgstr "Üldised kiirklahvid"
 
 #: modules/control/globalhotkeys/win32.c:50
 #: modules/control/globalhotkeys/xcb.c:53
 msgid "Global Hotkeys interface"
-msgstr "Globaalsete kiirklahvide liides"
+msgstr "Üldiste kiirklahvide liides"
 
 #: modules/control/hotkeys.c:100
 #: modules/gui/macosx/VLCSimplePrefsController.m:251
@@ -14677,11 +14666,11 @@ msgstr "Faili salvestaja"
 
 #: modules/demux/dirac.c:41
 msgid "Value to adjust dts by"
-msgstr "Väärtus, mille järgi dts-i kohandada"
+msgstr "Väärtus, mille alusel dts-i peaks kohandama"
 
 #: modules/demux/dirac.c:54
 msgid "Dirac video demuxer"
-msgstr "Diracheora video demukser"
+msgstr "Dirac videodemukser"
 
 #: modules/demux/directory.c:94
 msgid "Directory import"
@@ -15560,6 +15549,8 @@ msgid ""
 "Force the subtitles format. Selecting \"auto\" means autodetection and "
 "should always work."
 msgstr ""
+"Saad määrata sundkorras kasutatava subtiitrite vormingu. Kui valik on "
+"„automaatne“, siis peaks automaatne tuvastus alati leidma sobiliku vormingu."
 
 #: modules/demux/subtitle.c:61
 msgid "Override the default track description."
@@ -17195,7 +17186,7 @@ msgstr ""
 #: modules/gui/macosx/VLCPlaylist.m:231
 #: modules/gui/qt/components/playlist/standardpanel.cpp:274
 msgid "Shuffle playlist"
-msgstr ""
+msgstr "Sega esitusloend"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:54
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -18414,7 +18405,7 @@ msgstr " Ctrl-l          Värskenda ekraani"
 
 #: modules/gui/ncurses.c:876
 msgid "[Global]"
-msgstr "[Globaalne]"
+msgstr "[Üldine]"
 
 #: modules/gui/ncurses.c:878
 msgid " q, Q, Esc              Quit"
@@ -19357,7 +19348,7 @@ msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1148
 msgid "Global"
-msgstr "Globaalne"
+msgstr "Üldine"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1149
 msgid "Desktop level hotkey"
@@ -19371,26 +19362,24 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1405
-#, fuzzy
 msgid "Global Hotkey change"
-msgstr "Globaalsed kiirklahvid"
+msgstr "Üldiste kiirklahvide muudatus"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1406
 msgid "Hotkey change"
-msgstr ""
+msgstr "Kiirklahvide muutus"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1410
 msgid "Press the new key or combination for <b>%1</b>"
-msgstr ""
+msgstr "Vajuta uut klahvi või nende kombinatsiooni: <b>%1</b>"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1419
 msgid "Assign"
 msgstr "Määra"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1455
-#, fuzzy
 msgid "Warning: this key or combination is already assigned to \"<b>%1</b>\""
-msgstr "Seda kombinatsiooni kasutab juba \"%@\"."
+msgstr "Hoiatus: klahv on juba määratud toimingule „<b>%1</b>“"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1467
 msgid "Warning: <b>%1</b> is already an application menu shortcut"
@@ -19398,11 +19387,11 @@ msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1490
 msgid "Key or combination: <b>%1</b>"
-msgstr ""
+msgstr "Klahv või nende kombinatsioon: <b>%1</b>"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1498
 msgid "Key: <b>%1</b>"
-msgstr ""
+msgstr "Klahv: <b>%1</b>"
 
 #: modules/gui/qt/components/simple_preferences.cpp:256
 #: modules/gui/qt/components/simple_preferences.cpp:636
@@ -19566,24 +19555,20 @@ msgstr ""
 "*.webm)"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:184
-#, fuzzy
 msgid "This module outputs the stream using the RIST protocol (TR06)."
-msgstr "See moodul saadab ümberkodeeritud voo võrku mms-protokolli kaudu."
+msgstr "See moodul väljastab meediumi voo RIST-protokolli alusel (TR06)."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:186
-#, fuzzy
 msgid "Destination Address"
-msgstr "Sihtkoha eesliide"
+msgstr "Sihtaadress"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:191
-#, fuzzy
 msgid "Destination Port"
-msgstr "Sihtkoht"
+msgstr "Sihtport"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:201
-#, fuzzy
 msgid "Stream Name"
-msgstr "Voo nimi"
+msgstr "Edastusvoo nimi"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:237
 msgid "This module outputs the transcoded stream to a network via HTTP."
@@ -20830,11 +20815,11 @@ msgstr "Kuva ebaolulisi veateadete ja hoiatuste dialooge "
 
 #: modules/gui/qt/qt.cpp:125
 msgid "Enable Dark Mode"
-msgstr ""
+msgstr "Kasuta tumedat kujundust"
 
 #: modules/gui/qt/qt.cpp:126
 msgid "Applies a dark theme to the style."
-msgstr ""
+msgstr "Sellega kasutad kujunduse tumedat varianti."
 
 #: modules/gui/qt/qt.cpp:128
 msgid "Activate the updates availability notification"
@@ -21168,7 +21153,7 @@ msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:692
 msgid "Show indicator"
-msgstr ""
+msgstr "Näita indikaatorit"
 
 #: modules/hw/d3d9/d3d9_filters.c:454
 msgid "Direct3D9 adjust filter"
@@ -22958,7 +22943,7 @@ msgstr "Kopeerimise tükeldaja"
 
 #: modules/packetizer/dirac.c:87
 msgid "Dirac packetizer"
-msgstr "Dirac tükeldaja"
+msgstr "Diraci tükeldaja"
 
 #: modules/packetizer/dts.c:47
 msgid "DTS audio packetizer"
@@ -26804,11 +26789,11 @@ msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:74
 msgid "Video Upscaling Mode"
-msgstr ""
+msgstr "Video suurendamise viis"
 
 #: modules/video_output/win32/direct3d11.c:75
 msgid "Select the upscaling mode for video."
-msgstr ""
+msgstr "Vali sobilik viis video suurendamiseks"
 
 #: modules/video_output/win32/direct3d11.c:80
 msgid "Linear Sampler"
@@ -26828,23 +26813,23 @@ msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:82
 msgid "HDR Output Mode"
-msgstr ""
+msgstr "HDR-i väljundrežiim"
 
 #: modules/video_output/win32/direct3d11.c:83
 msgid "Use HDR output even if the source is SDR."
-msgstr ""
+msgstr "Kasuta HDR-väljundit ka siis, kui sisend on SDR-vormingus."
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Never out HDR"
-msgstr ""
+msgstr "Ära iialgi kasuta HDR-väljundit"
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Always output HDR"
-msgstr ""
+msgstr "Kasuta alati HDR-väljundit"
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Generate HDR from SDR"
-msgstr ""
+msgstr "Loo HDR-väljund SDR-vormingu alusel"
 
 #: modules/video_output/win32/direct3d11.c:92
 msgid "Direct3D11 video output"
@@ -27920,19 +27905,19 @@ msgstr "0.00 dB"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:147
 msgid "Audio Fingerprinting"
-msgstr ""
+msgstr "Helifailide sõrmejäljestamine"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:148
 msgid "Select a matching identity"
-msgstr ""
+msgstr "Vali sobiv identiteet"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:149
 msgid "No fingerprint has been found"
-msgstr ""
+msgstr "Ühtegi sõrmejälge ei leidu"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:150
 msgid "Fingerprinting track..."
-msgstr ""
+msgstr "Sõrmejäljestan lugu…"
 
 #: modules/gui/qt/ui/messages_panel.h:137
 msgid "&Verbosity:"
@@ -28449,7 +28434,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
 msgid "Use a dark palette"
-msgstr ""
+msgstr "Kasuta tumedat värvipaletti"
 
 #: modules/gui/qt/ui/sprefs_interface.h:551
 msgid "Skin resource file:"
@@ -28764,265 +28749,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Meediahalduri loend"
-
-#~ msgid "16 bytes"
-#~ msgstr "16 baiti"
-
-#~ msgid "24 bytes"
-#~ msgstr "24 baiti"
-
-#~ msgid "32 bytes"
-#~ msgstr "32 baiti"
-
-#~ msgid "4:2:0"
-#~ msgstr "4:2:0"
-
-#~ msgid "4:2:2"
-#~ msgstr "4:2:2"
-
-#~ msgid "4:4:4"
-#~ msgstr "4:4:4"
-
-#~ msgid "Rate control method"
-#~ msgstr "Sageduse kontrolli meetod"
-
-#~ msgid "Method used to encode the video sequence"
-#~ msgstr "Meetod selle videojada kodeerimiseks"
-
-#~ msgid "Constant noise threshold mode"
-#~ msgstr "konstantse müra läverežiim"
-
-#~ msgid "Constant bitrate mode (CBR)"
-#~ msgstr "Ühtlase bitikiiruse režiim (CBR)."
-
-#~ msgid "Low Delay mode"
-#~ msgstr "Madala viivituse režiim"
-
-#~ msgid "Lossless mode"
-#~ msgstr "Kadudeta režiim"
-
-#~ msgid "Constant lambda mode"
-#~ msgstr "Konstantse lambda režiim"
-
-#~ msgid "Constant error mode"
-#~ msgstr "Konstantse vea režiim"
-
-#~ msgid "Constant quality mode"
-#~ msgstr "konstantse kvaliteedi režiim"
-
-#~ msgid "GOP structure"
-#~ msgstr "GOP struktuur"
-
-#~ msgid "GOP structure used to encode the video sequence"
-#~ msgstr "GOP-struktuur videojada kodeerimiseks"
-
-#~ msgid "I-frame only sequence"
-#~ msgstr "Ainult I-kaadrite jada"
-
-#~ msgid "Constant quality factor"
-#~ msgstr "Ühtlase kvaliteedi tegur"
-
-#~ msgid "Noise Threshold"
-#~ msgstr "Müra lävi"
-
-#~ msgid "CBR bitrate (kbps)"
-#~ msgstr "CBR bitikiirus (kbps)"
-
-#~ msgid "Target bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "Sihtbitikiirus kbps-des, kui kodeeritakse konstantse bitikiiruse režiimis"
-
-#~ msgid "Maximum bitrate (kbps)"
-#~ msgstr "Maksimaalne bitikiirus (kbps)"
-
-#~ msgid "Maximum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr "Konstantse bitikiiruse režiimis maksimaalne bitikiirus kbps-des"
-
-#~ msgid "Minimum bitrate (kbps)"
-#~ msgstr "Minimaalne bitikiirus (kbps)"
-
-#~ msgid "Minimum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr "Konstantse bitikiiruse režiimis minimaalne bitikiirus kbps-des"
-
-#~ msgid "GOP length"
-#~ msgstr "GOP pikkus"
-
-#~ msgid "Prefilter"
-#~ msgstr "Eelfilter"
-
-#~ msgid "Enable adaptive prefiltering"
-#~ msgstr "Võimalda adaptiivne eelfiltreerimine"
-
-#~ msgid "No pre-filtering"
-#~ msgstr "Ei eel-filtreerita"
-
-#~ msgid "Centre Weighted Median"
-#~ msgstr "Kaalutud keskmediaan"
-
-#~ msgid "Gaussian Low Pass Filter"
-#~ msgstr "Gaussi madala läbimi filter"
-
-#~ msgid "Add Noise"
-#~ msgstr "Lisa müra"
-
-#~ msgid "Gaussian Adaptive Low Pass Filter"
-#~ msgstr "Gaussi adaptiivne madala läbimi filter"
-
-#~ msgid "Low Pass Filter"
-#~ msgstr "Madala läbimi filter"
-
-#~ msgid "Amount of prefiltering"
-#~ msgstr "Eelfiltreerimise kogus"
-
-#~ msgid "Higher value implies more prefiltering"
-#~ msgstr "Kõrgem väärtus eeldab enam eelfiltreerimist"
-
-#~ msgid "Picture coding mode"
-#~ msgstr "Pildi kodeerimise režiim"
-
-#~ msgid ""
-#~ "Field coding is where interlaced fields are coded separately as opposed "
-#~ "to a pseudo-progressive frame"
-#~ msgstr ""
-#~ "Välja kodeeringus kodeeritakse üle rea väljad eraldi, vastupidiselt "
-#~ "pseudo-progressiivsele kaadrile"
-
-#~ msgid "auto - let encoder decide based upon input (Best)"
-#~ msgstr "auto - lase koodril otsustada baseerudes sisendil (parim) "
-
-#~ msgid "force coding frame as single picture"
-#~ msgstr "jõuga kodeeri kaader, kui üksik pilt"
-
-#~ msgid "force coding frame as separate interlaced fields"
-#~ msgstr "jõuga kodeeri kaader, kui eraldi üle rea väli"
-
-#~ msgid "Size of motion compensation blocks"
-#~ msgstr "Liikumise kompensatsiooniblokkide laius"
-
-#~ msgid "automatic - let encoder decide based upon input (Best)"
-#~ msgstr "automaatne - lase koodril otsustada sisendi põhjal (Parim) "
-
-#~ msgid "small - use small motion compensation blocks"
-#~ msgstr "väike - kasuta väikseid liikumise kompensatsiooniblokke"
-
-#~ msgid "medium - use medium motion compensation blocks"
-#~ msgstr "keskmine - kasuta keskmisi liikumise kompensatsiooniblokke"
-
-#~ msgid "large - use large motion compensation blocks"
-#~ msgstr "suured - kasuta suuri liikumise kompensatsiooniblokke"
-
-#~ msgid "Overlap of motion compensation blocks"
-#~ msgstr "Liikumise kompensatsioonibloki ülekate"
-
-#~ msgid "none - Motion compensation blocks do not overlap"
-#~ msgstr "puudub - liikumise kompensatsiooniblokid ei kattu üle"
-
-#~ msgid "partial - Motion compensation blocks only partially overlap"
-#~ msgstr "osaline - liikumise kompensatsiooniblokid kattuvad osaliselt üle"
-
-#~ msgid "full - Motion compensation blocks fully overlap"
-#~ msgstr "täielik - liikumise kompensatsiooniblokid kattuvad täielikult"
-
-#~ msgid "Motion Vector precision"
-#~ msgstr "Liikumisvektori täpsus"
-
-#~ msgid "Motion Vector precision in pels"
-#~ msgstr "Liikumisvektori täpsus pel-des."
-
-#~ msgid "Three component motion estimation"
-#~ msgstr "Kolmekomponendiline liikumise hinnang"
-
-#~ msgid "Use chroma as part of the motion estimation process"
-#~ msgstr "Värvust kasutatakse liikumise hindamisprotsessi osana"
-
-#~ msgid "Intra picture DWT filter"
-#~ msgstr "Intra pildi DWT filter"
-
-#~ msgid "Inter picture DWT filter"
-#~ msgstr "Inter pildi DWT filter"
-
-#~ msgid "Number of DWT iterations"
-#~ msgstr "DWT iteratsioonide arv"
-
-#~ msgid "Also known as DWT levels"
-#~ msgstr "Tuntud ka kui DWT nivood"
-
-#~ msgid "Enable multiple quantizers"
-#~ msgstr "Võimalda mitu kvantijat"
-
-#~ msgid "Enable multiple quantizers per subband (one per codeblock)"
-#~ msgstr "Võimalda mitu kvantijat alamsageduse kohta (üks koodibloki kohta)"
-
-#~ msgid "Disable arithmetic coding"
-#~ msgstr "Keela aritmeetiline kood"
-
-#~ msgid "Use variable length codes instead, useful for very high bitrates"
-#~ msgstr ""
-#~ "Kasuta selle asemel muutuva pikkusega koodi. Kasulik väga suurte "
-#~ "bitikiiruste puhul"
-
-#~ msgid "perceptual weighting method"
-#~ msgstr "Pertseptuaalne kaalumise meetod"
-
-#~ msgid "perceptual distance"
-#~ msgstr "pertseptuaalne distants"
-
-#~ msgid "perceptual distance to calculate perceptual weight"
-#~ msgstr "pertseptuaalne distants arvutamaks pertseptuaalset kõrgust"
-
-#~ msgid "Horizontal slices per frame"
-#~ msgstr "Horisontaalsed viilud kaadri kohta"
-
-#~ msgid "Number of horizontal slices per frame in low delay mode"
-#~ msgstr "Horisontaalsete viilude arv kaadri kohta madala viivituse režiimis"
-
-#~ msgid "Vertical slices per frame"
-#~ msgstr "Vertikaalsed viilud kaadri kohta"
-
-#~ msgid "Number of vertical slices per frame in low delay mode"
-#~ msgstr "Vertikaalsete viilude arv kaadri kohta madala viivituse režiimis"
-
-#~ msgid "small - use small code blocks"
-#~ msgstr "väike - kasuta väikseid koodiblokke"
-
-#~ msgid "medium - use medium sized code blocks"
-#~ msgstr "keskmine - kasuta keskmise suurusega koodiblokke"
-
-#~ msgid "large - use large code blocks"
-#~ msgstr "suur - kasuta suuri koodiblokke"
-
-#~ msgid "Enable hierarchical Motion Estimation"
-#~ msgstr "Võimalda hierarhiline liikumise hindamine"
-
-#~ msgid "Enable Global Motion Estimation"
-#~ msgstr "Võimalda üldine liikumise hinnang"
-
-#~ msgid "Enable Phase Correlation Estimation"
-#~ msgstr "Võimalda faasi korrelatsiooni hinnang"
-
-#~ msgid "Enable Scene Change Detection"
-#~ msgstr "Võimalda stseeni muutmise tuvastamine"
-
-#~ msgid "Force Profile"
-#~ msgstr "Jõuga profiil"
-
-#~ msgid "VC2 Low Delay Profile"
-#~ msgstr "VC2 madala viivitusega profiil"
-
-#~ msgid "VC2 Simple Profile"
-#~ msgstr "VC2 lihtne profiil"
-
-#~ msgid "VC2 Main Profile"
-#~ msgstr "VC2 peamine profiil"
-
-#~ msgid "Main Profile"
-#~ msgstr "Peamine profiil"
-
-#~ msgid "Dirac video decoder using libschroedinger"
-#~ msgstr "Dirac video dekooder kasutades libschroedinger teeki"
-
-#~ msgid "Dirac video encoder using libschroedinger"
-#~ msgstr "Dirac videokooder, kasutab libschroedinger teeki"
-
-#~ msgid "Key: "
-#~ msgstr "Võti: "
