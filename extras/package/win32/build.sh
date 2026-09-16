@@ -128,15 +128,19 @@ fi
 case $ARCH in
     x86_64)
         SHORTARCH="win64"
+        MESON_CPU_FAMILY="x86_64"
         ;;
     i686)
         SHORTARCH="win32"
+        MESON_CPU_FAMILY="x86"
         ;;
     aarch64)
         SHORTARCH="winarm64"
+        MESON_CPU_FAMILY="aarch64"
         ;;
     armv7)
         SHORTARCH="winarm"
+        MESON_CPU_FAMILY="arm"
         ;;
     *)
         usage
@@ -608,7 +612,7 @@ if [ -n "$BUILD_MESON" ]; then
 
     printf '\n[host_machine]\n' >&3
     printf 'system = '"'"'windows'"'"'\n' >&3
-    printf 'cpu_family = '"'"'%s'"'"'\n' "${ARCH}" >&3
+    printf 'cpu_family = '"'"'%s'"'"'\n' "${MESON_CPU_FAMILY}" >&3
     printf 'endian = '"'"'little'"'"'\n' >&3
     printf 'cpu = '"'"'%s'"'"'\n' "${ARCH}" >&3
 
