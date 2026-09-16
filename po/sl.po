@@ -1,5 +1,5 @@
 # Slovenian translation
-# Copyright (C) 2023 VideoLAN
+# Copyright (C) 2026 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -12,18 +12,19 @@
 # Rok Žerdin <zerdin.rok1@gmail.com>, 2017
 # Matej Urbančič <>, 2018
 # Arnold Marko <arnold.marko@gmail.com>, 2023-2025
+# Michał Trzebiatowski <michtrz@gmail.com>, 2018
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22-rc1\n"
+"Project-Id-Version: vlc 3.0.24-beta1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2026-06-28 16:08+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: Arnold Marko <arnold.marko@gmail.com>, 2025\n"
 "Language-Team: Slovenian (https://app.transifex.com/yaron/teams/16553/sl/)\n"
-"Language: sl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: sl\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || "
 "n%100==4 ? 2 : 3);\n"
 
@@ -1079,24 +1080,20 @@ msgid "Decoded format"
 msgstr "Odkodiran zapis"
 
 #: src/input/es_out.c:3207
-#, fuzzy
 msgid "Decoded channels"
-msgstr "Zvokovni kanali"
+msgstr "Odkodirani kanali"
 
 #: src/input/es_out.c:3212
-#, fuzzy
 msgid "Decoded sample rate"
-msgstr "Frekvenca vzorčenja zvoka"
+msgstr "Odkodirana frekvenca vzorčenja"
 
 #: src/input/es_out.c:3219
-#, fuzzy
 msgid "Decoded bits per sample"
-msgstr "Bitna globina zvoka"
+msgstr "Dekodiranih bitov na vzorec"
 
 #: src/input/es_out.c:3224
-#, fuzzy
 msgid "Decoded Bitrate"
-msgstr "Odkodiran zapis"
+msgstr "Dekodirana bitna hitrost"
 
 #: src/input/es_out.c:3237
 msgid "Track replay gain"
@@ -8207,9 +8204,8 @@ msgid "Bitmask"
 msgstr "Bitna maska"
 
 #: modules/access/rist.c:313
-#, fuzzy
 msgid "Virtual Destination Port Filter"
-msgstr "Ciljna datoteka:"
+msgstr ""
 
 #: modules/access/rist.c:315
 msgid ""
@@ -8231,14 +8227,10 @@ msgstr ""
 "RIST največje trepetanje pri razdruževanju/odkodiranju (provzeto je 5ms)"
 
 #: modules/access/rist.c:328
-#, fuzzy
 msgid ""
 "This controls the maximum jitter that will be passed to the demux/decode "
 "chain. The lower the value, the more CPU cycles the module will consume"
 msgstr ""
-"To določa največji trepet (jitter), ki bo posredovan verigi za razdruževanje/"
-"odkodiranje. Manjša kot je vrednost, več ciklov bo potrebnih s strani "
-"algoritma."
 
 #: modules/access/rist.c:332
 msgid "RIST nack type, 0 = range, 1 = bitmask. Default is range"
@@ -8525,9 +8517,8 @@ msgid "SFTP port number to use on the server"
 msgstr "Vrata SFTP za povezavo s strežnikom."
 
 #: modules/access/sftp.c:61
-#, fuzzy
 msgid "Private key file"
-msgstr "Datoteka ključa AES"
+msgstr ""
 
 #: modules/access/sftp.c:62
 msgid ""
@@ -8679,9 +8670,8 @@ msgid "Password for stream encryption"
 msgstr "Geslo za šifriranje pretoka"
 
 #: modules/access/srt.c:566
-#, fuzzy
 msgid "SRT Stream ID"
-msgstr "ID SRT pretoka"
+msgstr ""
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -9550,18 +9540,16 @@ msgid "Source port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:272
-#, fuzzy
 msgid "Virtual Destination Port"
-msgstr "Cilj pretoka"
+msgstr ""
 
 #: modules/access_output/rist.c:274
 msgid "Destination port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:281
-#, fuzzy
 msgid "Multipeer mode"
-msgstr "Zvijalnik"
+msgstr ""
 
 #: modules/access_output/rist.c:283
 msgid ""
@@ -9570,23 +9558,20 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Duplicate"
-msgstr "Program"
+msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Load balanced"
-msgstr "Ravnotežje rdeče barve"
+msgstr ""
 
 #: modules/access_output/rist.c:294
 msgid "RIST stream output"
 msgstr "RIST izhod pretoka"
 
 #: modules/access_output/rist.c:299
-#, fuzzy
 msgid "RIST target payload size (bytes)"
-msgstr "RIST ciljna velikost paketa (bajtov)"
+msgstr ""
 
 #: modules/access_output/shout.c:64
 #: modules/gui/qt/components/sout/sout_widgets.cpp:438
@@ -12907,7 +12892,6 @@ msgstr "Odkodirnik podnapisov Text"
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -15210,11 +15194,11 @@ msgstr "Odlagalnik datotek"
 
 #: modules/demux/dirac.c:41
 msgid "Value to adjust dts by"
-msgstr "Vrednost za prilagajanje DTS"
+msgstr ""
 
 #: modules/demux/dirac.c:54
 msgid "Dirac video demuxer"
-msgstr "Odvijalnik slike Dirac"
+msgstr ""
 
 #: modules/demux/directory.c:94
 msgid "Directory import"
@@ -20018,36 +20002,32 @@ msgstr ""
 "Tipka za brisanje odstrani."
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1405
-#, fuzzy
 msgid "Global Hotkey change"
-msgstr "Sprememba hitre tipke"
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1406
 msgid "Hotkey change"
 msgstr "Sprememba hitre tipke"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1410
-#, fuzzy
 msgid "Press the new key or combination for <b>%1</b>"
-msgstr "Pritisnite novo tipko ali kombinacijo za"
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1419
 msgid "Assign"
 msgstr "Dodeli"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1455
-#, fuzzy
 msgid "Warning: this key or combination is already assigned to \"<b>%1</b>\""
-msgstr "Opozorilo: to kombinacijo tipk že uporablja"
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1467
 msgid "Warning: <b>%1</b> is already an application menu shortcut"
 msgstr "Opozorilo: <b>%1</b> je že bližnjica programskega menija"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1490
-#, fuzzy
 msgid "Key or combination: <b>%1</b>"
-msgstr "Tipka ali kombinacija:"
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1498
 msgid "Key: <b>%1</b>"
@@ -20214,25 +20194,20 @@ msgstr ""
 "Vsebniki (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:184
-#, fuzzy
 msgid "This module outputs the stream using the RIST protocol (TR06)."
 msgstr ""
-"Modul omogoča izhod prekodiranega pretoka v omrežje prek protokola mms."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:186
-#, fuzzy
 msgid "Destination Address"
-msgstr "Predpona cilja"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:191
-#, fuzzy
 msgid "Destination Port"
-msgstr "Cilj"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:201
-#, fuzzy
 msgid "Stream Name"
-msgstr "Ime pretoka"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:237
 msgid "This module outputs the transcoded stream to a network via HTTP."
@@ -23734,7 +23709,7 @@ msgstr "Paketnik Copy"
 
 #: modules/packetizer/dirac.c:87
 msgid "Dirac packetizer"
-msgstr "Paketnik Dirac"
+msgstr ""
 
 #: modules/packetizer/dts.c:47
 msgid "DTS audio packetizer"
@@ -29770,382 +29745,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Seznam upravljalnika vsebin"
-
-#~ msgid "RIST maximum packet size (bytes)"
-#~ msgstr "RIST največja velikost paketov (bajtov)"
-
-#~ msgid "RIST latency (ms)"
-#~ msgstr "RIST zakasnitev (ms)"
-
-#~ msgid "RIST nack retry interval (ms)"
-#~ msgstr "RIST interval med  ponovnim NACK poskusom (ms)"
-
-#~ msgid "RIST reorder buffer (ms)"
-#~ msgstr "RIST prerazvrstitveni medpomnilnik (ms)"
-
-#~ msgid "RIST maximum retry count"
-#~ msgstr "RIST največje število ponovnih poskusov"
-
-#~ msgid "Disable NACK output packets"
-#~ msgstr "Izklopi NACK izhodne pakete"
-
-#~ msgid "Use this to disable packet recovery"
-#~ msgstr "Uporabite to za izklop obnavljanja paketov"
-
-#~ msgid "Do not check for a valid rtcp message from the encoder"
-#~ msgstr "Ne preverjaj veljavnosti rtcp sporočil kodirnika"
-
-#~ msgid ""
-#~ "Send nack messages even when we have not confirmed that the encoder is on "
-#~ "our local network."
-#~ msgstr ""
-#~ "Pošlji NACK sporočila, četudi ni bilo potrjeno, da se kodirnik nahaja v "
-#~ "lokalnem omrežju"
-
-#~ msgid "16 bytes"
-#~ msgstr "16-bajtno"
-
-#~ msgid "24 bytes"
-#~ msgstr "24-bajtno"
-
-#~ msgid "32 bytes"
-#~ msgstr "32-bajtno"
-
-#~ msgid "RIST data output caching size (ms)"
-#~ msgstr "RIST velikost predpomnilnika za podatkovni izhod"
-
-#~ msgid ""
-#~ "Having this cache will guarantee that the packets going out are delivered "
-#~ "at a spacing determined by the chain timestamps thus ensuring a near "
-#~ "jitter free output. Be aware that this setting will also add to the "
-#~ "overall latency of the stream."
-#~ msgstr ""
-#~ "Predpomnilnik zagotavlja, da bodo izhodni paketi dostavljeni s "
-#~ "presledkom, kot ga določa časovni žig verige, kar poskrbi zaizohd, ki je "
-#~ "tako rekoč brez trepetanj (jitter). Ta nastavitev poveča zakasnitev "
-#~ "pretoka."
-
-#~ msgid "RIST retry-buffer queue size (ms)"
-#~ msgstr "RIST velikost mepomnilnika za ponovni poskus (ms)"
-
-#~ msgid ""
-#~ "This must match the buffer size (latency) configured on the server side. "
-#~ "If you are not sure, leave the default of 0 which will set it the maximum "
-#~ "value and will use about 100MB of RAM"
-#~ msgstr ""
-#~ "Ta vrednost mora biti enaka velikosti medpomnilnika (zakasnitvi) na "
-#~ "strani strežnika. Če niste prepričani, uporabite vrednost 0, ki uporabi "
-#~ "največjo vrednost in porabi okoli 100MB pomnilnika RAM."
-
-#~ msgid "SSRC used in RTP output (default is random, i.e. 0)"
-#~ msgstr ""
-#~ "SSRC uporabljen v RTP izhodu (privzeta je naključna vrednost, to je 0)"
-
-#~ msgid ""
-#~ "Use this setting to specify a known SSRC for the RTP header. This is only "
-#~ "useful if your receiver acts on it. When using VLC as receiver, it is not."
-#~ msgstr ""
-#~ "Uporabite to nastavitev za določitev znanega SSRC za RPT glavo. To je "
-#~ "uporabno le v primeru, da sprejemnik na to reagira. V primeru rabe VLC "
-#~ "temu ni tako."
-
-#~ msgid ""
-#~ "This Stream name will be sent to the receiver using the rist RTCP channel"
-#~ msgstr "To ime pretoka bo poslano sprejemniku preko RIST RTCP kanala"
-
-#~ msgid "4:2:0"
-#~ msgstr "4:2:0"
-
-#~ msgid "4:2:2"
-#~ msgstr "4:2:2"
-
-#~ msgid "4:4:4"
-#~ msgstr "4:4:4"
-
-#~ msgid "Rate control method"
-#~ msgstr "Metoda nadzora hitrosti"
-
-#~ msgid "Method used to encode the video sequence"
-#~ msgstr "Metoda, ki se uporablja za kodiranje zaporedja sličic"
-
-#~ msgid "Constant noise threshold mode"
-#~ msgstr "Način praga stalnega šuma"
-
-#~ msgid "Constant bitrate mode (CBR)"
-#~ msgstr "Način stalne bitne hitrosti (CBR)"
-
-#~ msgid "Low Delay mode"
-#~ msgstr "Način z majhnim zamikom"
-
-#~ msgid "Lossless mode"
-#~ msgstr "Način brez izgub"
-
-#~ msgid "Constant lambda mode"
-#~ msgstr "Stalni način lambda"
-
-#~ msgid "Constant error mode"
-#~ msgstr "Način stalnih napak"
-
-#~ msgid "Constant quality mode"
-#~ msgstr "Način stalne kakovosti"
-
-#~ msgid "GOP structure"
-#~ msgstr "GOP struktura"
-
-#~ msgid "GOP structure used to encode the video sequence"
-#~ msgstr "Zgradba GOP, ki se uporablja za kodiranja zaporedja sličic"
-
-#~ msgid ""
-#~ "No fixed gop structure. A picture can be intra or inter and refer to "
-#~ "previous or future pictures."
-#~ msgstr ""
-#~ "Brez stalne zgradbe skupine sličic (GOP). Slika je lahko intra ali inter "
-#~ "in se sklicuje na prejšnje ali prihodnje slike."
-
-#~ msgid "I-frame only sequence"
-#~ msgstr "Zaporedje samo sličic I"
-
-#~ msgid "Inter pictures refere to previous pictures only"
-#~ msgstr "Slike inter se sklicujejo samo na prejšnje slike"
-
-#~ msgid "Inter pictures can refer to previous or future pictures"
-#~ msgstr "Slike inter se sklicujejo na prejšnje in prihodnje slike"
-
-#~ msgid "Constant quality factor"
-#~ msgstr "Vrednost stalne kakovosti"
-
-#~ msgid "Quality factor to use in constant quality mode"
-#~ msgstr "Faktor kakovosti, ki se uporablja v načinu stalne kakovosti"
-
-#~ msgid "Noise Threshold"
-#~ msgstr "Prag šuma"
-
-#~ msgid "Noise threshold to use in constant noise threshold mode"
-#~ msgstr "Prag šuma uporabljen za način neprekinjenega praga šuma"
-
-#~ msgid "CBR bitrate (kbps)"
-#~ msgstr "Bitna hitrost CBR (kbps)"
-
-#~ msgid "Target bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "Ciljna bitna hitrost v kb/s med kodiranjem v načinu konstantne bitne "
-#~ "hitrosti"
-
-#~ msgid "Maximum bitrate (kbps)"
-#~ msgstr "Maksimalna bitna hitrost (kb/s)"
-
-#~ msgid "Maximum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "Maksimalna bitna hitrost v kb/s med kodiranjem v načinu konstantne bitne "
-#~ "hitrosti"
-
-#~ msgid "Minimum bitrate (kbps)"
-#~ msgstr "Najmanjša bitna hitrost (kb/s)"
-
-#~ msgid "Minimum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "Najmanjša sprejemljiva bitna hitrost v kb/s med kodiranjem v načinu "
-#~ "konstantne bitne hitrosti"
-
-#~ msgid "GOP length"
-#~ msgstr "GOP dolžina"
-
-#~ msgid ""
-#~ "Number of pictures between successive sequence headers i.e. length of the "
-#~ "group of pictures"
-#~ msgstr ""
-#~ "Število sličic med zaporednimi glavami zaporedja - dolžina skupine sličic"
-
-#~ msgid "Prefilter"
-#~ msgstr "Predfilter"
-
-#~ msgid "Enable adaptive prefiltering"
-#~ msgstr "Omogoči prilagodljivo predfiltriranje"
-
-#~ msgid "No pre-filtering"
-#~ msgstr "Brez predfiltriranja"
-
-#~ msgid "Centre Weighted Median"
-#~ msgstr "Uravnotežena sredina"
-
-#~ msgid "Gaussian Low Pass Filter"
-#~ msgstr "Gaussov nizkopropustni filter"
-
-#~ msgid "Add Noise"
-#~ msgstr "Dodaj šum"
-
-#~ msgid "Gaussian Adaptive Low Pass Filter"
-#~ msgstr "Gaussov prilagodljivi nizkopropustni filter"
-
-#~ msgid "Low Pass Filter"
-#~ msgstr "Nizkopropustni filter"
-
-#~ msgid "Amount of prefiltering"
-#~ msgstr "Količina predfiltriranja"
-
-#~ msgid "Higher value implies more prefiltering"
-#~ msgstr "Večja vrednost določa več predfiltriranja"
-
-#~ msgid "Picture coding mode"
-#~ msgstr "Način kodiranja slike"
-
-#~ msgid ""
-#~ "Field coding is where interlaced fields are coded separately as opposed "
-#~ "to a pseudo-progressive frame"
-#~ msgstr ""
-#~ "Pri kodiranju polja se prepletena polja kodirajo posebej v nasprotju s "
-#~ "psevdo progresivnimi sličicami"
-
-#~ msgid "auto - let encoder decide based upon input (Best)"
-#~ msgstr "samodejno – kodirnik se odloča glede na vhod (priporočljivo)"
-
-#~ msgid "force coding frame as single picture"
-#~ msgstr "vsili kodiranje sličice kot samostojne slike"
-
-#~ msgid "force coding frame as separate interlaced fields"
-#~ msgstr "vsili sličico za kodiranje kot ločena prepletena polja"
-
-#~ msgid "Size of motion compensation blocks"
-#~ msgstr "Velikost blokov poravnave gibanja"
-
-#~ msgid "automatic - let encoder decide based upon input (Best)"
-#~ msgstr "samodejno – kodirnik določi glede na vhod (priporočljivo)"
-
-#~ msgid "small - use small motion compensation blocks"
-#~ msgstr "majhna - uporaba majhnih blokov poravnave gibanja"
-
-#~ msgid "medium - use medium motion compensation blocks"
-#~ msgstr "srednja - uporaba srednjih blokov poravnave gibanja"
-
-#~ msgid "large - use large motion compensation blocks"
-#~ msgstr "velika - uporaba velikih blokov poravnave gibanja"
-
-#~ msgid "Overlap of motion compensation blocks"
-#~ msgstr "Prekrivanje blokov poravnave gibanja"
-
-#~ msgid "none - Motion compensation blocks do not overlap"
-#~ msgstr "brez - bloki poravnave gibanja se ne prekrivajo"
-
-#~ msgid "partial - Motion compensation blocks only partially overlap"
-#~ msgstr "delno - bloki poravnave gibanja se delno prekrivajo"
-
-#~ msgid "full - Motion compensation blocks fully overlap"
-#~ msgstr "popolno - bloki poravnave gibanja se popolnoma prekrivajo"
-
-#~ msgid "Motion Vector precision"
-#~ msgstr "Natančnost vektorja gibanja"
-
-#~ msgid "Motion Vector precision in pels"
-#~ msgstr "Natančnost vektorja gibanja v sl. točkah"
-
-#~ msgid "Three component motion estimation"
-#~ msgstr "Tridelno predvidevanje gibanja"
-
-#~ msgid "Use chroma as part of the motion estimation process"
-#~ msgstr "Uporabi barve v postopku predvidevanja gibanja"
-
-#~ msgid "Intra picture DWT filter"
-#~ msgstr "Filtri Intra picture DWT"
-
-#~ msgid "Inter picture DWT filter"
-#~ msgstr "Filtri Inter picture DWT"
-
-#~ msgid "Number of DWT iterations"
-#~ msgstr "Število DWT ponovitev"
-
-#~ msgid "Also known as DWT levels"
-#~ msgstr "Znane kot DWT ravni"
-
-#~ msgid "Enable multiple quantizers"
-#~ msgstr "Omogoči več delilnikov"
-
-#~ msgid "Enable multiple quantizers per subband (one per codeblock)"
-#~ msgstr ""
-#~ "Omogoči več delilnikov na pasovno širino (en delilnik na kodni blok)"
-
-#~ msgid "Disable arithmetic coding"
-#~ msgstr "Onemogoči aritmetično kodiranje"
-
-#~ msgid "Use variable length codes instead, useful for very high bitrates"
-#~ msgstr ""
-#~ "Uporaba spremenljive dolžine kode, uporabna pri visokih bitnih hitrostih"
-
-#~ msgid "perceptual weighting method"
-#~ msgstr "način zaznanega tehtanja"
-
-#~ msgid "perceptual distance"
-#~ msgstr "zaznana oddaljenost"
-
-#~ msgid "perceptual distance to calculate perceptual weight"
-#~ msgstr "zaznana oddaljenost za računanje zaznane teže"
-
-#~ msgid "Horizontal slices per frame"
-#~ msgstr "vodoravnih rezin na sličico"
-
-#~ msgid "Number of horizontal slices per frame in low delay mode"
-#~ msgstr "Število vodoravnih rezin na sličico v načinu nizke zakasnitve"
-
-#~ msgid "Vertical slices per frame"
-#~ msgstr "navpičnih rezin na sličico"
-
-#~ msgid "Number of vertical slices per frame in low delay mode"
-#~ msgstr "Število navpičnih rezin na sličico v načinu nizke zakasnitve"
-
-#~ msgid "Size of code blocks in each subband"
-#~ msgstr "Velikost blokov kode v vsakem podpasu"
-
-#~ msgid "small - use small code blocks"
-#~ msgstr "majhna - uporaba majhnih blokov kode"
-
-#~ msgid "medium - use medium sized code blocks"
-#~ msgstr "srednja - uporaba srednjih blokov kode"
-
-#~ msgid "large - use large code blocks"
-#~ msgstr "velika - uporaba velikih blokov kode"
-
-#~ msgid "full - One code block per subband"
-#~ msgstr "popolna - en blok kode na podpas"
-
-#~ msgid "Enable hierarchical Motion Estimation"
-#~ msgstr "Omogoči predvidevanje hierarhičnega gibanja"
-
-#~ msgid "Number of levels of downsampling"
-#~ msgstr "Število ravni podvzorčenja"
-
-#~ msgid ""
-#~ "Number of levels of downsampling in hierarchical motion estimation mode"
-#~ msgstr ""
-#~ "Število ravni vzorčenja navzdol v načinu ocenjevanja hierarhičnega gibanja"
-
-#~ msgid "Enable Global Motion Estimation"
-#~ msgstr "Omogoči oceno splošnega gibanja"
-
-#~ msgid "Enable Phase Correlation Estimation"
-#~ msgstr "Omogoči oceno soodnosa faze"
-
-#~ msgid "Enable Scene Change Detection"
-#~ msgstr "Omogoči zaznavanje spremembe prizora"
-
-#~ msgid "Force Profile"
-#~ msgstr "Vsili profil"
-
-#~ msgid "VC2 Low Delay Profile"
-#~ msgstr "Prifil nizke nazaksnitve VC2"
-
-#~ msgid "VC2 Simple Profile"
-#~ msgstr "Preprost profil VC2"
-
-#~ msgid "VC2 Main Profile"
-#~ msgstr "Glavni profil VC2"
-
-#~ msgid "Main Profile"
-#~ msgstr "Glavni profil"
-
-#~ msgid "Dirac video decoder using libschroedinger"
-#~ msgstr "Odkodirnik slike Dirac (libschroedinger)"
-
-#~ msgid "Dirac video encoder using libschroedinger"
-#~ msgstr "Kodirnik slike Dirac (libschroedinger)"
-
-#~ msgid "Key: "
-#~ msgstr "Tipka: "
