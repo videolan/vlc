@@ -250,11 +250,7 @@ bool ThemeLoader::unarchive( const std::string& fileName, const std::string &tem
                 return false;
             }
 
-            /* avoid bypassing uri resolve with query */
-            if( strchr( child->psz_name, '?' ) || strchr( child->psz_name, '#' ) )
-                return false;
-
-#if defined( _WIN32 )
+#if defined( _WIN32 ) || defined( __OS2__ )
             if( strchr( child->psz_name, '\\' ) )
                 return false;
 #endif
@@ -267,11 +263,23 @@ bool ThemeLoader::unarchive( const std::string& fileName, const std::string &tem
             if( base_uri.empty() || base_uri.back() != '/' )
                 base_uri += '/';
 
-            auto ref = make_cstr_ptr( vlc_uri_fixup( child->psz_name ) );
-            if( !ref )
-                return false;
+            /* URI metacharacters in member names are filename data. */
+            std::string ref;
+            for( const char *component = child->psz_name; *component; )
+            {
+                size_t len = strcspn( component, "/" );
+                auto encoded = make_cstr_ptr( vlc_uri_encode(
+                    std::string( component, len ).c_str() ) );
+                if( !encoded )
+                    return false;
 
-            auto resolved = make_cstr_ptr( vlc_uri_resolve( base_uri.c_str(), ref.get() ) );
+                ref += encoded.get();
+                component += len;
+                if( *component == '/' )
+                    ref += *component++;
+            }
+
+            auto resolved = make_cstr_ptr( vlc_uri_resolve( base_uri.c_str(), ref.c_str() ) );
             if( !resolved )
                 return false;
 
@@ -281,10 +289,6 @@ bool ThemeLoader::unarchive( const std::string& fileName, const std::string &tem
                 return false;
             }
 
-#if defined( _WIN32 )
-            if( strchr( child->psz_name, '\\' ) != nullptr )
-                return false;
-#endif
             /* Use the path validated through the uri resolution */
 
             auto out_path = tempPath + "/" + child->psz_name;
