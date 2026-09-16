@@ -1,23 +1,24 @@
 # Malay translation
-# Copyright (C) 2023 VideoLAN
+# Copyright (C) 2026 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# abuyop <abuyop@gmail.com>, 2013-2023
+# abuyop <abuyop@gmail.com>, 2013-2024
 # Mahrazi Mohd Kamal <mahrazi@gmail.com>, 2006,2013-2014
 # Timothy “Glash” Wong <timty97@gmail.com>, 2017
+# Michał Trzebiatowski <michtrz@gmail.com>, 2018
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22-rc1\n"
+"Project-Id-Version: vlc 3.0.24-beta1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2026-06-28 16:08+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: abuyop <abuyop@gmail.com>, 2024\n"
 "Language-Team: Malay (https://app.transifex.com/yaron/teams/16553/ms/)\n"
-"Language: ms\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: ms\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #: include/vlc_common.h:1055
@@ -1062,24 +1063,20 @@ msgid "Decoded format"
 msgstr "Format penyahkod"
 
 #: src/input/es_out.c:3207
-#, fuzzy
 msgid "Decoded channels"
-msgstr "Saluran audio"
+msgstr ""
 
 #: src/input/es_out.c:3212
-#, fuzzy
 msgid "Decoded sample rate"
-msgstr "Kadar persampelan audio"
+msgstr ""
 
 #: src/input/es_out.c:3219
-#, fuzzy
 msgid "Decoded bits per sample"
-msgstr "Bit audio per sampel"
+msgstr ""
 
 #: src/input/es_out.c:3224
-#, fuzzy
 msgid "Decoded Bitrate"
-msgstr "Format penyahkod"
+msgstr ""
 
 #: src/input/es_out.c:3237
 msgid "Track replay gain"
@@ -8154,9 +8151,8 @@ msgid "Bitmask"
 msgstr "Topeng bit"
 
 #: modules/access/rist.c:313
-#, fuzzy
 msgid "Virtual Destination Port Filter"
-msgstr "Fail destinasi:"
+msgstr ""
 
 #: modules/access/rist.c:315
 msgid ""
@@ -8177,14 +8173,10 @@ msgid "RIST demux/decode maximum jitter (default is 5ms)"
 msgstr "Ketaran maksimum demux/nyahkod RIST (lalai ialah 5ms)"
 
 #: modules/access/rist.c:328
-#, fuzzy
 msgid ""
 "This controls the maximum jitter that will be passed to the demux/decode "
 "chain. The lower the value, the more CPU cycles the module will consume"
 msgstr ""
-"Tindakan ini mengawal ketaran maksimum yang akan dilepasi ke rantaian demux/"
-"nyahkod. Semakin rendah nilai, semakin banyak algoritma kitaran CPU akan "
-"digunakan"
 
 #: modules/access/rist.c:332
 msgid "RIST nack type, 0 = range, 1 = bitmask. Default is range"
@@ -8474,9 +8466,8 @@ msgid "SFTP port number to use on the server"
 msgstr "Nombor port SFTP untuk digunakan pada pelayan"
 
 #: modules/access/sftp.c:61
-#, fuzzy
 msgid "Private key file"
-msgstr "Fail kekunci AES"
+msgstr ""
 
 #: modules/access/sftp.c:62
 msgid ""
@@ -8627,9 +8618,8 @@ msgid "Password for stream encryption"
 msgstr "Kata laluan untuk penyulitan strim"
 
 #: modules/access/srt.c:566
-#, fuzzy
 msgid "SRT Stream ID"
-msgstr "Output strim SRT"
+msgstr ""
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -9496,18 +9486,16 @@ msgid "Source port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:272
-#, fuzzy
 msgid "Virtual Destination Port"
-msgstr "Destinasi Strim"
+msgstr ""
 
 #: modules/access_output/rist.c:274
 msgid "Destination port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:281
-#, fuzzy
 msgid "Multipeer mode"
-msgstr "Multiplexer"
+msgstr ""
 
 #: modules/access_output/rist.c:283
 msgid ""
@@ -9516,23 +9504,20 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Duplicate"
-msgstr "Aplikasi"
+msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Load balanced"
-msgstr "Imbangan merah"
+msgstr ""
 
 #: modules/access_output/rist.c:294
 msgid "RIST stream output"
 msgstr "Output strim RIST"
 
 #: modules/access_output/rist.c:299
-#, fuzzy
 msgid "RIST target payload size (bytes)"
-msgstr "Saiz paket sasaran RIST (bait)"
+msgstr ""
 
 #: modules/access_output/shout.c:64
 #: modules/gui/qt/components/sout/sout_widgets.cpp:438
@@ -12860,7 +12845,6 @@ msgstr "Pengekod sarikata teks"
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -13302,7 +13286,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, fuzzy
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -15154,11 +15137,11 @@ msgstr "Penghumban fail"
 
 #: modules/demux/dirac.c:41
 msgid "Value to adjust dts by"
-msgstr "Nilai untuk laras dts"
+msgstr ""
 
 #: modules/demux/dirac.c:54
 msgid "Dirac video demuxer"
-msgstr "Demuxer video Dirac"
+msgstr ""
 
 #: modules/demux/directory.c:94
 msgid "Directory import"
@@ -19951,36 +19934,32 @@ msgstr ""
 "Padam kekunci untuk buang."
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1405
-#, fuzzy
 msgid "Global Hotkey change"
-msgstr "Kekunci panas berubah"
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1406
 msgid "Hotkey change"
 msgstr "Kekunci panas berubah"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1410
-#, fuzzy
 msgid "Press the new key or combination for <b>%1</b>"
-msgstr "Tekan kekunci atau gabungan baharu untuk"
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1419
 msgid "Assign"
 msgstr "Umpuk"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1455
-#, fuzzy
 msgid "Warning: this key or combination is already assigned to \"<b>%1</b>\""
-msgstr "Amaran: kekunci atau gabungan ini sudah diumpuk ke"
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1467
 msgid "Warning: <b>%1</b> is already an application menu shortcut"
 msgstr "Amaran: <b>%1</b> adalah pintasan menu aplikasi"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1490
-#, fuzzy
 msgid "Key or combination: <b>%1</b>"
-msgstr "Kekunci atau gabungan:"
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1498
 msgid "Key: <b>%1</b>"
@@ -20149,25 +20128,20 @@ msgstr ""
 "Kontena (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:184
-#, fuzzy
 msgid "This module outputs the stream using the RIST protocol (TR06)."
 msgstr ""
-"Modul ini outputkan strim bertranskod ke rangkaian melalui protokol mms."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:186
-#, fuzzy
 msgid "Destination Address"
-msgstr "Awalan destinasi"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:191
-#, fuzzy
 msgid "Destination Port"
-msgstr "Destinasi"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:201
-#, fuzzy
 msgid "Stream Name"
-msgstr "Nama Strim"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:237
 msgid "This module outputs the transcoded stream to a network via HTTP."
@@ -23677,7 +23651,7 @@ msgstr "Salin pempaket"
 
 #: modules/packetizer/dirac.c:87
 msgid "Dirac packetizer"
-msgstr "Pempaket Dirac"
+msgstr ""
 
 #: modules/packetizer/dts.c:47
 msgid "DTS audio packetizer"
@@ -29700,380 +29674,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Senarai Pengurus Media"
-
-#~ msgid "RIST maximum packet size (bytes)"
-#~ msgstr "Saiz paket maksimum RIST (bait)"
-
-#~ msgid "RIST latency (ms)"
-#~ msgstr "Kependaman RIST (ms)"
-
-#~ msgid "RIST nack retry interval (ms)"
-#~ msgstr "Sela cuba semula nack RIST (ms)"
-
-#~ msgid "RIST reorder buffer (ms)"
-#~ msgstr "Penimbal tertib semula RIST (ms)"
-
-#~ msgid "RIST maximum retry count"
-#~ msgstr "Kiraan cuba semula maksimum RIST"
-
-#~ msgid "Disable NACK output packets"
-#~ msgstr "Lumpuhkan paket output NACK"
-
-#~ msgid "Use this to disable packet recovery"
-#~ msgstr "Guna ini untuk melumpuhkan pemulihan paket"
-
-#~ msgid "Do not check for a valid rtcp message from the encoder"
-#~ msgstr "Jangan periksa untuk dapatkan mesej rtcp sah daripada pengekod"
-
-#~ msgid ""
-#~ "Send nack messages even when we have not confirmed that the encoder is on "
-#~ "our local network."
-#~ msgstr ""
-#~ "Hantar mesej nack walaupun tidak disahkan pengekod berada dalam rangkaian "
-#~ "setempat kita."
-
-#~ msgid "16 bytes"
-#~ msgstr "16 bait"
-
-#~ msgid "24 bytes"
-#~ msgstr "24 bait"
-
-#~ msgid "32 bytes"
-#~ msgstr "32 bait"
-
-#~ msgid "RIST data output caching size (ms)"
-#~ msgstr "Saiz cache output data RIST (ms)"
-
-#~ msgid ""
-#~ "Having this cache will guarantee that the packets going out are delivered "
-#~ "at a spacing determined by the chain timestamps thus ensuring a near "
-#~ "jitter free output. Be aware that this setting will also add to the "
-#~ "overall latency of the stream."
-#~ msgstr ""
-#~ "Dengan adanya cache akan menjamin paket-paket dihantar pada jarak yang "
-#~ "ditentukan oleh setem masa rantaian, maka memastikan output hampir bebas "
-#~ "ketaran. Hati-hati tetapan ini juga menambah kependaman keseluruhan bagi "
-#~ "strim."
-
-#~ msgid "RIST retry-buffer queue size (ms)"
-#~ msgstr "Saiz baris gilir penimbal-cuba-semula RIST (ms)"
-
-#~ msgid ""
-#~ "This must match the buffer size (latency) configured on the server side. "
-#~ "If you are not sure, leave the default of 0 which will set it the maximum "
-#~ "value and will use about 100MB of RAM"
-#~ msgstr ""
-#~ "Ia mesti sepadan dengan saiz penimbal (kependaman) yang dikonfigur pada "
-#~ "sisi pelayan. Jika anda tidak pasti, biarkan lalai iaitu 0, ia menetapkan "
-#~ "nilai maksimum dan akan menggunakan kira-kira 100MB RAM"
-
-#~ msgid "SSRC used in RTP output (default is random, i.e. 0)"
-#~ msgstr "SSRC digunakan dalam output RTP (lalai adalah rawak, iaitu 0)"
-
-#~ msgid ""
-#~ "Use this setting to specify a known SSRC for the RTP header. This is only "
-#~ "useful if your receiver acts on it. When using VLC as receiver, it is not."
-#~ msgstr ""
-#~ "Guna tetapan ini untuk menyatakan SSRC yang diketahui untuk pengepala "
-#~ "RTP. Ia hanya berguna jika penerima bertindak ke atasnya. Bila "
-#~ "menggunakan VLC sebagai penerima, ia tidak berlaku."
-
-#~ msgid ""
-#~ "This Stream name will be sent to the receiver using the rist RTCP channel"
-#~ msgstr ""
-#~ "Nama strim ini akan dihantar kepada penerima menggunakan saluran RTCP"
-
-#~ msgid "4:2:0"
-#~ msgstr "4:2:0"
-
-#~ msgid "4:2:2"
-#~ msgstr "4:2:2"
-
-#~ msgid "4:4:4"
-#~ msgstr "4:4:4"
-
-#~ msgid "Rate control method"
-#~ msgstr "Kaedah kawalan kadar"
-
-#~ msgid "Method used to encode the video sequence"
-#~ msgstr "Kaedah yang digunakan untuk mengekod jujukan video"
-
-#~ msgid "Constant noise threshold mode"
-#~ msgstr "Mod ambang hingar malar"
-
-#~ msgid "Constant bitrate mode (CBR)"
-#~ msgstr "Mod kadar bit malar (CBR)"
-
-#~ msgid "Low Delay mode"
-#~ msgstr "Mod Lengah Rendah"
-
-#~ msgid "Lossless mode"
-#~ msgstr "Mod Tak Hilang"
-
-#~ msgid "Constant lambda mode"
-#~ msgstr "Mod lambda malar"
-
-#~ msgid "Constant error mode"
-#~ msgstr "Mod ralat malar"
-
-#~ msgid "Constant quality mode"
-#~ msgstr "Mod jkualiti malar"
-
-#~ msgid "GOP structure"
-#~ msgstr "Struktur GOP"
-
-#~ msgid "GOP structure used to encode the video sequence"
-#~ msgstr "Struktur GOP yang digunakan untuk mengekod jujukan video"
-
-#~ msgid ""
-#~ "No fixed gop structure. A picture can be intra or inter and refer to "
-#~ "previous or future pictures."
-#~ msgstr ""
-#~ "Tiada struktur gop tetap. Gambar boleh jadi intra atau inter dan rujuk ke "
-#~ "gambar terdahulu atau akan datang."
-
-#~ msgid "I-frame only sequence"
-#~ msgstr "Jujukan I-frame sahaja"
-
-#~ msgid "Inter pictures refere to previous pictures only"
-#~ msgstr "Gambar inter dirujuk ke gambar terdahulu sahaja"
-
-#~ msgid "Inter pictures can refer to previous or future pictures"
-#~ msgstr "Gambar inter boleh dirujuk ke gambar terdahulu atau akan datang"
-
-#~ msgid "Constant quality factor"
-#~ msgstr "Faktor kualiti malar"
-
-#~ msgid "Quality factor to use in constant quality mode"
-#~ msgstr "Faktor kualiti yang digunakan dalam mod kualiti malar"
-
-#~ msgid "Noise Threshold"
-#~ msgstr "Ambang Hingar"
-
-#~ msgid "Noise threshold to use in constant noise threshold mode"
-#~ msgstr "Ambang hingar yang digunakan dalam mod ambang hingar malar"
-
-#~ msgid "CBR bitrate (kbps)"
-#~ msgstr "Kadar bit CBR (kbps)"
-
-#~ msgid "Target bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "Kadar bit sasaran dalam kbps bila mengekod dalam mod kadar bit malar"
-
-#~ msgid "Maximum bitrate (kbps)"
-#~ msgstr "Kad bit maksimum (kbps)"
-
-#~ msgid "Maximum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "Kadar bit maksimum dalam kbps bila mengekod dalam mod kadar bit malar"
-
-#~ msgid "Minimum bitrate (kbps)"
-#~ msgstr "Kadar bit minimum (kbps)"
-
-#~ msgid "Minimum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "Kadar bit minimum dalam kbps bila mengekod dalam mod kadar bit malar"
-
-#~ msgid "GOP length"
-#~ msgstr "Panjang GOP"
-
-#~ msgid ""
-#~ "Number of pictures between successive sequence headers i.e. length of the "
-#~ "group of pictures"
-#~ msgstr ""
-#~ "Bilangan gambar diantar pengepala jujukan yang berjaya iaitu panjang "
-#~ "kumpulan gambar"
-
-#~ msgid "Prefilter"
-#~ msgstr "Pra tapisan"
-
-#~ msgid "Enable adaptive prefiltering"
-#~ msgstr "Dayakan pra-penapisan adaptif"
-
-#~ msgid "No pre-filtering"
-#~ msgstr "Tiada pra-penapisan"
-
-#~ msgid "Centre Weighted Median"
-#~ msgstr "Median Berat Tengah"
-
-#~ msgid "Gaussian Low Pass Filter"
-#~ msgstr "Penapis Laluan Rendah Gaussian"
-
-#~ msgid "Add Noise"
-#~ msgstr "Tambah Hingar"
-
-#~ msgid "Gaussian Adaptive Low Pass Filter"
-#~ msgstr "Penapis Laluan Rendah Mudah Suai Gaussian"
-
-#~ msgid "Low Pass Filter"
-#~ msgstr "Penapis Laluan Rendah"
-
-#~ msgid "Amount of prefiltering"
-#~ msgstr "Amaun pra-penapisan"
-
-#~ msgid "Higher value implies more prefiltering"
-#~ msgstr "Nilai lebih tinggi melaksanakan lebih pra-penapisan"
-
-#~ msgid "Picture coding mode"
-#~ msgstr "Mod pengkodan gambar"
-
-#~ msgid ""
-#~ "Field coding is where interlaced fields are coded separately as opposed "
-#~ "to a pseudo-progressive frame"
-#~ msgstr ""
-#~ "Pengkodan medan yang mana medan terjalin dikod secara berasingan sebagai "
-#~ "berlawanan dengan bingkai pseudo-progresif"
-
-#~ msgid "auto - let encoder decide based upon input (Best)"
-#~ msgstr "auto - biarkan pengekod tentukan berasaskan input (Terbaik)"
-
-#~ msgid "force coding frame as single picture"
-#~ msgstr "paksa bingkai penkodan sebagai satu gambar"
-
-#~ msgid "force coding frame as separate interlaced fields"
-#~ msgstr "paksa bingkai pengkodan sebagai medan terjalin yang berasingan"
-
-#~ msgid "Size of motion compensation blocks"
-#~ msgstr "Saiz blok pemampasan gerakan"
-
-#~ msgid "automatic - let encoder decide based upon input (Best)"
-#~ msgstr "automatik - biarkan pengekod tentukan berdasarkan input (Terbaik)"
-
-#~ msgid "small - use small motion compensation blocks"
-#~ msgstr "kecil - guna blok pemampasan gerakan kecil"
-
-#~ msgid "medium - use medium motion compensation blocks"
-#~ msgstr "sederhana - guna blok pemampasan gerakan sederhana"
-
-#~ msgid "large - use large motion compensation blocks"
-#~ msgstr "besar - guna blok pemampasan gerakan besar"
-
-#~ msgid "Overlap of motion compensation blocks"
-#~ msgstr "Tindih blok pemampasan gerakan"
-
-#~ msgid "none - Motion compensation blocks do not overlap"
-#~ msgstr "tiada - Blok pemampasan gerakan tidak bertindan"
-
-#~ msgid "partial - Motion compensation blocks only partially overlap"
-#~ msgstr "separa - Blok pemampasan gerakan hanya separa bertindan"
-
-#~ msgid "full - Motion compensation blocks fully overlap"
-#~ msgstr "penuh - Blok pemampasan gerakan sepenuhnya bertindan"
-
-#~ msgid "Motion Vector precision"
-#~ msgstr "Kepersisian Vektor Gerakan"
-
-#~ msgid "Motion Vector precision in pels"
-#~ msgstr "Kepersisan Vektor Gerakan dalam pel"
-
-#~ msgid "Three component motion estimation"
-#~ msgstr "Tiga anggaran gerakan komponen"
-
-#~ msgid "Use chroma as part of the motion estimation process"
-#~ msgstr "Guna kroma sebagai sebahagian dari proses anggaran gerakan"
-
-#~ msgid "Intra picture DWT filter"
-#~ msgstr "Penapis DWT gambar intra"
-
-#~ msgid "Inter picture DWT filter"
-#~ msgstr "Penapis DWT gambar inter"
-
-#~ msgid "Number of DWT iterations"
-#~ msgstr "Bilangan iterasi DWT"
-
-#~ msgid "Also known as DWT levels"
-#~ msgstr "Juga dikenali sebagai aras DWT"
-
-#~ msgid "Enable multiple quantizers"
-#~ msgstr "Dayakan pengkuantiti berbilang"
-
-#~ msgid "Enable multiple quantizers per subband (one per codeblock)"
-#~ msgstr "Dayakan pengkuantiti berbilang per sub-jalur (satu per blok-kod)"
-
-#~ msgid "Disable arithmetic coding"
-#~ msgstr "Lumpuhkan pengkodan aritmatik"
-
-#~ msgid "Use variable length codes instead, useful for very high bitrates"
-#~ msgstr ""
-#~ "Guna kod panjang pembolehubah sebagai ganti, berguna untuk kadar bit "
-#~ "sangat tinggi"
-
-#~ msgid "perceptual weighting method"
-#~ msgstr "kaedah pemberatan perseptual"
-
-#~ msgid "perceptual distance"
-#~ msgstr "jarak perseptual"
-
-#~ msgid "perceptual distance to calculate perceptual weight"
-#~ msgstr "jarak perseptual untu mengira berat perseptual"
-
-#~ msgid "Horizontal slices per frame"
-#~ msgstr "Hirisan mengufuk per bingkai"
-
-#~ msgid "Number of horizontal slices per frame in low delay mode"
-#~ msgstr "Bilangan hirisan mengufuk per bingkai dalam mod lengah rendah"
-
-#~ msgid "Vertical slices per frame"
-#~ msgstr "Hirisan mengufuk per bingkai"
-
-#~ msgid "Number of vertical slices per frame in low delay mode"
-#~ msgstr "Bilangan hirisan mengufuk per bingkai dalam mod lengah rendah"
-
-#~ msgid "Size of code blocks in each subband"
-#~ msgstr "Saiz blok kod dalam setiap sub-jalur"
-
-#~ msgid "small - use small code blocks"
-#~ msgstr "kecil - guna blok kod kecil"
-
-#~ msgid "medium - use medium sized code blocks"
-#~ msgstr "sederhana - guna blok kod bersaiz sederhana"
-
-#~ msgid "large - use large code blocks"
-#~ msgstr "besar - guna blok kod besar"
-
-#~ msgid "full - One code block per subband"
-#~ msgstr "penuh - Satu blok kod per sub-jalur"
-
-#~ msgid "Enable hierarchical Motion Estimation"
-#~ msgstr "Dayakan Anggaran Gerakan berhieraki"
-
-#~ msgid "Number of levels of downsampling"
-#~ msgstr "Bilangan aras persampelan-turun"
-
-#~ msgid ""
-#~ "Number of levels of downsampling in hierarchical motion estimation mode"
-#~ msgstr ""
-#~ "Bilangan aras persampelan-turun dalam mod anggaran gerakan berhieraki"
-
-#~ msgid "Enable Global Motion Estimation"
-#~ msgstr "Dayakan Anggaran Gerakan Sejagat"
-
-#~ msgid "Enable Phase Correlation Estimation"
-#~ msgstr "Dayakan Anggaran Korelasi Fasa"
-
-#~ msgid "Enable Scene Change Detection"
-#~ msgstr "Dayakan Pengesanan Ubah Adegan"
-
-#~ msgid "Force Profile"
-#~ msgstr "Paksa Profil"
-
-#~ msgid "VC2 Low Delay Profile"
-#~ msgstr "Profil Lengah Rendah VC2"
-
-#~ msgid "VC2 Simple Profile"
-#~ msgstr "Profil Ringkas VC2"
-
-#~ msgid "VC2 Main Profile"
-#~ msgstr "Profil Utama VC2"
-
-#~ msgid "Main Profile"
-#~ msgstr "Profil Utama"
-
-#~ msgid "Dirac video decoder using libschroedinger"
-#~ msgstr "Pengekod video Dirac menggunakan libschroedinger"
-
-#~ msgid "Dirac video encoder using libschroedinger"
-#~ msgstr "Pengekod video Dirac menggunakan libschroedinger"
-
-#~ msgid "Key: "
-#~ msgstr "Kekunci:"
