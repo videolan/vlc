@@ -174,7 +174,8 @@ struct demux_sys_t
 {
     ogg_sync_state oy;        /* sync and verify incoming physical bitstream */
 
-    int i_streams;                           /* number of logical bitstreams */
+    int i_declared_streams;   /* total number of streams, including unsupported ones */
+    int i_streams;            /* effectively created logical_steams_t with ES. <= i_declared_streams */
     logical_stream_t **pp_stream;  /* pointer to an array of logical streams */
     logical_stream_t *p_skelstream; /* pointer to skeleton stream if any */
 

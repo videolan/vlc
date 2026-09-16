@@ -311,7 +311,7 @@ static int Demux( demux_t * p_demux )
 
             /* We keep the ES to try reusing it in Ogg_BeginningOfStream
              * only 1 ES is supported (common case for ogg web radio) */
-            if( p_sys->i_streams == 1 && p_sys->pp_stream[0]->p_es )
+            if( p_sys->i_streams == 1 && p_sys->i_declared_streams == 1 && p_sys->pp_stream[0]->p_es )
             {
                 if( p_sys->p_old_stream ) /* if no setupEs has reused */
                     Ogg_LogicalStreamDelete( p_demux, p_sys->p_old_stream );
@@ -416,7 +416,7 @@ static int Demux( demux_t * p_demux )
         /* if we've just pulled page, look for the right logical stream */
         if( !p_sys->b_page_waiting )
         {
-            if( p_sys->i_streams == 1 &&
+            if( p_sys->i_streams == 1 && p_sys->i_declared_streams == 1 &&
                 ogg_page_serialno( &p_sys->current_page ) != p_stream->os.serialno )
             {
                 msg_Err( p_demux, "Broken Ogg stream (serialno) mismatch" );
@@ -1655,6 +1655,9 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
             return p_ogg->i_streams ? VLC_SUCCESS : VLC_EGENERIC;
         }
 
+         /* New BOS, so new stream */
+        p_ogg->i_declared_streams++;
+
         /* Try to configure the new stream */
         logical_stream_t *p_stream = Ogg_FindLogicalStream( p_demux, &p_ogg->current_page );
         if( unlikely( !p_stream ) )
@@ -2295,6 +2298,7 @@ static void Ogg_EndOfStream( demux_t *p_demux )
     /* Reinit p_ogg */
     p_ogg->i_bitrate = 0;
     p_ogg->i_streams = 0;
+    p_ogg->i_declared_streams = 0;
     p_ogg->pp_stream = NULL;
     p_ogg->skeleton.major = 0;
     p_ogg->skeleton.minor = 0;
