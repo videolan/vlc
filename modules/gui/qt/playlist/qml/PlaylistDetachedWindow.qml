@@ -25,7 +25,7 @@ import VLC.Style
 
 
 Window {
-    visible: MainCtx.playqueuePanel.visible
+    visible: _componentCompleted && MainCtx.playqueuePanel.visible
 
     transientParent: MainCtx.intfMainWindow
 
@@ -36,6 +36,8 @@ Window {
 
     title: qsTr("Play Queue")
     color: theme.bg.primary
+
+    property bool _componentCompleted: false
 
     onVisibleChanged: {
         if (visible) {
@@ -57,6 +59,8 @@ Window {
             if (!ret)
                 console.debug("MainCtx::createWindowWithoutRedirectionSurface(): returned false for window", this)
         }
+
+        _componentCompleted = true
     }
 
     PlaylistPane {
