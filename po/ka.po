@@ -1,24 +1,25 @@
 # translation of ka.po to Georgian
 # Copyright (c) 2005 Canonical Ltd, and Rosetta Contributors 2005
-# Copyright (c) 2005-2023 VideoLAN
+# Copyright (c) 2005-2026 VideoLAN
 # This file is distributed under the same license as the vlc package.
 #
 # Alexander Didebulidze <didebuli@in.tum.de>, 2005, 2006, 2008.
 # Ubuntu Georgian Translators https://launchpad.net/people/ubuntu-l10n-ka 2005, 2006.
-# Georgianization, 2023
+# Georgianization, 2023,2026
+# Michał Trzebiatowski <michtrz@gmail.com>, 2017
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22-rc1\n"
+"Project-Id-Version: vlc 3.0.24-beta1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2026-06-28 16:08+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
-"Last-Translator: Georgianization, 2025\n"
+"Last-Translator: Georgianization, 2026\n"
 "Language-Team: Georgian (https://app.transifex.com/yaron/teams/16553/ka/)\n"
-"Language: ka\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: ka\n"
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
 
 #: include/vlc_common.h:1055
@@ -30,8 +31,8 @@ msgid ""
 msgstr ""
 "პროგრამა ვრცელდება ᲕᲐᲚᲓᲔᲑᲣᲚᲔᲑᲔᲑᲘᲡ ᲒᲐᲠᲔᲨᲔ, გარდა კანონით გათვალისწინებულისა.\n"
 "ხელახლა გავრცელება შეგიძლიათ GNU-ს ზოგადი საჯარო ლიცენზიით;\n"
-"ვრცლად გაეცანით ფაილში დასახელებით COPYING.\n"
-"დაწერილი VideoLAN-ის გუნდის მიერ; იხილეთ ფაილი AUTHORS.\n"
+"ვრცლად გაეცანით ფაილს, დასახელებით COPYING.\n"
+"შემდგენელია VideoLAN-ის გუნდის; იხილეთ ფაილი AUTHORS.\n"
 
 #: include/vlc_config_cat.h:33
 msgid "VLC preferences"
@@ -39,7 +40,7 @@ msgstr "VLC-ს პარამეტრები"
 
 #: include/vlc_config_cat.h:35
 msgid "Select \"Advanced Options\" to see all options."
-msgstr "აირციეთ „გაფართოებული პარამეტრები“ სრულად სანახავად."
+msgstr "აირჩიეთ „გაფართოებული პარამეტრები“ სრულად სანახავად."
 
 #: include/vlc_config_cat.h:38
 #: modules/gui/macosx/VLCSimplePrefsController.m:241
@@ -1012,24 +1013,20 @@ msgid "Decoded format"
 msgstr "გაშიფრული სახეობა"
 
 #: src/input/es_out.c:3207
-#, fuzzy
 msgid "Decoded channels"
-msgstr "ხმის არხები"
+msgstr "გაშიფრული არხები"
 
 #: src/input/es_out.c:3212
-#, fuzzy
 msgid "Decoded sample rate"
-msgstr "ხმის შერჩევის სიხშირე"
+msgstr "გაშიფრულის შერჩევის სიხშირე"
 
 #: src/input/es_out.c:3219
-#, fuzzy
 msgid "Decoded bits per sample"
-msgstr "ხმის ბიტი თითო შერჩევაში"
+msgstr "გაშიფრული ბიტი თითო შერჩევაში"
 
 #: src/input/es_out.c:3224
-#, fuzzy
 msgid "Decoded Bitrate"
-msgstr "გაშიფრული სახეობა"
+msgstr "გაშიფრულის ბიტსიხშირე"
 
 #: src/input/es_out.c:3237
 msgid "Track replay gain"
@@ -1192,7 +1189,7 @@ msgstr ""
 #: src/input/es_out.c:3375
 msgctxt "ViewPoint"
 msgid "Yaw"
-msgstr ""
+msgstr "შვეული მობრუნება"
 
 #: src/input/es_out.c:3377
 msgctxt "ViewPoint"
@@ -1202,12 +1199,12 @@ msgstr "ბგერა"
 #: src/input/es_out.c:3379
 msgctxt "ViewPoint"
 msgid "Roll"
-msgstr ""
+msgstr "განივი დახრა"
 
 #: src/input/es_out.c:3382
 msgctxt "ViewPoint"
 msgid "Field of view"
-msgstr ""
+msgstr "ხედვის არე"
 
 #: src/input/es_out.c:3387
 msgid "Max. luminance"
@@ -2681,7 +2678,7 @@ msgstr ""
 
 #: src/libvlc-module.c:646 modules/gui/qt/ui/sprefs_input.h:360
 msgid "Fast seek"
-msgstr ""
+msgstr "სწრაფი გადახვევა"
 
 #: src/libvlc-module.c:648
 msgid "Favor speed over precision while seeking"
@@ -3563,7 +3560,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1140
 msgid "Ignored extensions"
-msgstr ""
+msgstr "უგულებელყოფილი გაფართოებები"
 
 #: src/libvlc-module.c:1142
 msgid ""
@@ -3582,7 +3579,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1149
 msgid "Ignore files starting with '.'"
-msgstr ""
+msgstr "ფაილების არიდება თავსართით „.“"
 
 #: src/libvlc-module.c:1151
 msgid "Services discovery modules"
@@ -3699,39 +3696,43 @@ msgstr ""
 
 #: src/libvlc-module.c:1214 modules/gui/macosx/VLCMain+OldPrefs.m:120
 msgid "Ignore"
-msgstr ""
+msgstr "უგულებელყოფა"
 
 #: src/libvlc-module.c:1214
 msgid "Volume control"
-msgstr ""
+msgstr "ხმის დონის ცვლა"
 
 #: src/libvlc-module.c:1215
 msgid "Position control"
-msgstr ""
+msgstr "მდებარეობის ცვლა"
 
 #: src/libvlc-module.c:1215
 msgid "Position control reversed"
-msgstr ""
+msgstr "მდებარეობის უკუცვლა"
 
 #: src/libvlc-module.c:1218
 msgid "Mouse wheel vertical axis control"
-msgstr ""
+msgstr "თაგვის რგოლის შვეული მოძრაობით"
 
 #: src/libvlc-module.c:1220
 msgid ""
 "The mouse wheel vertical (up/down) axis can control volume, position or be "
 "ignored."
 msgstr ""
+"თაგვის რგოლის შვეული (ზემოთ/ქვემოთ) ტრიალით შეიძლება ხმის დონის ცვლა, "
+"მდებარეობის ცვლა ან  უგულებელყოფა."
 
 #: src/libvlc-module.c:1222
 msgid "Mouse wheel horizontal axis control"
-msgstr ""
+msgstr "თაგვის რგოლის თარაზული მოძრაობით"
 
 #: src/libvlc-module.c:1224
 msgid ""
 "The mouse wheel horizontal (left/right) axis can control volume, position or "
 "be ignored."
 msgstr ""
+"თაგვის რგოლის თარაზული (მარცხნივ/მარჯვნივ) ტრიალით შეიძლება ხმის დონის ცვლა, "
+"მდებარეობის ცვლა ან უგულებელყოფა."
 
 #: src/libvlc-module.c:1226 src/video_output/vout_intf.c:268
 #: modules/gui/macosx/VLCControlsBarCommon.m:98
@@ -4159,11 +4160,12 @@ msgstr ""
 
 #: src/libvlc-module.c:1335
 msgid "Subtitle sync / reset audio & subtitle synchronization"
-msgstr ""
+msgstr "ქვეწარწერის დასინქ. / განულება ხმისა და ქვეწარწერის თანადროულობის"
 
 #: src/libvlc-module.c:1336
 msgid "Select the key to reset synchronization of audio & subtitle timestamps."
 msgstr ""
+"აირჩიეთ ღილაკი ხმისა და ქვეწარწერების დროის ნიშნულთა ურთიერთშეწყობისთვის."
 
 #: src/libvlc-module.c:1337
 msgid "Subtitle position up"
@@ -4689,7 +4691,7 @@ msgstr ""
 
 #: src/libvlc-module.c:2773
 msgid "reset the current config to the default values"
-msgstr ""
+msgstr "მიმდინარე გამართვის დაბრუნება ნაგულისხმევ მნიშვნელობებზე"
 
 #: src/libvlc-module.c:2775
 msgid "use alternate config file"
@@ -5897,7 +5899,7 @@ msgstr ""
 #: modules/access/avaudiocapture.m:236 modules/access/avcapture.m:434
 #: modules/access/disc_helper.h:56
 msgid "Problem accessing a system resource"
-msgstr ""
+msgstr "ხარვეზი სისტემის სიმძლავრეებთან წვდომისას"
 
 #: modules/access/avaudiocapture.m:237
 msgid ""
@@ -6165,7 +6167,7 @@ msgid ""
 "DeckLink capture card to use, if multiple exist. The cards are numbered from "
 "0."
 msgstr ""
-"DeckLink ჩამწერი დაფა გამოსაყენებლად, თუ რამდენიმეა. დაფები ინომრება 0-იდან."
+"ჩამწერი დაფა DeckLink გამოსაყენებლად, თუ რამდენიმეა. დაფები ინომრება 0-იდან."
 
 #: modules/access/decklink.cpp:54
 msgid "Desired input video mode. Leave empty for autodetection."
@@ -6176,7 +6178,7 @@ msgid ""
 "Desired input video mode for DeckLink captures. This value should be a "
 "FOURCC code in textual form, e.g. \"ntsc\"."
 msgstr ""
-"შეტანის სასურველი ვიდეორეჟიმი DeckLink-ჩაწერებისთვის. მნიშვნელობად უნდა "
+"შეტანის სასურველი ვიდეორეჟიმი DeckLink-ჩამწერებისთვის. მნიშვნელობად უნდა "
 "მიეთითოს FOURCC-კოდი ტექსტური სახით, მაგ. „ntsc“."
 
 #: modules/access/decklink.cpp:60 modules/video_output/decklink.cpp:100
@@ -6188,8 +6190,8 @@ msgid ""
 "Audio connection to use for DeckLink captures. Valid choices: embedded, "
 "aesebu, analog. Leave blank for card default."
 msgstr ""
-"ხმოვანი კავშირი DeckLink-ჩაწერებისთვის. შეიძლება მიეთითოს: embedded, aesebu, "
-"analog. დატოვეთ ცარიელი, დაფის ნაგულისხმევის გამოსაყენებლად."
+"ხმოვანი კავშირი DeckLink-ჩამწერებისთვი. შეიძლება მიეთითოს: embedded, aesebu, "
+"analog. დატოვეთ ცარიელი ჩამწერი დაფის ნაგულისხმევის გამოსაყენებლად."
 
 #: modules/access/decklink.cpp:66 modules/demux/rawaud.c:43
 #: modules/video_output/decklink.cpp:105
@@ -6221,6 +6223,9 @@ msgid ""
 "Video connection to use for DeckLink captures. Valid choices: sdi, hdmi, "
 "opticalsdi, component, composite, svideo. Leave blank for card default."
 msgstr ""
+"ვიდეოკავშირი DeckLink-ჩამწერებისთვის. შეიძლება მიეთითოს: sdi, hdmi, "
+"opticalsdi, component, composite, svideo. დატოვეთ ცარიელი ჩამწერი დაფის "
+"ნაგულისხმევის გამოსაყენებლად."
 
 #: modules/access/decklink.cpp:87 modules/access/linsys/linsys_sdi.c:94
 msgid "SDI"
@@ -6232,7 +6237,7 @@ msgstr ""
 
 #: modules/access/decklink.cpp:87
 msgid "Optical SDI"
-msgstr ""
+msgstr "ოპტიკური SDI"
 
 #: modules/access/decklink.cpp:87
 msgid "Component"
@@ -7774,16 +7779,15 @@ msgstr ""
 
 #: modules/access/rist.c:44
 msgid "Range"
-msgstr ""
+msgstr "დაშორება"
 
 #: modules/access/rist.c:44
 msgid "Bitmask"
-msgstr ""
+msgstr "ბიტნიღაბი"
 
 #: modules/access/rist.c:313
-#, fuzzy
 msgid "Virtual Destination Port Filter"
-msgstr "საბოლოო ფაილი:"
+msgstr ""
 
 #: modules/access/rist.c:315
 msgid ""
@@ -7793,11 +7797,11 @@ msgstr ""
 
 #: modules/access/rist.c:321 modules/access_output/rist.c:293
 msgid "RIST"
-msgstr ""
+msgstr "RIST"
 
 #: modules/access/rist.c:322
 msgid "RIST input"
-msgstr ""
+msgstr "RIST-შეტანა"
 
 #: modules/access/rist.c:327
 msgid "RIST demux/decode maximum jitter (default is 5ms)"
@@ -8080,9 +8084,8 @@ msgid "SFTP port number to use on the server"
 msgstr ""
 
 #: modules/access/sftp.c:61
-#, fuzzy
 msgid "Private key file"
-msgstr "ახალი პროფილის შექმნა"
+msgstr ""
 
 #: modules/access/sftp.c:62
 msgid ""
@@ -8227,12 +8230,11 @@ msgstr ""
 
 #: modules/access/srt.c:560 modules/access_output/srt.c:468
 msgid "Password for stream encryption"
-msgstr ""
+msgstr "პაროლი ნაკადის დასაშიფრად"
 
 #: modules/access/srt.c:566
-#, fuzzy
 msgid "SRT Stream ID"
-msgstr "ნაკადი %d"
+msgstr ""
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -8264,7 +8266,7 @@ msgstr ""
 
 #: modules/access/v4l2/controls.c:770
 msgid "Reset defaults"
-msgstr ""
+msgstr "დაბრუნება ნაგულისხმევზე"
 
 #: modules/access/v4l2/v4l2.c:44
 msgid "Video capture device"
@@ -8346,7 +8348,7 @@ msgstr ""
 
 #: modules/access/v4l2/v4l2.c:82
 msgid "Reset controls"
-msgstr ""
+msgstr "სამართავის ჩამოყრა"
 
 #: modules/access/v4l2/v4l2.c:83
 msgid "Reset controls to defaults."
@@ -9078,18 +9080,16 @@ msgid "Source port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:272
-#, fuzzy
 msgid "Virtual Destination Port"
-msgstr "ნაკადის დანიშნულება"
+msgstr ""
 
 #: modules/access_output/rist.c:274
 msgid "Destination port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:281
-#, fuzzy
 msgid "Multipeer mode"
-msgstr "ჩუმი რეჯიმი"
+msgstr ""
 
 #: modules/access_output/rist.c:283
 msgid ""
@@ -9098,9 +9098,8 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Duplicate"
-msgstr "პროგრამა"
+msgstr ""
 
 #: modules/access_output/rist.c:287
 msgid "Load balanced"
@@ -9108,7 +9107,7 @@ msgstr ""
 
 #: modules/access_output/rist.c:294
 msgid "RIST stream output"
-msgstr ""
+msgstr "RIST-ნაკადის გამოტანა"
 
 #: modules/access_output/rist.c:299
 msgid "RIST target payload size (bytes)"
@@ -9624,7 +9623,7 @@ msgstr ""
 
 #: modules/audio_filter/equalizer.c:58
 msgid "Equalizer preset"
-msgstr "მათანაბრებლის მზა პარამეტრები"
+msgstr "მათანაბრებლის მზა ნაკრები"
 
 #: modules/audio_filter/equalizer.c:59
 msgid "Preset to use for the equalizer."
@@ -10325,7 +10324,7 @@ msgstr ""
 
 #: modules/audio_output/mmdevice.c:1517
 msgid "Enabled (AC3/DTS only)"
-msgstr ""
+msgstr "ჩართული (AC3/DTS მხოლოდ)"
 
 #: modules/audio_output/mmdevice.c:1518
 msgid "Enabled"
@@ -11022,11 +11021,13 @@ msgstr ""
 
 #: modules/codec/dav1d.c:52
 msgid "Frames Threads"
-msgstr ""
+msgstr "კადრების ნაკადები"
 
 #: modules/codec/dav1d.c:53
 msgid "Max number of threads used for frame decoding, default 0=auto"
 msgstr ""
+"არაუმეტეს რამდენი ნაკადი გამოიყენებოდეს კადრის გასაშიფრად, ნაგულისხმევად "
+"0=თვითშერჩევით"
 
 #: modules/codec/dav1d.c:54
 msgid "Tiles Threads"
@@ -11046,7 +11047,7 @@ msgstr ""
 
 #: modules/codec/dav1d.c:62
 msgid "Dav1d video decoder"
-msgstr ""
+msgstr "Dav1d-ვიდეოგამშიფრავი"
 
 #: modules/codec/dca.c:63
 msgid "DTS dynamic range compression"
@@ -11657,9 +11658,9 @@ msgid ""
 "Allow the use of the Intel Media SDK software implementation of the codecs "
 "if no QuickSync Video hardware acceleration is present on the system."
 msgstr ""
-"შესაძლებელი იქნება Intel Media SDK პროგრამული უზრუნველყოფის გამოყენება "
-"დამშიფრავებისთვის, როცა QuickSync ვიდეოს აპარატურული მხარდაჭერა სისტემაში "
-"არაა წარმოდგენილი."
+"შესაძლებელი იქნება მშიფრავების პროგრამულ უზრუნველყოფად გამოიყენოს Intel "
+"Media SDK, როცა ვიდეოს აპარატურულ ამაჩქარებლად QuickSync არაა წარმოდგენილი "
+"სისტემაში."
 
 #: modules/codec/qsv.c:61
 msgid "Codec Profile"
@@ -12216,7 +12217,6 @@ msgstr ""
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -14118,11 +14118,11 @@ msgstr "ეთერში გაშვებულის დაყოვნე�
 
 #: modules/demux/adaptive/adaptive.cpp:78
 msgid "Tradeoff between stability and real time"
-msgstr ""
+msgstr "დათმობა მდგრადობასა და დაუყოვნებლობას შორის"
 
 #: modules/demux/adaptive/adaptive.cpp:80
 msgid "Max buffering (ms)"
-msgstr ""
+msgstr "მომარაგება არაუმეტეს (მწმ)"
 
 #: modules/demux/adaptive/adaptive.cpp:82
 msgid "Adaptive Logic"
@@ -14143,7 +14143,7 @@ msgstr "მცირე დაყოვნება"
 
 #: modules/demux/adaptive/adaptive.cpp:88
 msgid "Overrides low latency parameters"
-msgstr ""
+msgstr "ჩაანაცვლებს მცირე დაყოვნების პარამეტრებს"
 
 #: modules/demux/adaptive/adaptive.cpp:109
 msgid "Predictive"
@@ -16008,7 +16008,7 @@ msgstr ""
 #: modules/gui/macosx/VLCFSPanelController.m:137
 #: modules/gui/macosx/VLCFSPanelController.m:138
 msgid "Leave fullscreen"
-msgstr ""
+msgstr "სრულეკრანიანიდან გამოსვლა"
 
 #: modules/gui/macosx/VLCFSPanelController.m:140
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:80
@@ -16033,7 +16033,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCHelpWindowController.m:47
 msgid "VLC media player Help"
-msgstr ""
+msgstr "VLC-დამკვრელი – დახმარება"
 
 #: modules/gui/macosx/VLCHelpWindowController.m:50
 #: modules/gui/macosx/VLCMainMenu.m:467 modules/gui/macosx/VLCMainMenu.m:1101
@@ -16054,19 +16054,19 @@ msgstr "შეტყობინებები"
 
 #: modules/gui/macosx/VLCLogWindowController.m:104
 msgid "Save log"
-msgstr ""
+msgstr "აღრიცხვების შენახვა"
 
 #: modules/gui/macosx/VLCLogWindowController.m:105
 msgid "Save the debug log to a file"
-msgstr ""
+msgstr "გამართვის აღრიცხვების ფაილში შენახვა"
 
 #: modules/gui/macosx/VLCLogWindowController.m:107
 msgid "Refresh log"
-msgstr ""
+msgstr "აღრიცხვების გაახლება"
 
 #: modules/gui/macosx/VLCLogWindowController.m:108
 msgid "Refresh the log output"
-msgstr ""
+msgstr "გამოტანილი აღრიცხვების გაახლება"
 
 #: modules/gui/macosx/VLCLogWindowController.m:110
 msgid "Clear log"
@@ -16078,11 +16078,11 @@ msgstr "გამოტანილი ჩანაწერების გა�
 
 #: modules/gui/macosx/VLCLogWindowController.m:113
 msgid "Toggle details"
-msgstr ""
+msgstr "გადართვა დაწვრილებითზე"
 
 #: modules/gui/macosx/VLCLogWindowController.m:114
 msgid "Show/hide details about a log message"
-msgstr ""
+msgstr "აღრიცხვების შესახებ დაწვრილებით ჩვენება/დამალვა"
 
 #: modules/gui/macosx/VLCLogWindowController.m:198
 #, c-format
@@ -16280,7 +16280,7 @@ msgstr "გადასვლა დროით"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
 msgid "Renderer"
-msgstr ""
+msgstr "გამომსახველი"
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
@@ -17269,7 +17269,7 @@ msgstr "მიმდევრობითი დანომვრა"
 #: modules/gui/macosx/VLCSimplePrefsController.m:393
 #: modules/gui/macosx/prefs.m:190
 msgid "Reset All"
-msgstr ""
+msgstr "ყველას ჩამოყრა"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:395
 #: modules/gui/macosx/prefs.m:187 modules/gui/qt/dialogs/preferences.cpp:56
@@ -19039,7 +19039,7 @@ msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1405
 msgid "Global Hotkey change"
-msgstr ""
+msgstr "საერთო სწრაფი ღილაკის შეცვლა"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1406
 msgid "Hotkey change"
@@ -19047,7 +19047,7 @@ msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1410
 msgid "Press the new key or combination for <b>%1</b>"
-msgstr ""
+msgstr "დააჭირეთ ახალ ღილაკს ცალკე ან ერთობლივად – <b>%1</b>"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1419
 msgid "Assign"
@@ -19055,7 +19055,7 @@ msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1455
 msgid "Warning: this key or combination is already assigned to \"<b>%1</b>\""
-msgstr ""
+msgstr "გაფრთხილება: ამ ღილაკს ცალკე ან ერთობლივად უკვე იყენებს „<b>%1</b>“"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1467
 msgid "Warning: <b>%1</b> is already an application menu shortcut"
@@ -19063,11 +19063,11 @@ msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1490
 msgid "Key or combination: <b>%1</b>"
-msgstr ""
+msgstr "ღილაკი ცალკე ან ერთობლივად: <b>%1</b>"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1498
 msgid "Key: <b>%1</b>"
-msgstr ""
+msgstr "ღილაკი: <b>%1</b>"
 
 #: modules/gui/qt/components/simple_preferences.cpp:256
 #: modules/gui/qt/components/simple_preferences.cpp:636
@@ -19230,24 +19230,20 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:184
-#, fuzzy
 msgid "This module outputs the stream using the RIST protocol (TR06)."
-msgstr "გადაშიფრული ნაკადი ქსელში გადაიცემა MMS-ოქმით."
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:186
-#, fuzzy
 msgid "Destination Address"
-msgstr "დანიშნულების თავსართი"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:191
-#, fuzzy
 msgid "Destination Port"
-msgstr "დანიშნულება"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:201
-#, fuzzy
 msgid "Stream Name"
-msgstr "ნაკადის სახელი"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:237
 msgid "This module outputs the transcoded stream to a network via HTTP."
@@ -20633,7 +20629,7 @@ msgstr ""
 
 #: modules/gui/qt/qt.cpp:175
 msgid "Ignore keyboard volume buttons."
-msgstr ""
+msgstr "კლავიატურის ხმის ღილაკების უგულებელყოფა."
 
 #: modules/gui/qt/qt.cpp:177
 msgid ""
@@ -22640,7 +22636,7 @@ msgstr ""
 
 #: modules/packetizer/av1.c:586
 msgid "AV1 video packetizer"
-msgstr ""
+msgstr "AV1-ვიდეოს დამნაწილებელი"
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
@@ -23834,7 +23830,7 @@ msgstr ""
 #: modules/stream_out/chromecast/cast.cpp:192
 #: modules/stream_out/chromecast/cast.cpp:1213
 msgid "Performance warning"
-msgstr ""
+msgstr "წარმადობის შესახებ გაფრთხილება"
 
 #: modules/stream_out/chromecast/cast.cpp:193
 msgid "Display a performance warning when transcoding"
@@ -23842,15 +23838,15 @@ msgstr "წარმადობის შესახებ გაფრთხ�
 
 #: modules/stream_out/chromecast/cast.cpp:194
 msgid "Enable Audio passthrough"
-msgstr ""
+msgstr "ხმის გატარების ჩართვა"
 
 #: modules/stream_out/chromecast/cast.cpp:195
 msgid "Disable if your receiver does not support Dolby®."
-msgstr ""
+msgstr "გათიშვა, თუ მიმღებზე არაა მხარდაჭერილი Dolby®."
 
 #: modules/stream_out/chromecast/cast.cpp:217
 msgid "High (high quality and high bandwidth)"
-msgstr ""
+msgstr "მაღალი (მაღალი ხარისხი და მაღალი გამტარუნარიანობა)"
 
 #: modules/stream_out/chromecast/cast.cpp:218
 msgid "Medium (medium quality and medium bandwidth)"
@@ -23858,19 +23854,19 @@ msgstr "საშუალო (საშუალო ხარისხი დ�
 
 #: modules/stream_out/chromecast/cast.cpp:219
 msgid "Low (low quality and low bandwidth)"
-msgstr ""
+msgstr "დაბალი (დაბალი ხარისხი და დაბალი გამტარუნარიანობა)"
 
 #: modules/stream_out/chromecast/cast.cpp:220
 msgid "Low CPU (low quality but high bandwidth)"
-msgstr ""
+msgstr "დაბალი CPU (დაბალი ხარისხი, მაგრამ მაღალი გამტარუნარიანობა)"
 
 #: modules/stream_out/chromecast/cast.cpp:223
 msgid "Conversion quality"
-msgstr ""
+msgstr "გარდაქმნის ხარისხი"
 
 #: modules/stream_out/chromecast/cast.cpp:224
 msgid "Change this option to increase conversion speed or quality."
-msgstr ""
+msgstr "ამ პარამეტრის ცვლილება ზრდის გარდაქმნის სიჩქარეს ან ხარისხს."
 
 #: modules/stream_out/chromecast/cast.cpp:227
 msgid "IP Address of the Chromecast."
@@ -23901,6 +23897,8 @@ msgid ""
 "Casting this video requires conversion. This conversion can use all the "
 "available power and could quickly drain your battery."
 msgstr ""
+"ამ ვიდეოს გადაცემა საჭიროებს გარდაქმნას. ამგვარი გარდაქმნა იყენებს "
+"ხელმისაწვდომ სიმძლავრეს სრულად და შეიძლება სწრაფად განმუხტოს ბატარეა."
 
 #: modules/stream_out/chromecast/chromecast_demux.cpp:511
 msgid "Chromecast demux wrapper"
@@ -26238,7 +26236,7 @@ msgstr ""
 
 #: modules/video_output/decklink.cpp:239
 msgid "DecklinkOutput"
-msgstr ""
+msgstr "Decklink-გამოტანა"
 
 #: modules/video_output/decklink.cpp:240
 msgid "Output module to write to Blackmagic SDI card"
@@ -26250,19 +26248,19 @@ msgstr "DeckLink ძირითადი პარამეტრებით"
 
 #: modules/video_output/decklink.cpp:246
 msgid "DeckLink Video Output module"
-msgstr ""
+msgstr "DeckLink-ვიდეოგამოტანის დანამატი"
 
 #: modules/video_output/decklink.cpp:251
 msgid "DeckLink Video Options"
-msgstr ""
+msgstr "DeckLink-ვიდეოპარამეტრები"
 
 #: modules/video_output/decklink.cpp:274
 msgid "DeckLink Audio Output module"
-msgstr "ხმის DeckLink-გამომტანი მოდული"
+msgstr "ხმის DeckLink-გამომტანი დანამატი"
 
 #: modules/video_output/decklink.cpp:279
 msgid "DeckLink Audio Options"
-msgstr ""
+msgstr "DeckLink-ხმის პარამეტრები"
 
 #: modules/video_output/drawable.c:34
 msgid "Window handle (HWND)"
@@ -27495,6 +27493,9 @@ msgid ""
 "instance will be transmitted over the internet to the Google Image Charts "
 "web service to generate this QR code."
 msgstr ""
+"VLC შეძლებს გამოაჩინოს QR-კოდი ბმულით მობილური ვერსიის ვებგარსზე; მისამართი "
+"ამ გაშვებული VLC-დამკვრელის ვებგარსისა გადაიცემა ინტერნეტით, რომ გაეცნოს "
+"მომსახურება Google Image Charts და შეადგინოს QR-კოდი."
 
 #: share/lua/http/index.html:284
 msgid "Do you want to go ahead with this?"
@@ -27992,7 +27993,7 @@ msgstr "x264 პროფილი და დონის შერჩევა"
 
 #: modules/gui/qt/ui/sprefs_input.h:356
 msgid "Hardware-accelerated decoding"
-msgstr ""
+msgstr "გაშიფვრა აპარატურული აჩქარებით"
 
 #: modules/gui/qt/ui/sprefs_input.h:357
 msgid "Video quality post-processing level"
@@ -28008,11 +28009,11 @@ msgstr "x264 მზა ნაკრებითა და გაწყობი�
 
 #: modules/gui/qt/ui/sprefs_input.h:361
 msgid "Optical drive"
-msgstr ""
+msgstr "ოპტიკური ამძრავი"
 
 #: modules/gui/qt/ui/sprefs_input.h:362
 msgid "Default optical device"
-msgstr ""
+msgstr "ნაგულისხმევი ოპტიკური წამკითხველი"
 
 #: modules/gui/qt/ui/sprefs_input.h:366
 msgid "Damaged or incomplete AVI file"
@@ -28224,7 +28225,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Control"
-msgstr ""
+msgstr "სამართავი"
 
 #: modules/gui/qt/ui/streampanel.h:173
 msgid "Run manually"
@@ -28411,41 +28412,3 @@ msgstr ""
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "ჩანაწერების სამართავი სია"
-
-#~ msgid "RIST reorder buffer (ms)"
-#~ msgstr "RIST-ის გადაწყობის მარაგი (მწმ)"
-
-#~ msgid "RIST data output caching size (ms)"
-#~ msgstr "RIST-მონაცემების გამოტანის მარაგის ზომა (მწმ)"
-
-#~ msgid "Low Delay mode"
-#~ msgstr "დაბალი დაყოვნების რეჟიმი"
-
-#~ msgid "Noise Threshold"
-#~ msgstr "ხმაურის ზღურბლი"
-
-#~ msgid "Enable multiple quantizers per subband (one per codeblock)"
-#~ msgstr ""
-#~ "რამდენიმე დაკვანტვის ამოქმედება თითოეულ ქვესიხშირეზე (ცალ-ცალკე ყოველ "
-#~ "მართკუთხა არეზე)"
-
-#~ msgid "Number of horizontal slices per frame in low delay mode"
-#~ msgstr "თარაზული ნაწილების რიცხვი თითო კადრში დაბალი დაყოვნების რეჟიმში"
-
-#~ msgid "Number of vertical slices per frame in low delay mode"
-#~ msgstr "შვეული ნაწილების რიცხვი თითო კადრში დაბალი დაყოვნების რეჟიმში"
-
-#~ msgid "Force Profile"
-#~ msgstr "იძულებითი პროფილი"
-
-#~ msgid "VC2 Low Delay Profile"
-#~ msgstr "VC2 მცირე დაყოვნების პროფილი"
-
-#~ msgid "VC2 Simple Profile"
-#~ msgstr "VC2 მარტივი პროფილი"
-
-#~ msgid "VC2 Main Profile"
-#~ msgstr "VC2 ძირითადი პროფილი"
-
-#~ msgid "Main Profile"
-#~ msgstr "ძირითადი პროფილი"
