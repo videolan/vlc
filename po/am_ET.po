@@ -1,23 +1,24 @@
 # Amharic (Ethiopia) translation
-# Copyright (C) 2023 VideoLAN
+# Copyright (C) 2026 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
 # samson <sambelet@yahoo.com>, 2014-2020
+# Michał Trzebiatowski <michtrz@gmail.com>, 2017
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22-rc1\n"
+"Project-Id-Version: vlc 3.0.24-beta1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2026-06-28 16:08+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: samson <sambelet@yahoo.com>, 2020\n"
 "Language-Team: Amharic (Ethiopia) (https://app.transifex.com/yaron/teams/"
 "16553/am_ET/)\n"
-"Language: am_ET\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: am_ET\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: include/vlc_common.h:1055
@@ -958,24 +959,20 @@ msgid "Decoded format"
 msgstr ""
 
 #: src/input/es_out.c:3207
-#, fuzzy
 msgid "Decoded channels"
-msgstr "የ ድምፅ ጣቢያዎች"
+msgstr ""
 
 #: src/input/es_out.c:3212
-#, fuzzy
 msgid "Decoded sample rate"
-msgstr "የ ድምፅ ናሙና መጠን"
+msgstr ""
 
 #: src/input/es_out.c:3219
-#, fuzzy
 msgid "Decoded bits per sample"
-msgstr "ቢትስ በ ናሙና"
+msgstr ""
 
 #: src/input/es_out.c:3224
-#, fuzzy
 msgid "Decoded Bitrate"
-msgstr "Bitrate"
+msgstr ""
 
 #: src/input/es_out.c:3237
 msgid "Track replay gain"
@@ -7997,9 +7994,8 @@ msgid "Password for stream encryption"
 msgstr ""
 
 #: modules/access/srt.c:566
-#, fuzzy
 msgid "SRT Stream ID"
-msgstr "ማስተላለፊያ %d"
+msgstr ""
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -8845,9 +8841,8 @@ msgid "Destination port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:281
-#, fuzzy
 msgid "Multipeer mode"
-msgstr "በ ፀጥታ ዘዴ"
+msgstr ""
 
 #: modules/access_output/rist.c:283
 msgid ""
@@ -8856,14 +8851,12 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Duplicate"
-msgstr "መተግበሪያ"
+msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Load balanced"
-msgstr "ድምፅ ማካካሻ"
+msgstr ""
 
 #: modules/access_output/rist.c:294
 msgid "RIST stream output"
@@ -11925,7 +11918,6 @@ msgstr ""
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -18841,14 +18833,12 @@ msgid "Destination Address"
 msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:191
-#, fuzzy
 msgid "Destination Port"
-msgstr "መድረሻውን ይምረጡ"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:201
-#, fuzzy
 msgid "Stream Name"
-msgstr "ማስተላለፊያ"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:237
 msgid "This module outputs the transcoded stream to a network via HTTP."
@@ -27839,27 +27829,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "የ መገናኛ ዝርዝር አስታዳዳሪ"
-
-#~ msgid "16 bytes"
-#~ msgstr "16 ባይትስ"
-
-#~ msgid "24 bytes"
-#~ msgstr "24 ባይትስ"
-
-#~ msgid "32 bytes"
-#~ msgstr "32 ባይትስ"
-
-#~ msgid "4:2:0"
-#~ msgstr "4:2:0"
-
-#~ msgid "4:2:2"
-#~ msgstr "4:2:2"
-
-#~ msgid "4:4:4"
-#~ msgstr "4:4:4"
-
-#~ msgid "Rate control method"
-#~ msgstr "መጠን መቆጣጠሪያ ዘዴ"
-
-#~ msgid "Add Noise"
-#~ msgstr "ረብሻ መጨመሪያ"
