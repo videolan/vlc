@@ -1,5 +1,5 @@
 # Norwegian Nynorsk translation
-# Copyright (C) 2023 VideoLAN
+# Copyright (C) 2026 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -8,19 +8,21 @@
 # Copyright (C) Jon Stødle <jonstodle@gmail.com>, 2009
 # Eirik U. Birkeland <eirbir@gmail.com>, 2009-2010
 # Imre Kristoffer Eilertsen <imreeil42@gmail.com>, 2016-2017
+# Michał Trzebiatowski <michtrz@gmail.com>, 2017
+# Bjørn I., 2026
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22-rc1\n"
+"Project-Id-Version: vlc 3.0.24-beta1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2026-06-28 16:08+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
-"Last-Translator: Bjørn I., 2025\n"
+"Last-Translator: Bjørn I., 2026\n"
 "Language-Team: Norwegian Nynorsk (https://app.transifex.com/yaron/teams/"
 "16553/nn/)\n"
-"Language: nn\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: nn\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: include/vlc_common.h:1055
@@ -879,7 +881,7 @@ msgstr "Inga skildring for denne kodeken"
 
 #: src/input/decoder.c:1897
 msgid "Codec not supported"
-msgstr "Kodek ikkje støtta"
+msgstr "Kodeken er ikkje stødd"
 
 #: src/input/decoder.c:1898
 #, c-format
@@ -1025,27 +1027,23 @@ msgstr "Bit per utval"
 
 #: src/input/es_out.c:3200 src/input/es_out.c:3275
 msgid "Decoded format"
-msgstr "Avkoda format"
+msgstr "Dekoda format"
 
 #: src/input/es_out.c:3207
-#, fuzzy
 msgid "Decoded channels"
-msgstr "Lydkanalar"
+msgstr "Dekoda kanalar"
 
 #: src/input/es_out.c:3212
-#, fuzzy
 msgid "Decoded sample rate"
-msgstr "Lydsamplingsfrekvens"
+msgstr "Dekoda samplingsrate"
 
 #: src/input/es_out.c:3219
-#, fuzzy
 msgid "Decoded bits per sample"
-msgstr "Bit per utval"
+msgstr "Avkoda bitar per sampling"
 
 #: src/input/es_out.c:3224
-#, fuzzy
 msgid "Decoded Bitrate"
-msgstr "Avkoda format"
+msgstr "Dekoda bitfrekvens"
 
 #: src/input/es_out.c:3237
 msgid "Track replay gain"
@@ -1622,7 +1620,7 @@ msgstr "Medierolle"
 
 #: src/libvlc-module.c:130
 msgid "Media (player) role for operating system policy."
-msgstr ""
+msgstr "Medie(spelarens) rolle for policyen til operativsystemet."
 
 #: src/libvlc-module.c:132 modules/gui/macosx/VLCSimplePrefsController.m:281
 #: modules/stream_out/display.c:40 modules/gui/qt/ui/sprefs_audio.h:408
@@ -1704,6 +1702,8 @@ msgid ""
 "This delays the audio output. The delay must be given in milliseconds. This "
 "can be handy if you notice a lag between the video and the audio."
 msgstr ""
+"Dette forseinkar ut-lyden. Forseinkinga må oppgjevast i millisekund. Dette "
+"kan vera nyttig om du oppdagar ei forskyving mellom video og lyd."
 
 #: src/libvlc-module.c:168
 msgid "This selects which plugin to use for audio resampling."
@@ -1714,6 +1714,8 @@ msgid ""
 "Sets the audio output channels mode that will be used by default if your "
 "hardware and the audio stream are compatible."
 msgstr ""
+"Stiller inn modusen for lydutgangskanalar som skal brukast som standard "
+"dersom maskinvara og lydstraumen er kompatible."
 
 #: src/libvlc-module.c:174
 msgid "Force S/PDIF support"
@@ -1724,6 +1726,8 @@ msgid ""
 "This option should be used when the audio output can't negotiate S/PDIF "
 "support."
 msgstr ""
+"Denne innstillinga bør brukast når lydutgangen ikkje kan forhandla om S/PDIF-"
+"støtte."
 
 #: src/libvlc-module.c:178
 msgid "Force detection of Dolby Surround"
@@ -1792,7 +1796,7 @@ msgstr "Omspelingsforsterkings-modus"
 
 #: src/libvlc-module.c:214
 msgid "Select the replay gain mode"
-msgstr ""
+msgstr "Vel modus for avspelingsforsterking"
 
 #: src/libvlc-module.c:216
 msgid "Replay preamp"
@@ -1803,6 +1807,8 @@ msgid ""
 "This allows you to change the default target level (89 dB) for stream with "
 "replay gain information"
 msgstr ""
+"Dette lèt deg endra standardmålnivået (89 dB) for strøyming med informasjon "
+"for avspelingsforsterking"
 
 #: src/libvlc-module.c:221
 msgid "Default replay gain"
@@ -1811,6 +1817,8 @@ msgstr "Standard omspelingsforsterking"
 #: src/libvlc-module.c:223
 msgid "This is the gain used for stream without replay gain information"
 msgstr ""
+"Dette er forsterkinga som vert brukt for strøyming utan informasjon om "
+"avspelingsforsterking"
 
 #: src/libvlc-module.c:225
 msgid "Peak protection"
@@ -1829,6 +1837,8 @@ msgid ""
 "This allows playing audio at lower or higher speed without affecting the "
 "audio pitch"
 msgstr ""
+"Dette gjer det mogleg å spele av lyd med lågare eller høgare fart utan å "
+"påverke tonehøgda"
 
 #: src/libvlc-module.c:239 src/libvlc-module.c:1131
 #: modules/access/dshow/dshow.cpp:2083 modules/access/dtv/access.c:114
@@ -2076,7 +2086,7 @@ msgstr "Slå på bakgrunnsmodus"
 #: src/libvlc-module.c:321
 msgid ""
 "The wallpaper mode allows you to display the video as the desktop background."
-msgstr ""
+msgstr "Bakgrunnsbilde-modusen lèt deg vise videoen som skrivebordsbakgrunn."
 
 #: src/libvlc-module.c:324
 msgid "Show media title on video"
@@ -2108,7 +2118,7 @@ msgstr "Gøym peikar og fullskjermskontrollpanel etter x millisekund"
 
 #: src/libvlc-module.c:339
 msgid "Hide mouse cursor and fullscreen controller after n milliseconds."
-msgstr ""
+msgstr "Gøym musepeikaren og heilskjermkontrollar efter n millisekund."
 
 #: src/libvlc-module.c:342 src/libvlc-module.c:344
 #: src/video_output/interlacing.c:112 modules/gui/macosx/VLCMainMenu.m:443
@@ -2129,7 +2139,7 @@ msgstr "Linjedoblingsmodus"
 
 #: src/libvlc-module.c:354
 msgid "Deinterlace method to use for video processing."
-msgstr ""
+msgstr "Avflettningsmetode å bruka for videohandsaming."
 
 #: src/libvlc-module.c:361 modules/video_filter/deinterlace/deinterlace.h:58
 msgid "Discard"
@@ -2185,6 +2195,8 @@ msgstr "Videosplittar-module"
 #: src/libvlc-module.c:381
 msgid "This adds video splitters like clone or wall"
 msgstr ""
+"Dette legg til videosplittarar som kloning eller "
+"vegg.                              "
 
 #: src/libvlc-module.c:383
 msgid "Video filter module"
@@ -2195,6 +2207,8 @@ msgid ""
 "This adds post-processing filters to enhance the picture quality, for "
 "instance deinterlacing, or distort the video."
 msgstr ""
+"Dette legg till etterbehandlingsfilter for å forbetra bildekvaliteten, t.d. "
+"avflettning eller videoforvrenging."
 
 #: src/libvlc-module.c:389
 msgid "Video snapshot directory (or filename)"
@@ -2214,7 +2228,7 @@ msgstr "Filformat for skjermbilete av video"
 
 #: src/libvlc-module.c:399
 msgid "Image format which will be used to store the video snapshots"
-msgstr ""
+msgstr "Bildeormat som skal brukast til å lagra videoskjermbilde"
 
 #: src/libvlc-module.c:401
 msgid "Display video snapshot preview"
@@ -2231,10 +2245,11 @@ msgstr "Bruk talrekkje i staden for tidsstempel"
 #: src/libvlc-module.c:407
 msgid "Use sequential numbers instead of timestamps for snapshot numbering"
 msgstr ""
+"Bruk talrekkje i staden for tidsstempel til namngjeving av skjermbilete"
 
 #: src/libvlc-module.c:409
 msgid "Video snapshot width"
-msgstr "Breidd på skjermbilete av video"
+msgstr "Breidde på skjermbilete av video"
 
 #: src/libvlc-module.c:411
 msgid ""
@@ -2321,6 +2336,8 @@ msgid ""
 "Comma separated list of crop ratios which will be added in the interface's "
 "crop ratios list."
 msgstr ""
+"Kommaseparert liste over nedklippingsforhold som vil bli lagt til i lista "
+"til grensesnittet over nedklippingsforhold."
 
 #: src/libvlc-module.c:450
 msgid "Custom aspect ratios list"
@@ -2331,6 +2348,8 @@ msgid ""
 "Comma separated list of aspect ratios which will be added in the interface's "
 "aspect ratio list."
 msgstr ""
+"Kommaseparert liste over høgde/breidde-forhold  som vil bli lagt til i høgde/"
+"breidde-forholdslista til grensesnittet."
 
 #: src/libvlc-module.c:455
 msgid "Fix HDTV height"
@@ -2349,7 +2368,7 @@ msgstr ""
 
 #: src/libvlc-module.c:462
 msgid "Monitor pixel aspect ratio"
-msgstr ""
+msgstr "Høgde/breidde-forhold for bildpunkt på skjermen"
 
 #: src/libvlc-module.c:464
 msgid ""
@@ -2370,6 +2389,8 @@ msgid ""
 "Enables framedropping on MPEG2 stream. Framedropping occurs when your "
 "computer is not powerful enough"
 msgstr ""
+"Slår på ramedropping på MPEG2-straumar. Ramedropping oppstår når maskinen "
+"din ikkje er kraftig nok"
 
 #: src/libvlc-module.c:473
 msgid "Drop late frames"
@@ -2397,11 +2418,12 @@ msgstr ""
 
 #: src/libvlc-module.c:483
 msgid "Key press events"
-msgstr ""
+msgstr "Tastetrykk-hendingar"
 
 #: src/libvlc-module.c:485
 msgid "This enables VLC hotkeys from the (non-embedded) video window."
 msgstr ""
+"Dette aktiverer VLC-snøggtastar frå det (ikkje-innebygde) videovindauget."
 
 #: src/libvlc-module.c:487 modules/spu/remoteosd.c:91
 msgid "Mouse events"
@@ -2409,7 +2431,7 @@ msgstr "Musehendinger"
 
 #: src/libvlc-module.c:489
 msgid "This enables handling of mouse clicks on the video."
-msgstr ""
+msgstr "Dette aktiverar handsaming av museklikk på videoen."
 
 #: src/libvlc-module.c:497
 msgid ""
@@ -2435,7 +2457,7 @@ msgstr "Mellomlagring for direkteopptak (ms)"
 
 #: src/libvlc-module.c:507
 msgid "Caching value for cameras and microphones, in milliseconds."
-msgstr ""
+msgstr "Mellomlagringsverdi for kamera og mikrofonar, i millisekund."
 
 #: src/libvlc-module.c:509
 msgid "Disc caching (ms)"
@@ -2451,7 +2473,7 @@ msgstr "Nettverksmellomlagring (ms)"
 
 #: src/libvlc-module.c:515
 msgid "Caching value for network resources, in milliseconds."
-msgstr ""
+msgstr "Mellomlagringsverdi for nettverksressursar, i millisekund."
 
 #: src/libvlc-module.c:517
 msgid "Clock reference average counter"
@@ -2479,7 +2501,7 @@ msgstr ""
 
 #: src/libvlc-module.c:528
 msgid "Clock jitter"
-msgstr ""
+msgstr "Klokkestøy"
 
 #: src/libvlc-module.c:530
 msgid ""
@@ -2530,13 +2552,15 @@ msgstr "Slå på"
 
 #: src/libvlc-module.c:542
 msgid "MTU of the network interface"
-msgstr ""
+msgstr "MTU for nettverksgrensesnittet"
 
 #: src/libvlc-module.c:544
 msgid ""
 "This is the maximum application-layer packet size that can be transmitted "
 "over the network (in bytes)."
 msgstr ""
+"Dette er den maksimale pakkestorleiken på applikasjonslaget som kan "
+"overførast over nettverket (i byte)."
 
 #: src/libvlc-module.c:549 modules/stream_out/rtp.c:124
 msgid "Hop limit (TTL)"
@@ -2554,7 +2578,7 @@ msgstr ""
 
 #: src/libvlc-module.c:555
 msgid "Multicast output interface"
-msgstr ""
+msgstr "Multicast-utgangsgrensesnitt"
 
 #: src/libvlc-module.c:557
 msgid "Default multicast interface. This overrides the routing table."
@@ -2597,7 +2621,7 @@ msgstr "Lydspor"
 
 #: src/libvlc-module.c:580
 msgid "Stream number of the audio track to use (from 0 to n)."
-msgstr ""
+msgstr "Strøymenummeret for det lydsporet du vil bruka (frå 0 til n)."
 
 #: src/libvlc-module.c:583 modules/gui/qt/ui/open_disk.h:310
 msgid "Subtitle track"
@@ -2605,7 +2629,7 @@ msgstr "Undertekstspor"
 
 #: src/libvlc-module.c:585
 msgid "Stream number of the subtitle track to use (from 0 to n)."
-msgstr ""
+msgstr "Strøymenummeret på undertekstsporet du vil bruka (frå 0 till n)."
 
 #: src/libvlc-module.c:588 modules/stream_out/transcode/transcode.c:97
 msgid "Audio language"
@@ -2656,7 +2680,7 @@ msgstr "Straume-IDen til undertekstsporet som skal brukast."
 
 #: src/libvlc-module.c:612
 msgid "Preferred Closed Captions decoder"
-msgstr ""
+msgstr "Føretrekt undertekstdekodar"
 
 #: src/libvlc-module.c:616
 msgid "Preferred video resolution"
@@ -2700,7 +2724,7 @@ msgstr "Inndata-repeteringar"
 
 #: src/libvlc-module.c:632
 msgid "Number of time the same input will be repeated"
-msgstr ""
+msgstr "Antal gongar same innmating skal takast oppatt"
 
 #: src/libvlc-module.c:634 modules/gui/macosx/VLCOpenWindowController.m:159
 msgid "Start time"
@@ -2732,7 +2756,7 @@ msgstr "Snøggsøk"
 
 #: src/libvlc-module.c:648
 msgid "Favor speed over precision while seeking"
-msgstr ""
+msgstr "Prioriter fart over presisjon under søking"
 
 #: src/libvlc-module.c:650
 msgid "Playback speed"
@@ -2779,15 +2803,15 @@ msgstr ""
 
 #: src/libvlc-module.c:671
 msgid "Record directory"
-msgstr ""
+msgstr "Opptaksmappe"
 
 #: src/libvlc-module.c:673
 msgid "Directory where the records will be stored"
-msgstr ""
+msgstr "Mappe der opptaka vil bli lagra"
 
 #: src/libvlc-module.c:675
 msgid "Prefer native stream recording"
-msgstr ""
+msgstr "Føretrekk innebygd strøymeopptak"
 
 #: src/libvlc-module.c:677
 msgid ""
@@ -2892,7 +2916,7 @@ msgstr ""
 
 #: src/libvlc-module.c:726
 msgid "Subpictures source module"
-msgstr ""
+msgstr "Kjeldemodul for underbilde"
 
 #: src/libvlc-module.c:728
 msgid ""
@@ -2912,7 +2936,7 @@ msgstr ""
 
 #: src/libvlc-module.c:736
 msgid "Autodetect subtitle files"
-msgstr ""
+msgstr "Identifiser undertekstfiler automatisk"
 
 #: src/libvlc-module.c:738
 msgid ""
@@ -3077,7 +3101,7 @@ msgstr ""
 
 #: src/libvlc-module.c:838
 msgid "HTTP/TLS server certificate"
-msgstr ""
+msgstr "HTTP/TLS-serversertifikat"
 
 #: src/libvlc-module.c:840
 msgid ""
@@ -3282,7 +3306,7 @@ msgstr ""
 
 #: src/libvlc-module.c:948
 msgid "Enable audio stream output"
-msgstr ""
+msgstr "Slå på lydstraummutgang"
 
 #: src/libvlc-module.c:950
 msgid ""
@@ -3786,31 +3810,35 @@ msgstr "Lydstyrkekontroll"
 
 #: src/libvlc-module.c:1215
 msgid "Position control"
-msgstr ""
+msgstr "Posisjonskontroll"
 
 #: src/libvlc-module.c:1215
 msgid "Position control reversed"
-msgstr ""
+msgstr "Posisjonskontroll reversert"
 
 #: src/libvlc-module.c:1218
 msgid "Mouse wheel vertical axis control"
-msgstr ""
+msgstr "Vertikal aksekontroll for musehjul"
 
 #: src/libvlc-module.c:1220
 msgid ""
 "The mouse wheel vertical (up/down) axis can control volume, position or be "
 "ignored."
 msgstr ""
+"Musetasten sin vertikale akse (opp/ned) kan styre volum, posisjon eller "
+"ignorerast."
 
 #: src/libvlc-module.c:1222
 msgid "Mouse wheel horizontal axis control"
-msgstr ""
+msgstr "Horisontal aksekontroll for musehjul"
 
 #: src/libvlc-module.c:1224
 msgid ""
 "The mouse wheel horizontal (left/right) axis can control volume, position or "
 "be ignored."
 msgstr ""
+"Musetasten sin horisontale akse (venstre/høgre) kan styre volum, posisjon "
+"eller bli ignorert."
 
 #: src/libvlc-module.c:1226 src/video_output/vout_intf.c:268
 #: modules/gui/macosx/VLCControlsBarCommon.m:98
@@ -4073,6 +4101,8 @@ msgid ""
 "Select the key to move the selector up in DVD menus / Move viewpoint to up "
 "(pitch)."
 msgstr ""
+"Vel tasten for å flytta veljaren opp i DVDmenyar / Flytt synspunkt opp "
+"(tonehøgde)."
 
 #: src/libvlc-module.c:1297
 msgid "Navigate down"
@@ -4201,11 +4231,11 @@ msgstr ""
 
 #: src/libvlc-module.c:1326
 msgid "Scale up subtitles text"
-msgstr ""
+msgstr "Skaler opp undertekst"
 
 #: src/libvlc-module.c:1327
 msgid "Scale down subtitles text"
-msgstr ""
+msgstr "Skaler ned undertekst"
 
 #: src/libvlc-module.c:1328
 msgid "Select the key to change subtitles text scaling"
@@ -4249,7 +4279,7 @@ msgstr "Undertekstplassering opp"
 
 #: src/libvlc-module.c:1338
 msgid "Select the key to move subtitles higher."
-msgstr ""
+msgstr "Vel nykelen for å flytta undertekstane høgare."
 
 #: src/libvlc-module.c:1339
 msgid "Subtitle position down"
@@ -4712,7 +4742,7 @@ msgstr "Ytingsval"
 
 #: src/libvlc-module.c:2061
 msgid "Clock source"
-msgstr ""
+msgstr "Klokkekjelde"
 
 #: src/libvlc-module.c:2179
 msgid "Hot keys"
@@ -5085,7 +5115,7 @@ msgstr "%.1f KiB"
 #: src/misc/update.c:488
 #, c-format
 msgid "%<PRIu64> B"
-msgstr ""
+msgstr "%<PRIu64> B"
 
 #: src/misc/update.c:580
 msgid "Saving file failed"
@@ -5965,7 +5995,7 @@ msgstr "Vedleggs-inndata"
 
 #: modules/access/avaudiocapture.m:212
 msgid "No Audio Input device found"
-msgstr ""
+msgstr "Inga lydinngangseining funnen"
 
 #: modules/access/avaudiocapture.m:213
 msgid ""
@@ -6100,14 +6130,18 @@ msgid ""
 "This Blu-ray Disc needs a library for BD+ decoding, and your system does not "
 "have it."
 msgstr ""
+"Denne Blu-Ray-disken krev eit bibliotek for dekoding av BD+, og maskina di "
+"har ikkje det."
 
 #: modules/access/bluray.c:891
 msgid "Your system BD+ decoding library does not work. Missing configuration?"
 msgstr ""
+"Dekodingsbiblioteket for BD+ på maskina di verkar ikkje. Manglar det noko i "
+"oppsettet?"
 
 #: modules/access/bluray.c:924
 msgid "Java required"
-msgstr ""
+msgstr "Java påkravd"
 
 #: modules/access/bluray.c:925
 #, c-format
@@ -6115,10 +6149,12 @@ msgid ""
 "This Blu-ray disc requires Java for menus support.%s\n"
 "The disc will be played without menus."
 msgstr ""
+"Denne Blu-ray- plata krev Java for menystøtte. %s\n"
+"Platen vil bli spelt av utan menyar."
 
 #: modules/access/bluray.c:926
 msgid "Java was not found on your system."
-msgstr ""
+msgstr "Fann ikkje Java på systemet ditt."
 
 #: modules/access/bluray.c:949
 msgid "Failed to start bluray playback. Please try without menu support."
@@ -6153,11 +6189,11 @@ msgstr "Lyd-CD, inndata"
 
 #: modules/access/cdda.c:1014
 msgid "[cdda:][device][@[track]]"
-msgstr ""
+msgstr "[cdda:][eining][@[spor]]"
 
 #: modules/access/cdda.c:1023
 msgid "Musicbrainz Server"
-msgstr ""
+msgstr "Musicbrainz-server"
 
 #: modules/access/cdda.c:1024
 msgid "Address of the musicbrainz server to use."
@@ -6205,7 +6241,7 @@ msgstr "IIDC digitalkamera (FireWire) inndata"
 
 #: modules/access/dcp/dcp.cpp:43
 msgid "KDM file"
-msgstr ""
+msgstr "KDM-fil"
 
 #: modules/access/dcp/dcp.cpp:44
 msgid "Path to Key Delivery Message XML file"
@@ -6252,7 +6288,7 @@ msgstr ""
 #: modules/access/decklink.cpp:66 modules/demux/rawaud.c:43
 #: modules/video_output/decklink.cpp:105
 msgid "Audio samplerate (Hz)"
-msgstr ""
+msgstr "Lydsamplingsfrekvens (Hz)"
 
 #: modules/access/decklink.cpp:68
 msgid ""
@@ -6491,7 +6527,7 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:176
 msgid "Video input pin"
-msgstr ""
+msgstr "Videoinndatapinne"
 
 #: modules/access/dshow/dshow.cpp:178
 msgid ""
@@ -6503,7 +6539,7 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:182
 msgid "Audio input pin"
-msgstr ""
+msgstr "Lydinndatapinne"
 
 #: modules/access/dshow/dshow.cpp:184
 msgid "Select the audio input source. See the \"video input\" option."
@@ -6511,7 +6547,7 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:185
 msgid "Video output pin"
-msgstr ""
+msgstr "Videoutdatapinne"
 
 #: modules/access/dshow/dshow.cpp:187
 msgid "Select the video output type. See the \"video input\" option."
@@ -6519,7 +6555,7 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:188
 msgid "Audio output pin"
-msgstr ""
+msgstr "Lydutdatapinne"
 
 #: modules/access/dshow/dshow.cpp:190
 msgid "Select the audio output type. See the \"video input\" option."
@@ -6710,7 +6746,7 @@ msgstr ""
 
 #: modules/access/dtv/access.c:102
 msgid "High-priority code rate"
-msgstr ""
+msgstr "Kodefart med høg prioritet"
 
 #: modules/access/dtv/access.c:103
 msgid "Low-priority code rate"
@@ -6868,6 +6904,8 @@ msgid ""
 "receiver are long, higher voltage may be required.\n"
 "Not all receivers support this."
 msgstr ""
+"Om kablane mellom satelittens lågstøy blockdown-koverter og mottakaren er "
+"lange, kan høgare spenning vera naudsynt. Ikkje alle mottakarar stør dette."
 
 #: modules/access/dtv/access.c:190
 msgid "Local oscillator low frequency (kHz)"
@@ -6875,7 +6913,7 @@ msgstr ""
 
 #: modules/access/dtv/access.c:191
 msgid "Local oscillator high frequency (kHz)"
-msgstr ""
+msgstr "Lokal oscillator høgfrekvens (kHz)"
 
 #: modules/access/dtv/access.c:193
 msgid ""
@@ -6904,6 +6942,8 @@ msgid ""
 "A continuous tone at 22kHz can be sent on the cable. This normally selects "
 "the higher frequency band from a universal LNB."
 msgstr ""
+"Ein kontinuerleg tone på 22kHz kan sendast på kabelen. Dette vel vanlegvis "
+"det høgare frekvensbandet frå ein universell LNB."
 
 #: modules/access/dtv/access.c:206
 msgid "DiSEqC LNB number"
@@ -6936,7 +6976,7 @@ msgstr ""
 
 #: modules/access/dtv/access.c:227
 msgid "Network identifier"
-msgstr ""
+msgstr "Nettverksidentifisering"
 
 #: modules/access/dtv/access.c:228
 msgid "Satellite azimuth"
@@ -6980,7 +7020,7 @@ msgstr "ATSC-underkanalar"
 
 #: modules/access/dtv/access.c:243
 msgid "Physical channel"
-msgstr ""
+msgstr "Fysisk kanal"
 
 #: modules/access/dtv/access.c:249
 msgid "DTV"
@@ -7060,7 +7100,7 @@ msgstr ""
 
 #: modules/access/dvb/access.c:73
 msgid "Scan tuning list"
-msgstr ""
+msgstr "Skann mottakslista"
 
 #: modules/access/dvb/access.c:74
 msgid "Filename containing initial scan tuning data."
@@ -7106,6 +7146,8 @@ msgid ""
 "Start the DVD directly in the main menu. This will try to skip all the "
 "useless warning introductions."
 msgstr ""
+"Start DVD-en direkte i hovudmenyen. Dette vil prøva å hoppa over dei "
+"ubrukelege åtvaringsintroduksjonane."
 
 #: modules/access/dvdnav.c:98
 msgid "DVD with menus"
@@ -7141,7 +7183,7 @@ msgstr "DVDRead Input (no menu support)"
 #: modules/access/dvdread.c:237
 #, c-format
 msgid "DVDRead could not open the disc \"%s\"."
-msgstr ""
+msgstr "DVDRead klarte ikkje å opna «%s»-disken."
 
 #: modules/access/dvdread.c:253
 msgid "Cannot play a non-UDF mastered DVD."
@@ -7293,15 +7335,15 @@ msgstr ""
 
 #: modules/access/http/access.c:288
 msgid "HTTPS input"
-msgstr ""
+msgstr "HTTPS-inndata"
 
 #: modules/access/http/access.c:289
 msgid "HTTPS"
-msgstr ""
+msgstr "HTTPS"
 
 #: modules/access/http/access.c:296
 msgid "Continuous stream"
-msgstr ""
+msgstr "Kontinuerleg strøyming"
 
 #: modules/access/http/access.c:297
 msgid "Keep reading a resource that keeps being updated."
@@ -7317,7 +7359,7 @@ msgstr ""
 
 #: modules/access/http/access.c:301
 msgid "Referrer"
-msgstr ""
+msgstr "Tilvisar"
 
 #: modules/access/http/access.c:302
 msgid "Provide the referral URL, i.e. HTTP \"Referer\" (sic)."
@@ -7325,7 +7367,7 @@ msgstr ""
 
 #: modules/access/http/access.c:306
 msgid "User agent"
-msgstr ""
+msgstr "Brukaragent"
 
 #: modules/access/http/access.c:307
 msgid ""
@@ -7456,7 +7498,7 @@ msgstr ""
 
 #: modules/access/imem.c:105
 msgid "Get function"
-msgstr ""
+msgstr "Få funksjon"
 
 #: modules/access/imem.c:107
 msgid "Address of the get callback function"
@@ -7464,7 +7506,7 @@ msgstr ""
 
 #: modules/access/imem.c:109
 msgid "Release function"
-msgstr ""
+msgstr "Sleppfunksjon"
 
 #: modules/access/imem.c:111
 msgid "Address of the release callback function"
@@ -7671,7 +7713,7 @@ msgstr "RTSP-godkjenning"
 
 #: modules/access/live555.cpp:678
 msgid "Please enter a valid login name and a password."
-msgstr ""
+msgstr "Skriv inn eit gyldig brukarnamn og passord."
 
 #: modules/access/live555.cpp:703
 msgid "RTSP connection failed"
@@ -7742,11 +7784,11 @@ msgstr ""
 
 #: modules/access/nfs.c:57
 msgid "NFS"
-msgstr ""
+msgstr "NFS"
 
 #: modules/access/nfs.c:58
 msgid "NFS input"
-msgstr ""
+msgstr "NFS-inndata"
 
 #: modules/access/nfs.c:114
 msgid "NFS operation failed"
@@ -7793,7 +7835,7 @@ msgstr "PulseAudio-inndata"
 
 #: modules/access/rdp.c:72
 msgid "Encrypted connexion"
-msgstr ""
+msgstr "Kryptert samband"
 
 #: modules/access/rdp.c:74
 msgid "Acquisition rate (in fps)"
@@ -7816,9 +7858,8 @@ msgid "Bitmask"
 msgstr ""
 
 #: modules/access/rist.c:313
-#, fuzzy
 msgid "Virtual Destination Port Filter"
-msgstr "Målfil:"
+msgstr ""
 
 #: modules/access/rist.c:315
 msgid ""
@@ -7828,11 +7869,11 @@ msgstr ""
 
 #: modules/access/rist.c:321 modules/access_output/rist.c:293
 msgid "RIST"
-msgstr ""
+msgstr "RIST"
 
 #: modules/access/rist.c:322
 msgid "RIST input"
-msgstr ""
+msgstr "RIST-inndata"
 
 #: modules/access/rist.c:327
 msgid "RIST demux/decode maximum jitter (default is 5ms)"
@@ -7978,7 +8019,7 @@ msgstr ""
 
 #: modules/access/satip.c:64
 msgid "Request server to send stream as multicast"
-msgstr ""
+msgstr "Be serveren om å sende straum som multicast"
 
 #: modules/access/satip.c:66 modules/lua/vlc.c:62
 #: share/lua/http/dialogs/stream_config_window.html:28
@@ -8111,9 +8152,8 @@ msgid "SFTP port number to use on the server"
 msgstr ""
 
 #: modules/access/sftp.c:61
-#, fuzzy
 msgid "Private key file"
-msgstr "AES-lykelfil"
+msgstr ""
 
 #: modules/access/sftp.c:62
 msgid ""
@@ -8239,11 +8279,11 @@ msgstr ""
 
 #: modules/access/srt.c:548 modules/access_output/srt.c:457
 msgid "SRT"
-msgstr ""
+msgstr "SRT"
 
 #: modules/access/srt.c:549
 msgid "SRT input"
-msgstr ""
+msgstr "SRT-inndata"
 
 #: modules/access/srt.c:555 modules/access_output/srt.c:464
 msgid "Return poll wait after timeout milliseconds (-1 = infinite)"
@@ -8251,16 +8291,15 @@ msgstr ""
 
 #: modules/access/srt.c:558 modules/access_output/srt.c:466
 msgid "SRT latency (ms)"
-msgstr ""
+msgstr "SRT-ventetid (ms)"
 
 #: modules/access/srt.c:560 modules/access_output/srt.c:468
 msgid "Password for stream encryption"
-msgstr ""
+msgstr "Passord for straumkryptering"
 
 #: modules/access/srt.c:566
-#, fuzzy
 msgid "SRT Stream ID"
-msgstr "Straum %d"
+msgstr "SRT straum-ID"
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -8432,7 +8471,7 @@ msgstr ""
 
 #: modules/access/v4l2/v4l2.c:95
 msgid "Automatic hue"
-msgstr ""
+msgstr "Automatisk fargespekter"
 
 #: modules/access/v4l2/v4l2.c:97
 msgid "Automatically adjust the picture hue."
@@ -8504,7 +8543,7 @@ msgstr "Skarpheit"
 
 #: modules/access/v4l2/v4l2.c:121
 msgid "Sharpness filter adjust."
-msgstr ""
+msgstr "Justering av skarpleikfilter."
 
 #: modules/access/v4l2/v4l2.c:122
 msgid "Chroma gain"
@@ -8675,7 +8714,7 @@ msgstr "Bråkemodus"
 
 #: modules/access/v4l2/v4l2.c:186
 msgid "Loudness mode a.k.a. bass boost."
-msgstr ""
+msgstr "Lydstyrkemodus, også kalla bassboost"
 
 #: modules/access/v4l2/v4l2.c:188
 msgid "v4l2 driver controls"
@@ -8777,11 +8816,11 @@ msgstr "VCD-inndata"
 
 #: modules/access/vcd/vcd.c:54
 msgid "[vcd:][device][#[title][,[chapter]]]"
-msgstr ""
+msgstr "[vcd:][eining][#[tittel][,[kapittel]]]"
 
 #: modules/access/vdr.c:72
 msgid "Support for VDR recordings (http://www.tvdr.de/)."
-msgstr ""
+msgstr "Støtte for VDR-opptak (http://www.tvdr.de/)."
 
 #: modules/access/vdr.c:74
 msgid "Chapter offset in ms"
@@ -8891,7 +8930,7 @@ msgstr ""
 
 #: modules/access/wasapi.c:493
 msgid "WASAPI"
-msgstr ""
+msgstr "WASAPI"
 
 #: modules/access/wasapi.c:494
 msgid "Windows Audio Session API input"
@@ -9098,18 +9137,16 @@ msgid "Source port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:272
-#, fuzzy
 msgid "Virtual Destination Port"
-msgstr "Strøyme-plassering"
+msgstr ""
 
 #: modules/access_output/rist.c:274
 msgid "Destination port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:281
-#, fuzzy
 msgid "Multipeer mode"
-msgstr "AM-mottakarmodus"
+msgstr ""
 
 #: modules/access_output/rist.c:283
 msgid ""
@@ -9118,14 +9155,12 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Duplicate"
-msgstr "Applikasjon"
+msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Load balanced"
-msgstr "Raud-balanse"
+msgstr ""
 
 #: modules/access_output/rist.c:294
 msgid "RIST stream output"
@@ -9531,11 +9566,11 @@ msgstr ""
 #: modules/audio_filter/stereo_widen.c:60
 #: modules/gui/qt/components/extended_panels.cpp:1368
 msgid "Feedback gain"
-msgstr ""
+msgstr "Attendekoplingsforstering"
 
 #: modules/audio_filter/chorus_flanger.c:89
 msgid "Gain on Feedback loop"
-msgstr ""
+msgstr "Forsterking på attendekoplingssløyfe"
 
 #: modules/audio_filter/chorus_flanger.c:91
 msgid "Wet mix"
@@ -9604,7 +9639,7 @@ msgstr "Lydbøyingsgrad"
 
 #: modules/audio_filter/compressor.c:171
 msgid "Set the knee radius in dB."
-msgstr ""
+msgstr "Still inn lydbøyingsgrad"
 
 #: modules/audio_filter/compressor.c:173
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:231
@@ -9726,7 +9761,7 @@ msgstr "Stor hall"
 
 #: modules/audio_filter/equalizer_presets.h:56
 msgid "Live"
-msgstr "Konsert"
+msgstr "DIrekte"
 
 #: modules/audio_filter/equalizer_presets.h:56
 msgid "Party"
@@ -9797,6 +9832,9 @@ msgid ""
 "A higher number of buffers will increase the response time of the filter to "
 "a spike but will make it less sensitive to short variations."
 msgstr ""
+"Dette er talet på lydbuffrar som effektmålinga vert gjort på. Eit høgare tal "
+"buffrar vil auka responstida til filteret for ein topp, men vil gjera det "
+"mindre følsamt for korte variasjonar."
 
 #: modules/audio_filter/normvol.c:71
 msgid "Maximal volume level"
@@ -9938,11 +9976,11 @@ msgstr ""
 
 #: modules/audio_filter/scaletempo.c:52
 msgid "Pitch Shifter"
-msgstr ""
+msgstr "Tonehøgdeskiftar"
 
 #: modules/audio_filter/scaletempo.c:53
 msgid "Audio pitch changer"
-msgstr ""
+msgstr "Lydtonehøgde-endrar"
 
 #: modules/audio_filter/scaletempo.c:55
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:263
@@ -10054,7 +10092,7 @@ msgstr ""
 #: modules/audio_filter/stereo_widen.c:64
 #: modules/gui/qt/components/extended_panels.cpp:1369
 msgid "Crossfeed"
-msgstr ""
+msgstr "Kryssmating"
 
 #: modules/audio_filter/stereo_widen.c:65
 msgid ""
@@ -10391,6 +10429,8 @@ msgid ""
 "The option allows you to enable or disable the high-quality float32 audio "
 "output mode (which is not well supported by some soundcards)."
 msgstr ""
+"Valet lèt deg slå på eller av høgkvalitets float32-lydmodus (som ikkje er "
+"godt stødd av nokre lydkort)."
 
 #: modules/codec/a52.c:72
 msgid "A/52 dynamic range compression"
@@ -10630,6 +10670,9 @@ msgid ""
 "Skipping the loop filter (aka deblocking) usually has a detrimental effect "
 "on quality. However it provides a big speedup for high definition streams."
 msgstr ""
+"Å hoppa over lykkjefilteret (også kjend som deblocking) har vanlegvis "
+"negativ effekt på kvaliteten. Likevel gir det ein stor auke i fart for "
+"straumar i høg oppløysing."
 
 #: modules/codec/avcodec/avcodec.h:114
 #: modules/gui/macosx/VLCSimplePrefsController.m:311
@@ -10832,6 +10875,8 @@ msgid ""
 "Raise the quantizer for macroblocks with a high temporal complexity "
 "(default: 0.0)."
 msgstr ""
+"Auka kvantiseraren for makroblokkene med høg tidsfesta kompleksitet "
+"(standard: 0.0)."
 
 #: modules/codec/avcodec/avcodec.h:217
 msgid "Border masking"
@@ -11165,6 +11210,8 @@ msgid ""
 "This library will produce higher quality audio at the expense of additional "
 "CPU usage (default is enabled)."
 msgstr ""
+"Dette biblioteket vil produsera lyd av høgare kvalitet på kostnad av auka "
+"CPU-bruk (standard er aktivert)."
 
 #: modules/codec/fdkaac.c:79
 msgid "Signaling mode of the extension AOT"
@@ -11645,6 +11692,9 @@ msgid ""
 "the correct profile from other sources, such as resolution and bitrate. E.g. "
 "'high'"
 msgstr ""
+"Spesifiser kodekprofilen eksplisitt. Om du ikkje gjer det, vil kodeken "
+"bestemma korrekt profil frå andre kjelder, som oppløysing og bitrate. Til "
+"dømes 'høg'"
 
 #: modules/codec/qsv.c:67
 msgid "Codec Level"
@@ -11811,6 +11861,9 @@ msgid ""
 "result. Higher numbers may result on better throughput depending on "
 "hardware. MPEG2 needs at least 1 here."
 msgstr ""
+"Definerer talet på parallelle kodingoperasjonar før vi synkroniserer "
+"resultatet. Høgare tal kan gje betre gjennomstrøyming avhengig av "
+"maskinvara. MPEG2 treng minst 1 her."
 
 #: modules/codec/qsv.c:193
 msgid "Intel QuickSync Video encoder for MPEG4-Part10/MPEG2 (aka H.264/H.262)"
@@ -11877,7 +11930,7 @@ msgstr ""
 
 #: modules/codec/speex.c:65
 msgid "Enforce a quality between 0 (low) and 10 (high)."
-msgstr ""
+msgstr "Sørg for ein kvalitet mellom 0 (låg) og 10 (høg)."
 
 #: modules/codec/speex.c:67
 msgid "Encoding complexity"
@@ -12187,7 +12240,6 @@ msgstr ""
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -12304,6 +12356,8 @@ msgid ""
 "Enforce a quality between 1 (low) and 10 (high), instead of specifying a "
 "particular bitrate. This will produce a VBR stream."
 msgstr ""
+"Set ein kvalitet mellom 1 (låg) og 10 (høg), i staden for å oppgje ein "
+"bestemt bitfart. Dette vil produsera ein VBR-straum."
 
 #: modules/codec/theora.c:110 modules/video_filter/postproc.c:69
 msgid "Post processing quality"
@@ -12592,21 +12646,23 @@ msgstr ""
 
 #: modules/codec/x264.c:143
 msgid "Skip loop filter"
-msgstr ""
+msgstr "Hopp over sløyfefilter"
 
 #: modules/codec/x264.c:144
 msgid "Deactivate the deblocking loop filter (decreases quality)."
-msgstr ""
+msgstr "Deaktiver deblokkeringssløyfefilteret (reduserer kvaliteten)."
 
 #: modules/codec/x264.c:146
 msgid "Loop filter AlphaC0 and Beta parameters alpha:beta"
-msgstr ""
+msgstr "Sløyfefilter AlphaC0 og Beta parametrar alpha:beta"
 
 #: modules/codec/x264.c:147
 msgid ""
 "Loop filter AlphaC0 and Beta parameters. Range -6 to 6 for both alpha and "
 "beta parameters. -6 means light filter, 6 means strong."
 msgstr ""
+"Loopfilteret AlphaC0 og Beta-parametrar. Område -6 til 6 for både alfa- og "
+"beta-parametrar. -6 tyder lett filter, 6 tyder sterkt."
 
 #: modules/codec/x264.c:151
 msgid "H.264 level"
@@ -12972,6 +13028,7 @@ msgstr ""
 #: modules/codec/x264.c:327
 msgid "RD based mode decision for B-frames. This requires subme 6 (or higher)."
 msgstr ""
+"RD-basert modusavgjerd for B-rammer. Dette krev subme 6 (eller høgare)."
 
 #: modules/codec/x264.c:330
 msgid "Decide references on a per partition basis"
@@ -14304,7 +14361,7 @@ msgstr ""
 
 #: modules/demux/dirac.c:54
 msgid "Dirac video demuxer"
-msgstr "Dirac video-demultipleksar"
+msgstr ""
 
 #: modules/demux/directory.c:94
 msgid "Directory import"
@@ -15298,7 +15355,7 @@ msgstr "Artistar"
 #: modules/gui/macosx/VLCAboutWindowController.m:103
 msgid ""
 "VLC media player and VideoLAN are trademarks of the VideoLAN Association."
-msgstr ""
+msgstr "VLC-mediespelaren og VideoLan er varemerke for VideoLan Association."
 
 #: modules/gui/macosx/VLCAboutWindowController.m:128
 msgid ""
@@ -15975,7 +16032,7 @@ msgstr "Lydstyrke: %i %%"
 
 #: modules/gui/macosx/VLCHelpWindowController.m:47
 msgid "VLC media player Help"
-msgstr ""
+msgstr "Hjelp for VLC mediaspelar"
 
 #: modules/gui/macosx/VLCHelpWindowController.m:50
 #: modules/gui/macosx/VLCMainMenu.m:467 modules/gui/macosx/VLCMainMenu.m:1101
@@ -16791,7 +16848,7 @@ msgstr "Fald saman alle"
 #: modules/gui/macosx/VLCPlaylist.m:231
 #: modules/gui/qt/components/playlist/standardpanel.cpp:274
 msgid "Shuffle playlist"
-msgstr ""
+msgstr "Bland spelelista"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:54
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -17455,7 +17512,7 @@ msgstr "Radius"
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:215
 #: modules/gui/qt/ui/video_effects.h:1262
 msgid "Film Grain"
-msgstr ""
+msgstr "Filmkorn"
 
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:216
 #: modules/video_filter/grain.c:53 modules/gui/qt/ui/video_effects.h:1263
@@ -18001,7 +18058,7 @@ msgstr "[Global]"
 
 #: modules/gui/ncurses.c:878
 msgid " q, Q, Esc              Quit"
-msgstr ""
+msgstr " q, Q, Esc              Avslutt"
 
 #: modules/gui/ncurses.c:879
 msgid " s                      Stop"
@@ -18334,7 +18391,7 @@ msgstr "Baklengs"
 
 #: modules/gui/qt/components/controller.hpp:124
 msgid "Change the loop and repeat modes"
-msgstr ""
+msgstr "Endre sløyfe- og repetisjonsmodusane"
 
 #: modules/gui/qt/components/controller.hpp:125
 msgid "Previous media in the playlist"
@@ -18521,6 +18578,8 @@ msgid ""
 "Knee\n"
 "radius"
 msgstr ""
+"Lydbøyings-\n"
+"radius"
 
 #: modules/gui/qt/components/extended_panels.cpp:1331
 msgid ""
@@ -18530,7 +18589,7 @@ msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:1384
 msgid "Adjust pitch"
-msgstr ""
+msgstr "Juster lydtonehøgde"
 
 #: modules/gui/qt/components/extended_panels.cpp:1418
 msgid "(Hastened)"
@@ -18558,7 +18617,7 @@ msgstr "Merknadar"
 
 #: modules/gui/qt/components/info_panels.cpp:376
 msgid "Extra metadata and other information are shown in this panel.\n"
-msgstr ""
+msgstr "Ekstra metadata og anna informasjon vert vist i dette panelet..\n"
 
 #: modules/gui/qt/components/info_panels.cpp:473
 msgid ""
@@ -18950,9 +19009,8 @@ msgstr ""
 "Trykk Delete-tasten for å fjerne."
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1405
-#, fuzzy
 msgid "Global Hotkey change"
-msgstr "Globale snøggtastar"
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1406
 msgid "Hotkey change"
@@ -18975,9 +19033,8 @@ msgid "Warning: <b>%1</b> is already an application menu shortcut"
 msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1490
-#, fuzzy
 msgid "Key or combination: <b>%1</b>"
-msgstr "Tast eller kombinasjon:"
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1498
 msgid "Key: <b>%1</b>"
@@ -19144,19 +19201,16 @@ msgid "This module outputs the stream using the RIST protocol (TR06)."
 msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:186
-#, fuzzy
 msgid "Destination Address"
-msgstr "Plassering"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:191
-#, fuzzy
 msgid "Destination Port"
-msgstr "Plassering"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:201
-#, fuzzy
 msgid "Stream Name"
-msgstr "Straumnamn"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:237
 msgid "This module outputs the transcoded stream to a network via HTTP."
@@ -19299,7 +19353,7 @@ msgstr "Oppdater"
 
 #: modules/gui/qt/dialogs/epg.cpp:162
 msgid " (%1+ rated)"
-msgstr ""
+msgstr " (%1+ vurdert)"
 
 #: modules/gui/qt/dialogs/errors.cpp:40
 msgid "Errors"
@@ -19589,7 +19643,9 @@ msgstr "Last omatt utvidingar"
 msgid ""
 "Skins customize player's appearance. You can activate them through "
 "preferences."
-msgstr "Kler opp avspelarens utsjåande. Du kan aktivere dei i innstillingane."
+msgstr ""
+"Tema tilpassar utsjånaden til avspelaren. Du kan aktivera dei i "
+"innstillingane."
 
 #: modules/gui/qt/dialogs/plugins.cpp:388
 msgid ""
@@ -20723,7 +20779,7 @@ msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:692
 msgid "Show indicator"
-msgstr ""
+msgstr "Vis indikator"
 
 #: modules/hw/d3d9/d3d9_filters.c:454
 msgid "Direct3D9 adjust filter"
@@ -20898,7 +20954,7 @@ msgstr ""
 
 #: modules/keystore/keychain.m:47
 msgid "System default"
-msgstr ""
+msgstr "Systemstandard"
 
 #: modules/keystore/keychain.m:48
 msgid "After first unlock"
@@ -20918,7 +20974,7 @@ msgstr ""
 
 #: modules/keystore/keychain.m:53
 msgid "When unlocked"
-msgstr ""
+msgstr "Når ulåst"
 
 #: modules/keystore/keychain.m:54
 msgid "When unlocked, on this device only"
@@ -22881,7 +22937,7 @@ msgstr ""
 
 #: modules/spu/logo.c:54
 msgid "Number of loops for the logo animation. -1 = continuous, 0 = disabled"
-msgstr ""
+msgstr "Tal på sløyfer for logoanimasjonen. -1 = kontinuerleg, 0 = deaktiverte"
 
 #: modules/spu/logo.c:56
 msgid "Logo individual image time in ms"
@@ -23673,7 +23729,7 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:217
 msgid "High (high quality and high bandwidth)"
-msgstr ""
+msgstr "Høg (høg kvalitet og høg bandbreidde)"
 
 #: modules/stream_out/chromecast/cast.cpp:218
 msgid "Medium (medium quality and medium bandwidth)"
@@ -23685,7 +23741,7 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:220
 msgid "Low CPU (low quality but high bandwidth)"
-msgstr ""
+msgstr "Låg CPU (låg kvalitet men høg bandbreidde)"
 
 #: modules/stream_out/chromecast/cast.cpp:223
 msgid "Conversion quality"
@@ -23757,7 +23813,7 @@ msgstr ""
 
 #: modules/stream_out/delay.c:55
 msgid "Delay a stream"
-msgstr ""
+msgstr "Forseink ein straum"
 
 #: modules/stream_out/description.c:54
 msgid "Description stream output"
@@ -24304,7 +24360,7 @@ msgstr ""
 
 #: modules/stream_out/transcode/transcode.c:58
 msgid "Video frame-rate"
-msgstr ""
+msgstr "Videobildefrekvens"
 
 #: modules/stream_out/transcode/transcode.c:60
 msgid "Target output frame rate for the video stream."
@@ -25405,7 +25461,7 @@ msgstr ""
 
 #: modules/video_filter/hqdn3d.c:64
 msgid "High Quality 3D Denoiser filter"
-msgstr ""
+msgstr "Høgkvalitets 3D-støyreduksjonsfilter"
 
 #: modules/video_filter/invert.c:50
 msgid "Invert video filter"
@@ -25534,15 +25590,15 @@ msgstr ""
 
 #: modules/video_filter/opencv_wrapper.c:69
 msgid "Show only errors"
-msgstr ""
+msgstr "Vis berre feil"
 
 #: modules/video_filter/opencv_wrapper.c:70
 msgid "Show errors and warnings"
-msgstr ""
+msgstr "Vis feil og åtvaringar"
 
 #: modules/video_filter/opencv_wrapper.c:70
 msgid "Show everything including debug messages"
-msgstr ""
+msgstr "Vis alt, inkludert feilsøkingsmeldingar"
 
 #: modules/video_filter/opencv_wrapper.c:73
 msgid "OpenCV video filter wrapper"
@@ -25550,11 +25606,11 @@ msgstr ""
 
 #: modules/video_filter/opencv_wrapper.c:74
 msgid "OpenCV"
-msgstr ""
+msgstr "OpenCV"
 
 #: modules/video_filter/opencv_wrapper.c:81
 msgid "Scale factor (0.1-2.0)"
-msgstr ""
+msgstr "Skaleringsfaktor (0.1-2.0)"
 
 #: modules/video_filter/opencv_wrapper.c:82
 msgid ""
@@ -25822,7 +25878,7 @@ msgstr ""
 
 #: modules/video_filter/scene.c:86
 msgid "Always write to the same file"
-msgstr ""
+msgstr "Skriv alltid til same fil"
 
 #: modules/video_filter/scene.c:87
 msgid ""
@@ -26399,7 +26455,7 @@ msgstr ""
 
 #: modules/video_output/vmem.c:48
 msgid "Pitch"
-msgstr "Nivå"
+msgstr "Tonehøgde"
 
 #: modules/video_output/vmem.c:49
 msgid "Video memory buffer pitch in bytes."
@@ -27332,15 +27388,15 @@ msgstr "0.00 dB"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:147
 msgid "Audio Fingerprinting"
-msgstr ""
+msgstr "Lydfingeravtrykk"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:148
 msgid "Select a matching identity"
-msgstr ""
+msgstr "Vel ein samsvarande identitet"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:149
 msgid "No fingerprint has been found"
-msgstr ""
+msgstr "Fann ingen fingeravtrykk"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:150
 msgid "Fingerprinting track..."
@@ -27360,7 +27416,7 @@ msgstr "&Lagra som…"
 
 #: modules/gui/qt/ui/messages_panel.h:141
 msgid "Modules Tree"
-msgstr ""
+msgstr "Modultre"
 
 #: modules/gui/qt/ui/open.h:258
 msgid "Show extended options"
@@ -27806,7 +27862,7 @@ msgstr "Menyspråk:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:535
 msgid "Look and feel"
-msgstr "Utsjåande og føling"
+msgstr "Utsjånad og verkemåte"
 
 #: modules/gui/qt/ui/sprefs_interface.h:536
 msgid "Use custom skin"
@@ -27858,7 +27914,7 @@ msgstr "Automatisk heving av grensesnittet:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
 msgid "Use a dark palette"
-msgstr ""
+msgstr "Bruk ein mørk palett"
 
 #: modules/gui/qt/ui/sprefs_interface.h:551
 msgid "Skin resource file:"
@@ -28173,75 +28229,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Mediehandsamingsliste"
-
-#~ msgid "4:2:0"
-#~ msgstr "4:2:0"
-
-#~ msgid "4:2:2"
-#~ msgstr "4:2:2"
-
-#~ msgid "4:4:4"
-#~ msgstr "4:4:4"
-
-#~ msgid "Low Delay mode"
-#~ msgstr "Lågforseinkingsmodus"
-
-#~ msgid "Lossless mode"
-#~ msgstr "Tapsfri modus"
-
-#~ msgid "I-frame only sequence"
-#~ msgstr "Sekvens med kun İ-bilete."
-
-#~ msgid "CBR bitrate (kbps)"
-#~ msgstr "CBR-bitfrekvens (Kb/s)"
-
-#~ msgid "Maximum bitrate (kbps)"
-#~ msgstr "Maksimal bitfrekvens (Kb/s)"
-
-#~ msgid "Minimum bitrate (kbps)"
-#~ msgstr "Minimum bitfrekvens (Kb/s)"
-
-#~ msgid "GOP length"
-#~ msgstr "GOP-lengde"
-
-#~ msgid "Prefilter"
-#~ msgstr "Prefilter"
-
-#~ msgid "No pre-filtering"
-#~ msgstr "Inga pre-filtrering"
-
-#~ msgid "Add Noise"
-#~ msgstr "Legg til bråk"
-
-#~ msgid "Low Pass Filter"
-#~ msgstr "Lågpassfilter"
-
-#~ msgid "Amount of prefiltering"
-#~ msgstr "Mengde av førehandsfiltrering"
-
-#~ msgid "Also known as DWT levels"
-#~ msgstr "Òg kjend som DWT-nivå"
-
-#~ msgid "Horizontal slices per frame"
-#~ msgstr "Vassrette skiver per ramme"
-
-#~ msgid "Vertical slices per frame"
-#~ msgstr "Loddrette skiver per ramme"
-
-#~ msgid "Force Profile"
-#~ msgstr "Framtving profil"
-
-#~ msgid "VC2 Low Delay Profile"
-#~ msgstr "VC2-lågforseinkingsprofil"
-
-#~ msgid "VC2 Simple Profile"
-#~ msgstr "VC2 enkel profil"
-
-#~ msgid "VC2 Main Profile"
-#~ msgstr "VC2 hovudprofil"
-
-#~ msgid "Main Profile"
-#~ msgstr "Hovudprofil"
-
-#~ msgid "Key: "
-#~ msgstr "Tast: "
