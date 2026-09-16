@@ -1,5 +1,5 @@
 # Nepali translation
-# Copyright (C) 2023 VideoLAN
+# Copyright (C) 2026 VideoLAN
 # This file is distributed under the same license as the vlc package.
 #
 # Translators:
@@ -25,18 +25,19 @@
 # jackie lhowa, 2022
 # Salina Koirala, 2022
 # Kabin Bhandari, 2022
+# Michał Trzebiatowski <michtrz@gmail.com>, 2021
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22-rc1\n"
+"Project-Id-Version: vlc 3.0.24-beta1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2026-06-28 16:08+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: Kabin Bhandari, 2022\n"
 "Language-Team: Nepali (https://app.transifex.com/yaron/teams/16553/ne/)\n"
-"Language: ne\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: ne\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: include/vlc_common.h:1055
@@ -1066,24 +1067,20 @@ msgid "Decoded format"
 msgstr "Decoded स्वरूप"
 
 #: src/input/es_out.c:3207
-#, fuzzy
 msgid "Decoded channels"
-msgstr "अडियो च्यानल"
+msgstr ""
 
 #: src/input/es_out.c:3212
-#, fuzzy
 msgid "Decoded sample rate"
-msgstr "अडियो नमूना दर"
+msgstr ""
 
 #: src/input/es_out.c:3219
-#, fuzzy
 msgid "Decoded bits per sample"
-msgstr "प्रति नमूना बिट"
+msgstr ""
 
 #: src/input/es_out.c:3224
-#, fuzzy
 msgid "Decoded Bitrate"
-msgstr "Decoded स्वरूप"
+msgstr ""
 
 #: src/input/es_out.c:3237
 msgid "Track replay gain"
@@ -8371,9 +8368,8 @@ msgid "Password for stream encryption"
 msgstr ""
 
 #: modules/access/srt.c:566
-#, fuzzy
 msgid "SRT Stream ID"
-msgstr "प्रवाह %d"
+msgstr ""
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -9211,18 +9207,16 @@ msgid "Source port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:272
-#, fuzzy
 msgid "Virtual Destination Port"
-msgstr "गन्तव्य सेटअप"
+msgstr ""
 
 #: modules/access_output/rist.c:274
 msgid "Destination port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:281
-#, fuzzy
 msgid "Multipeer mode"
-msgstr "शान्त मोड"
+msgstr ""
 
 #: modules/access_output/rist.c:283
 msgid ""
@@ -9231,9 +9225,8 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Duplicate"
-msgstr "अनुप्रयोग"
+msgstr ""
 
 #: modules/access_output/rist.c:287
 msgid "Load balanced"
@@ -12373,7 +12366,6 @@ msgstr ""
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -12788,7 +12780,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, fuzzy
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -19366,19 +19357,16 @@ msgid "This module outputs the stream using the RIST protocol (TR06)."
 msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:186
-#, fuzzy
 msgid "Destination Address"
-msgstr "गन्तव्य"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:191
-#, fuzzy
 msgid "Destination Port"
-msgstr "गन्तव्य"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:201
-#, fuzzy
 msgid "Stream Name"
-msgstr "प्रवाह नाम"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:237
 msgid "This module outputs the transcoded stream to a network via HTTP."
@@ -28481,24 +28469,3 @@ msgstr "AAAA;"
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "मिडिया प्रबन्धक सूची"
-
-#~ msgid "16 bytes"
-#~ msgstr "१६ बाइट्स"
-
-#~ msgid "24 bytes"
-#~ msgstr "२४ बाइट्स"
-
-#~ msgid "32 bytes"
-#~ msgstr "३२ बाइट्स"
-
-#~ msgid "Lossless mode"
-#~ msgstr "हानिरहित मोड"
-
-#~ msgid "Constant lambda mode"
-#~ msgstr "स्थिर ल्याम्डा मोड"
-
-#~ msgid "Constant error mode"
-#~ msgstr "स्थिर त्रुटि मोड"
-
-#~ msgid "Constant quality mode"
-#~ msgstr "स्थिर गुणस्तर मोड"
