@@ -1,3 +1,5 @@
+fs = import('fs')
+
 skins2_option = get_option('skins2') \
     .disable_auto_if(host_system != 'windows' and host_system != 'darwin' and not x11_dep.found()) \
     .require(freetype_dep.found(), error_message: 'Freetype is not available')
@@ -207,5 +209,42 @@ if skins2_feasible
     install_data('../../../share/skins2/skin.dtd',               install_dir: skinsdatadir_path)
     install_data('../../../share/skins2/winamp2.xml',            install_dir: skinsdatadir_path)
 
-    # TODO default.vlt which is a gzip/tarball of the skins2/default folder
+    # Content of the default skin archive, in the order it is stored
+    default_vlt_files = files(
+        '../../../share/skins2/default/subX/about.png',
+        '../../../share/skins2/default/subX/eq.png',
+        '../../../share/skins2/default/subX/font.otf',
+        '../../../share/skins2/default/subX/main.png',
+        '../../../share/skins2/default/subX/pl.png',
+        '../../../share/skins2/default/subX/playtreeglyphs.png',
+        '../../../share/skins2/default/subX/sysbuttons.png',
+        '../../../share/skins2/default/subX/vol_anim.png',
+        '../../../share/skins2/default/subX/vol_slider.png',
+        '../../../share/skins2/default/theme.xml',
+    )
+
+    # Store root as the owner of the files like the autotools build. This is not
+    # supported by the tar of macOS.
+    tar = find_program('tar')
+    if build_machine.system() == 'darwin'
+        tar_owner_args = []
+    else
+        tar_owner_args = ['--owner=root', '--group=root']
+    endif
+
+    relative_vlt_files = []
+    foreach f : default_vlt_files
+        relative_vlt_files += fs.relative_to(f, '../../../share/skins2')
+    endforeach
+
+    custom_target(
+        input: default_vlt_files,
+        output: 'default.vlt',
+        command: [tar, 'cvvzf', '@OUTPUT@', '--format=ustar', tar_owner_args,
+                '--directory=' + vlc_src_root / 'share/skins2', relative_vlt_files
+        ],
+        env: {'GZIP': '--no-name'},
+        console: true,
+        install: true,
+        install_dir: skinsdatadir_path)
 endif
