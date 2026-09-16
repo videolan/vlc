@@ -68,9 +68,12 @@ vlc_modules += {
 
 if lua_dep.found() and get_option('lua').allowed()
   if host_system == 'windows'
-    luadatadir_path = prefix_path + 'lua'
+    # VLC looks for everything next to the executable on Windows
+    luac_install_dir = prefix_path / 'lua'
+    lua_pkgdata_install_dir = prefix_path / 'lua'
   else
-    luadatadir_path = pkglibdir_path + 'lua'
+    luac_install_dir = pkglibexecdir_path / 'lua'
+    lua_pkgdata_install_dir = pkgdatadir_path / 'lua'
   endif
 
   luac = find_program('luac', required: true)
@@ -130,7 +133,7 @@ if lua_dep.found() and get_option('lua').allowed()
                   build_by_default: true,
                   build_subdir: subdir,
                   install: true,
-                  install_dir: luadatadir_path / subdir,
+                  install_dir: luac_install_dir / subdir,
                   command: [luac, '-o', '@OUTPUT@', '@INPUT0@'])
   endforeach
 
@@ -201,7 +204,7 @@ if lua_dep.found() and get_option('lua').allowed()
   foreach m : lua_pkgdata
     splitpath = m.full_path().replace(vlc_src_root / 'share/lua/', '').split('/')
     subdir = '/'.join(splitpath.slice(0, splitpath.length() - 1))
-    install_data(m, install_dir: luadatadir_path / subdir)
+    install_data(m, install_dir: lua_pkgdata_install_dir / subdir)
   endforeach
 
 endif
