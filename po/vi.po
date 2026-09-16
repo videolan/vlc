@@ -1,5 +1,5 @@
 # Vietnamese translation
-# Copyright (C) 2023 VideoLAN
+# Copyright (C) 2026 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -9,19 +9,22 @@
 # bachien <bachien@ejnu.net>, 2018
 # brad freedom <brad.freedom@gmail.com>, 2020
 # sixtyninefourtwenty <quangtrung02hn16@gmail.com>, 2021
-# IoeCmcomc, 2022
+# IoeCmcomc, 2022,2024
+# Michał Trzebiatowski <michtrz@gmail.com>, 2018
+# Hoàng Ngọc Long <dragonknight192105@yahoo.com>, 2024
+# Phi Huynh <huynhkhaphi2806@socson.org>, 2024
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22-rc1\n"
+"Project-Id-Version: vlc 3.0.24-beta1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2026-06-28 16:08+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: Phi Huynh <huynhkhaphi2806@socson.org>, 2024\n"
 "Language-Team: Vietnamese (https://app.transifex.com/yaron/teams/16553/vi/)\n"
-"Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: vi\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #: include/vlc_common.h:1055
@@ -1109,24 +1112,20 @@ msgid "Decoded format"
 msgstr "Định dạng giải mã"
 
 #: src/input/es_out.c:3207
-#, fuzzy
 msgid "Decoded channels"
-msgstr "Kênh audio"
+msgstr ""
 
 #: src/input/es_out.c:3212
-#, fuzzy
 msgid "Decoded sample rate"
-msgstr "Tần số lấy mẫu âm thanh"
+msgstr ""
 
 #: src/input/es_out.c:3219
-#, fuzzy
 msgid "Decoded bits per sample"
-msgstr "Số bit của âm thanh cho từng mẫu"
+msgstr ""
 
 #: src/input/es_out.c:3224
-#, fuzzy
 msgid "Decoded Bitrate"
-msgstr "Định dạng giải mã"
+msgstr ""
 
 #: src/input/es_out.c:3237
 msgid "Track replay gain"
@@ -8315,9 +8314,8 @@ msgid "Bitmask"
 msgstr "Mặt nạ bit"
 
 #: modules/access/rist.c:313
-#, fuzzy
 msgid "Virtual Destination Port Filter"
-msgstr "Đích đến của tập tin:"
+msgstr ""
 
 #: modules/access/rist.c:315
 msgid ""
@@ -8338,13 +8336,10 @@ msgid "RIST demux/decode maximum jitter (default is 5ms)"
 msgstr "RIST tách kênh/giải mã jitter tối đa (mặc định là 5ms)"
 
 #: modules/access/rist.c:328
-#, fuzzy
 msgid ""
 "This controls the maximum jitter that will be passed to the demux/decode "
 "chain. The lower the value, the more CPU cycles the module will consume"
 msgstr ""
-"Điều này kiểm soát jitter tối đa sẽ được chuyển đến chuỗi tách kênh/giải mã. "
-"Giá trị càng thấp thì thuật toán sẽ tiêu thụ càng nhiều chu kỳ CPU"
 
 #: modules/access/rist.c:332
 msgid "RIST nack type, 0 = range, 1 = bitmask. Default is range"
@@ -8647,9 +8642,8 @@ msgid "SFTP port number to use on the server"
 msgstr "Số hiệu cổng SFTP được dùng trên phía server"
 
 #: modules/access/sftp.c:61
-#, fuzzy
 msgid "Private key file"
-msgstr "Tập tin khóa AES"
+msgstr ""
 
 #: modules/access/sftp.c:62
 msgid ""
@@ -8801,9 +8795,8 @@ msgid "Password for stream encryption"
 msgstr "Mật khẩu để mã hoá luồng"
 
 #: modules/access/srt.c:566
-#, fuzzy
 msgid "SRT Stream ID"
-msgstr "Đầu ra luồng SRT"
+msgstr ""
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -9676,18 +9669,16 @@ msgid "Source port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:272
-#, fuzzy
 msgid "Virtual Destination Port"
-msgstr "Đích đến của Luồng"
+msgstr ""
 
 #: modules/access_output/rist.c:274
 msgid "Destination port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:281
-#, fuzzy
 msgid "Multipeer mode"
-msgstr "Bộ ghép kênh"
+msgstr ""
 
 #: modules/access_output/rist.c:283
 msgid ""
@@ -9696,23 +9687,20 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Duplicate"
-msgstr "Ứng dụng"
+msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Load balanced"
-msgstr "Cân bằng đỏ"
+msgstr ""
 
 #: modules/access_output/rist.c:294
 msgid "RIST stream output"
 msgstr "Luồng RIST xuất ra"
 
 #: modules/access_output/rist.c:299
-#, fuzzy
 msgid "RIST target payload size (bytes)"
-msgstr "Kích cỡ gói tin RIST nhắn đến (bytes)"
+msgstr ""
 
 #: modules/access_output/shout.c:64
 #: modules/gui/qt/components/sout/sout_widgets.cpp:438
@@ -13077,7 +13065,6 @@ msgstr "Giải mã văn bản trong phụ đề"
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -13531,7 +13518,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, fuzzy
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -15413,11 +15399,11 @@ msgstr "Trình kết xuất tệp"
 
 #: modules/demux/dirac.c:41
 msgid "Value to adjust dts by"
-msgstr "Giá trị để điều chỉnh dts bằng"
+msgstr ""
 
 #: modules/demux/dirac.c:54
 msgid "Dirac video demuxer"
-msgstr "Bộ tách kênh video Dirac"
+msgstr ""
 
 #: modules/demux/directory.c:94
 msgid "Directory import"
@@ -20231,36 +20217,32 @@ msgstr ""
 "Nhấn phím Delete để xóa."
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1405
-#, fuzzy
 msgid "Global Hotkey change"
-msgstr "Thay đổi phím tắt"
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1406
 msgid "Hotkey change"
 msgstr "Thay đổi phím tắt"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1410
-#, fuzzy
 msgid "Press the new key or combination for <b>%1</b>"
-msgstr "Nhấn phím mới trên bàn phím hoặc tổ hợp phím cho "
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1419
 msgid "Assign"
 msgstr "Gán"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1455
-#, fuzzy
 msgid "Warning: this key or combination is already assigned to \"<b>%1</b>\""
-msgstr "Cảnh báo: phím này hoặc tổ hợp phím này đã được gán cho "
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1467
 msgid "Warning: <b>%1</b> is already an application menu shortcut"
 msgstr "Cảnh báo: <b>%1</b> là phím tắt đến bảng chọn của ứng dụng"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1490
-#, fuzzy
 msgid "Key or combination: <b>%1</b>"
-msgstr "Phím hoặc tổ hợp phím: "
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1498
 msgid "Key: <b>%1</b>"
@@ -20430,25 +20412,20 @@ msgstr ""
 "Dạng lưu (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:184
-#, fuzzy
 msgid "This module outputs the stream using the RIST protocol (TR06)."
 msgstr ""
-"Mô-đun này xuất luồng được chuyển mã sang mạng thông qua giao thức mms."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:186
-#, fuzzy
 msgid "Destination Address"
-msgstr "Tiền tố đích đến"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:191
-#, fuzzy
 msgid "Destination Port"
-msgstr "Đích đến"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:201
-#, fuzzy
 msgid "Stream Name"
-msgstr "Tên luồng"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:237
 msgid "This module outputs the transcoded stream to a network via HTTP."
@@ -23969,7 +23946,7 @@ msgstr "Sao chép gói tin"
 
 #: modules/packetizer/dirac.c:87
 msgid "Dirac packetizer"
-msgstr "Bộ đóng gói Dirac"
+msgstr ""
 
 #: modules/packetizer/dts.c:47
 msgid "DTS audio packetizer"
@@ -30025,389 +30002,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Danh sách quản lý tập tin"
-
-#~ msgid "RIST maximum packet size (bytes)"
-#~ msgstr "Kích thước gói tối đa RIST (byte)"
-
-#~ msgid "RIST latency (ms)"
-#~ msgstr "Độ trễ RIST (ms)"
-
-#~ msgid "RIST nack retry interval (ms)"
-#~ msgstr "Khoảng thời gian thử lại RIST nack (ms)"
-
-#~ msgid "RIST reorder buffer (ms)"
-#~ msgstr "Bộ đệm sắp xếp lại RIST (ms)"
-
-#~ msgid "RIST maximum retry count"
-#~ msgstr "Số lần thử lại tối đa RIST"
-
-#~ msgid "Disable NACK output packets"
-#~ msgstr "Vô hiệu hóa các gói tin đầu ra NACK"
-
-#~ msgid "Use this to disable packet recovery"
-#~ msgstr "Sử dụng cái này để vô hiệu quá khám phá gói tin"
-
-#~ msgid "Do not check for a valid rtcp message from the encoder"
-#~ msgstr "Không kiểm tra thông điệp rtcp hợp lệ từ bộ mã hóa"
-
-#~ msgid ""
-#~ "Send nack messages even when we have not confirmed that the encoder is on "
-#~ "our local network."
-#~ msgstr ""
-#~ "Gửi thông điệp nack ngay cả khi chúng tôi chưa xác nhận rằng bộ mã hóa có "
-#~ "trên mạng cục bộ của chúng tôi hay không."
-
-#~ msgid "16 bytes"
-#~ msgstr "16 byte"
-
-#~ msgid "24 bytes"
-#~ msgstr "24 byte"
-
-#~ msgid "32 bytes"
-#~ msgstr "32 byte"
-
-#~ msgid "RIST data output caching size (ms)"
-#~ msgstr "Kích thước bộ nhớ đệm đầu ra dữ liệu RIST (ms)"
-
-#~ msgid ""
-#~ "Having this cache will guarantee that the packets going out are delivered "
-#~ "at a spacing determined by the chain timestamps thus ensuring a near "
-#~ "jitter free output. Be aware that this setting will also add to the "
-#~ "overall latency of the stream."
-#~ msgstr ""
-#~ "Việc có vùng nhớ đệm này sẽ đảm bảo rằng các gói đi ra ngoài được phân "
-#~ "phối ở khoảng cách được xác định bởi dấu thời gian của chuỗi, do đó đảm "
-#~ "bảo đầu ra gần như không bị giật. Xin lưu ý rằng cài đặt này cũng sẽ làm "
-#~ "tăng thêm độ trễ tổng thể của luồng."
-
-#~ msgid "RIST retry-buffer queue size (ms)"
-#~ msgstr "Kích thước hàng đợi bộ đệm thử lại RIST (ms)"
-
-#~ msgid ""
-#~ "This must match the buffer size (latency) configured on the server side. "
-#~ "If you are not sure, leave the default of 0 which will set it the maximum "
-#~ "value and will use about 100MB of RAM"
-#~ msgstr ""
-#~ "Điều này phải phù hợp với kích thước bộ đệm (độ trễ) được định cấu hình ở "
-#~ "phía máy chủ. Nếu bạn không chắc chắn, hãy để mặc định là 0, giá trị này "
-#~ "sẽ đặt giá trị tối đa và sẽ sử dụng khoảng 100 MB RAM"
-
-#~ msgid "SSRC used in RTP output (default is random, i.e. 0)"
-#~ msgstr ""
-#~ "SSRC được sử dụng trong đầu ra RTP (mặc định là ngẫu nhiên, tức là 0)"
-
-#~ msgid ""
-#~ "Use this setting to specify a known SSRC for the RTP header. This is only "
-#~ "useful if your receiver acts on it. When using VLC as receiver, it is not."
-#~ msgstr ""
-#~ "Sử dụng cài đặt này để chỉ định SSRC đã biết cho tiêu đề RTP. Điều này "
-#~ "chỉ hữu ích nếu người nhận của bạn hành động theo nó. Khi sử dụng VLC làm "
-#~ "người nhận thì không."
-
-#~ msgid ""
-#~ "This Stream name will be sent to the receiver using the rist RTCP channel"
-#~ msgstr "Tên Luồng này sẽ được gửi đến người nhận bằng kênh RTCP rist"
-
-#~ msgid "4:2:0"
-#~ msgstr "4:2:0"
-
-#~ msgid "4:2:2"
-#~ msgstr "4:2:2"
-
-#~ msgid "4:4:4"
-#~ msgstr "4:4:4"
-
-#~ msgid "Rate control method"
-#~ msgstr "Phương pháp điều khiển tốc độ"
-
-#~ msgid "Method used to encode the video sequence"
-#~ msgstr "Phương pháp được sử dụng để mã hóa các chuỗi video liên tiếp"
-
-#~ msgid "Constant noise threshold mode"
-#~ msgstr "Chế độ hằng số ngưỡng ồn"
-
-#~ msgid "Constant bitrate mode (CBR)"
-#~ msgstr "Chế độ hằng số bitrate (CBR)"
-
-#~ msgid "Low Delay mode"
-#~ msgstr "Chế độ độ trễ thấp"
-
-#~ msgid "Lossless mode"
-#~ msgstr "Chế độ nguyên bản"
-
-#~ msgid "Constant lambda mode"
-#~ msgstr "Chế độ hằng số lambda"
-
-#~ msgid "Constant error mode"
-#~ msgstr "Chế độ lỗi liên tục"
-
-#~ msgid "Constant quality mode"
-#~ msgstr "Chế độ hằng số chất lượng"
-
-#~ msgid "GOP structure"
-#~ msgstr "Cấu trúc GOP"
-
-#~ msgid "GOP structure used to encode the video sequence"
-#~ msgstr "Cấu trúc GOP được sử dụng để mã hóa chuỗi các video liên tiếp"
-
-#~ msgid ""
-#~ "No fixed gop structure. A picture can be intra or inter and refer to "
-#~ "previous or future pictures."
-#~ msgstr ""
-#~ "Không chỉnh sửa cấu trúc gop. Một bức hình có thể được hiện hoặc ẩn và "
-#~ "tham chiếu tới các bức hình trước đó."
-
-#~ msgid "I-frame only sequence"
-#~ msgstr "Chỉ dành cho chuỗi liên tiếp dạng I-frame"
-
-#~ msgid "Inter pictures refere to previous pictures only"
-#~ msgstr "Ẩn hình ảnh chỉ tham chiếu đến hình ảnh trước đó"
-
-#~ msgid "Inter pictures can refer to previous or future pictures"
-#~ msgstr "Hiện hình ảnh chỉ tham chiếu đến hình ảnh trước đó hoặc sau đó"
-
-#~ msgid "Constant quality factor"
-#~ msgstr "Hệ số chất lượng không đổi"
-
-#~ msgid "Quality factor to use in constant quality mode"
-#~ msgstr "Hệ số chất lượng được sử dụng trong chế độ hằng số chất lượng"
-
-#~ msgid "Noise Threshold"
-#~ msgstr "Ngưỡng ồn"
-
-#~ msgid "Noise threshold to use in constant noise threshold mode"
-#~ msgstr "Ngưỡng ồn được sử dụng trong chế độ ngưỡng hằng số ồn"
-
-#~ msgid "CBR bitrate (kbps)"
-#~ msgstr "bitrate CBR (kbps)"
-
-#~ msgid "Target bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "Bitrate mong muốn tínhb ằng kbps khi đang mã hóa ở chế độ hằng số bitrate"
-
-#~ msgid "Maximum bitrate (kbps)"
-#~ msgstr "Bitrate tối đa (kbps)"
-
-#~ msgid "Maximum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "Số bitrate tối đa tính bằng kbps khi đang mã hóa trong chế độ hằng số "
-#~ "bitrate"
-
-#~ msgid "Minimum bitrate (kbps)"
-#~ msgstr "Bitrate tối thiểu (kbps)"
-
-#~ msgid "Minimum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "Số bitrate tối thiểu tính bằng kbps khi đang mã hóa trong chế độ hằng số "
-#~ "bitrate"
-
-#~ msgid "GOP length"
-#~ msgstr "Độ dài GOP"
-
-#~ msgid ""
-#~ "Number of pictures between successive sequence headers i.e. length of the "
-#~ "group of pictures"
-#~ msgstr ""
-#~ "Số lượng hình ảnh của các chuỗi header liên tiếp ví dụ như chiều dài của "
-#~ "nhóm các hình ảnh"
-
-#~ msgid "Prefilter"
-#~ msgstr "Lọc lại"
-
-#~ msgid "Enable adaptive prefiltering"
-#~ msgstr "Bật tính năng lọic trước khi gắn kết"
-
-#~ msgid "No pre-filtering"
-#~ msgstr "Không xử lý trước bằng bộ lọc"
-
-#~ msgid "Centre Weighted Median"
-#~ msgstr "Trọng lượng trung bình ở giữa"
-
-#~ msgid "Gaussian Low Pass Filter"
-#~ msgstr "Bộ lộc dạng"
-
-#~ msgid "Add Noise"
-#~ msgstr "Thêm độ ồn"
-
-#~ msgid "Gaussian Adaptive Low Pass Filter"
-#~ msgstr "Bộ lọc dạng Gaussian Adaptive Low Pas"
-
-#~ msgid "Low Pass Filter"
-#~ msgstr "Bộ lọc dạng Low Pass"
-
-#~ msgid "Amount of prefiltering"
-#~ msgstr "Số lượng các bộ lọc tiền xử lý"
-
-#~ msgid "Higher value implies more prefiltering"
-#~ msgstr "Giá trị càng cao chỉ rõ mức độ nhiều bộ lọc tiền xử lý"
-
-#~ msgid "Picture coding mode"
-#~ msgstr "Chế độ mã hóa hình ảnh"
-
-#~ msgid ""
-#~ "Field coding is where interlaced fields are coded separately as opposed "
-#~ "to a pseudo-progressive frame"
-#~ msgstr ""
-#~ "Khung thông tin mã hóa là nơi các khung thông thin quét mành được viết mã "
-#~ "độc lập để làm đối trọng trong khung hình liên tục dạng mã pseudo"
-
-#~ msgid "auto - let encoder decide based upon input (Best)"
-#~ msgstr ""
-#~ "auto - cho phep trinh ma hoa quyet dinh dua vao du lieu dau vao (Tot nhat)"
-
-#~ msgid "force coding frame as single picture"
-#~ msgstr "buoc khung hinh duoc viet ma hien thi dang don hinh anh"
-
-#~ msgid "force coding frame as separate interlaced fields"
-#~ msgstr "buoc khung hinh duoc viet ma tac biet khoi vung du lieu quet manh"
-
-#~ msgid "Size of motion compensation blocks"
-#~ msgstr "Kích thước của các khối bù trừ chuyển động"
-
-#~ msgid "automatic - let encoder decide based upon input (Best)"
-#~ msgstr ""
-#~ "tự động - cho phép trình mã hóa quyết định dựa trên dữ liệu đầu vào (Tốt "
-#~ "nhất)"
-
-#~ msgid "small - use small motion compensation blocks"
-#~ msgstr "nhỏ - sử dụng cho các khối bù trừ chuyển động dạng nhỏ"
-
-#~ msgid "medium - use medium motion compensation blocks"
-#~ msgstr ""
-#~ "trung bình - sử dụng cho các khối bù trừ chuyển động dạng trung bình"
-
-#~ msgid "large - use large motion compensation blocks"
-#~ msgstr ""
-#~ "lớn - sử dụng các việc bù trừ cho các khối có chuyển động khối dạng lớn"
-
-#~ msgid "Overlap of motion compensation blocks"
-#~ msgstr "Độ che phủ của các khối bù trừ chuyển động"
-
-#~ msgid "none - Motion compensation blocks do not overlap"
-#~ msgstr ""
-#~ "không - Các khối bù trừ chuyển động không thực hiện chức năng che phủ"
-
-#~ msgid "partial - Motion compensation blocks only partially overlap"
-#~ msgstr ""
-#~ "từng phần - Chỉ dựa vào độ che phủ từng phần đối với các khối bù trừ "
-#~ "chuyển động"
-
-#~ msgid "full - Motion compensation blocks fully overlap"
-#~ msgstr "đầy đủ - Hoàn toàn che phủ dựa vào các khối bù trừ chuyển động"
-
-#~ msgid "Motion Vector precision"
-#~ msgstr "Dự đoán véttơ chuyển động"
-
-#~ msgid "Motion Vector precision in pels"
-#~ msgstr "Độ chính xác vétơ chuyển động tính bằng pels"
-
-#~ msgid "Three component motion estimation"
-#~ msgstr "Ba yếu tố trong việc dự đoán chuyển động"
-
-#~ msgid "Use chroma as part of the motion estimation process"
-#~ msgstr "Sử dụng màu sắc dưới dạng tiến trình dự đoán chuyển động"
-
-#~ msgid "Intra picture DWT filter"
-#~ msgstr "Bộ lọc DWT dành cho hình ảnh Intra"
-
-#~ msgid "Inter picture DWT filter"
-#~ msgstr "Bộ lọc DWT dành cho hình ảnh Inter"
-
-#~ msgid "Number of DWT iterations"
-#~ msgstr "Số lần lặp lại DWT"
-
-#~ msgid "Also known as DWT levels"
-#~ msgstr "Hay mức độ DWT"
-
-#~ msgid "Enable multiple quantizers"
-#~ msgstr "Kích hoạt nhiều bộ lượng tử hóa"
-
-#~ msgid "Enable multiple quantizers per subband (one per codeblock)"
-#~ msgstr "Bật nhiều phần lượng tử cho mỗi băng con (mỗi khối lệnh)"
-
-#~ msgid "Disable arithmetic coding"
-#~ msgstr "Tắt phần mã số học"
-
-#~ msgid "Use variable length codes instead, useful for very high bitrates"
-#~ msgstr "Sử dụng biến số của độ dài codec, hữu dụng cho các bitrate cao"
-
-#~ msgid "perceptual weighting method"
-#~ msgstr "phương pháp phụ trợ giác quan"
-
-#~ msgid "perceptual distance"
-#~ msgstr "khoảng cách giác quan"
-
-#~ msgid "perceptual distance to calculate perceptual weight"
-#~ msgstr "khoảng cách giác quan để tính toán giác quan phụ trợ"
-
-#~ msgid "Horizontal slices per frame"
-#~ msgstr "Lát ngang trên một khung"
-
-#~ msgid "Number of horizontal slices per frame in low delay mode"
-#~ msgstr "Số lượng các lát ngang mỗi khung trong chế độ trở ngại thấp"
-
-#~ msgid "Vertical slices per frame"
-#~ msgstr "Lát cắt dọc trên một khung"
-
-#~ msgid "Number of vertical slices per frame in low delay mode"
-#~ msgstr "Số lát dọc trên một khung trong chế độ trở ngại thấp"
-
-#~ msgid "Size of code blocks in each subband"
-#~ msgstr "Kích thước khối mã lệnh cho mỗi băng con"
-
-#~ msgid "small - use small code blocks"
-#~ msgstr "nhỏ - sử dụng các khối mã nhỏ"
-
-#~ msgid "medium - use medium sized code blocks"
-#~ msgstr "trung bình - sử dụng các khối mã có kích thước trung bình"
-
-#~ msgid "large - use large code blocks"
-#~ msgstr "lớn - sử dụng các khối mã lớn"
-
-#~ msgid "full - One code block per subband"
-#~ msgstr "đầy đủ - Một khối mã lệnh cho mỗi băng con"
-
-#~ msgid "Enable hierarchical Motion Estimation"
-#~ msgstr "Bật ước lượng chuyển động phân nhánh"
-
-#~ msgid "Number of levels of downsampling"
-#~ msgstr "Số lượng các cấp độ của"
-
-#~ msgid ""
-#~ "Number of levels of downsampling in hierarchical motion estimation mode"
-#~ msgstr ""
-#~ "Số lượng cấp độ các phần downsampling trong chế độ dự đoán chuyển động "
-#~ "phân nhánh"
-
-#~ msgid "Enable Global Motion Estimation"
-#~ msgstr "Kích hoạt \"khảo sát chuyển động toàn cục\""
-
-#~ msgid "Enable Phase Correlation Estimation"
-#~ msgstr "Bật Dự Đoán Chu Kỳ Liên Quan"
-
-#~ msgid "Enable Scene Change Detection"
-#~ msgstr "Bật Phát Hiện Thay Đổi Cảnh Quan"
-
-#~ msgid "Force Profile"
-#~ msgstr "Bắt buộc dùng hồ sơ"
-
-#~ msgid "VC2 Low Delay Profile"
-#~ msgstr "Hồ sơ độ trễ VC2 Low"
-
-#~ msgid "VC2 Simple Profile"
-#~ msgstr "Hồ sơ VC2 dạng đơn giản"
-
-#~ msgid "VC2 Main Profile"
-#~ msgstr "Hồ sơ chính VC2"
-
-#~ msgid "Main Profile"
-#~ msgstr "Hồ sơ chính"
-
-#~ msgid "Dirac video decoder using libschroedinger"
-#~ msgstr "Trình giải mã video dạng Dirac sử dụng libschroedinger"
-
-#~ msgid "Dirac video encoder using libschroedinger"
-#~ msgstr "Trình giải mã video dạng Dirac sử dụng libschroedinger"
-
-#~ msgid "Key: "
-#~ msgstr "Khóa: "
