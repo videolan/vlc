@@ -1,24 +1,25 @@
 # Dutch translation
-# Copyright (C) 2025 VideoLAN
+# Copyright (C) 2026 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
 # Alexander Henket <ahenket at xs4all dot nl>, 2009
 # Derk-Jan Hartman <hartman at videolan dot org>, 2004-2005
 # Myckel Habets <myckel at sdf dot lonestar dot org>, 2007-2010
-# Thomas De Rocker, 2008-2025
+# Thomas De Rocker, 2008-2026
+# Michał Trzebiatowski <michtrz@gmail.com>, 2018
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22\n"
+"Project-Id-Version: vlc 3.0.24-beta1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2026-06-28 16:08+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
-"Last-Translator: Thomas De Rocker, 2025\n"
+"Last-Translator: Thomas De Rocker, 2026\n"
 "Language-Team: Dutch (https://app.transifex.com/yaron/teams/16553/nl/)\n"
-"Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: nl\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: include/vlc_common.h:1055
@@ -8229,9 +8230,8 @@ msgid "Bitmask"
 msgstr "Bitmasker"
 
 #: modules/access/rist.c:313
-#, fuzzy
 msgid "Virtual Destination Port Filter"
-msgstr "Doelbestand:"
+msgstr ""
 
 #: modules/access/rist.c:315
 msgid ""
@@ -8252,14 +8252,10 @@ msgid "RIST demux/decode maximum jitter (default is 5ms)"
 msgstr "RIST maximale jitter voor demux/decoderen (standaard is 5 ms)"
 
 #: modules/access/rist.c:328
-#, fuzzy
 msgid ""
 "This controls the maximum jitter that will be passed to the demux/decode "
 "chain. The lower the value, the more CPU cycles the module will consume"
 msgstr ""
-"Dit bepaalt de maximale jitter die wordt doorgegeven aan de demux-/"
-"decodeerketen. Hoe lager de waarde, hoe meer CPU-cycli het algoritme zal "
-"verbruiken"
 
 #: modules/access/rist.c:332
 msgid "RIST nack type, 0 = range, 1 = bitmask. Default is range"
@@ -8553,9 +8549,8 @@ msgid "SFTP port number to use on the server"
 msgstr "SFTP-poortnummer om te gebruiken op de server"
 
 #: modules/access/sftp.c:61
-#, fuzzy
 msgid "Private key file"
-msgstr "AES-sleutelbestand"
+msgstr ""
 
 #: modules/access/sftp.c:62
 msgid ""
@@ -8707,9 +8702,8 @@ msgid "Password for stream encryption"
 msgstr "Wachtwoord voor stream-versleuteling"
 
 #: modules/access/srt.c:566
-#, fuzzy
 msgid "SRT Stream ID"
-msgstr " SRT-stream-ID"
+msgstr ""
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -9586,18 +9580,16 @@ msgid "Source port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:272
-#, fuzzy
 msgid "Virtual Destination Port"
-msgstr "Stream-bestemming"
+msgstr ""
 
 #: modules/access_output/rist.c:274
 msgid "Destination port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:281
-#, fuzzy
 msgid "Multipeer mode"
-msgstr "Multiplexer"
+msgstr ""
 
 #: modules/access_output/rist.c:283
 msgid ""
@@ -9606,23 +9598,20 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Duplicate"
-msgstr "Programma"
+msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Load balanced"
-msgstr "Roodbalans"
+msgstr ""
 
 #: modules/access_output/rist.c:294
 msgid "RIST stream output"
 msgstr "RIST-streamuitvoer"
 
 #: modules/access_output/rist.c:299
-#, fuzzy
 msgid "RIST target payload size (bytes)"
-msgstr "RIST doelpakketgrootte (bytes)"
+msgstr ""
 
 #: modules/access_output/shout.c:64
 #: modules/gui/qt/components/sout/sout_widgets.cpp:438
@@ -12980,7 +12969,6 @@ msgstr "Tekst ondertiteldecoder"
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -15295,11 +15283,11 @@ msgstr "Bestandsdumper"
 
 #: modules/demux/dirac.c:41
 msgid "Value to adjust dts by"
-msgstr "Waarde om dts mee bij te stellen"
+msgstr ""
 
 #: modules/demux/dirac.c:54
 msgid "Dirac video demuxer"
-msgstr "Dirac-videodemuxer"
+msgstr ""
 
 #: modules/demux/directory.c:94
 msgid "Directory import"
@@ -20110,40 +20098,37 @@ msgstr ""
 "Delete-toets om te verwijderen."
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1405
-#, fuzzy
 msgid "Global Hotkey change"
-msgstr "Wijziging sneltoets"
+msgstr "Wijziging globale sneltoets"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1406
 msgid "Hotkey change"
 msgstr "Wijziging sneltoets"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1410
-#, fuzzy
 msgid "Press the new key or combination for <b>%1</b>"
-msgstr "Druk op de nieuwe toets of combinatie voor "
+msgstr "Druk op de nieuwe toets of combinatie voor  <b>%1</b>"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1419
 msgid "Assign"
 msgstr "Toewijzen"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1455
-#, fuzzy
 msgid "Warning: this key or combination is already assigned to \"<b>%1</b>\""
-msgstr "Waarschuwing: deze toets of combinatie is al toegewezen aan "
+msgstr ""
+"Waarschuwing: deze toets of combinatie is al toegewezen aan  \"<b>%1</b>\""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1467
 msgid "Warning: <b>%1</b> is already an application menu shortcut"
 msgstr "Waarschuwing: <b>%1</b> is reeds een toepassingsmenu-snelkoppeling"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1490
-#, fuzzy
 msgid "Key or combination: <b>%1</b>"
-msgstr "Toets of combinatie: "
+msgstr "Toets of combinatie: <b>%1</b>"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1498
 msgid "Key: <b>%1</b>"
-msgstr ""
+msgstr "Toets: <b>%1</b>"
 
 #: modules/gui/qt/components/simple_preferences.cpp:256
 #: modules/gui/qt/components/simple_preferences.cpp:636
@@ -20308,26 +20293,20 @@ msgstr ""
 "*.flv *.webm)"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:184
-#, fuzzy
 msgid "This module outputs the stream using the RIST protocol (TR06)."
 msgstr ""
-"Deze module schrijft de getranscodeerde stream naar een netwerk via het mms-"
-"protocol."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:186
-#, fuzzy
 msgid "Destination Address"
-msgstr "Doelprefix"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:191
-#, fuzzy
 msgid "Destination Port"
-msgstr "Doel"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:201
-#, fuzzy
 msgid "Stream Name"
-msgstr "Streamnaam"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:237
 msgid "This module outputs the transcoded stream to a network via HTTP."
@@ -23842,7 +23821,7 @@ msgstr "Copy packetizer"
 
 #: modules/packetizer/dirac.c:87
 msgid "Dirac packetizer"
-msgstr "Ddirac packetizer"
+msgstr ""
 
 #: modules/packetizer/dts.c:47
 msgid "DTS audio packetizer"
@@ -29932,383 +29911,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Mediabeheerlijst"
-
-#~ msgid "RIST maximum packet size (bytes)"
-#~ msgstr "RIST maximale pakketgrootte (bytes)"
-
-#~ msgid "RIST latency (ms)"
-#~ msgstr "RIST-latentie (ms)"
-
-#~ msgid "RIST nack retry interval (ms)"
-#~ msgstr "RIST nack-retry-interval (ms)"
-
-#~ msgid "RIST reorder buffer (ms)"
-#~ msgstr "RIST reorder-buffer (ms)"
-
-#~ msgid "RIST maximum retry count"
-#~ msgstr "RIST maximaal aantal pogingen"
-
-#~ msgid "Disable NACK output packets"
-#~ msgstr "NACK-uitvoerpakketten uitschakelen"
-
-#~ msgid "Use this to disable packet recovery"
-#~ msgstr "Gebruik dit om pakket-herstel uit te schakelen"
-
-#~ msgid "Do not check for a valid rtcp message from the encoder"
-#~ msgstr "Niet controleren op een geldig rtcp-bericht van de encoder"
-
-#~ msgid ""
-#~ "Send nack messages even when we have not confirmed that the encoder is on "
-#~ "our local network."
-#~ msgstr ""
-#~ "Nack-berichten versturen, zelfs als we niet hebben bevestigd dat de "
-#~ "encoder zich op ons lokale netwerk bevindt."
-
-#~ msgid "16 bytes"
-#~ msgstr "16 bytes"
-
-#~ msgid "24 bytes"
-#~ msgstr "24 bytes"
-
-#~ msgid "32 bytes"
-#~ msgstr "32 bytes"
-
-#~ msgid "RIST data output caching size (ms)"
-#~ msgstr "Buffergrootte RIST data-uitvoer (ms)"
-
-#~ msgid ""
-#~ "Having this cache will guarantee that the packets going out are delivered "
-#~ "at a spacing determined by the chain timestamps thus ensuring a near "
-#~ "jitter free output. Be aware that this setting will also add to the "
-#~ "overall latency of the stream."
-#~ msgstr ""
-#~ "Het hebben van deze buffer zal garanderen dat de pakketten die naar "
-#~ "buiten gaan afgeleverd worden met een tussenruimte die bepaald wordt door "
-#~ "de tijdstempels van de keten, waardoor een bijna jittervrije uitvoer "
-#~ "gegarandeerd wordt. Wees u ervan bewust dat deze instelling ook zal "
-#~ "bijdragen aan de totale latentie van de stream."
-
-#~ msgid "RIST retry-buffer queue size (ms)"
-#~ msgstr "RIST retry-buffer wachtrij-grootte (ms)"
-
-#~ msgid ""
-#~ "This must match the buffer size (latency) configured on the server side. "
-#~ "If you are not sure, leave the default of 0 which will set it the maximum "
-#~ "value and will use about 100MB of RAM"
-#~ msgstr ""
-#~ "Dit moet overeenkomen met de buffergrootte (latentie) geconfigureerd aan "
-#~ "de serverzijde. Als u niet zeker bent, laat dan de standaardwaarde 0 "
-#~ "staan. Dit is de maximale waarde en zal ongeveer 100 MB RAM gebruiken"
-
-#~ msgid "SSRC used in RTP output (default is random, i.e. 0)"
-#~ msgstr ""
-#~ "SSRC gebruikt in RTP-uitvoer (standaard is willekeurig, dat wil zeggen 0)"
-
-#~ msgid ""
-#~ "Use this setting to specify a known SSRC for the RTP header. This is only "
-#~ "useful if your receiver acts on it. When using VLC as receiver, it is not."
-#~ msgstr ""
-#~ "Gebruik deze instelling om een bekende SSRC op te geven voor de RTP "
-#~ "header. Dit is alleen nuttig als uw ontvanger er naar handelt. Als u VLC "
-#~ "als ontvanger gebruikt, is dat niet het geval."
-
-#~ msgid ""
-#~ "This Stream name will be sent to the receiver using the rist RTCP channel"
-#~ msgstr ""
-#~ "Deze streamnaam zal naar de ontvanger worden gestuurd via het rist RTCP-"
-#~ "kanaal"
-
-#~ msgid "4:2:0"
-#~ msgstr "4:2:0"
-
-#~ msgid "4:2:2"
-#~ msgstr "4:2:2"
-
-#~ msgid "4:4:4"
-#~ msgstr "4:4:4"
-
-#~ msgid "Rate control method"
-#~ msgstr "Methode rate-bediening"
-
-#~ msgid "Method used to encode the video sequence"
-#~ msgstr "Gebruikte methode om de videosequentie te coderen"
-
-#~ msgid "Constant noise threshold mode"
-#~ msgstr "Constante ruisdrempelmodus"
-
-#~ msgid "Constant bitrate mode (CBR)"
-#~ msgstr "Constante bitrate-modus (CBR)"
-
-#~ msgid "Low Delay mode"
-#~ msgstr "Lage delay-modus"
-
-#~ msgid "Lossless mode"
-#~ msgstr "Lossless-modus"
-
-#~ msgid "Constant lambda mode"
-#~ msgstr "Constante lambda-modus"
-
-#~ msgid "Constant error mode"
-#~ msgstr "Constante-foutmodus"
-
-#~ msgid "Constant quality mode"
-#~ msgstr "Constante-kwaliteitmodus"
-
-#~ msgid "GOP structure"
-#~ msgstr "GOP-structuur"
-
-#~ msgid "GOP structure used to encode the video sequence"
-#~ msgstr "GOP-structuur gebruikt om de videosequentie te coderen"
-
-#~ msgid ""
-#~ "No fixed gop structure. A picture can be intra or inter and refer to "
-#~ "previous or future pictures."
-#~ msgstr ""
-#~ "Geen vaste gop-structuur. Een afbeelding kan intra of inter zijn en "
-#~ "verwijzen naar vroegere of toekomstige afbeeldingen."
-
-#~ msgid "I-frame only sequence"
-#~ msgstr "I-frame louter opeenvolging"
-
-#~ msgid "Inter pictures refere to previous pictures only"
-#~ msgstr "Inter-afbeeldingen verwijzen alleen naar vroegere afbeeldingen"
-
-#~ msgid "Inter pictures can refer to previous or future pictures"
-#~ msgstr ""
-#~ "Inter-afbeeldingen kunnen verwijzen naar vroegere of toekomstige "
-#~ "afbeeldingen"
-
-#~ msgid "Constant quality factor"
-#~ msgstr "Constante kwaliteitsfactor"
-
-#~ msgid "Quality factor to use in constant quality mode"
-#~ msgstr "Kwaliteitsfactor om te gebruiken in constante-kwaliteitsmodus"
-
-#~ msgid "Noise Threshold"
-#~ msgstr "Ruisdrempel"
-
-#~ msgid "Noise threshold to use in constant noise threshold mode"
-#~ msgstr "Ruisdrempel te gebruiken bij constante-ruisdrempelmodus"
-
-#~ msgid "CBR bitrate (kbps)"
-#~ msgstr "CBR bitrate (kbps)"
-
-#~ msgid "Target bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr "Bitrate-doel in kbps bij coderen in constante-bitratemodus"
-
-#~ msgid "Maximum bitrate (kbps)"
-#~ msgstr "Maximum bitrate (kbps)"
-
-#~ msgid "Maximum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr "Maximum bitrate in kbps bij coderen in constante-bitratemodus"
-
-#~ msgid "Minimum bitrate (kbps)"
-#~ msgstr "Minimum bitrate (kbps)"
-
-#~ msgid "Minimum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr "Minimum bitrate in kbps bij coderen in constante-bitratemodus"
-
-#~ msgid "GOP length"
-#~ msgstr "GOP lengte"
-
-#~ msgid ""
-#~ "Number of pictures between successive sequence headers i.e. length of the "
-#~ "group of pictures"
-#~ msgstr ""
-#~ "Aantal afbeeldingen tussen opeenvolgende sequentie-headers, dus de lengte "
-#~ "van de groep afbeeldingen"
-
-#~ msgid "Prefilter"
-#~ msgstr "Prefilter"
-
-#~ msgid "Enable adaptive prefiltering"
-#~ msgstr "Adaptieve prefiltering inschakelen"
-
-#~ msgid "No pre-filtering"
-#~ msgstr "Geen voorfiltering"
-
-#~ msgid "Centre Weighted Median"
-#~ msgstr "Middengewogen mediaan"
-
-#~ msgid "Gaussian Low Pass Filter"
-#~ msgstr "Gaussiaanse lowpass-filter"
-
-#~ msgid "Add Noise"
-#~ msgstr "Ruis toevoegen"
-
-#~ msgid "Gaussian Adaptive Low Pass Filter"
-#~ msgstr "Gaussiaanse adaptive lowpassfilter"
-
-#~ msgid "Low Pass Filter"
-#~ msgstr "Lowpass-filter"
-
-#~ msgid "Amount of prefiltering"
-#~ msgstr "Hoeveelheid prefiltering"
-
-#~ msgid "Higher value implies more prefiltering"
-#~ msgstr "Hogere waarde is meer prefilteren"
-
-#~ msgid "Picture coding mode"
-#~ msgstr "Afbeeldingcoderingsmodus"
-
-#~ msgid ""
-#~ "Field coding is where interlaced fields are coded separately as opposed "
-#~ "to a pseudo-progressive frame"
-#~ msgstr ""
-#~ "Veldcodering is waar geïnterlinieerde velden in tegenstelling tot een "
-#~ "pseudo-progressief frame apart gecodeerd worden"
-
-#~ msgid "auto - let encoder decide based upon input (Best)"
-#~ msgstr "auto - laat encoder bepalen gebaseerd op de invoer (beste)"
-
-#~ msgid "force coding frame as single picture"
-#~ msgstr "forceer framecodering als een enkele afbeelding"
-
-#~ msgid "force coding frame as separate interlaced fields"
-#~ msgstr "forceer framecodering in afzonderlijke geïnterlinieerde velden"
-
-#~ msgid "Size of motion compensation blocks"
-#~ msgstr "Grootte van bewegingscompensatieblokken"
-
-#~ msgid "automatic - let encoder decide based upon input (Best)"
-#~ msgstr "auto - laat encoder bepalen gebaseerd op de invoer (beste)"
-
-#~ msgid "small - use small motion compensation blocks"
-#~ msgstr "klein - gebruik kleine bewegingscompensatieblokken"
-
-#~ msgid "medium - use medium motion compensation blocks"
-#~ msgstr "medium - gebruik medium bewegingscompensatieblokken"
-
-#~ msgid "large - use large motion compensation blocks"
-#~ msgstr "groot - gebruik grote bewegingscompensatieblokken"
-
-#~ msgid "Overlap of motion compensation blocks"
-#~ msgstr "Overlap van bewegingscompensatieblokken"
-
-#~ msgid "none - Motion compensation blocks do not overlap"
-#~ msgstr "geen - bewegingscompensatieblokken overlappen niet"
-
-#~ msgid "partial - Motion compensation blocks only partially overlap"
-#~ msgstr ""
-#~ "gedeeltelijk - bewegingscompensatie blokkeert alleen gedeeltelijke overlap"
-
-#~ msgid "full - Motion compensation blocks fully overlap"
-#~ msgstr "volledig - bewegingscompensatieblokken overlappen volledig"
-
-#~ msgid "Motion Vector precision"
-#~ msgstr "Bewegingsvectorprecisie"
-
-#~ msgid "Motion Vector precision in pels"
-#~ msgstr "Bewegingsvectorprecisie in pels"
-
-#~ msgid "Three component motion estimation"
-#~ msgstr "Drie componenten bewegingsschatting"
-
-#~ msgid "Use chroma as part of the motion estimation process"
-#~ msgstr "Gebruik chroma als onderdeel in het bewegingsschattingsproces"
-
-#~ msgid "Intra picture DWT filter"
-#~ msgstr "Intra afbeelding DWT filter"
-
-#~ msgid "Inter picture DWT filter"
-#~ msgstr "Inter afbeelding DWT filter"
-
-#~ msgid "Number of DWT iterations"
-#~ msgstr "Aantal DWT iteraties"
-
-#~ msgid "Also known as DWT levels"
-#~ msgstr "Ook DWT-niveaus genoemd"
-
-#~ msgid "Enable multiple quantizers"
-#~ msgstr "Meerdere quantizers inschakelen"
-
-#~ msgid "Enable multiple quantizers per subband (one per codeblock)"
-#~ msgstr "Activeer meerdere quantisaties per subband (een per codeblok)"
-
-#~ msgid "Disable arithmetic coding"
-#~ msgstr "Rekenkundige codering uitschakelen"
-
-#~ msgid "Use variable length codes instead, useful for very high bitrates"
-#~ msgstr ""
-#~ "Gebruik in plaats daarvan codes met variabele lengte, handig voor hoge "
-#~ "bitrates"
-
-#~ msgid "perceptual weighting method"
-#~ msgstr "perceptuele weegmethode"
-
-#~ msgid "perceptual distance"
-#~ msgstr "perceptuele afstand"
-
-#~ msgid "perceptual distance to calculate perceptual weight"
-#~ msgstr "perceptuele afstand om perceptueel gewicht te berekenen"
-
-#~ msgid "Horizontal slices per frame"
-#~ msgstr "Horizontale stukken per frame"
-
-#~ msgid "Number of horizontal slices per frame in low delay mode"
-#~ msgstr "Aantal horizontale stukken per frame in lage delaymodus"
-
-#~ msgid "Vertical slices per frame"
-#~ msgstr "Verticale stukken per frame"
-
-#~ msgid "Number of vertical slices per frame in low delay mode"
-#~ msgstr "Aantal verticale stukken per frame in lage delaymodus"
-
-#~ msgid "Size of code blocks in each subband"
-#~ msgstr "Grootte van codeblokken in elke subband"
-
-#~ msgid "small - use small code blocks"
-#~ msgstr "klein - gebruik kleine codeblokken"
-
-#~ msgid "medium - use medium sized code blocks"
-#~ msgstr "medium - gebruik middelgrote codeblokken"
-
-#~ msgid "large - use large code blocks"
-#~ msgstr "groot - gebruik grote codeblokken"
-
-#~ msgid "full - One code block per subband"
-#~ msgstr "volledig - één codeblok per subband"
-
-#~ msgid "Enable hierarchical Motion Estimation"
-#~ msgstr "Hiërarchische bewegingsschatting inschakelen"
-
-#~ msgid "Number of levels of downsampling"
-#~ msgstr "Aantal niveaus downsampling"
-
-#~ msgid ""
-#~ "Number of levels of downsampling in hierarchical motion estimation mode"
-#~ msgstr ""
-#~ "Aantal downsampling-niveaus in hiërarchische bewegingsvoorspellingsmodus"
-
-#~ msgid "Enable Global Motion Estimation"
-#~ msgstr "Globale bewegingsschatting inschakelen"
-
-#~ msgid "Enable Phase Correlation Estimation"
-#~ msgstr "Schatting fase-verband inschakelen"
-
-#~ msgid "Enable Scene Change Detection"
-#~ msgstr "Scènewijziging-detectie inschakelen"
-
-#~ msgid "Force Profile"
-#~ msgstr "Profiel forceren"
-
-#~ msgid "VC2 Low Delay Profile"
-#~ msgstr "VC2 Lage Delay Profiel"
-
-#~ msgid "VC2 Simple Profile"
-#~ msgstr "VC2 Simpel profiel"
-
-#~ msgid "VC2 Main Profile"
-#~ msgstr "VC2 Hoofdprofiel"
-
-#~ msgid "Main Profile"
-#~ msgstr "Hoofdprofiel"
-
-#~ msgid "Dirac video decoder using libschroedinger"
-#~ msgstr "Dirac video-decoder, gebruikmakend van libschroedinger"
-
-#~ msgid "Dirac video encoder using libschroedinger"
-#~ msgstr "Dirac video-encoder, gebruikmakend van libschroedinger"
-
-#~ msgid "Key: "
-#~ msgstr "Toets: "
