@@ -1,28 +1,30 @@
 # Indonesian translation
-# Copyright (C) 2023 VideoLAN
+# Copyright (C) 2026 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
 # Aulia Firdaus Simbolon <dausbajing@hotmail.co.id>, 2013
 # La Ode Muh. Fadlun Akbar <fadlun.net@gmail.com>, 2014
-# Luqman Hakim <ovdl@rocketmail.com>, 2008,2010
+# Luqman Hakim <ovdl@rocketmail.com>, 2008,2010,2023
 # Nasip Purnomo <madara.code@gmail.com>, 2014
 # zk <zamani.karmana@gmail.com>, 2015
 # Syahmin Sukhairi <syahmin@gmail.com>, 2021
 # Kevin Putra Satrianto <kevin.negated@gmail.com>, 2021
 # I Putu Cahya Adi Ganesha, 2022
+# Michał Trzebiatowski <michtrz@gmail.com>, 2018
+# Rafi Ahsanal, 2023
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22-rc1\n"
+"Project-Id-Version: vlc 3.0.24-beta1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2026-06-28 16:08+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: Rafi Ahsanal, 2023\n"
 "Language-Team: Indonesian (https://app.transifex.com/yaron/teams/16553/id/)\n"
-"Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: id\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #: include/vlc_common.h:1055
@@ -1068,24 +1070,20 @@ msgid "Decoded format"
 msgstr "Format terdekode"
 
 #: src/input/es_out.c:3207
-#, fuzzy
 msgid "Decoded channels"
-msgstr "Kanal audio"
+msgstr ""
 
 #: src/input/es_out.c:3212
-#, fuzzy
 msgid "Decoded sample rate"
-msgstr "Kadar persampelan audio"
+msgstr ""
 
 #: src/input/es_out.c:3219
-#, fuzzy
 msgid "Decoded bits per sample"
-msgstr "Bit audio per sampel"
+msgstr ""
 
 #: src/input/es_out.c:3224
-#, fuzzy
 msgid "Decoded Bitrate"
-msgstr "Format terdekode"
+msgstr ""
 
 #: src/input/es_out.c:3237
 msgid "Track replay gain"
@@ -8064,9 +8062,8 @@ msgid "Bitmask"
 msgstr ""
 
 #: modules/access/rist.c:313
-#, fuzzy
 msgid "Virtual Destination Port Filter"
-msgstr "File tujuan:"
+msgstr ""
 
 #: modules/access/rist.c:315
 msgid ""
@@ -8371,9 +8368,8 @@ msgid "SFTP port number to use on the server"
 msgstr "Nomor port SFTP yang digunakan pada server"
 
 #: modules/access/sftp.c:61
-#, fuzzy
 msgid "Private key file"
-msgstr "File kunci AES"
+msgstr ""
 
 #: modules/access/sftp.c:62
 msgid ""
@@ -8518,9 +8514,8 @@ msgid "Password for stream encryption"
 msgstr "Password untuk enkripsi stream"
 
 #: modules/access/srt.c:566
-#, fuzzy
 msgid "SRT Stream ID"
-msgstr "Strim %d"
+msgstr ""
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -9367,18 +9362,16 @@ msgid "Source port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:272
-#, fuzzy
 msgid "Virtual Destination Port"
-msgstr "Destinasi Stream"
+msgstr ""
 
 #: modules/access_output/rist.c:274
 msgid "Destination port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:281
-#, fuzzy
 msgid "Multipeer mode"
-msgstr "Mode penala AM"
+msgstr ""
 
 #: modules/access_output/rist.c:283
 msgid ""
@@ -9387,14 +9380,12 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Duplicate"
-msgstr "Aplikasi"
+msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Load balanced"
-msgstr "Keseimbangan audio"
+msgstr ""
 
 #: modules/access_output/rist.c:294
 msgid "RIST stream output"
@@ -12627,7 +12618,6 @@ msgstr "Dekoder teks terjemahan"
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -13045,7 +13035,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, fuzzy
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -14868,7 +14857,7 @@ msgstr ""
 
 #: modules/demux/dirac.c:54
 msgid "Dirac video demuxer"
-msgstr "Demuxer video Dirac"
+msgstr ""
 
 #: modules/demux/directory.c:94
 msgid "Directory import"
@@ -19566,36 +19555,32 @@ msgstr ""
 "Tombol delete untuk menghapus."
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1405
-#, fuzzy
 msgid "Global Hotkey change"
-msgstr "Perubahan Hotkey"
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1406
 msgid "Hotkey change"
 msgstr "Perubahan Hotkey"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1410
-#, fuzzy
 msgid "Press the new key or combination for <b>%1</b>"
-msgstr "Tekan tombol atau kombinasi tombol baru untuk "
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1419
 msgid "Assign"
 msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1455
-#, fuzzy
 msgid "Warning: this key or combination is already assigned to \"<b>%1</b>\""
-msgstr "Perhatian: tombol atau kombinasi tombol ini sudah ditentukan ke "
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1467
 msgid "Warning: <b>%1</b> is already an application menu shortcut"
 msgstr "Perhatian: <b>%1<b> sudah digunakan sebagai jalan pintas menu aplikasi"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1490
-#, fuzzy
 msgid "Key or combination: <b>%1</b>"
-msgstr "Tombol atau kombinasi tombol: "
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1498
 msgid "Key: <b>%1</b>"
@@ -19764,26 +19749,20 @@ msgstr ""
 "Wadah (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:184
-#, fuzzy
 msgid "This module outputs the stream using the RIST protocol (TR06)."
 msgstr ""
-"Modul ini menghasilkan keluaran stream tertranskodekan ke jaringan lewat "
-"protokol mms."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:186
-#, fuzzy
 msgid "Destination Address"
-msgstr "Prefiks dari tujuan"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:191
-#, fuzzy
 msgid "Destination Port"
-msgstr "Destinasi"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:201
-#, fuzzy
 msgid "Stream Name"
-msgstr "Nama Stream"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:237
 msgid "This module outputs the transcoded stream to a network via HTTP."
@@ -23193,7 +23172,7 @@ msgstr "Packetizer Penyalin"
 
 #: modules/packetizer/dirac.c:87
 msgid "Dirac packetizer"
-msgstr "Packetizer Dirac"
+msgstr ""
 
 #: modules/packetizer/dts.c:47
 msgid "DTS audio packetizer"
@@ -29095,211 +29074,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Daftar Media Manager"
-
-#~ msgid "RIST latency (ms)"
-#~ msgstr "Latensi RIST (milidetik)"
-
-#~ msgid "16 bytes"
-#~ msgstr "16 byte"
-
-#~ msgid "24 bytes"
-#~ msgstr "24 byte"
-
-#~ msgid "32 bytes"
-#~ msgstr "32 byte"
-
-#~ msgid ""
-#~ "This Stream name will be sent to the receiver using the rist RTCP channel"
-#~ msgstr ""
-#~ "Nama Stream ini akan dikirimkan ke penerima menggunakan kanal rist RTCP"
-
-#~ msgid "4:2:0"
-#~ msgstr "4:2:0"
-
-#~ msgid "4:2:2"
-#~ msgstr "4:2:2"
-
-#~ msgid "4:4:4"
-#~ msgstr "4:4:4"
-
-#~ msgid "Rate control method"
-#~ msgstr "Metode pengendalian kecepatan"
-
-#~ msgid "Method used to encode the video sequence"
-#~ msgstr "Metode yang digunakan untuk mengenkode sekuens video"
-
-#~ msgid "Constant noise threshold mode"
-#~ msgstr "Mode ambang kebisingan konstan"
-
-#~ msgid "Lossless mode"
-#~ msgstr "Mode Lossless"
-
-#~ msgid "Constant lambda mode"
-#~ msgstr "Mode lambda konstan"
-
-#~ msgid "Constant error mode"
-#~ msgstr "Mode kesalahan konstan"
-
-#~ msgid "Constant quality mode"
-#~ msgstr "Mode kualitas konstan"
-
-#~ msgid "GOP structure"
-#~ msgstr "Struktur GOP"
-
-#~ msgid "GOP structure used to encode the video sequence"
-#~ msgstr "Struktur GOP yang digunakan untuk mengenkode sekuens video"
-
-#~ msgid "Constant quality factor"
-#~ msgstr "Faktor kualitas konstan"
-
-#~ msgid "Quality factor to use in constant quality mode"
-#~ msgstr "Faktor kualitas yang digunakan dalam mode kualitas konstan"
-
-#~ msgid "Noise Threshold"
-#~ msgstr "Batasan Noise"
-
-#~ msgid "Noise threshold to use in constant noise threshold mode"
-#~ msgstr "Batasan noise yang digunakan dalam mode batasan noise konstan"
-
-#~ msgid "CBR bitrate (kbps)"
-#~ msgstr "Kadar bit CBR (kbps)"
-
-#~ msgid "Target bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "Kadar bit target dalam kbps ketika mengenkode dalam mode kadar bit konstan"
-
-#~ msgid "Maximum bitrate (kbps)"
-#~ msgstr "Kadar bit maksimum (kbps)"
-
-#~ msgid "Maximum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "Kadar bit maksimum dalam kbps ketika mengenkode dalam mode kadar bit "
-#~ "konstan"
-
-#~ msgid "Minimum bitrate (kbps)"
-#~ msgstr "Kadar bit minimum (kbps)"
-
-#~ msgid "Minimum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "Kadar bit minimum dalam kbps ketika mengenkode dalam mode kadar bit "
-#~ "konstan"
-
-#~ msgid "GOP length"
-#~ msgstr "Panjang GOP"
-
-#~ msgid "Prefilter"
-#~ msgstr "Pra-filter"
-
-#~ msgid "Enable adaptive prefiltering"
-#~ msgstr "Hidupkan pra-filter teradaptasi"
-
-#~ msgid "No pre-filtering"
-#~ msgstr "Tanpa pre-filtering"
-
-#~ msgid "Add Noise"
-#~ msgstr "Tambah Noise"
-
-#~ msgid "Amount of prefiltering"
-#~ msgstr "Jumlah pra-filter"
-
-#~ msgid "Higher value implies more prefiltering"
-#~ msgstr ""
-#~ "Nilai yang semakin tinggi berimplikasi pada pra-filter yang lebih banyak"
-
-#~ msgid "Picture coding mode"
-#~ msgstr "Mode pengkodean gambar"
-
-#~ msgid "auto - let encoder decide based upon input (Best)"
-#~ msgstr "auto - biarkan enkoder menentukan berdasarkan input (Terbaik)"
-
-#~ msgid "force coding frame as single picture"
-#~ msgstr "paksa mengkoding frame sebagai sebuah gambar"
-
-#~ msgid "force coding frame as separate interlaced fields"
-#~ msgstr "paksa pengkodingan frame sebagai ruang interlaced terpisah"
-
-#~ msgid "Size of motion compensation blocks"
-#~ msgstr "Ukuran dari blok kompensasi gerak"
-
-#~ msgid "automatic - let encoder decide based upon input (Best)"
-#~ msgstr "otomatis - biarkan enkoder menentukan berdasarkan input (Terbaik)"
-
-#~ msgid "small - use small motion compensation blocks"
-#~ msgstr "kecil - gunakan blok kompensasi gerak kecil"
-
-#~ msgid "medium - use medium motion compensation blocks"
-#~ msgstr "medium - gunakan blok kompensasi gerak medium"
-
-#~ msgid "large - use large motion compensation blocks"
-#~ msgstr "besar - gunakan blok kompensasi gerak besar"
-
-#~ msgid "Motion Vector precision"
-#~ msgstr "Presisi Vektor Gerak"
-
-#~ msgid "Motion Vector precision in pels"
-#~ msgstr "Presisi vektor gerak dalam pels"
-
-#~ msgid "Use chroma as part of the motion estimation process"
-#~ msgstr "Gunakan kroma sebagai bagian dari proses estimasi gerak"
-
-#~ msgid "Intra picture DWT filter"
-#~ msgstr "Filter intra gambar DWT"
-
-#~ msgid "Inter picture DWT filter"
-#~ msgstr "Filter inter gambar DWT"
-
-#~ msgid "Number of DWT iterations"
-#~ msgstr "Jumlah iterasi DWT"
-
-#~ msgid "Enable multiple quantizers"
-#~ msgstr "Hidupkan pengkuantitasan ganda"
-
-#~ msgid "Enable multiple quantizers per subband (one per codeblock)"
-#~ msgstr "Hidupkan pengkuantitasan ganda per subjalur (satu per blokkode)"
-
-#~ msgid "Disable arithmetic coding"
-#~ msgstr "Matikan pengkodingan aritmatik"
-
-#~ msgid "Use variable length codes instead, useful for very high bitrates"
-#~ msgstr ""
-#~ "Gunakan kode panjang variable, sangat berguna untuk kadar bit sangat "
-#~ "tinggi"
-
-#~ msgid "Horizontal slices per frame"
-#~ msgstr "Irisan horisontal per bingkai"
-
-#~ msgid "Vertical slices per frame"
-#~ msgstr "Irisan vertikal per bingkai"
-
-#~ msgid "Enable Global Motion Estimation"
-#~ msgstr "Hidupkan Estimasi Gerak Global"
-
-#~ msgid "Enable Phase Correlation Estimation"
-#~ msgstr "Hidupkan Estimasi Korelasi Fase"
-
-#~ msgid "Enable Scene Change Detection"
-#~ msgstr "Hidupkan Deteksi Perubahan Adegan"
-
-#~ msgid "Force Profile"
-#~ msgstr "Paksakan Profil"
-
-#~ msgid "VC2 Low Delay Profile"
-#~ msgstr "Profil VC2 Penundaan Rendah"
-
-#~ msgid "VC2 Simple Profile"
-#~ msgstr "Profil VC2 Sederhana"
-
-#~ msgid "VC2 Main Profile"
-#~ msgstr "Profil Utama VC2"
-
-#~ msgid "Main Profile"
-#~ msgstr "Profil Utama"
-
-#~ msgid "Dirac video decoder using libschroedinger"
-#~ msgstr "Dekoder video Dirac menggunakan pustaka libschroedinger"
-
-#~ msgid "Dirac video encoder using libschroedinger"
-#~ msgstr "Enkoder video Dirac menggunakan pustaka libschroedinger"
-
-#~ msgid "Key: "
-#~ msgstr "Kunci: "
