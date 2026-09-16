@@ -1,5 +1,5 @@
 # Finnish translation
-# Copyright (C) 2025 VideoLAN
+# Copyright (C) 2026 VideoLAN
 # This file is distributed under the same license as the vlc package.
 #
 # Translators:
@@ -20,19 +20,20 @@
 # Ammuu5, 2020
 # Elias Meyer <elektrovirus@protonmail.com>, 2021
 # Jiri Grönroos <jiri.gronroos@iki.fi>, 2021
-# Kimmo Kujansuu <mrkujansuu@gmail.com>, 2022-2025
+# Kimmo Kujansuu <mrkujansuu@gmail.com>, 2022-2026
+# Michał Trzebiatowski <michtrz@gmail.com>, 2018
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22\n"
+"Project-Id-Version: vlc 3.0.24-beta1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2026-06-28 16:08+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
-"Last-Translator: Kimmo Kujansuu <mrkujansuu@gmail.com>, 2025\n"
+"Last-Translator: Kimmo Kujansuu <mrkujansuu@gmail.com>, 2026\n"
 "Language-Team: Finnish (https://app.transifex.com/yaron/teams/16553/fi/)\n"
-"Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: fi\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: include/vlc_common.h:1055
@@ -8225,15 +8226,16 @@ msgid "Bitmask"
 msgstr "Bitmaski"
 
 #: modules/access/rist.c:313
-#, fuzzy
 msgid "Virtual Destination Port Filter"
-msgstr "Kohdetiedosto:"
+msgstr "Virtuaalinen porttisuodatin"
 
 #: modules/access/rist.c:315
 msgid ""
 "Destination port to be used inside the reduced-mode of the main profile to "
 "filter incoming data. Use zero to allow all."
 msgstr ""
+"Kohdeportti saapuvan datan suodatukseen pääprofiilin rajoitetussa tilassa. "
+"Arvo 0 sallii kaiken."
 
 #: modules/access/rist.c:321 modules/access_output/rist.c:293
 msgid "RIST"
@@ -8248,13 +8250,12 @@ msgid "RIST demux/decode maximum jitter (default is 5ms)"
 msgstr "RIST demux/decode maksimi värinä (oletus on 5ms)"
 
 #: modules/access/rist.c:328
-#, fuzzy
 msgid ""
 "This controls the maximum jitter that will be passed to the demux/decode "
 "chain. The lower the value, the more CPU cycles the module will consume"
 msgstr ""
 "Tämä ohjaa maksimi värinää, joka välitetään demux-/decode-ketjuun. Mitä "
-"pienempi arvo, sitä enemmän prosessorin kuormaa algoritmi kuluttaa"
+"pienempi arvo, sitä enemmän algoritmi kuluttaa prosessorikuormaa"
 
 #: modules/access/rist.c:332
 msgid "RIST nack type, 0 = range, 1 = bitmask. Default is range"
@@ -8543,9 +8544,8 @@ msgid "SFTP port number to use on the server"
 msgstr "Palvelimella käytettävä SFTP portin numero"
 
 #: modules/access/sftp.c:61
-#, fuzzy
 msgid "Private key file"
-msgstr "AES-avaintiedosto"
+msgstr "Salausavaimen tiedosto"
 
 #: modules/access/sftp.c:62
 msgid ""
@@ -8553,6 +8553,10 @@ msgid ""
 "assumed to be in the same directory with '.pub' appended. If unset, standard "
 "key paths will be attempted (e.g. '~/.ssh/id_rsa')."
 msgstr ""
+"Salausavaimen tiedostoa käytetään SSH:n julkisen avaimen todennukseen. "
+"Julkisen avaimen tiedoston oletetaan olevan samassa hakemistossa, jossa on "
+"pääte \".pub\". Jos arvoa ei ole määritetty, yritetään käyttää "
+"vakiomuotoisia avainpolkuja (esim. \"~/.ssh/id_rsa\")."
 
 #: modules/access/sftp.c:68
 msgid "SFTP input"
@@ -8695,9 +8699,8 @@ msgid "Password for stream encryption"
 msgstr "Striimauksen salauksen salasana"
 
 #: modules/access/srt.c:566
-#, fuzzy
 msgid "SRT Stream ID"
-msgstr " SRT Stream ID"
+msgstr "SRT Stream ID"
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -9565,50 +9568,47 @@ msgstr "LiveHTTP"
 
 #: modules/access_output/rist.c:268
 msgid "Virtual Source Port"
-msgstr ""
+msgstr "Virtuaalinen lähdeportti"
 
 #: modules/access_output/rist.c:270
 msgid "Source port to be used inside the reduced-mode of the main profile"
-msgstr ""
+msgstr "Pääprofiilin sisällä käytettävä lähdeportti"
 
 #: modules/access_output/rist.c:272
-#, fuzzy
 msgid "Virtual Destination Port"
-msgstr "Suoratoiston kohde"
+msgstr "Virtuaalinen kohdeportti"
 
 #: modules/access_output/rist.c:274
 msgid "Destination port to be used inside the reduced-mode of the main profile"
-msgstr ""
+msgstr "Pääprofiilin sisällä käytettävä kohdeportti"
 
 #: modules/access_output/rist.c:281
-#, fuzzy
 msgid "Multipeer mode"
-msgstr "Multiplekseri"
+msgstr "Lähilaitteiden yhteys"
 
 #: modules/access_output/rist.c:283
 msgid ""
 "This allows you to select between duplicate or load balanced modes when "
 "sending data to multiple peers (several network paths)"
 msgstr ""
+"Voit valita kuormituksen, kun lähetät dataa laitteille (useille "
+"verkkopoluille)"
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Duplicate"
-msgstr "Sovellus"
+msgstr "Monistaminen"
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Load balanced"
-msgstr "Punabalanssi"
+msgstr "Kuormantasaus"
 
 #: modules/access_output/rist.c:294
 msgid "RIST stream output"
 msgstr "RIST striimin ulostulo"
 
 #: modules/access_output/rist.c:299
-#, fuzzy
 msgid "RIST target payload size (bytes)"
-msgstr "RIST-kohdepaketin koko (tavua)"
+msgstr "RIST-hyötykuorman koko (tavua)"
 
 #: modules/access_output/shout.c:64
 #: modules/gui/qt/components/sout/sout_widgets.cpp:438
@@ -12944,7 +12944,6 @@ msgstr "Tekstityksen purkukooderi"
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -15275,7 +15274,7 @@ msgstr "DTS-aikaleiman säädön määrä"
 
 #: modules/demux/dirac.c:54
 msgid "Dirac video demuxer"
-msgstr "Dirac videon demultiplekseri"
+msgstr "Dirac-video demultiplekseri"
 
 #: modules/demux/directory.c:94
 msgid "Directory import"
@@ -19675,7 +19674,7 @@ msgstr ""
 
 #: modules/gui/qt/components/info_panels.cpp:548
 msgid "Current media / stream statistics"
-msgstr "Tilastotietoja nykyisestä mediasta / tietovirrasta"
+msgstr "Median / striimin tiedot"
 
 #: modules/gui/qt/components/info_panels.cpp:574
 msgid "Input/Read"
@@ -19872,7 +19871,7 @@ msgstr "Laitteen nimi"
 
 #: modules/gui/qt/components/open_panels.cpp:1098
 msgid "Your display will be opened and played in order to stream or save it."
-msgstr "Näyttösi sisältö luetaan ja voit ohjata sen muualle tai tallentaa."
+msgstr "Näyttösi kopioidaan ja voit ohjata sen muualle tai tallentaa sitä."
 
 #. xgettext: frames per second
 #: modules/gui/qt/components/open_panels.cpp:1112
@@ -20057,40 +20056,36 @@ msgstr ""
 "Delete-näppäintä poistaaksesi."
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1405
-#, fuzzy
 msgid "Global Hotkey change"
-msgstr "Pikanäppäimen vaihto"
+msgstr "Pikanäppäimien vaihto"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1406
 msgid "Hotkey change"
 msgstr "Pikanäppäimen vaihto"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1410
-#, fuzzy
 msgid "Press the new key or combination for <b>%1</b>"
-msgstr "Paina uusi näppäin tai näppäinyhdistelmä toiminnolle"
+msgstr "Paina uutta näppäintä tai yhdistelmää, <b>%1</b>"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1419
 msgid "Assign"
 msgstr "Aseta"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1455
-#, fuzzy
 msgid "Warning: this key or combination is already assigned to \"<b>%1</b>\""
-msgstr "Varoitus: Tämä näppäinyhdistelmä on jo varattu "
+msgstr "Varoitus: Näppäinyhdistelmä on jo varattu, \"<b>%1</b>\" "
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1467
 msgid "Warning: <b>%1</b> is already an application menu shortcut"
 msgstr "Varoitus: <b>%1</b> on jo valikon pikavalinta"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1490
-#, fuzzy
 msgid "Key or combination: <b>%1</b>"
-msgstr "Näppäin tai yhdistelmä:"
+msgstr "Näppäin tai yhdistelmä <b>%1</b>"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1498
 msgid "Key: <b>%1</b>"
-msgstr ""
+msgstr "Näppäin: <b>%1</b>"
 
 #: modules/gui/qt/components/simple_preferences.cpp:256
 #: modules/gui/qt/components/simple_preferences.cpp:636
@@ -20235,7 +20230,7 @@ msgstr "Tyyppi:"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:128
 msgid "This module writes the transcoded stream to a file."
-msgstr "Tämä moduuli tallentaa transkoodatun liikenteen tiedostoon."
+msgstr "Tämä moduuli tallentaa transkoodatun striimin tiedostoon."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:130
 msgid "Filename"
@@ -20253,32 +20248,24 @@ msgstr ""
 "Säiliöt (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:184
-#, fuzzy
 msgid "This module outputs the stream using the RIST protocol (TR06)."
-msgstr ""
-"Tämä moduuli lähettää transkoodatun liikenteen verkkoon käyttäen MMS-"
-"protokollaa."
+msgstr "Tämä moduuli lähettää videostriimiä RIST-protokollan (TR06) avulla."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:186
-#, fuzzy
 msgid "Destination Address"
-msgstr "Kohteen etuliite"
+msgstr "Kohdeosoite"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:191
-#, fuzzy
 msgid "Destination Port"
-msgstr "Kohde"
+msgstr "Kohdeportti"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:201
-#, fuzzy
 msgid "Stream Name"
 msgstr "Striimin nimi"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:237
 msgid "This module outputs the transcoded stream to a network via HTTP."
-msgstr ""
-"Tämä moduuli lähettää transkoodatun liikenteen verkkoon käyttäen HTTP "
-"protokollaa."
+msgstr "Tämä moduuli lähettää transkoodatun striimin verkkoon HTTP:n avulla."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:239
 #: modules/gui/qt/components/sout/sout_widgets.cpp:335
@@ -20288,27 +20275,19 @@ msgstr "Polku"
 #: modules/gui/qt/components/sout/sout_widgets.cpp:291
 msgid ""
 "This module outputs the transcoded stream to a network via the mms protocol."
-msgstr ""
-"Tämä moduuli lähettää transkoodatun liikenteen verkkoon käyttäen MMS-"
-"protokollaa."
+msgstr "Tämä moduuli lähettää transkoodatun striimin verkkoon MMS:n avulla."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:333
 msgid "This module outputs the transcoded stream to a network via RTSP."
-msgstr ""
-"Tämä moduuli lähettää transkoodatun liikenteen verkkoon käyttäen RTSP-"
-"protokollaa."
+msgstr "Tämä moduuli lähettää transkoodatun striimin verkkoon RTSP:n avulla."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:379
 msgid "This module outputs the transcoded stream to a network via UDP."
-msgstr ""
-"Tämä moduuli lähettää transkoodatun liikenteen verkkoon käyttäen UDP-"
-"protokollaa."
+msgstr "Tämä moduuli lähettää transkoodatun striimin verkkoon UDP:n avulla."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:421
 msgid "This module outputs the transcoded stream to a network via RTP."
-msgstr ""
-"Tämä moduuli lähettää transkoodatun liikenteen verkkoon käyttäen RTP-"
-"protokollaa."
+msgstr "Tämä moduuli lähettää transkoodatun striimin verkkoon RTP:n avulla."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:428
 msgid "Base port"
@@ -20864,7 +20843,7 @@ msgstr ""
 
 #: modules/gui/qt/dialogs/sout.cpp:43 modules/gui/qt/ui/sout.h:198
 msgid "Stream Output"
-msgstr "Striimauksen ulostulo"
+msgstr "Striimin ulostulo"
 
 #: modules/gui/qt/dialogs/sout.cpp:49
 msgid ""
@@ -20873,8 +20852,8 @@ msgid ""
 "You should start by checking that source matches what you want your input to "
 "be and then press the \"Next\" button to continue.\n"
 msgstr ""
-"Tällä ohjatulla toiminnolla voit suoratoistaa tai muuntaa käytettäväksi "
-"sinun verkossa tai Internetissä.\n"
+"Tällä ohjatulla toiminnolla voit striimata Internettissä tai muuntaa mediaa "
+"tietokoneellasi.\n"
 "Tarkista, että lähde vastaa sisältöä ja paina sitten painiketta "
 "\"Seuraava\".\n"
 
@@ -20884,9 +20863,9 @@ msgid ""
 "This is automatically generated when you change the above settings,\n"
 "but you can change it manually."
 msgstr ""
-"Striimauksen ulostulon merkkijono.\n"
-"Merkkijono luodaan itsestään, kun muutat yllä olevia asetuksia,\n"
-"mutta sitä voi päivittää myös käsin."
+"Striimin merkkijono ulostulolle.\n"
+"Merkkijono luodaan automaattisesti, kun muutat yllä olevia asetuksia.\n"
+"Voi päivittää niitä myös käsin."
 
 #: modules/gui/qt/dialogs/sout.cpp:87
 msgid "Back"
@@ -21200,7 +21179,7 @@ msgstr "Avaa optinen &levy..."
 
 #: modules/gui/qt/menus.cpp:368
 msgid "Open &Network Stream..."
-msgstr "Avaa suoratoisto &verkosta..."
+msgstr "Avaa striimi &verkosta..."
 
 #: modules/gui/qt/menus.cpp:370 modules/gui/qt/menus.cpp:949
 msgid "Open &Capture Device..."
@@ -23403,9 +23382,9 @@ msgid ""
 "Windows Media Player will cache streamed content. Set to audio+video bitrate "
 "in bytes"
 msgstr ""
-"Älä yritä arvata ASF siirtonopeutta. Asettamalla voit hallita, kuinka "
-"Windows Media Player tallentaa välimuistiin striimatun sisällön. Aseta audio "
-"ja video siirtonopeus tavuina"
+"Älä arvaa ASF siirtonopeutta. Asetuksilla voit hallita, kuinka Windows Media "
+"Player tallentaa välimuistiin striimatun sisällön. Aseta audion ja videon "
+"siirtonopeus tavuina"
 
 #: modules/mux/asf.c:73
 msgid "ASF muxer"
@@ -23451,7 +23430,7 @@ msgstr "MP4/MOV multipleksi"
 
 #: modules/mux/mp4/mp4.c:77
 msgid "Fragmented and streamable MP4 muxer"
-msgstr "Hajautettu ja suoratoistettava MP4 multipleksi"
+msgstr "Paloitteleva ja suoratoistokelpoinen MP4-yhdistäjä"
 
 #: modules/mux/mpeg/ps.c:48 modules/mux/mpeg/ts.c:162
 msgid "DTS delay (ms)"
@@ -23463,9 +23442,9 @@ msgid ""
 "the data in the stream, compared to the SCRs. This allows for some buffering "
 "inside the client decoder."
 msgstr ""
-"Viivästä DTS (purkukoodauksen aikaleimoja) ja PTS (esitysaikaleimat) "
-"-SCR:iin verrattuna. Tämä mahdollistaa jonkin verran puskurointia ohjelman "
-"purkukoodauksen sisällä."
+"Viivästää striimin DTS (purkukoodauksen aikaleimoja) ja PTS "
+"(esitysaikaleimat) verrattuna SCR. Tämä lisää jonkin verran puskuria "
+"ohjelman purkukoodauksen sisällä."
 
 #: modules/mux/mpeg/ps.c:54
 msgid "PES maximum size"
@@ -23488,8 +23467,8 @@ msgid ""
 "Assign a fixed PID to the video stream. The PCR PID will automatically be "
 "the video."
 msgstr ""
-"Aseta videostriimille kiinteä PID. PCR PID tulee automaattisesti olemaan "
-"tämä video."
+"Aseta videostriimille kiinteä PID, jolloin PCR PID asettuu automaattisesti "
+"videolle."
 
 #: modules/mux/mpeg/ts.c:105
 msgid "Audio PID"
@@ -23497,7 +23476,7 @@ msgstr "Audio PID"
 
 #: modules/mux/mpeg/ts.c:106
 msgid "Assign a fixed PID to the audio stream."
-msgstr "Aseta audiovirtaan kiinteä PID."
+msgstr "Aseta audiostriimiin kiinteä PID."
 
 #: modules/mux/mpeg/ts.c:107
 msgid "SPU PID"
@@ -23521,7 +23500,7 @@ msgstr "TS ID"
 
 #: modules/mux/mpeg/ts.c:112
 msgid "Assign a fixed Transport Stream ID."
-msgstr "Määritä kiinteä Transport Stream ID."
+msgstr "Aseta kiinteä Transport Stream ID."
 
 #: modules/mux/mpeg/ts.c:113
 msgid "NET ID"
@@ -23576,9 +23555,9 @@ msgid ""
 "Sets PID to the ID if the incoming ES. This is for use with --ts-es-id-pid, "
 "and allows having the same PIDs in the input and output streams."
 msgstr ""
-"Asettaa PID:n ID siihen arvoon, joka on sisääntuleva ES tunniste. Tämä on "
-"tarkoitettu valinnan --ts-es-id-pid kanssa käytettäväksi, ja mahdollistaa "
-"samat PID:t sisään ja ulos suoratoistossa."
+"Asettaa PID-tunnukseksi saapuvan alavirran ES-tunnuksen. Tarkoitettu "
+"käytettäväksi --ts-es-id-pid-valinnan kanssa. Tämä mahdollistaa samojen PID-"
+"tunnusten säilyttämisen syöte- ja ulostulovirroissa."
 
 #: modules/mux/mpeg/ts.c:133
 msgid "Data alignment"
@@ -23603,9 +23582,9 @@ msgid ""
 "bitrate between the two boundaries. This avoids having huge bitrate peaks, "
 "especially for reference frames."
 msgstr ""
-"Leikkele striimi annetun mittaisiksi viipaleiksi ja takaa vakionopeus kunkin "
-"viipaleen rajojen välillä. Tämä estää suuret nopeuspiikit erityisesti "
-"viitekehysten osalta."
+"Leikkaa striimi annetun pituisiksi viipaleiksi ja varmista, että bittinopeus "
+"pysyy vakiona kahden rajan välillä. Näin vältät suuret bittinopeuspiikit, "
+"erityisesti referenssiruuduissa."
 
 #: modules/mux/mpeg/ts.c:143
 msgid "Use keyframes"
@@ -23619,10 +23598,10 @@ msgid ""
 "enhances the efficiency of the shaping algorithm, since I frames are usually "
 "the biggest frames in the stream."
 msgstr ""
-"Jos käytössä ja muotoilu on määritetty, TS multipleksi asettaa rajat I-"
-"kuvien loppuun. Tällöin käyttäjän antama muotoilun viive on pahimman "
+"Jos tämä on käytössä ja muotoilu on määritetty, TS multipleksi asettaa rajat "
+"I-kuvien loppuun. Tällöin käyttäjän antama muotoilun viive on pahimman "
 "tapauksen arvio, jota käytetään kun referenssiruutua ei ole saatavilla. Tämä "
-"parantaa muotoilualgoritmin tehokkuutta, koska I-ruudut ovat yleensä videon "
+"parantaa algoritmin tehokkuutta, koska I-ruudut ovat yleensä videon "
 "suurimpia ruutuja."
 
 #: modules/mux/mpeg/ts.c:151
@@ -23656,9 +23635,9 @@ msgid ""
 "the data in the stream, compared to the PCRs. This allows for some buffering "
 "inside the client decoder."
 msgstr ""
-"Viivästä DTS (dekoodaus) ja PTS (esitysaikaleimoja) tietovirrassa, PCR:iin "
-"verrattuna. Tämä mahdollistaa jonkin verran puskurointia ohjelman "
-"purkukoodauksen sisällä."
+"Viivästyttää virrassa olevan datan DTS- (purkukoodaus) ja PTS- (esitys) "
+"aikaleimoja suhteessa PCR-kellofrekvenssiin, mikä mahdollistaa puskuroinnin "
+"vastaanottavan asiakasohjelman dekooderissa."
 
 #: modules/mux/mpeg/ts.c:168
 msgid "Crypt audio"
@@ -23787,7 +23766,7 @@ msgstr "Kopioiva paketointi"
 
 #: modules/packetizer/dirac.c:87
 msgid "Dirac packetizer"
-msgstr "Dirac paketointi"
+msgstr "Dirac-paketointi"
 
 #: modules/packetizer/dts.c:47
 msgid "DTS audio packetizer"
@@ -24846,15 +24825,15 @@ msgstr "Päällekkäisyyden korjaus"
 
 #: modules/stream_extractor/archive.c:54
 msgid "libarchive based stream directory"
-msgstr "libarchive-pohjainen striimihakemisto"
+msgstr "Libarchive-pohjainen striimihakemisto"
 
 #: modules/stream_extractor/archive.c:58
 msgid "libarchive based stream extractor"
-msgstr "libarchive pohjainen striimin purkaja"
+msgstr "Libarchive-pohjainen striiminpurkaja"
 
 #: modules/stream_filter/adf.c:42
 msgid "ADF stream filter"
-msgstr "ADF striimin suodatin"
+msgstr "ADF-striimisuodatin"
 
 #: modules/stream_filter/aribcam.c:45
 msgid "ARIB STD-B25 Cam module"
@@ -24862,11 +24841,11 @@ msgstr "ARIB STD-B25 Cam-moduuli"
 
 #: modules/stream_filter/cache_block.c:498
 msgid "Block stream cache"
-msgstr "Estä striimin välimuisti"
+msgstr "Estä striimivälimuisti"
 
 #: modules/stream_filter/cache_read.c:570
 msgid "Byte stream cache"
-msgstr "Striimin tavuvälimuisti"
+msgstr "Striimitavuvälimuisti"
 
 #: modules/stream_filter/decomp.c:62
 msgid "LZMA decompression"
@@ -24890,7 +24869,7 @@ msgstr "Zlib-purkusuodatin"
 
 #: modules/stream_filter/prefetch.c:530
 msgid "Stream prefetch filter"
-msgstr "Suoratoiston esihakusuodatin"
+msgstr "Striimin esihakusuodatin"
 
 #: modules/stream_filter/prefetch.c:533
 msgid "Buffer size"
@@ -24918,7 +24897,7 @@ msgstr "Hakemisen kynnys eteenpäin (tavua)"
 
 #: modules/stream_filter/record.c:49
 msgid "Internal stream record"
-msgstr "Sisäinen tietovirran tallennus"
+msgstr "Sisäinen striimitallennus"
 
 #: modules/stream_filter/skiptags.c:243
 msgid "APE/ID3 tags-skipping filter"
@@ -24930,15 +24909,15 @@ msgstr "Autom. poisto"
 
 #: modules/stream_out/autodel.c:47
 msgid "Automatically add/delete input streams"
-msgstr "Lisää/poista automaattisesti tulevaa virtausta"
+msgstr "Lisää/poistaa autom. tulevaa striimiä"
 
 #: modules/stream_out/bridge.c:43
 msgid ""
 "Integer identifier for this elementary stream. This will be used to \"find\" "
 "this stream later."
 msgstr ""
-"Tämän alkeisvirran kokonaislukutunniste. Tätä käytetään myöhemmin tämän "
-"virran etsimiseen."
+"Tämän alavirran elementaarivirran tunniste, jota käytetään striimin "
+"\"tunnistamiseen\" myöhemmin."
 
 #: modules/stream_out/bridge.c:46
 msgid "Destination bridge-in name"
@@ -24970,9 +24949,8 @@ msgid ""
 "Offset to add to the stream IDs specified in bridge_out to obtain the stream "
 "IDs bridge_in will register."
 msgstr ""
-"Siirtymä \"offset\", joka lisätään bridge_out määrättyihin "
-"tietovirtatunnisteisiin, jotta niistä saadaan tunnisteet, jotka bridge_in "
-"rekisteröi."
+"Poikkeama, joka lisätään bridge_out-kohdassa määritettyihin virran "
+"tunnisteisiin, jotta saadaan tunnisteet, jotka bridge_in rekisteröi."
 
 #: modules/stream_out/bridge.c:60
 msgid "Name of current instance"
@@ -24988,7 +24966,7 @@ msgstr ""
 
 #: modules/stream_out/bridge.c:65
 msgid "Fallback to placeholder stream when out of data"
-msgstr "Käytä täytetietovirtaa, kun data loppuu"
+msgstr "Käytä autom. täytevirtaa, kun data loppuu."
 
 #: modules/stream_out/bridge.c:67
 msgid ""
@@ -24997,10 +24975,10 @@ msgid ""
 "configure a place holder stream when the real source breaks. Source and "
 "placeholder streams should have the same format."
 msgstr ""
-"Jos asetus on tosi, silta hylkää kaikki syötetyt perus striimit, paitsi jos "
-"se ei vastaanota tietoja toisesta siltauksesta. Tämän avulla voidaan "
-"määrittää paikanhaltija, kun todellinen lähde katkeaa. Lähde ja paikanhaltia "
-"on oltava samassa formaatissa."
+"Jos asetuksena on tosi, silta hylkää kaikki saapuvat alavirrat, paitsi jos "
+"se ei saa dataa toisesta sillasta. Tätä voidaan käyttää korvikestriimin "
+"määrittämiseen, kun varsinainen lähde menee epäkuntoon. Alkuperäisen lähteen "
+"ja korvikestriimin on oltava samassa formaatissa."
 
 #: modules/stream_out/bridge.c:72
 msgid "Placeholder delay"
@@ -25021,10 +24999,10 @@ msgid ""
 "the expense of a slightly longer delay, depending on the frequence of I "
 "frames in the streams."
 msgstr ""
-"Jos päällä, vaihto täytetietovirran ja oikean tietovirran välillä tehdään "
-"vain I-ruutujen kohdalla. Tämä poistaa vaihdon aiheuttamat artifaktit, mutta "
-"lisää jonkin verran viivettä, riippuen I-ruutujen tiheydestä kummassakin "
-"virrassa."
+"Jos asetus on käytössä, vaihto korvikestriimin ja normaalin virran välillä "
+"tapahtuu vain I-ruutujen kohdalla. Tämä poistaa kuvahäiriöt virran "
+"vaihtuessa, mutta aiheuttaa hieman pidemmän viiveen riippuen I-ruutujen "
+"tiheydestä striimeissä."
 
 #: modules/stream_out/bridge.c:92
 msgid "Bridge"
@@ -25032,7 +25010,7 @@ msgstr "Siltaaja"
 
 #: modules/stream_out/bridge.c:93
 msgid "Bridge stream output"
-msgstr "Siltaava virtauksen ulostulo"
+msgstr "Siltastriimin ulostulo"
 
 #: modules/stream_out/bridge.c:95
 msgid "Bridge out"
@@ -25052,7 +25030,7 @@ msgstr "Oletus: 90 sek"
 
 #: modules/stream_out/chromaprint.c:61
 msgid "Chromaprint stream output"
-msgstr "Chromaprint striimin ulostulo"
+msgstr "Chromaprint audiostriimin ulostulo"
 
 #: modules/stream_out/chromecast/cast.cpp:189
 msgid "HTTP port"
@@ -25063,8 +25041,8 @@ msgid ""
 "This sets the HTTP port of the local server used to stream the media to the "
 "Chromecast."
 msgstr ""
-"Tämä asettaa paikallisen palvelimen HTTP portin, jota käytetään median "
-"striimaamiseen Chromecastiin."
+"Tämä asettaa HTTP-portin, jota käytetään tietokoneelta striimaamiseen "
+"Chromecastille."
 
 #: modules/stream_out/chromecast/cast.cpp:192
 #: modules/stream_out/chromecast/cast.cpp:1213
@@ -25125,7 +25103,7 @@ msgstr "Chromecast"
 
 #: modules/stream_out/chromecast/cast.cpp:240
 msgid "Chromecast stream output"
-msgstr "Chromecast virtauksen ulostulo"
+msgstr "Chromecast striimiulostulo"
 
 #: modules/stream_out/chromecast/cast.cpp:1212
 msgid "Ok, Don't warn me again"
@@ -25149,15 +25127,15 @@ msgstr "sykli"
 
 #: modules/stream_out/cycle.c:327
 msgid "Cyclic stream output"
-msgstr "Syklinen virtauksen ulotulo"
+msgstr "Syklinen striimiulotulo"
 
 #: modules/stream_out/delay.c:39 modules/stream_out/setid.c:41
 msgid "Elementary Stream ID"
-msgstr "Alkeisvirran tunniste \"ES ID\""
+msgstr "Alavirran tunniste"
 
 #: modules/stream_out/delay.c:41 modules/stream_out/setid.c:43
 msgid "Specify an identifier integer for this elementary stream"
-msgstr "Määrää tälle alkeisvirralle \"ES\" virran tunnistava kokonaisluku"
+msgstr "Määritä tälle alavirralle tunniste kokonaislukuna"
 
 #: modules/stream_out/delay.c:43
 msgid "Delay of the ES (ms)"
@@ -25168,16 +25146,16 @@ msgid ""
 "Specify a delay (in ms) for this elementary stream. Positive means delay and "
 "negative means advance."
 msgstr ""
-"Määrää tälle alkeisvirralle (ES) viive (millisekunteina). Positiivinen arvo "
-"viivästää, negatiivinen edistää."
+"Määritä tälle alavirralle viive (ms). Positiivinen arvo viivästää, "
+"negatiivinen edistää."
 
 #: modules/stream_out/delay.c:55
 msgid "Delay a stream"
-msgstr "Viivytä tietovirtaa"
+msgstr "Viivästä striimiä"
 
 #: modules/stream_out/description.c:54
 msgid "Description stream output"
-msgstr "Kuvauksien virtauksen ulostulo"
+msgstr "Striimitietojen/metatietojen ulostulo"
 
 #: modules/stream_out/display.c:41
 msgid "Enable/disable audio rendering."
@@ -25193,11 +25171,11 @@ msgstr "Viive (ms)"
 
 #: modules/stream_out/display.c:45
 msgid "Introduces a delay in the display of the stream."
-msgstr "Viivästää näytettävää tietovirtaa."
+msgstr "Viivästää näytettävää striimiä."
 
 #: modules/stream_out/display.c:54
 msgid "Display stream output"
-msgstr "Näytä striimauksen ulostulo"
+msgstr "Näyttöstriimin ulostulo"
 
 #: modules/stream_out/duplicate.c:44
 msgid "Duplicate stream output"
@@ -25277,16 +25255,16 @@ msgstr "Tätä verkko-osoitteen ulostuloa käytetään videolle."
 
 #: modules/stream_out/es.c:80
 msgid "Elementary stream output"
-msgstr "Alkeistason striimin ulostulo"
+msgstr "Alavirran ulostulo"
 
 #: modules/stream_out/es.c:350 modules/stream_out/es.c:363
 #, c-format
 msgid "There is no suitable stream-output access module for \"%s/%s://%s\"."
-msgstr "Kohteelle \"%s/%s://%s\" ei ole sopivaa striimiulostulon moduulia."
+msgstr "Kohteelle \"%s/%s://%s\" striimiulostulolle ei ole sopivaa moduulia."
 
 #: modules/stream_out/gather.c:45
 msgid "Gathering stream output"
-msgstr "Keräävä striimiulostulo"
+msgstr "Keräävä koontistriimiulostulo"
 
 #: modules/stream_out/mosaic_bridge.c:103
 msgid "Specify an identifier string for this subpicture"
@@ -25317,7 +25295,7 @@ msgstr "Videosuodatin"
 
 #: modules/stream_out/mosaic_bridge.c:117
 msgid "Video filters will be applied to the video stream."
-msgstr "Videosuodatimia käytetään videovirtaan."
+msgstr "Videosuodattimet sovelletaan videovirrassa."
 
 #: modules/stream_out/mosaic_bridge.c:119
 msgid "Image chroma"
@@ -25349,7 +25327,7 @@ msgstr "Mosaiikkisilta"
 
 #: modules/stream_out/mosaic_bridge.c:140
 msgid "Mosaic bridge stream output"
-msgstr "Mosaiikkisilta virtauksen ulostulo"
+msgstr "Mosaiikkisiltastriimin ulostulo"
 
 #: modules/stream_out/record.c:50
 msgid "Destination prefix"
@@ -25361,7 +25339,7 @@ msgstr "Automaattisesti luodun kohdetiedoston nimen etuliite"
 
 #: modules/stream_out/record.c:57
 msgid "Record stream output"
-msgstr "Tallenna suoratoisto"
+msgstr "Tallennusstriimin ulostulo"
 
 #: modules/stream_out/rtp.c:78
 msgid "This is the output URL that will be used."
@@ -25392,8 +25370,9 @@ msgid ""
 "This allows you to specify the muxer used for the streaming output. Default "
 "is to use no muxer (standard RTP stream)."
 msgstr ""
-"Tämän avulla voit määrittää multipleksin käyttämän suoratoiston ulostulon. "
-"Oletuksena ei käytetä multipleksiä (tavallisesti RTP suoratoisto)."
+"Tämän avulla voit asettaa striimiulostulolle käytettävän yhdistäjän "
+"\"muxerin\". Oletus on, ettei yhdistäjää käytetä (standardissa RTP-"
+"striimissä)."
 
 #: modules/stream_out/rtp.c:92 modules/stream_out/standard.c:59
 msgid "Session name"
@@ -25426,8 +25405,8 @@ msgid ""
 "This allows you to give a short description with details about the stream, "
 "that will be announced in the SDP (Session Descriptor)."
 msgstr ""
-"Tämä mahdollistaa lyhyen kuvauksen antamisen tietovirran sisällöstä, joka "
-"tiedotetaan SDP:ssä (Session Descriptor)."
+"Tämän avulla voit antaa lyhyen kuvauksen ja lisätietoja striimistä, ja nämä "
+"tiedot ilmoitetaan SDP-kuvauksessa (Session Descriptor)."
 
 #: modules/stream_out/rtp.c:104 modules/stream_out/standard.c:67
 msgid "Session URL"
@@ -25439,9 +25418,9 @@ msgid ""
 "website of the streaming organization), that will be announced in the SDP "
 "(Session Descriptor)."
 msgstr ""
-"Tähän voit laittaa URL:n, joka sisältää lisätietoa tietovirrasta (yleensä "
-"tietovirtaa lähettävän organisaation websivut). Tämä URL tiedotetaan SDP:ssä "
-"(Session Descriptor)."
+"Tämän avulla voit antaa URL-osoitteen, josta löytyy lisätietoja striimistä "
+"(usein tosta vastaavan organisaation verkkosivusto). Tämä osoite ilmoitetaan "
+"SDP-kuvauksessa (Session Descriptor)."
 
 #: modules/stream_out/rtp.c:109 modules/stream_out/standard.c:72
 msgid "Session email"
@@ -25452,12 +25431,12 @@ msgid ""
 "This allows you to give a contact mail address for the stream, that will be "
 "announced in the SDP (Session Descriptor)."
 msgstr ""
-"Tämä mahdollistaa sähköpostiosoitteen antamisen yhteystietoja varten. Osoite "
-"tiedotetaan SDP:ssä (Session Descriptor)."
+"Tämän avulla voit antaa sähköpostiosoitteen yhteystietoja varten. Tämä "
+"osoite ilmoitetaan SDP-kuvauksessa (Session Descriptor)."
 
 #: modules/stream_out/rtp.c:116
 msgid "This allows you to specify the base port for the RTP streaming."
-msgstr "Tämä mahdollistaa perusportin asettamisen RTP striimaukselle."
+msgstr "Tämän avulla voit asettaa RTP-suoratoistolle käytettävän kanta-portin."
 
 #: modules/stream_out/rtp.c:117
 msgid "Audio port"
@@ -25466,7 +25445,8 @@ msgstr "Audio portti"
 #: modules/stream_out/rtp.c:119
 msgid ""
 "This allows you to specify the default audio port for the RTP streaming."
-msgstr "Tämän avulla voit määrittää oletus audioportin RTP striimaukselle."
+msgstr ""
+"Tämän avulla voit asettaa RTP-suoratoistolle käytettävän oletus audio-portin."
 
 #: modules/stream_out/rtp.c:120
 msgid "Video port"
@@ -25475,7 +25455,8 @@ msgstr "Video portti"
 #: modules/stream_out/rtp.c:122
 msgid ""
 "This allows you to specify the default video port for the RTP streaming."
-msgstr "Tämä mahdollistaa videoportin oletuksen asettamisen RTP suoratoistoon."
+msgstr ""
+"Tämän avulla voit asettaa RTP-suoratoistolle käytettävän oletus video-portin."
 
 #: modules/stream_out/rtp.c:130
 msgid "RTP/RTCP multiplexing"
@@ -25494,7 +25475,7 @@ msgid ""
 "Default caching value for outbound RTP streams. This value should be set in "
 "milliseconds."
 msgstr ""
-"Oletuspuskuroinnin määrä lähtevälle RTP suoratoistolle. Asetetaan "
+"Ulosmenevien RTP-striimien välimuistin oletuskoko. Tämä arvo tulee asettaa "
 "millisekunteina."
 
 #: modules/stream_out/rtp.c:140
@@ -25520,7 +25501,7 @@ msgstr "MP4A LATM"
 
 #: modules/stream_out/rtp.c:165
 msgid "This allows you to stream MPEG4 LATM audio streams (see RFC3016)."
-msgstr "Tämän avulla voit suoratoistaa MPEG4 LATM audiovirtaa (katso RFC3016)."
+msgstr "Tämän avulla voit striimata MPEG4 LATM audiovirtaa (katso RFC3016)."
 
 #: modules/stream_out/rtp.c:167
 msgid "RTSP session timeout (s)"
@@ -25538,7 +25519,7 @@ msgstr ""
 
 #: modules/stream_out/rtp.c:188
 msgid "RTP stream output"
-msgstr "RTP suoratoiston ulostulo"
+msgstr "RTP-striimin ulostulo"
 
 #: modules/stream_out/rtp.c:245
 msgid "RTSP VoD server"
@@ -25550,11 +25531,11 @@ msgstr "Uusi ES ID"
 
 #: modules/stream_out/setid.c:47
 msgid "Specify an new identifier integer for this elementary stream"
-msgstr "Määrää tälle alkeisvirralle \"ES\" uusi kokonaislukutunniste"
+msgstr "Määritä uusi tunniste kokonaislukuna tälle alavirralle"
 
 #: modules/stream_out/setid.c:51
 msgid "Specify an ISO-639 code (three characters) for this elementary stream"
-msgstr "Määrää tälle alkeisvirralle \"ES\" ISO-639 -maakoodi (kolme merkkiä)"
+msgstr "Aseta tälle alavirralle ISO-639 -maakoodi (kolme merkkiä)"
 
 #: modules/stream_out/setid.c:61
 msgid "Set ID"
@@ -25566,7 +25547,7 @@ msgstr "Aseta ES ID"
 
 #: modules/stream_out/setid.c:63
 msgid "Change the id of an elementary stream"
-msgstr "Vaihda alkeisvirran tunnistetta \"ES ID\""
+msgstr "Vaihda tunniste tälle alavirralle"
 
 #: modules/stream_out/setid.c:74
 msgid "Set ES Lang"
@@ -25578,7 +25559,7 @@ msgstr "Aseta Lang"
 
 #: modules/stream_out/setid.c:76
 msgid "Change the language of an elementary stream"
-msgstr "Vaihda alkeisvirran kielitietoa \"ES Lang\""
+msgstr "Vaihda kieli tälle alavirralle"
 
 #: modules/stream_out/smem.c:61
 msgid "Video prerender callback"
@@ -25653,7 +25634,7 @@ msgid ""
 "Time Synchronisation option for output. If true, stream will render as "
 "usual, else it will be rendered as fast as possible."
 msgstr ""
-"Ajan synkronointi ulostuloa varten. Jos valittuna, suoratoisto renderöidään "
+"Ajan synkronointi ulostuloa varten. Jos valittuna, striimi renderöidään "
 "tavalliseen tapaan, muussa tapauksessa se tehdään mahdollisimman nopeasti."
 
 #: modules/stream_out/smem.c:96
@@ -25662,7 +25643,7 @@ msgstr "Smem"
 
 #: modules/stream_out/smem.c:97
 msgid "Stream output to memory buffer"
-msgstr "Suoratoiston ulostulo muistipuskuriin"
+msgstr "Striimiulostulo muistipuskuriin"
 
 #: modules/stream_out/stats.c:42
 msgid "Writes stats to file instead of stdout"
@@ -25674,15 +25655,15 @@ msgstr "Rivillä näytettävä etuliite"
 
 #: modules/stream_out/stats.c:52
 msgid "Writes statistic info about stream"
-msgstr "Kirjoittaa striimauksen tilastotietoja"
+msgstr "Kirjoittaa striimiin tietoja/metatietoja"
 
 #: modules/stream_out/standard.c:44
 msgid "Output method to use for the stream."
-msgstr "Suoratoistoon käytettävä lähtömetodi."
+msgstr "Striimille käytettävä ulostulomenetelmä."
 
 #: modules/stream_out/standard.c:47
 msgid "Muxer to use for the stream."
-msgstr "Suoratoistoon käytettävä multiplekseri."
+msgstr "Striimille käytettävä yhdistäjä \"muxeri\"."
 
 #: modules/stream_out/standard.c:48
 #: share/lua/http/dialogs/create_stream.html:334
@@ -25694,8 +25675,7 @@ msgstr "Ulostulon kohde"
 msgid ""
 "Destination (URL) to use for the stream. Overrides path and bind parameters"
 msgstr ""
-"Kohde verkko-osoite (URL), jota käytetään virtaukseen. Yliajaa path- ja bind-"
-"parametrit."
+"Striimille käytettävä kohde (URL-osoite). Korvaa path- ja bind-parametrit."
 
 #: modules/stream_out/standard.c:51
 msgid "Address to bind to (helper setting for dst)"
@@ -25706,24 +25686,24 @@ msgid ""
 "address:port to bind vlc to listening incoming streams. Helper setting for "
 "dst, dst=bind+'/'+path. dst-parameter overrides this."
 msgstr ""
-"osoite:portti, josta VLC kuuntelee sisääntulevia tietovirtoja. Apuasetus "
-"dst:lle. \"dst=bind+'/'+path\" -dst-parametri yliajaa tämän."
+"osoite:portti, josta VLC kuuntelee sisääntulevia striimejä. Apuasetus "
+"dst:lle. \"dst=bind+'/'+path\" -dst-parametri korvaa tämän."
 
 #: modules/stream_out/standard.c:55
 msgid "Filename for stream (helper setting for dst)"
-msgstr "Tietovirran tiedostonimi (dst:n apuasetus)"
+msgstr "Striimin tiedostonimi (dst:n apuasetus)"
 
 #: modules/stream_out/standard.c:57
 msgid ""
 "Filename for stream. Helper setting for dst, dst=bind+'/'+path. dst-"
 "parameter overrides this."
 msgstr ""
-"Tietovirran tiedostonimi. Apuasetus dst:lle. \"dst=bind+'/'+path\" dst-"
-"parametri yliajaa tämän."
+"Striimin tiedostonimi. Apuasetus dst:lle. \"dst=bind+'/'+path\" dst-"
+"parametri korvaa tämän."
 
 #: modules/stream_out/standard.c:93
 msgid "Standard stream output"
-msgstr "Standardi suoratoiston ulostulo"
+msgstr "Vakio striimiulostulo"
 
 #: modules/stream_out/transcode/transcode.c:45
 msgid "Video encoder"
@@ -25750,7 +25730,7 @@ msgstr "Videon siirtonopeus"
 
 #: modules/stream_out/transcode/transcode.c:54
 msgid "Target bitrate of the transcoded video stream."
-msgstr "Muunnetun videovirran tavoitebittinopeus."
+msgstr "Muunnetun videostriimin tavoitebittinopeus."
 
 #: modules/stream_out/transcode/transcode.c:55
 msgid "Video scaling"
@@ -25766,7 +25746,7 @@ msgstr "Videon kuvataajuus"
 
 #: modules/stream_out/transcode/transcode.c:60
 msgid "Target output frame rate for the video stream."
-msgstr "Tavoitetaajuus videostriimin ulostuloon."
+msgstr "Videovirran tavoiteltu ulostulon kuvataajuus."
 
 #: modules/stream_out/transcode/transcode.c:61
 msgid "Deinterlace video"
@@ -25805,8 +25785,8 @@ msgid ""
 "Video filters will be applied to the video streams (after overlays are "
 "applied). You can enter a colon-separated list of filters."
 msgstr ""
-"Videosuotimet, joiden läpi videovirta ajetaan (sen jälkeen, kun ylipiirrot "
-"on käsitelty). Voit syöttää kaksoispisteillä erotetun listan suodattimista."
+"Videosuodattimet otetaan käyttöön videovirroissa (peitekuvien asettamisen "
+"jälkeen). Voit antaa suodattimet kaksoispisteellä erotettuna luettelona."
 
 #: modules/stream_out/transcode/transcode.c:84
 msgid "Audio encoder"
@@ -25839,8 +25819,7 @@ msgstr "Kohdista siirtonopeus muunnetulle audiostriimille."
 #: modules/stream_out/transcode/transcode.c:96
 msgid ""
 "Sample rate of the transcoded audio stream (11250, 22500, 44100 or 48000)."
-msgstr ""
-"Transkoodatun audiovirran näytetaajuus (11250, 22500, 44100 tai 48000)."
+msgstr "Koodatun audiovirran näytetaajuus (11250, 22500, 44100 tai 48000)."
 
 #: modules/stream_out/transcode/transcode.c:99
 msgid "This is the language of the audio stream."
@@ -25848,7 +25827,7 @@ msgstr "Tämä on audiovirrassa puhuttu kieli."
 
 #: modules/stream_out/transcode/transcode.c:102
 msgid "Number of audio channels in the transcoded streams."
-msgstr "Audiokanavien lukumäärä transkoodatuissa striimissä."
+msgstr "Audiokanavien määrä koodatuissa striimeissä."
 
 #: modules/stream_out/transcode/transcode.c:103
 msgid "Audio filter"
@@ -25859,8 +25838,8 @@ msgid ""
 "Audio filters will be applied to the audio streams (after conversion filters "
 "are applied). You can enter a colon-separated list of filters."
 msgstr ""
-"Suotimet, joiden läpi audiostriimi ajetaan (kun muunnokset on käsitelty). "
-"Voit syöttää kaksoispisteillä erotetun listan suodattimista."
+"Suotimet, joiden läpi audiostriimi ajetaan (muuntamisen jälkeen). Voit antaa "
+"suodattimet kaksoispisteellä erotettuna luettelona."
 
 #: modules/stream_out/transcode/transcode.c:108
 msgid "Subtitle encoder"
@@ -25889,9 +25868,10 @@ msgid ""
 "overlayed directly onto the video. You can specify a colon-separated list of "
 "subpicture modules."
 msgstr ""
-"Tämän avulla voit lisätä peittäviä pintoja (tunnetaan myös \"alikuvina\") "
-"muunnettuun videoon. Suodattimen tuottamat kuvat piirretään suoraan videon "
-"päälle. Voit kaksoispisteillä erotella moduulien listaa."
+"Tämän avulla voit lisätä peitekuvia (tunnetaan myös nimellä ”alikuvat”) "
+"koodattuun videovirtaan. Suodattimien tuottamat alikuvat sijoitetaan suoraan "
+"videon päälle. Voit määrittää alikuvamoduulit kaksoispisteellä erotettuna "
+"luettelona."
 
 #: modules/stream_out/transcode/transcode.c:123
 msgid "Number of threads"
@@ -25928,7 +25908,7 @@ msgstr "Transkoodaus"
 
 #: modules/stream_out/transcode/transcode.c:147
 msgid "Transcode stream output"
-msgstr "Transkoodaava suoratoiston ulostulo \"videomuunnin\""
+msgstr "Videomuunnin striimiulostulo"
 
 #: modules/stream_out/transcode/transcode.c:201
 msgid "Overlays/Subtitles"
@@ -26680,7 +26660,7 @@ msgstr "Lähetyksen lomituksen poisto"
 
 #: modules/video_filter/deinterlace/deinterlace.c:259
 msgid "Deinterlace method to use for streaming."
-msgstr "Lomituksen poisto, jota käytetään striimatessa lähetykseen."
+msgstr "Lomituksen poisto, jota käytetään striimauksen aikana."
 
 #: modules/video_filter/deinterlace/deinterlace.c:268
 msgid "Phosphor chroma mode for 4:2:0 input"
@@ -28865,7 +28845,7 @@ msgstr "Katselu piilota/näytä"
 
 #: share/lua/http/index.html:235
 msgid "Manage Streams"
-msgstr "Hallitse tietovirtaa"
+msgstr "Hallitse striimejä"
 
 #: share/lua/http/index.html:236
 msgid "Track Synchronisation"
@@ -28923,7 +28903,7 @@ msgid ""
 "By creating a stream, the <i>Main Controls</i> will operate the stream "
 "instead of the main interface."
 msgstr ""
-"Kun luot suoratoiston, <i>Tietokoneen säätimet</i> ohjaavat toistoa ohjelman "
+"Kun luot striimin, <i>Tietokoneen säätimet</i> ohjaavat toistoa ohjelman "
 "rajapinnan sijaan."
 
 #: share/lua/http/index.html:290
@@ -28932,14 +28912,14 @@ msgid ""
 "configuration, or to modify the default settings, select the button to the "
 "right: <i>Manage Streams</i>"
 msgstr ""
-"Suoratoistoa luodaan käyttäen oletusasetuksia. Tehdäksesi lisäasetuksia tai "
-"muuttaaksesi oletuksia, käytä <i>Hallitse tietovirtaa</i>."
+"Striimiä luodaan käyttäen oletuksia. Tehdäksesi lisäasetuksia tai "
+"muuttaaksesi oletuksia, käytä <i>Hallitse striimejä</i>."
 
 #: share/lua/http/index.html:294
 msgid ""
 "Once the stream is created, the <i>Media Viewer</i> window will display the "
 "stream."
-msgstr "Kun tietovirta on luotu, ikkuna <i>Median katselu</i>näyttää sen."
+msgstr "Kun striimi on luotu, ikkunssa <i>Median katselu</i>voit katsoa sitä."
 
 #: share/lua/http/index.html:295
 msgid ""
@@ -28952,20 +28932,20 @@ msgid ""
 "item, the first selected item from the <i>Library</i> will be the subject of "
 "the stream."
 msgstr ""
-"Tällä hetkellä soiva soittolistan kohde lähetetään suoratoistona. Jos mikään "
-"ei ole soimassa, ensimmäinen valittu kohde <i>Kirjastosta</i> lähetetään."
+"Tällä hetkellä soiva soittolista lähetetään suoratoistona. Jos mikään ei "
+"soi, niin ensimmäinen valinta <i>Kirjastosta</i> lähetetään."
 
 #: share/lua/http/index.html:301
 msgid ""
 "To stop the stream and resume normal controls, click the <i>Open Stream</i> "
 "button again."
 msgstr ""
-"Pysäyttääksesi lähetyksen ja palataksesi normaaliin ohjaukseen, paina "
-"<i>Avaa suoratoisto</i>painiketta uudelleen."
+"Kun pysäytät lähetyksen ja palataksesi normaaliin ohjaukseen, paina <i>Avaa "
+"striimi</i>painiketta uudelleen."
 
 #: share/lua/http/index.html:304
 msgid "Are you sure you wish to create the stream?"
-msgstr "Haluatko varmasti luoda suoratoiston?"
+msgstr "Haluatko luoda suoratoiston?"
 
 #: modules/gui/qt/ui/about.h:282 modules/gui/qt/ui/open.h:255
 #: modules/gui/qt/ui/podcast_configuration.h:98
@@ -29296,7 +29276,7 @@ msgstr "Profiilin &nimi"
 
 #: modules/gui/qt/ui/sout.h:200
 msgid "Set up media sources to stream"
-msgstr "Aseta medialähteet suoratoistoa varten"
+msgstr "Aseta mediat suoratoistoa varten"
 
 #: modules/gui/qt/ui/sout.h:202
 msgid "Destination Setup"
@@ -29348,7 +29328,7 @@ msgstr "Muut vaihtoehdot"
 
 #: modules/gui/qt/ui/sout.h:215
 msgid "Stream all elementary streams"
-msgstr "Suoratoista kaikki alkeisvirrat"
+msgstr "Suoratoista kaikki alavirrat"
 
 #: modules/gui/qt/ui/sout.h:216
 msgid "Generated stream output string"
@@ -29835,384 +29815,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Mediahallinnan lista"
-
-#~ msgid "RIST maximum packet size (bytes)"
-#~ msgstr "RIST-paketin enimmäiskoko (tavua)"
-
-#~ msgid "RIST latency (ms)"
-#~ msgstr "RIST-viive (ms)"
-
-#~ msgid "RIST nack retry interval (ms)"
-#~ msgstr "RIST-kuittauksen yritysväli (ms)"
-
-#~ msgid "RIST reorder buffer (ms)"
-#~ msgstr "RIST-tallennuksen puskuri (ms)"
-
-#~ msgid "RIST maximum retry count"
-#~ msgstr "RIST-yritysten enimmäismäärä"
-
-#~ msgid "Disable NACK output packets"
-#~ msgstr "Poista NACK-ulostulon paketit käytöstä"
-
-#~ msgid "Use this to disable packet recovery"
-#~ msgstr "Käytä tätä poistaaksesi pakettien palautus käytöstä"
-
-#~ msgid "Do not check for a valid rtcp message from the encoder"
-#~ msgstr "Älä tarkista kooderista kelvollista rtcp-viestiä"
-
-#~ msgid ""
-#~ "Send nack messages even when we have not confirmed that the encoder is on "
-#~ "our local network."
-#~ msgstr ""
-#~ "Lähetä nack-viestejä, vaikka ei ole vahvistusta, että kooderi olisi "
-#~ "lähiverkossa."
-
-#~ msgid "16 bytes"
-#~ msgstr "16 tavua"
-
-#~ msgid "24 bytes"
-#~ msgstr "24 tavua"
-
-#~ msgid "32 bytes"
-#~ msgstr "32 tavua"
-
-#~ msgid "RIST data output caching size (ms)"
-#~ msgstr "RIST-ulostulon puskurin koko (ms)"
-
-#~ msgid ""
-#~ "Having this cache will guarantee that the packets going out are delivered "
-#~ "at a spacing determined by the chain timestamps thus ensuring a near "
-#~ "jitter free output. Be aware that this setting will also add to the "
-#~ "overall latency of the stream."
-#~ msgstr ""
-#~ "Tämä välimuisti takaa, että lähtevät paketit toimitetaan ketjun "
-#~ "aikaleiman mukaan määräytyvällä välillä, mikä takaa lähes värinävapaan "
-#~ "tuotoksen. Huomaa, että tämä asetus lisää myös suoratoiston yleistä "
-#~ "viivettä."
-
-#~ msgid "RIST retry-buffer queue size (ms)"
-#~ msgstr "RIST-puskurin uudelleenyritysjonon koko (ms)"
-
-#~ msgid ""
-#~ "This must match the buffer size (latency) configured on the server side. "
-#~ "If you are not sure, leave the default of 0 which will set it the maximum "
-#~ "value and will use about 100MB of RAM"
-#~ msgstr ""
-#~ "Tämän on täsmättävä palvelimen puolella määritettyä kokoa (viivettä). Jos "
-#~ "et ole varma, jätä oletusarvo 0, joka asettaa sille maksimiarvon ja "
-#~ "käyttää noin 100Mt muistia"
-
-#~ msgid "SSRC used in RTP output (default is random, i.e. 0)"
-#~ msgstr "RTP-ulostulossa käytetty SSRC (oletus on satunnainen, ts. 0)"
-
-#~ msgid ""
-#~ "Use this setting to specify a known SSRC for the RTP header. This is only "
-#~ "useful if your receiver acts on it. When using VLC as receiver, it is not."
-#~ msgstr ""
-#~ "Asetuksella voit määrittää RTP-otsikolle tunnetun SSRC:n. Tämä on "
-#~ "hyödyllistä vain, jos vastaanottaja toimii samoini. Kun käytetään VLC:tä "
-#~ "vastaanottimena, näin ei ole."
-
-#~ msgid ""
-#~ "This Stream name will be sent to the receiver using the rist RTCP channel"
-#~ msgstr ""
-#~ "Tämä striimin nimi lähetetään vastaanottimelle \"Rist RTCP\" kanavaa "
-#~ "käyttäen"
-
-#~ msgid "4:2:0"
-#~ msgstr "4:2:0"
-
-#~ msgid "4:2:2"
-#~ msgstr "4:2:2"
-
-#~ msgid "4:4:4"
-#~ msgstr "4:4:4"
-
-#~ msgid "Rate control method"
-#~ msgstr "Nopeuden säätömenetelmä"
-
-#~ msgid "Method used to encode the video sequence"
-#~ msgstr "Videon pakkaamiseen käytettävä metodi"
-
-#~ msgid "Constant noise threshold mode"
-#~ msgstr "Jatkuva kohinan kynnystila"
-
-#~ msgid "Constant bitrate mode (CBR)"
-#~ msgstr "Jatkuva siirtonopeus (CBR)"
-
-#~ msgid "Low Delay mode"
-#~ msgstr "Lyhyen viiveen moodi"
-
-#~ msgid "Lossless mode"
-#~ msgstr "Häviötön moodi"
-
-#~ msgid "Constant lambda mode"
-#~ msgstr "Vakiolambdamoodi"
-
-#~ msgid "Constant error mode"
-#~ msgstr "Vakiovirhemoodi"
-
-#~ msgid "Constant quality mode"
-#~ msgstr "Vakiolaatumoodi"
-
-#~ msgid "GOP structure"
-#~ msgstr "GOP-rakenne"
-
-#~ msgid "GOP structure used to encode the video sequence"
-#~ msgstr ""
-#~ "Videon pakkaamiseen käytettävä GOP-rakenne (Group Of Pictures; kuvaryhmä)"
-
-#~ msgid ""
-#~ "No fixed gop structure. A picture can be intra or inter and refer to "
-#~ "previous or future pictures."
-#~ msgstr ""
-#~ "Ei kiinnitettyä gop-rakennetta (Group Of Pictures; kuvaryhmä). Mikä "
-#~ "hyvänsä kuva voi olla intra tai inter -tyyppiä, ja viitata sekä "
-#~ "edellisiin että tuleviin kuviin."
-
-#~ msgid "I-frame only sequence"
-#~ msgstr "Pelkästään I-kuvia"
-
-#~ msgid "Inter pictures refere to previous pictures only"
-#~ msgstr "Inter-tyypin kuvat saavat viitata vain edellisiin kuviin"
-
-#~ msgid "Inter pictures can refer to previous or future pictures"
-#~ msgstr ""
-#~ "Inter-tyypin kuvat saavat viitata sekä edellisiin että tuleviin kuviin"
-
-#~ msgid "Constant quality factor"
-#~ msgstr "Vakiolaatutekijä"
-
-#~ msgid "Quality factor to use in constant quality mode"
-#~ msgstr "Laatutekijä, jota käytetään vakiolaatumoodissa"
-
-#~ msgid "Noise Threshold"
-#~ msgstr "Kohinakynnys"
-
-#~ msgid "Noise threshold to use in constant noise threshold mode"
-#~ msgstr "Kohinan kynnysarvo, jota käytetään vakiokohinakynnysmoodissa"
-
-#~ msgid "CBR bitrate (kbps)"
-#~ msgstr "CBR siirtonopeus (kbps)"
-
-#~ msgid "Target bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr "Tavoite kbps siirtonopeus, kun koodataan vakiosiirtonopeudessa"
-
-#~ msgid "Maximum bitrate (kbps)"
-#~ msgstr "Suurin siirtonopeus (kbps)"
-
-#~ msgid "Maximum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr "Suurin kbps siirtonopeus, kun koodataan vakiosiirtonopeudessa"
-
-#~ msgid "Minimum bitrate (kbps)"
-#~ msgstr "Pienin siirtonopeus (kbps)"
-
-#~ msgid "Minimum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr "Pienin kbps siirtonopeus, kun koodataan vakiosiirtonopeudessa"
-
-#~ msgid "GOP length"
-#~ msgstr "GOP:n pituus"
-
-#~ msgid ""
-#~ "Number of pictures between successive sequence headers i.e. length of the "
-#~ "group of pictures"
-#~ msgstr "Kuvien määrä peräkkäisten jaksojen välillä eli kuvaryhmän pituus"
-
-#~ msgid "Prefilter"
-#~ msgstr "Esisuodatin"
-
-#~ msgid "Enable adaptive prefiltering"
-#~ msgstr "Mukautuva esisuodatus käyttöön"
-
-#~ msgid "No pre-filtering"
-#~ msgstr "Ei esisuodatusta"
-
-#~ msgid "Centre Weighted Median"
-#~ msgstr "Keskellä painotettu mediaani"
-
-#~ msgid "Gaussian Low Pass Filter"
-#~ msgstr "Gaussin alipäästösuodatin"
-
-#~ msgid "Add Noise"
-#~ msgstr "Lisää kohinaa"
-
-#~ msgid "Gaussian Adaptive Low Pass Filter"
-#~ msgstr "Gaussin mukautuva alipäästösuodatin"
-
-#~ msgid "Low Pass Filter"
-#~ msgstr "Alipäästösuodatin"
-
-#~ msgid "Amount of prefiltering"
-#~ msgstr "Esisuodatuksen määrä"
-
-#~ msgid "Higher value implies more prefiltering"
-#~ msgstr "Suuremmat arvot suodattavat enemmän"
-
-#~ msgid "Picture coding mode"
-#~ msgstr "Kuvankoodauksen tila"
-
-#~ msgid ""
-#~ "Field coding is where interlaced fields are coded separately as opposed "
-#~ "to a pseudo-progressive frame"
-#~ msgstr ""
-#~ "Kenttäkoodauksessa lomitetun kuvan kentät pakataan erikseen, sen sijaan "
-#~ "että ne tallennettaisiin yhtenä \"pseudo-progressiivisena\" kuvana."
-
-#~ msgid "auto - let encoder decide based upon input (Best)"
-#~ msgstr "Automaattinen - pakkaaja päättää itse (paras laatu)"
-
-#~ msgid "force coding frame as single picture"
-#~ msgstr "Pakota ruudun koodaus yhtenä kuvana"
-
-#~ msgid "force coding frame as separate interlaced fields"
-#~ msgstr "Pakota kenttäkoodaus"
-
-#~ msgid "Size of motion compensation blocks"
-#~ msgstr "Liikekompensaatioblokkien koko"
-
-#~ msgid "automatic - let encoder decide based upon input (Best)"
-#~ msgstr "Automaattinen - pakkaaja päättää itse (paras laatu)"
-
-#~ msgid "small - use small motion compensation blocks"
-#~ msgstr "Pieni - käytä pieniä liikekompensaatioblokkeja"
-
-#~ msgid "medium - use medium motion compensation blocks"
-#~ msgstr "Keski - käytä keskikokoisia liikekompensaatioblokkeja"
-
-#~ msgid "large - use large motion compensation blocks"
-#~ msgstr "Suuri - käytä suuria liikekompensaatioblokkeja"
-
-#~ msgid "Overlap of motion compensation blocks"
-#~ msgstr "Liikekompensaatioblokkien päällekkäisyys"
-
-#~ msgid "none - Motion compensation blocks do not overlap"
-#~ msgstr "Pois - Liikekompensaatioblokit eivät mene päällekkäin"
-
-#~ msgid "partial - Motion compensation blocks only partially overlap"
-#~ msgstr "Osin - Liikekompensaatioblokit peittävät toisensa osittain"
-
-#~ msgid "full - Motion compensation blocks fully overlap"
-#~ msgstr "Täysi - Liikekompensaatioblokit peittävät toisensa täysin"
-
-#~ msgid "Motion Vector precision"
-#~ msgstr "Liikevektorien tarkkuus"
-
-#~ msgid "Motion Vector precision in pels"
-#~ msgstr "Liikevektorien tarkkuus (precision) pel-yksiköissä."
-
-#~ msgid "Three component motion estimation"
-#~ msgstr "Kolmikomponenttinen liikearviointi"
-
-#~ msgid "Use chroma as part of the motion estimation process"
-#~ msgstr "Käytä väritietoa osana liikkeenarviointiprosessia"
-
-#~ msgid "Intra picture DWT filter"
-#~ msgstr "Kuvansisäinen DWT-suodatin"
-
-#~ msgid "Inter picture DWT filter"
-#~ msgstr "Kuvien välinen DWT-suodatin"
-
-#~ msgid "Number of DWT iterations"
-#~ msgstr "DWT-iteraatioiden määrä"
-
-#~ msgid "Also known as DWT levels"
-#~ msgstr "Tunnetaan myös DWT-tasojen määränä"
-
-#~ msgid "Enable multiple quantizers"
-#~ msgstr "Käytä useita kvantisoijia"
-
-#~ msgid "Enable multiple quantizers per subband (one per codeblock)"
-#~ msgstr ""
-#~ "Kytkee päälle usean kvantisoijan käyttämisen kullekin alikaistalle (yksi "
-#~ "koodiblokkia kohti)"
-
-#~ msgid "Disable arithmetic coding"
-#~ msgstr "Aritmeettinen koodaus pois"
-
-#~ msgid "Use variable length codes instead, useful for very high bitrates"
-#~ msgstr ""
-#~ "Käytä sen sijaan vaihtelevan pituisia koodeja, jotka ovat hyödyllisiä "
-#~ "erittäin suurille siirtonopeuksille"
-
-#~ msgid "perceptual weighting method"
-#~ msgstr "Havaintopainotusmetodi"
-
-#~ msgid "perceptual distance"
-#~ msgstr "Havaintoetäisyys"
-
-#~ msgid "perceptual distance to calculate perceptual weight"
-#~ msgstr ""
-#~ "Havaintoetäisyys \"perceptual distance\", josta lasketaan "
-#~ "havaintopainotus \"perceptual weight\""
-
-#~ msgid "Horizontal slices per frame"
-#~ msgstr "Vaakaviipaleiden määrä ruudussa"
-
-#~ msgid "Number of horizontal slices per frame in low delay mode"
-#~ msgstr "Montako vaakaviipaletta ruudussa matalaviivemoodissa"
-
-#~ msgid "Vertical slices per frame"
-#~ msgstr "Pystyviipaleiden määrä ruudussa"
-
-#~ msgid "Number of vertical slices per frame in low delay mode"
-#~ msgstr "Montako pystyviipaletta ruudussa matalaviivemoodissa"
-
-#~ msgid "Size of code blocks in each subband"
-#~ msgstr "Kunkin alikaistan \"subband\" koodiblokkien koko"
-
-#~ msgid "small - use small code blocks"
-#~ msgstr "Pieni - käytä pieniä koodiblokkeja"
-
-#~ msgid "medium - use medium sized code blocks"
-#~ msgstr "Keski - käytä keskikokoisia koodiblokkeja"
-
-#~ msgid "large - use large code blocks"
-#~ msgstr "Suuri - käytä suuria koodiblokkeja"
-
-#~ msgid "full - One code block per subband"
-#~ msgstr "Täysi - yksi koodiblokki per alikaista"
-
-#~ msgid "Enable hierarchical Motion Estimation"
-#~ msgstr "Hierarkinen liikkeenennustus"
-
-#~ msgid "Number of levels of downsampling"
-#~ msgstr "Alasmuunnoksen tasojen määrä"
-
-#~ msgid ""
-#~ "Number of levels of downsampling in hierarchical motion estimation mode"
-#~ msgstr ""
-#~ "Kuinka monta tasoa suoritetaan alasmuunnosta (downsampling) "
-#~ "hierarkkisessa liikkeenennustuksessa"
-
-#~ msgid "Enable Global Motion Estimation"
-#~ msgstr "Ota liikkeen ennustaminen käyttöön"
-
-#~ msgid "Enable Phase Correlation Estimation"
-#~ msgstr "Ota vaihekorrelaation ennustaminen käyttöön"
-
-#~ msgid "Enable Scene Change Detection"
-#~ msgstr "Ota kohtauksen vaihtumisen tunnistus käyttöön"
-
-#~ msgid "Force Profile"
-#~ msgstr "Pakota profiili"
-
-#~ msgid "VC2 Low Delay Profile"
-#~ msgstr "VC2 Low Delay profiili"
-
-#~ msgid "VC2 Simple Profile"
-#~ msgstr "VC2 Simple profiili"
-
-#~ msgid "VC2 Main Profile"
-#~ msgstr "VC2 Main profiili"
-
-#~ msgid "Main Profile"
-#~ msgstr "Main-profiili"
-
-#~ msgid "Dirac video decoder using libschroedinger"
-#~ msgstr "Dirac video purkukooderi, käyttäen libschroedinger kirjastoa"
-
-#~ msgid "Dirac video encoder using libschroedinger"
-#~ msgstr "Dirac videokooderi käyttäen libschroedinger kirjastoa"
-
-#~ msgid "Key: "
-#~ msgstr "Näppäin: "
