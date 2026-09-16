@@ -25,12 +25,11 @@ vlc_modules += {
 }
 
 # liveHTTP
-gpg_error_dep = cc.find_library('gpg-error', dirs: contrib_libdir, required: false)
 vlc_modules += {
     'name' : 'access_output_livehttp',
     'sources' : files('livehttp.c'),
-    'dependencies' : [ gcrypt_dep, gpg_error_dep ],
-    'enabled' : gcrypt_dep.found() and gpg_error_dep.found(),
+    'dependencies' : [ gcrypt_dep ],
+    'enabled' : gcrypt_dep.found(),
     'shortname' : 'a_o_live',
     'plugin_dir' : 'access_output',
 }
