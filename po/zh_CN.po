@@ -1,9 +1,9 @@
 # Simplified Chinese translation
-# Copyright (C) 2023 VideoLAN
+# Copyright (C) 2026 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Dian Li <xslidian@gmail.com>, 2009-2017, 2022
+# Dian Li <xslidian@gmail.com>, 2009-2017,2022,2025
 # pingplug <pingplug@foxmail.com>, 2016-2017
 # SnowOnion Lee <snowonionlee@gmail.com>, 2016
 # Sophia Meifang Wang <sophiatiger121@hotmail.com>, 2015
@@ -11,19 +11,22 @@
 # Yoyo <admin@wisestudio.org>, 2008
 # zhangmin <zm1990s@gmail.com>, 2014
 # QWERT, 2021
+# Michał Trzebiatowski <michtrz@gmail.com>, 2018
+# tjw123hh tjw123hh, 2026
+# Phonebook3599, 2026
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22-rc1\n"
+"Project-Id-Version: vlc 3.0.24-beta1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2026-06-28 16:08+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
-"Last-Translator: Dian Li (xslidian) <xslidian@gmail.com>, 2025\n"
+"Last-Translator: Phonebook3599, 2026\n"
 "Language-Team: Chinese (China) (https://app.transifex.com/yaron/teams/16553/"
 "zh_CN/)\n"
-"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #: include/vlc_common.h:1055
@@ -1039,24 +1042,20 @@ msgid "Decoded format"
 msgstr "已解码格式"
 
 #: src/input/es_out.c:3207
-#, fuzzy
 msgid "Decoded channels"
-msgstr "音频声道数"
+msgstr "已解码声道"
 
 #: src/input/es_out.c:3212
-#, fuzzy
 msgid "Decoded sample rate"
-msgstr "音频采样率"
+msgstr "已解码采样率"
 
 #: src/input/es_out.c:3219
-#, fuzzy
 msgid "Decoded bits per sample"
-msgstr "音频位／采样"
+msgstr "已解码位每采样"
 
 #: src/input/es_out.c:3224
-#, fuzzy
 msgid "Decoded Bitrate"
-msgstr "已解码格式"
+msgstr "已解码码率"
 
 #: src/input/es_out.c:3237
 msgid "Track replay gain"
@@ -6120,11 +6119,11 @@ msgstr "[cdda:][设备][@[音轨]]"
 
 #: modules/access/cdda.c:1023
 msgid "Musicbrainz Server"
-msgstr ""
+msgstr "MusicBrainz 服务器"
 
 #: modules/access/cdda.c:1024
 msgid "Address of the musicbrainz server to use."
-msgstr ""
+msgstr "要使用的 MusicBrainz 服务器地址。"
 
 #: modules/access/cdda.c:1026
 msgid "CDDB Server"
@@ -7822,9 +7821,8 @@ msgid "Bitmask"
 msgstr "位掩码"
 
 #: modules/access/rist.c:313
-#, fuzzy
 msgid "Virtual Destination Port Filter"
-msgstr "目标文件:"
+msgstr ""
 
 #: modules/access/rist.c:315
 msgid ""
@@ -7845,12 +7843,10 @@ msgid "RIST demux/decode maximum jitter (default is 5ms)"
 msgstr "RIST 多路分配器/解码最大抖动 (默认5毫秒)"
 
 #: modules/access/rist.c:328
-#, fuzzy
 msgid ""
 "This controls the maximum jitter that will be passed to the demux/decode "
 "chain. The lower the value, the more CPU cycles the module will consume"
 msgstr ""
-"这控制将被传递到demux/decode链的最大抖动。数值越低，算法消耗的CPU周期越多"
 
 #: modules/access/rist.c:332
 msgid "RIST nack type, 0 = range, 1 = bitmask. Default is range"
@@ -8130,9 +8126,8 @@ msgid "SFTP port number to use on the server"
 msgstr "服务器端所用的 SFTP 端口号"
 
 #: modules/access/sftp.c:61
-#, fuzzy
 msgid "Private key file"
-msgstr "AES 密钥文件"
+msgstr "私钥文件"
 
 #: modules/access/sftp.c:62
 msgid ""
@@ -8280,9 +8275,8 @@ msgid "Password for stream encryption"
 msgstr "流加密密码"
 
 #: modules/access/srt.c:566
-#, fuzzy
 msgid "SRT Stream ID"
-msgstr "SRT 流输出"
+msgstr ""
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -9129,18 +9123,16 @@ msgid "Source port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:272
-#, fuzzy
 msgid "Virtual Destination Port"
-msgstr "串流目标"
+msgstr ""
 
 #: modules/access_output/rist.c:274
 msgid "Destination port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:281
-#, fuzzy
 msgid "Multipeer mode"
-msgstr "混流器"
+msgstr ""
 
 #: modules/access_output/rist.c:283
 msgid ""
@@ -9149,23 +9141,20 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Duplicate"
-msgstr "应用程序"
+msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Load balanced"
-msgstr "红平衡"
+msgstr ""
 
 #: modules/access_output/rist.c:294
 msgid "RIST stream output"
 msgstr "RIST 流输出"
 
 #: modules/access_output/rist.c:299
-#, fuzzy
 msgid "RIST target payload size (bytes)"
-msgstr "RIST 目标数据包大小 (字节)"
+msgstr ""
 
 #: modules/access_output/shout.c:64
 #: modules/gui/qt/components/sout/sout_widgets.cpp:438
@@ -9261,15 +9250,15 @@ msgstr "SRT 流输出"
 
 #: modules/access_output/srt.c:471
 msgid "SRT maximum payload size (bytes)"
-msgstr ""
+msgstr "SRT 最大负载大小 (字节)"
 
 #: modules/access_output/srt.c:475
 msgid "SRT maximum bandwidth ceiling (bytes)"
-msgstr ""
+msgstr "SRT 最大带宽上限 (字节)"
 
 #: modules/access_output/srt.c:480
 msgid " SRT Stream ID"
-msgstr ""
+msgstr "SRT 串流 ID"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -11129,11 +11118,11 @@ msgstr "用于 tile 解码的最大线程数，默认0=自动"
 
 #: modules/codec/dav1d.c:56
 msgid "All Layers"
-msgstr ""
+msgstr "所有层"
 
 #: modules/codec/dav1d.c:57
 msgid "Whether or not to display all spatial layers, default false"
-msgstr ""
+msgstr "是否显示所有空间层，默认关闭"
 
 #: modules/codec/dav1d.c:62
 msgid "Dav1d video decoder"
@@ -12356,7 +12345,6 @@ msgstr "文本字幕解码器"
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -12777,7 +12765,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, fuzzy
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -14578,11 +14565,11 @@ msgstr "文件转储器"
 
 #: modules/demux/dirac.c:41
 msgid "Value to adjust dts by"
-msgstr "dts 调整值"
+msgstr ""
 
 #: modules/demux/dirac.c:54
 msgid "Dirac video demuxer"
-msgstr "Dirac 视频分流器"
+msgstr ""
 
 #: modules/demux/directory.c:94
 msgid "Directory import"
@@ -17093,7 +17080,7 @@ msgstr "全部收缩"
 #: modules/gui/macosx/VLCPlaylist.m:231
 #: modules/gui/qt/components/playlist/standardpanel.cpp:274
 msgid "Shuffle playlist"
-msgstr ""
+msgstr "随机播放列表"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:54
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -19283,36 +19270,32 @@ msgstr ""
 "按删除键移除。"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1405
-#, fuzzy
 msgid "Global Hotkey change"
-msgstr "热键更改"
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1406
 msgid "Hotkey change"
 msgstr "热键更改"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1410
-#, fuzzy
 msgid "Press the new key or combination for <b>%1</b>"
-msgstr "请按下该动作的新热键或组合键 "
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1419
 msgid "Assign"
 msgstr "分配"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1455
-#, fuzzy
 msgid "Warning: this key or combination is already assigned to \"<b>%1</b>\""
-msgstr "警告: 该热键或组合键已分配给 "
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1467
 msgid "Warning: <b>%1</b> is already an application menu shortcut"
 msgstr "警告: <b>%1</b> 已被应用程序菜单快捷键占用"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1490
-#, fuzzy
 msgid "Key or combination: <b>%1</b>"
-msgstr "快捷键或组合键: "
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1498
 msgid "Key: <b>%1</b>"
@@ -19478,24 +19461,20 @@ msgstr ""
 "容器 (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:184
-#, fuzzy
 msgid "This module outputs the stream using the RIST protocol (TR06)."
-msgstr "此模块通过 mms 协议向网络输出转码后的流。"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:186
-#, fuzzy
 msgid "Destination Address"
-msgstr "目标前缀"
+msgstr "目标地址"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:191
-#, fuzzy
 msgid "Destination Port"
-msgstr "目标"
+msgstr "目标端口"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:201
-#, fuzzy
 msgid "Stream Name"
-msgstr "流名称"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:237
 msgid "This module outputs the transcoded stream to a network via HTTP."
@@ -20751,11 +20730,11 @@ msgstr "显示不重要的错误和警告消息对话框"
 
 #: modules/gui/qt/qt.cpp:125
 msgid "Enable Dark Mode"
-msgstr ""
+msgstr "启用深色模式"
 
 #: modules/gui/qt/qt.cpp:126
 msgid "Applies a dark theme to the style."
-msgstr ""
+msgstr "应用深色主题样式。"
 
 #: modules/gui/qt/qt.cpp:128
 msgid "Activate the updates availability notification"
@@ -21073,15 +21052,15 @@ msgstr "设置图像色度，在 0.01 和 10 之间。默认为 1。"
 
 #: modules/hw/d3d11/d3d11_filters.c:683
 msgid "AMD VQ Enhancer"
-msgstr ""
+msgstr "AMD 视频质量增强器"
 
 #: modules/hw/d3d11/d3d11_filters.c:689
 msgid "AMD Frame Rate Doubler"
-msgstr ""
+msgstr "AMD 帧率倍增器"
 
 #: modules/hw/d3d11/d3d11_filters.c:692
 msgid "Show indicator"
-msgstr ""
+msgstr "显示指示器"
 
 #: modules/hw/d3d9/d3d9_filters.c:454
 msgid "Direct3D9 adjust filter"
@@ -22903,7 +22882,7 @@ msgstr "复制封包器"
 
 #: modules/packetizer/dirac.c:87
 msgid "Dirac packetizer"
-msgstr "Dirac 封包器"
+msgstr ""
 
 #: modules/packetizer/dts.c:47
 msgid "DTS audio packetizer"
@@ -26754,47 +26733,47 @@ msgstr "Windows 8 及更高版本推荐使用的视频输出"
 
 #: modules/video_output/win32/direct3d11.c:74
 msgid "Video Upscaling Mode"
-msgstr ""
+msgstr "视频超分辨率模式"
 
 #: modules/video_output/win32/direct3d11.c:75
 msgid "Select the upscaling mode for video."
-msgstr ""
+msgstr "选择视频的超分辨率模式。"
 
 #: modules/video_output/win32/direct3d11.c:80
 msgid "Linear Sampler"
-msgstr ""
+msgstr "线性采样"
 
 #: modules/video_output/win32/direct3d11.c:80
 msgid "Point Sampler"
-msgstr ""
+msgstr "点采样"
 
 #: modules/video_output/win32/direct3d11.c:80
 msgid "Video Processor"
-msgstr ""
+msgstr "视频处理器"
 
 #: modules/video_output/win32/direct3d11.c:80
 msgid "Super Resolution"
-msgstr ""
+msgstr "超分辨率"
 
 #: modules/video_output/win32/direct3d11.c:82
 msgid "HDR Output Mode"
-msgstr ""
+msgstr "HDR 输出模式"
 
 #: modules/video_output/win32/direct3d11.c:83
 msgid "Use HDR output even if the source is SDR."
-msgstr ""
+msgstr "即使源为 SDR 也使用 HDR 输出。"
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Never out HDR"
-msgstr ""
+msgstr "从不输出 HDR"
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Always output HDR"
-msgstr ""
+msgstr "始终输出 HDR"
 
 #: modules/video_output/win32/direct3d11.c:88
 msgid "Generate HDR from SDR"
-msgstr ""
+msgstr "从 SDR 生成 HDR"
 
 #: modules/video_output/win32/direct3d11.c:92
 msgid "Direct3D11 video output"
@@ -27865,19 +27844,19 @@ msgstr "0.00 dB"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:147
 msgid "Audio Fingerprinting"
-msgstr ""
+msgstr "音频指纹识别"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:148
 msgid "Select a matching identity"
-msgstr ""
+msgstr "选择匹配的资料"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:149
 msgid "No fingerprint has been found"
-msgstr ""
+msgstr "未找到匹配指纹"
 
 #: modules/gui/qt/ui/fingerprintdialog.h:150
 msgid "Fingerprinting track..."
-msgstr ""
+msgstr "正在对该轨道进行指纹识别..."
 
 #: modules/gui/qt/ui/messages_panel.h:137
 msgid "&Verbosity:"
@@ -28393,7 +28372,7 @@ msgstr "自动唤起界面:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:550
 msgid "Use a dark palette"
-msgstr ""
+msgstr "使用深色调色板"
 
 #: modules/gui/qt/ui/sprefs_interface.h:551
 msgid "Skin resource file:"
@@ -28708,361 +28687,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "媒体管理器列表"
-
-#~ msgid "RIST maximum packet size (bytes)"
-#~ msgstr "RIST 最大数据包大小(字节)"
-
-#~ msgid "RIST latency (ms)"
-#~ msgstr "RIST 延迟 (毫秒)"
-
-#~ msgid "RIST nack retry interval (ms)"
-#~ msgstr "RIST nack 重试间隔 （毫秒）"
-
-#~ msgid "RIST reorder buffer (ms)"
-#~ msgstr "RIST 重新排序缓冲 (毫秒)"
-
-#~ msgid "RIST maximum retry count"
-#~ msgstr "RIST 重试最大次数"
-
-#~ msgid "Disable NACK output packets"
-#~ msgstr "禁用 NACK 输出包"
-
-#~ msgid "Use this to disable packet recovery"
-#~ msgstr "使用这个来禁用包恢复"
-
-#~ msgid "Do not check for a valid rtcp message from the encoder"
-#~ msgstr "不检查来自编码器的有效rtcp消息 "
-
-#~ msgid ""
-#~ "Send nack messages even when we have not confirmed that the encoder is on "
-#~ "our local network."
-#~ msgstr "即使我们没有确认编码器在我们的本地网络上，也发送nack消息。"
-
-#~ msgid "16 bytes"
-#~ msgstr "16 字节"
-
-#~ msgid "24 bytes"
-#~ msgstr "24 字节"
-
-#~ msgid "32 bytes"
-#~ msgstr "32 字节"
-
-#~ msgid "RIST data output caching size (ms)"
-#~ msgstr "RIST 数据输出缓存大小 (毫秒)"
-
-#~ msgid ""
-#~ "Having this cache will guarantee that the packets going out are delivered "
-#~ "at a spacing determined by the chain timestamps thus ensuring a near "
-#~ "jitter free output. Be aware that this setting will also add to the "
-#~ "overall latency of the stream."
-#~ msgstr ""
-#~ "拥有这个缓存将保证发送的数据包以链时间戳确定的间隔发送，从而确保几乎没有抖"
-#~ "动的输出。请注意，此设置会增加流的整体延迟。"
-
-#~ msgid "RIST retry-buffer queue size (ms)"
-#~ msgstr "RIST 重试缓冲区队列大小(毫秒)"
-
-#~ msgid ""
-#~ "This must match the buffer size (latency) configured on the server side. "
-#~ "If you are not sure, leave the default of 0 which will set it the maximum "
-#~ "value and will use about 100MB of RAM"
-#~ msgstr ""
-#~ "这必须与服务器端配置的缓冲区大小(延迟)匹配。如果您不确定，请保留默认值0，"
-#~ "这会将其设置为最大值，并将使用大约100MB 内存"
-
-#~ msgid "SSRC used in RTP output (default is random, i.e. 0)"
-#~ msgstr "RTP输出中使用的SSRC(默认为随机，即0) "
-
-#~ msgid ""
-#~ "Use this setting to specify a known SSRC for the RTP header. This is only "
-#~ "useful if your receiver acts on it. When using VLC as receiver, it is not."
-#~ msgstr ""
-#~ "使用此设置为RTP头指定已知的SSRC。这只有在你的接受器对它采取行动时才有用。"
-#~ "当使用VLC作为接收器时，它不是。"
-
-#~ msgid ""
-#~ "This Stream name will be sent to the receiver using the rist RTCP channel"
-#~ msgstr "个流名称将使用rist RTCP通道发送到接收端 "
-
-#~ msgid "4:2:0"
-#~ msgstr "4:2:0"
-
-#~ msgid "4:2:2"
-#~ msgstr "4:2:2"
-
-#~ msgid "4:4:4"
-#~ msgstr "4:4:4"
-
-#~ msgid "Rate control method"
-#~ msgstr "码率控制方法"
-
-#~ msgid "Method used to encode the video sequence"
-#~ msgstr "用于编码视频序列的方式"
-
-#~ msgid "Constant noise threshold mode"
-#~ msgstr "恒定噪点阈值模式"
-
-#~ msgid "Constant bitrate mode (CBR)"
-#~ msgstr "恒定码率模式 (CBR)"
-
-#~ msgid "Low Delay mode"
-#~ msgstr "低延迟模式"
-
-#~ msgid "Lossless mode"
-#~ msgstr "无损模式"
-
-#~ msgid "Constant lambda mode"
-#~ msgstr "恒定 lambda 模式"
-
-#~ msgid "Constant error mode"
-#~ msgstr "恒定错误模式"
-
-#~ msgid "Constant quality mode"
-#~ msgstr "恒定质量模式"
-
-#~ msgid "GOP structure"
-#~ msgstr "GOP 结构"
-
-#~ msgid "GOP structure used to encode the video sequence"
-#~ msgstr "用于编码视频序列的 GOP 结构"
-
-#~ msgid ""
-#~ "No fixed gop structure. A picture can be intra or inter and refer to "
-#~ "previous or future pictures."
-#~ msgstr "无固定 gop 结构。画面可以帧内或帧间，可引用先前或后面的画面。"
-
-#~ msgid "I-frame only sequence"
-#~ msgstr "仅 I-帧的序列"
-
-#~ msgid "Inter pictures refere to previous pictures only"
-#~ msgstr "仅帧间引用先前画面"
-
-#~ msgid "Inter pictures can refer to previous or future pictures"
-#~ msgstr "帧间引用先前或后面的画面"
-
-#~ msgid "Constant quality factor"
-#~ msgstr "恒定质量系数"
-
-#~ msgid "Quality factor to use in constant quality mode"
-#~ msgstr "用于恒定质量模式的质量系数"
-
-#~ msgid "Noise Threshold"
-#~ msgstr "噪点阈值"
-
-#~ msgid "Noise threshold to use in constant noise threshold mode"
-#~ msgstr "用于恒定噪点阈值模式的噪点阈值"
-
-#~ msgid "CBR bitrate (kbps)"
-#~ msgstr "CBR 码率 (kbps)"
-
-#~ msgid "Target bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr "以恒定码率模式编码时的目标码率，单位为 kbps"
-
-#~ msgid "Maximum bitrate (kbps)"
-#~ msgstr "最高码率 (kbps)"
-
-#~ msgid "Maximum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr "以恒定码率模式编码时的最高码率，单位为 kbps"
-
-#~ msgid "Minimum bitrate (kbps)"
-#~ msgstr "最低码率 (kbps)"
-
-#~ msgid "Minimum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr "以恒定码率模式编码时的最低码率，单位为 kbps"
-
-#~ msgid "GOP length"
-#~ msgstr "GOP 长度"
-
-#~ msgid ""
-#~ "Number of pictures between successive sequence headers i.e. length of the "
-#~ "group of pictures"
-#~ msgstr "连续序列头之间的画面数，即画面组长度"
-
-#~ msgid "Prefilter"
-#~ msgstr "预过滤器"
-
-#~ msgid "Enable adaptive prefiltering"
-#~ msgstr "启用自适应预过滤"
-
-#~ msgid "No pre-filtering"
-#~ msgstr "无预过滤"
-
-#~ msgid "Centre Weighted Median"
-#~ msgstr "中值加权中位数"
-
-#~ msgid "Gaussian Low Pass Filter"
-#~ msgstr "高斯低通滤镜"
-
-#~ msgid "Add Noise"
-#~ msgstr "增噪"
-
-#~ msgid "Gaussian Adaptive Low Pass Filter"
-#~ msgstr "高斯自适应低通滤镜"
-
-#~ msgid "Low Pass Filter"
-#~ msgstr "低通滤镜"
-
-#~ msgid "Amount of prefiltering"
-#~ msgstr "预过滤总量"
-
-#~ msgid "Higher value implies more prefiltering"
-#~ msgstr "较高数值意味着更多的预过滤"
-
-#~ msgid "Picture coding mode"
-#~ msgstr "画面编码模式"
-
-#~ msgid ""
-#~ "Field coding is where interlaced fields are coded separately as opposed "
-#~ "to a pseudo-progressive frame"
-#~ msgstr "分场编码将隔行扫描的场分开编码，而不是伪逐行扫描帧"
-
-#~ msgid "auto - let encoder decide based upon input (Best)"
-#~ msgstr "自动 - 让编码器根据输入数据决定 (最佳)"
-
-#~ msgid "force coding frame as single picture"
-#~ msgstr "强制将帧编码为单一画面"
-
-#~ msgid "force coding frame as separate interlaced fields"
-#~ msgstr "强制将帧编码为两个隔行扫描场"
-
-#~ msgid "Size of motion compensation blocks"
-#~ msgstr "运动补偿块尺寸"
-
-#~ msgid "automatic - let encoder decide based upon input (Best)"
-#~ msgstr "自动 - 让编码器根据输入数据决定 (最佳)"
-
-#~ msgid "small - use small motion compensation blocks"
-#~ msgstr "小 - 使用小运动补偿块"
-
-#~ msgid "medium - use medium motion compensation blocks"
-#~ msgstr "中 - 使用中运动补偿块"
-
-#~ msgid "large - use large motion compensation blocks"
-#~ msgstr "大 - 使用大运动补偿块"
-
-#~ msgid "Overlap of motion compensation blocks"
-#~ msgstr "运动补偿块重叠"
-
-#~ msgid "none - Motion compensation blocks do not overlap"
-#~ msgstr "无 - 运动补偿块不重叠"
-
-#~ msgid "partial - Motion compensation blocks only partially overlap"
-#~ msgstr "部分 - 运动补偿块仅部分重叠"
-
-#~ msgid "full - Motion compensation blocks fully overlap"
-#~ msgstr "全 - 运动补偿块完全重叠"
-
-#~ msgid "Motion Vector precision"
-#~ msgstr "运动向量精度"
-
-#~ msgid "Motion Vector precision in pels"
-#~ msgstr "运动向量的精度，单位为像素"
-
-#~ msgid "Three component motion estimation"
-#~ msgstr "三原色动作估计"
-
-#~ msgid "Use chroma as part of the motion estimation process"
-#~ msgstr "将色度用作运动估算过程的一部分"
-
-#~ msgid "Intra picture DWT filter"
-#~ msgstr "画面内 DWT 滤镜"
-
-#~ msgid "Inter picture DWT filter"
-#~ msgstr "画面间 DWT 滤镜"
-
-#~ msgid "Number of DWT iterations"
-#~ msgstr "DWT 迭代数目"
-
-#~ msgid "Also known as DWT levels"
-#~ msgstr "又称 DWT 级别"
-
-#~ msgid "Enable multiple quantizers"
-#~ msgstr "启用多个量化器"
-
-#~ msgid "Enable multiple quantizers per subband (one per codeblock)"
-#~ msgstr "为每个子带启用多个量化器 (每个编码块一个)"
-
-#~ msgid "Disable arithmetic coding"
-#~ msgstr "禁用算术编码"
-
-#~ msgid "Use variable length codes instead, useful for very high bitrates"
-#~ msgstr "改用可变长编码，码率非常高时很有用"
-
-#~ msgid "perceptual weighting method"
-#~ msgstr "感知加权法"
-
-#~ msgid "perceptual distance"
-#~ msgstr "感知距离"
-
-#~ msgid "perceptual distance to calculate perceptual weight"
-#~ msgstr "计算感知权重的感知距离"
-
-#~ msgid "Horizontal slices per frame"
-#~ msgstr "每帧水平切片数"
-
-#~ msgid "Number of horizontal slices per frame in low delay mode"
-#~ msgstr "低延迟模式下每帧水平切片数"
-
-#~ msgid "Vertical slices per frame"
-#~ msgstr "每帧垂直切片数"
-
-#~ msgid "Number of vertical slices per frame in low delay mode"
-#~ msgstr "低延迟模式下每帧垂直切片数"
-
-#~ msgid "Size of code blocks in each subband"
-#~ msgstr "各子带编码块大小"
-
-#~ msgid "small - use small code blocks"
-#~ msgstr "小 - 使用小编码块"
-
-#~ msgid "medium - use medium sized code blocks"
-#~ msgstr "中 - 使用中等大小的编码块"
-
-#~ msgid "large - use large code blocks"
-#~ msgstr "大 - 使用大编码块"
-
-#~ msgid "full - One code block per subband"
-#~ msgstr "全 - 每个子带一个编码块"
-
-#~ msgid "Enable hierarchical Motion Estimation"
-#~ msgstr "启用分层运动估算"
-
-#~ msgid "Number of levels of downsampling"
-#~ msgstr "缩减采样的级别"
-
-#~ msgid ""
-#~ "Number of levels of downsampling in hierarchical motion estimation mode"
-#~ msgstr "分层运动估计模式缩减采样级别数"
-
-#~ msgid "Enable Global Motion Estimation"
-#~ msgstr "启用全局运动估算"
-
-#~ msgid "Enable Phase Correlation Estimation"
-#~ msgstr "启用相位关联估算"
-
-#~ msgid "Enable Scene Change Detection"
-#~ msgstr "启用场景变化侦测"
-
-#~ msgid "Force Profile"
-#~ msgstr "强制配置文件"
-
-#~ msgid "VC2 Low Delay Profile"
-#~ msgstr "VC2 低延迟配置文件"
-
-#~ msgid "VC2 Simple Profile"
-#~ msgstr "VC2 简单配置文件"
-
-#~ msgid "VC2 Main Profile"
-#~ msgstr "VC2 主配置文件"
-
-#~ msgid "Main Profile"
-#~ msgstr "主配置文件"
-
-#~ msgid "Dirac video decoder using libschroedinger"
-#~ msgstr "Dirac 视频解码器，使用 libschroedinger"
-
-#~ msgid "Dirac video encoder using libschroedinger"
-#~ msgstr "Dirac 视频编码器，使用 libschroedinger"
-
-#~ msgid "Key: "
-#~ msgstr "按键: "
