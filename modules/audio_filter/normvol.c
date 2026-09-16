@@ -43,6 +43,8 @@
 #include <vlc_aout.h>
 #include <vlc_filter.h>
 
+#define MIN_FMAX 0.01f
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -104,7 +106,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->f_max = var_CreateGetFloat( vlc_object_parent(p_filter),
                                        "norm-max-level" );
 
-    if( p_sys->f_max <= 0 ) p_sys->f_max = 0.01;
+    if( p_sys->f_max <= 0 ) p_sys->f_max = MIN_FMAX;
 
     /* We need to store (nb_buffers+1)*nb_channels floats */
     p_sys->p_last = calloc( i_channels * (p_sys->i_nb + 2), sizeof(float) );
@@ -190,6 +192,7 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
         /* Seuil arbitraire */
         p_sys->f_max = var_GetFloat( vlc_object_parent(p_filter),
                                      "norm-max-level" );
+        if( p_sys->f_max <= 0 ) p_sys->f_max = MIN_FMAX;
 
         //fprintf(stderr,"Average %f, max %f\n", f_average, p_sys->f_max );
         if( f_average > p_sys->f_max )
