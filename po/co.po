@@ -1,23 +1,24 @@
 # Corsican translation
-# Copyright (C) 2023 VideoLAN
+# Copyright (C) 2026 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Patriccollu di Santa Maria è Sichè <Patrick.Santa-Maria@laposte.net>, 2016-2023
+# Patriccollu di Santa Maria è Sichè <Patrick.Santa-Maria@laposte.net>, 2016-2023,2026
+# Michał Trzebiatowski <michtrz@gmail.com>, 2017
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22-rc1\n"
+"Project-Id-Version: vlc 3.0.24-beta1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2026-06-28 16:08+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: Patriccollu di Santa Maria è Sichè <Patrick.Santa-"
-"Maria@laposte.net>, 2024\n"
+"Maria@laposte.net>, 2026\n"
 "Language-Team: Corsican (https://app.transifex.com/yaron/teams/16553/co/)\n"
-"Language: co\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: co\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: include/vlc_common.h:1055
@@ -638,7 +639,7 @@ msgstr ""
 
 #: src/audio_output/filters.c:267
 msgid "Audio filtering failed"
-msgstr "A filtratura audio hè fiascata"
+msgstr "A filtrazione audio hè fiascata"
 
 #: src/audio_output/filters.c:268
 #, c-format
@@ -1077,24 +1078,20 @@ msgid "Decoded format"
 msgstr "Furmatu discudificatu"
 
 #: src/input/es_out.c:3207
-#, fuzzy
 msgid "Decoded channels"
-msgstr "Canali audio"
+msgstr "Canali discudificati"
 
 #: src/input/es_out.c:3212
-#, fuzzy
 msgid "Decoded sample rate"
-msgstr "Frequenza di campiunariu audio"
+msgstr "Frequenza di campiunariu discudificata"
 
 #: src/input/es_out.c:3219
-#, fuzzy
 msgid "Decoded bits per sample"
-msgstr "Bits audio à u campione"
+msgstr "Bits à u campione discudificati"
 
 #: src/input/es_out.c:3224
-#, fuzzy
 msgid "Decoded Bitrate"
-msgstr "Furmatu discudificatu"
+msgstr "Flussu binariu discudificatu"
 
 #: src/input/es_out.c:3237
 msgid "Track replay gain"
@@ -1510,7 +1507,7 @@ msgstr "Web"
 
 #: src/interface/interface.c:99
 msgid "Mouse Gestures"
-msgstr "Gesti di u topu"
+msgstr "Mosse di u topu"
 
 #: src/interface/interface.c:222
 msgid ""
@@ -1582,7 +1579,7 @@ msgstr ""
 "Si pò selezziunà l’interfaccie addiziunale per VLC. Seranu lanciate in tacca "
 "di sfondulu in più di l’interfaccia predefinita. Impiegà una lista di moduli "
 "d’interfaccia staccati da dui punti. (i valori classichi sò « rc » "
-"(cuntrollu alluntanatu), « http », « gestures », ecc.)"
+"(cuntrollu alluntanatu), « http », « mosse », ecc.)"
 
 #: src/libvlc-module.c:83
 msgid "You can select control interfaces for VLC."
@@ -1751,7 +1748,7 @@ msgstr ""
 
 #: src/libvlc-module.c:161
 msgid "Audio desynchronization compensation"
-msgstr "Cumpensazione di a disincrunizazione audio"
+msgstr "Cumpensu di a disincrunizazione audio"
 
 #: src/libvlc-module.c:163
 msgid ""
@@ -2597,7 +2594,7 @@ msgid ""
 msgstr ""
 "St’ozzione vi permette di sincrunizà di manera alluntanata l’arilogii per u "
 "servitore è u cliente. I parametri detagliati sò dispunibule in « Espertu > "
-"Sincrunizazione di a reta »"
+"Sincrunizazione di a reta »."
 
 #: src/libvlc-module.c:540 src/video_output/vout_intf.c:98
 #: src/video_output/vout_intf.c:116 modules/access/dshow/dshow.cpp:92
@@ -2896,7 +2893,7 @@ msgid ""
 "{...}\""
 msgstr ""
 "Si pò pruvede manualmente una lista d’indette per un flussu in a forma "
-"« {name=nome-di-lindetta,time=ora-ozzionale,bytes=spiazzamentu-ozzionale-in-"
+"« {name=nome-di-lindetta,time=ora-ozzionale,bytes=spustime-ozzionale-in-"
 "ottetti},{...} »"
 
 #: src/libvlc-module.c:671
@@ -3109,7 +3106,7 @@ msgid ""
 "Load this subtitle file. To be used when autodetect cannot detect your "
 "subtitle file."
 msgstr ""
-"Caricà stu schedariu di sottutituli. À impiegà quandu a scuperta autumatica "
+"Caricà stu schedariu di sottutituli. Da impiegà quandu a scuperta autumatica "
 "ùn pò micca truvà u vostru schedariu di sottutituli."
 
 #: src/libvlc-module.c:762
@@ -3275,7 +3272,7 @@ msgid ""
 "[user@]myproxy.mydomain:myport/ ; if empty, the http_proxy environment "
 "variable will be tried."
 msgstr ""
-"U proxy HTTP à impiegà deve esse in a forma http://"
+"U proxy HTTP da impiegà deve esse in a forma http://"
 "[utilizatore@]umoproxy.umoduminiu:umoportu/ ; s’ellu hè viotu, a variabile "
 "d’ambiente http_proxy serà provata."
 
@@ -3305,7 +3302,7 @@ msgstr "Nome d’utilizatore SOCKS"
 
 #: src/libvlc-module.c:864
 msgid "User name to be used for connection to the SOCKS proxy."
-msgstr "Nome d’utilizatore à impiegà per a cunnessione à u proxy SOCKS."
+msgstr "Nome d’utilizatore da impiegà per a cunnessione à u proxy SOCKS."
 
 #: src/libvlc-module.c:866
 msgid "SOCKS password"
@@ -3313,7 +3310,7 @@ msgstr "Parolla d’intesa SOCKS"
 
 #: src/libvlc-module.c:868
 msgid "Password to be used for connection to the SOCKS proxy."
-msgstr "Parolla d’intesa à impiegà per a cunnessione à u proxy SOCKS."
+msgstr "Parolla d’intesa da impiegà per a cunnessione à u proxy SOCKS."
 
 #: src/libvlc-module.c:870
 msgid "Title metadata"
@@ -3659,9 +3656,9 @@ msgid ""
 "You can use it to tune VLC priority against other programs, or against other "
 "VLC instances."
 msgstr ""
-"St’ozzione aghjunghje un valore (pusitivu o nigativu) à a priurità "
-"predefinita di VLC. Si pò impiegà què per adattà a priurità di VLC in pettu "
-"à l’altri prugrammi o in pettu à l’altre istanze di VLC."
+"St’ozzione aghjunghje un valore di spustime (pusitivu o nigativu) à a "
+"priurità predefinita di VLC. Si pò impiegà què per adattà a priurità di VLC "
+"in pettu à l’altri prugrammi o in pettu à l’altre istanze di VLC."
 
 #: src/libvlc-module.c:1042
 msgid ""
@@ -6327,7 +6324,7 @@ msgid ""
 "to access your camera."
 msgstr ""
 "Ci vole à apre « Preferenze di u sistema » -> « Sicurità è vita privata » è "
-"permette VLC d’accede à u vostru apparechju-fotò."
+"permette VLC d’accede à u vostru apparechju’fotò."
 
 #: modules/access/avio.h:33
 msgid "AVIO"
@@ -6406,7 +6403,7 @@ msgstr ""
 
 #: modules/access/bluray.c:876
 msgid "AACS Host certificate revoked."
-msgstr "U certificatu d’ospite AACS hè revocatu."
+msgstr "U certificatu d’ospite AACS hè revucatu."
 
 #: modules/access/bluray.c:878
 msgid "AACS MMC failed."
@@ -6482,11 +6479,11 @@ msgstr "[cdda:][apparechju][@[traccia]]"
 
 #: modules/access/cdda.c:1023
 msgid "Musicbrainz Server"
-msgstr ""
+msgstr "Servitore Musicbrainz"
 
 #: modules/access/cdda.c:1024
 msgid "Address of the musicbrainz server to use."
-msgstr ""
+msgstr "Indirizzu di u servitore musicbrainz à impiegà."
 
 #: modules/access/cdda.c:1026
 msgid "CDDB Server"
@@ -6526,7 +6523,7 @@ msgstr "DC1394"
 
 #: modules/access/dc1394.c:52
 msgid "IIDC Digital Camera (FireWire) input"
-msgstr "Entrata d’apparechju-fotò numericu IIDC (FireWire)"
+msgstr "Entrata d’apparechju’fotò numericu IIDC (FireWire)"
 
 #: modules/access/dcp/dcp.cpp:43
 msgid "KDM file"
@@ -6638,7 +6635,7 @@ msgstr "Cumpunentu"
 
 #: modules/access/decklink.cpp:87
 msgid "Composite"
-msgstr ""
+msgstr "Cumpositu"
 
 #: modules/access/decklink.cpp:87
 msgid "S-Video"
@@ -7789,11 +7786,11 @@ msgstr ""
 #: modules/codec/edummy.c:39 modules/control/dummy.c:49
 #: modules/text_renderer/tdummy.c:35 modules/video_output/vdummy.c:47
 msgid "Dummy"
-msgstr "Fittiziu"
+msgstr "Fattiziu"
 
 #: modules/access/idummy.c:42
 msgid "Dummy input"
-msgstr "Entrata fittizia"
+msgstr "Entrata fattizia"
 
 #: modules/access/imem.c:49 modules/gui/qt/components/playlist/sorting.h:59
 #: modules/stream_out/bridge.c:41 modules/stream_out/mosaic_bridge.c:101
@@ -7902,15 +7899,15 @@ msgstr "Dati per a funzione di ritornu"
 
 #: modules/access/imem.c:103
 msgid "Data for the get and release functions"
-msgstr "Dati per e funzioni d’ottenzione è di dillinata"
+msgstr "Dati per e funzioni d’ottenimentu è di dillinata"
 
 #: modules/access/imem.c:105
 msgid "Get function"
-msgstr "Funzione d’ottenzione"
+msgstr "Funzione d’ottenimentu"
 
 #: modules/access/imem.c:107
 msgid "Address of the get callback function"
-msgstr "Indirizzu di a funzione di ritornu per l’ottenzione"
+msgstr "Indirizzu di a funzione di ritornu per l’ottenimentu"
 
 #: modules/access/imem.c:109
 msgid "Release function"
@@ -8297,15 +8294,16 @@ msgid "Bitmask"
 msgstr "Maschera di bit"
 
 #: modules/access/rist.c:313
-#, fuzzy
 msgid "Virtual Destination Port Filter"
-msgstr "Schedariu di destinazione :"
+msgstr "Filtru virtuale di u portu di destinazione"
 
 #: modules/access/rist.c:315
 msgid ""
 "Destination port to be used inside the reduced-mode of the main profile to "
 "filter incoming data. Use zero to allow all."
 msgstr ""
+"Portu di destinazione da impiegà cù u modu riduttu di u prufilu principale "
+"per a filtrazione di i dati d’entrata. Impiegà zeru per tuttu permette."
 
 #: modules/access/rist.c:321 modules/access_output/rist.c:293
 msgid "RIST"
@@ -8322,19 +8320,19 @@ msgstr ""
 "predefinitu)"
 
 #: modules/access/rist.c:328
-#, fuzzy
 msgid ""
 "This controls the maximum jitter that will be passed to the demux/decode "
 "chain. The lower the value, the more CPU cycles the module will consume"
 msgstr ""
 "Què cuntrolleghja u saltichjime massimu chì serà passatu à a catena di u "
-"dimultiplessore o di u discudificatore. Più u valore hè bassu, più a "
-"cudificazione impiegherà di cicli CPU"
+"dimultiplessore o di u discudificatore. Più u valore hè bassu, più u modulu "
+"cunsumerà cicli CPU"
 
 #: modules/access/rist.c:332
 msgid "RIST nack type, 0 = range, 1 = bitmask. Default is range"
 msgstr ""
-"RIST nack type, 0 = range, 1 = bitmask. U valore predefinitu hè l’intervallu"
+"Tipu di nack di u RIST, 0=intervallu, 1=maschera di bit. U valore "
+"predefinitu hè l’intervallu"
 
 #: modules/access/rtp/rtp.c:44
 msgid "RTCP (local) port"
@@ -8415,13 +8413,16 @@ msgstr ""
 
 #: modules/access/rtp/rtp.c:78
 msgid "RTP payload format assumed for dynamic payloads"
-msgstr "Furmatu di carica RTP assuntu per e cariche dinamiche"
+msgstr "Furmatu di carica ghjuvevule RTP suppostu per e cariche dinamiche"
 
 #: modules/access/rtp/rtp.c:81
 msgid ""
 "This payload format will be assumed for dynamic payload types (between 96 "
 "and 127) if it can't be determined otherwise with out-of-band mappings (SDP)"
 msgstr ""
+"Stu furmatu di carica ghjuvevule serà appiecatu per i tipi di carica "
+"dinamica (trà 96 è 127) s’ellu ùn pò micca esse determinatu altrimentu cù "
+"currispundenze fora di striscia (SDP)"
 
 #: modules/access/rtp/rtp.c:95 modules/stream_out/rtp.c:187
 msgid "RTP"
@@ -8441,8 +8442,9 @@ msgid ""
 "A description in SDP format is required to receive the RTP stream. Note that "
 "rtp:// URIs cannot work with dynamic RTP payload format (%<PRIu8>)."
 msgstr ""
-"A discrizzione in u furmatu SDP hè richiesta per riceve u flussu RTP. Note "
-"that rtp:// URIs cannot work with dynamic RTP payload format (%<PRIu8>)."
+"Una discrizzione in u furmatu SDP hè richiesta per riceve u flussu RTP. "
+"Sappiate chì l’indirrizzi URI rtp:// ùn ponu funziunà cù u furmatu di carica "
+"ghjuvevule RTP dinamica (%<PRIu8>)."
 
 #: modules/access/rtsp/access.c:48 modules/access/rtsp/access.c:49
 msgid "Real RTSP"
@@ -8621,9 +8623,8 @@ msgid "SFTP port number to use on the server"
 msgstr "Numeru di portu SFTP à impiegà nant’à u servitore"
 
 #: modules/access/sftp.c:61
-#, fuzzy
 msgid "Private key file"
-msgstr "Schedariu di chjave AES"
+msgstr "Schedariu di chjave privata"
 
 #: modules/access/sftp.c:62
 msgid ""
@@ -8631,6 +8632,10 @@ msgid ""
 "assumed to be in the same directory with '.pub' appended. If unset, standard "
 "key paths will be attempted (e.g. '~/.ssh/id_rsa')."
 msgstr ""
+"Schedariu di chjave privata impiegatu per l’autenticazione di chjave publica "
+"SSH. U schedariu di chjave privata deve truvassi in u listessu cartulare cù "
+"« .pub » aghjuntu à a fine. S’ellu ùn hè micca definitu, i chjassi classichi "
+"di chjave seranu pruvati (p.i. « ~/.ssh/id_rsa »)."
 
 #: modules/access/sftp.c:68
 msgid "SFTP input"
@@ -8781,9 +8786,8 @@ msgid "Password for stream encryption"
 msgstr "Parolla d’intesa per a cifratura di u flussu"
 
 #: modules/access/srt.c:566
-#, fuzzy
 msgid "SRT Stream ID"
-msgstr "Esciuta di flussu SRT"
+msgstr "Identificazione di flussu SRT"
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -8885,7 +8889,7 @@ msgstr "Apparechju radio"
 
 #: modules/access/v4l2/v4l2.c:74
 msgid "Radio tuner device node."
-msgstr "Nodu d’apparechju di sintonizzazione radio."
+msgstr "Nodu d’apparechju di sintunizazione radio."
 
 #: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1074
 msgid "Frequency"
@@ -8894,7 +8898,7 @@ msgstr "Frequenza"
 #: modules/access/v4l2/v4l2.c:77
 msgid "Tuner frequency in Hz or kHz (see debug output)."
 msgstr ""
-"Frequenza di u sintonizzatore in Hz o kHz (fighjate u raportu di spannatura)."
+"Frequenza di u sintunizatore in Hz o kHz (fighjate u raportu di spannatura)."
 
 #: modules/access/v4l2/v4l2.c:78
 msgid "Audio mode"
@@ -8902,7 +8906,7 @@ msgstr "Modu audio"
 
 #: modules/access/v4l2/v4l2.c:80
 msgid "Tuner audio mono/stereo and track selection."
-msgstr "Sintonizzatore audio mono/stereo è selezzione di a traccia."
+msgstr "Sintunizatore audio mono/stereo è selezzione di a traccia."
 
 #: modules/access/v4l2/v4l2.c:82
 msgid "Reset controls"
@@ -9038,7 +9042,7 @@ msgstr "Finezza"
 
 #: modules/access/v4l2/v4l2.c:121
 msgid "Sharpness filter adjust."
-msgstr ""
+msgstr "Accumudata di u filtru fi finezza."
 
 #: modules/access/v4l2/v4l2.c:122
 msgid "Chroma gain"
@@ -9075,7 +9079,7 @@ msgstr "60 Hz"
 
 #: modules/access/v4l2/v4l2.c:139
 msgid "Backlight compensation"
-msgstr "Cumpensazione di a retroilluminazione"
+msgstr "Cumpensu di retroalluminazione"
 
 #: modules/access/v4l2/v4l2.c:141
 msgid "Band-stop filter"
@@ -9293,7 +9297,7 @@ msgstr "Entrata video"
 
 #: modules/access/v4l2/v4l2.c:317
 msgid "Tuner"
-msgstr "Sintonizzatore"
+msgstr "Sintunizatore"
 
 #: modules/access/v4l2/v4l2.c:332
 msgid "Controls"
@@ -9309,7 +9313,7 @@ msgstr "Entrata audio/video cumpressa da Video4Linux"
 
 #: modules/access/v4l2/v4l2.c:431
 msgid "Video4Linux radio tuner"
-msgstr "Sintonizzatore radio Video4Linux"
+msgstr "Sintunizatore radio Video4Linux"
 
 #: modules/access/vcd/vcd.c:47
 msgid "VCD"
@@ -9329,7 +9333,7 @@ msgstr "Pigliata in carica di l’arregistramenti VDR (http://www.tvdr.de/)."
 
 #: modules/access/vdr.c:74
 msgid "Chapter offset in ms"
-msgstr "Spiazzamentu di i capituli in ms"
+msgstr "Spustime di i capituli in ms"
 
 #: modules/access/vdr.c:76
 msgid "Move all chapters. This value should be set in milliseconds."
@@ -9377,11 +9381,11 @@ msgstr ""
 
 #: modules/access/vnc.c:51
 msgid "X.509 Certificate Revocation List"
-msgstr "Lista di revocazione di certificatu X.509"
+msgstr "Lista di revucazione di certificatu X.509"
 
 #: modules/access/vnc.c:52
 msgid "List of revoked servers certificates"
-msgstr "Lista di i certificati di servitori revocati"
+msgstr "Lista di i certificati di servitori revucati"
 
 #: modules/access/vnc.c:53
 msgid "X.509 Client certificate"
@@ -9445,7 +9449,7 @@ msgstr "Entrata di l'API Windows Audio Session"
 
 #: modules/access_output/dummy.c:43 modules/stream_out/dummy.c:50
 msgid "Dummy stream output"
-msgstr "Flussu fittiziu d’esciuta"
+msgstr "Flussu fattiziu d’esciuta"
 
 #: modules/access_output/file.c:314
 msgid "Keep existing file"
@@ -9552,8 +9556,8 @@ msgstr "Frazziunà i segmenti in ogni locu"
 msgid ""
 "Don't require a keyframe before splitting a segment. Needed for audio only."
 msgstr ""
-"Ùn richiede micca una fiura di referenza prima di frazziunà un segmentu. "
-"Impiegatu solu per l’audio."
+"Ùn richiede micca una fiura chjave prima di frazziunà un segmentu. Impiegatu "
+"solu per l’audio."
 
 #: modules/access_output/livehttp.c:74
 msgid "Number of segments"
@@ -9657,25 +9661,24 @@ msgstr "LiveHTTP"
 
 #: modules/access_output/rist.c:268
 msgid "Virtual Source Port"
-msgstr ""
+msgstr "Portu virtuale d’origine"
 
 #: modules/access_output/rist.c:270
 msgid "Source port to be used inside the reduced-mode of the main profile"
-msgstr ""
+msgstr "Portu d’origine da impiegà cù u modu riduttu di u prufilu principale"
 
 #: modules/access_output/rist.c:272
-#, fuzzy
 msgid "Virtual Destination Port"
-msgstr "Destinazione di u Flussu"
+msgstr "Portu virtuale di destinazione"
 
 #: modules/access_output/rist.c:274
 msgid "Destination port to be used inside the reduced-mode of the main profile"
 msgstr ""
+"Portu di destinazione da impiegà cù u modu riduttu di u prufilu principale"
 
 #: modules/access_output/rist.c:281
-#, fuzzy
 msgid "Multipeer mode"
-msgstr "Modu di tuner AM"
+msgstr ""
 
 #: modules/access_output/rist.c:283
 msgid ""
@@ -9684,23 +9687,20 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Duplicate"
-msgstr "Appiecazione"
+msgstr "Duppià"
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Load balanced"
-msgstr "Bilancia di i rossi"
+msgstr ""
 
 #: modules/access_output/rist.c:294
 msgid "RIST stream output"
 msgstr "Esciuta di flussu RIST"
 
 #: modules/access_output/rist.c:299
-#, fuzzy
 msgid "RIST target payload size (bytes)"
-msgstr "Dimensione di destinazione di u pacchettu RIST (ottetti)"
+msgstr ""
 
 #: modules/access_output/shout.c:64
 #: modules/gui/qt/components/sout/sout_widgets.cpp:438
@@ -9804,15 +9804,15 @@ msgstr "Esciuta di flussu SRT"
 
 #: modules/access_output/srt.c:471
 msgid "SRT maximum payload size (bytes)"
-msgstr ""
+msgstr "Dimensione massima di carica ghjuvevule SRT (ottetti)"
 
 #: modules/access_output/srt.c:475
 msgid "SRT maximum bandwidth ceiling (bytes)"
-msgstr ""
+msgstr "Suffittu massimu di larghezza di striscia SRT (ottetti)"
 
 #: modules/access_output/srt.c:480
 msgid " SRT Stream ID"
-msgstr ""
+msgstr " Identificazione di flussu SRT"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -10128,35 +10128,40 @@ msgstr "Tempu in milliseconde di u ritardu medianu. Solu medianu !"
 
 #: modules/audio_filter/chorus_flanger.c:82
 msgid "Sweep Depth"
-msgstr ""
+msgstr "Prufundezza di spazzera"
 
 #: modules/audio_filter/chorus_flanger.c:83
 msgid ""
 "Time in milliseconds of the maximum sweep depth. Thus, the sweep range will "
 "be delay-time +/- sweep-depth."
 msgstr ""
+"Durata in milliseconde di a prufundezza massima di spazzera. Tandu, "
+"l’intervallu di spazzera serà a durata di u cumportu + o - a prufundezza di "
+"spazzera."
 
 #: modules/audio_filter/chorus_flanger.c:85
 msgid "Sweep Rate"
-msgstr ""
+msgstr "Frequenza di spazzera"
 
 #: modules/audio_filter/chorus_flanger.c:86
 msgid "Rate of change of sweep depth in milliseconds shift per second of play"
 msgstr ""
+"Frequenza di cambiamentu di prufundezza di spazzera in spustime di "
+"milliseconde per seconda di lettura"
 
 #: modules/audio_filter/chorus_flanger.c:89
 #: modules/audio_filter/stereo_widen.c:60
 #: modules/gui/qt/components/extended_panels.cpp:1368
 msgid "Feedback gain"
-msgstr "Guadagnu di ritornu"
+msgstr "Guadagnu di retroazzione"
 
 #: modules/audio_filter/chorus_flanger.c:89
 msgid "Gain on Feedback loop"
-msgstr ""
+msgstr "Guadagnu di l’iterazione di retroazzione"
 
 #: modules/audio_filter/chorus_flanger.c:91
 msgid "Wet mix"
-msgstr "Mischju umidu"
+msgstr "Mischju mogliu"
 
 #: modules/audio_filter/chorus_flanger.c:91
 msgid "Level of delayed signal"
@@ -10313,7 +10318,7 @@ msgstr "Ugualizatore"
 
 #: modules/audio_filter/equalizer_presets.h:54
 msgid "Flat"
-msgstr "Piattu"
+msgstr "Pianu"
 
 #: modules/audio_filter/equalizer_presets.h:54
 #: modules/meta_engine/ID3Genres.h:65
@@ -10376,7 +10381,7 @@ msgstr "Ska"
 
 #: modules/audio_filter/equalizer_presets.h:57
 msgid "Soft"
-msgstr "Melodicu"
+msgstr "Dolce"
 
 #: modules/audio_filter/equalizer_presets.h:57
 msgid "Soft rock"
@@ -10501,7 +10506,7 @@ msgstr "Q di a frequenza 3"
 
 #: modules/audio_filter/resampler/bandlimited.c:89
 msgid "Audio filter for band-limited interpolation resampling"
-msgstr "Filtru audio per u ricampiunariu da interpolazione à striscia ridotta"
+msgstr "Filtru audio per u ricampiunariu da interpulazione à striscia ridotta"
 
 #: modules/audio_filter/resampler/soxr.c:40
 #: modules/audio_filter/resampler/speex.c:34
@@ -10639,7 +10644,7 @@ msgstr "Larghezza di a stanza virtuale"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:241
 #: modules/gui/qt/components/extended_panels.cpp:1349
 msgid "Wet"
-msgstr "Crosciu"
+msgstr "Mogliu"
 
 #: modules/audio_filter/spatializer/spatializer.cpp:64
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:242
@@ -10672,13 +10677,13 @@ msgid ""
 msgstr ""
 "Stu filtru amendeghja l’effettu video, squassendu u signale mono (quellu "
 "cumunu à i dui canali) è indusgiulendu u signale mancu versu à diritta è "
-"vice versa, allarghendu cusì l’effettu video."
+"viciversa, allarghendu cusì l’effettu video."
 
 #: modules/audio_filter/stereo_widen.c:58
 msgid "Time in ms of the delay of left signal into right and vice versa."
 msgstr ""
 "Tempu, in milliseconde, di u ritardu di u signale mancu versu quellu di a "
-"diritta, è vice versa."
+"diritta, è viciversa."
 
 #: modules/audio_filter/stereo_widen.c:61
 msgid ""
@@ -10687,8 +10692,8 @@ msgid ""
 "widening effect."
 msgstr ""
 "Quantità di guadagnu di u signale mancu ritardatu versu quellu di a diritta, "
-"è vice versa. Dà un effettu di ritardu di u signale mancu versu l’esciuta "
-"diritta, è vice versa, ciò chì face un effettu d’amplificazione."
+"è viciversa. Dà un effettu di ritardu di u signale mancu versu l’esciuta "
+"diritta, è viciversa, ciò chì face un effettu d’amplificazione."
 
 #: modules/audio_filter/stereo_widen.c:64
 #: modules/gui/qt/components/extended_panels.cpp:1369
@@ -10733,7 +10738,7 @@ msgstr "Vulume audio interu"
 
 #: modules/audio_output/adummy.c:37
 msgid "Dummy audio output"
-msgstr "Esciuta audio fittizia"
+msgstr "Esciuta audio fattizia"
 
 #: modules/audio_output/alsa.c:64 modules/audio_output/oss.c:69
 msgid "Audio output device"
@@ -10862,7 +10867,7 @@ msgid ""
 msgstr ""
 "Selezziunà a cunfigurazione di i spachjasoni ch’ella ci vole à impiegà. "
 "St’ozzione ùn permette micca u mischiu versu più di cumplessità. Dunque "
-"micca cunversione di tipu Stereo -> 5.1 !"
+"MICCA cunversione di tipu Stereo -> 5.1."
 
 #: modules/audio_output/directsound.c:70 modules/audio_output/mmdevice.c:1525
 msgid "Audio volume in hundredths of decibels (dB)."
@@ -10991,7 +10996,7 @@ msgstr "Attivatu (AC3/DTS solu)"
 
 #: modules/audio_output/mmdevice.c:1518
 msgid "Enabled"
-msgstr "Attivata"
+msgstr "Attivu"
 
 #: modules/audio_output/mmdevice.c:1529
 msgid "Windows Multimedia Device output"
@@ -10999,7 +11004,7 @@ msgstr "Esciuta Windows Multimedia Device"
 
 #: modules/audio_output/mmdevice.c:1535
 msgid "Output back-end"
-msgstr ""
+msgstr "Motore d’esciuta"
 
 #: modules/audio_output/mmdevice.c:1535
 msgid "Audio output back-end interface."
@@ -11236,7 +11241,7 @@ msgstr ""
 
 #: modules/codec/avcodec/avcodec.h:70
 msgid "Workaround bugs"
-msgstr ""
+msgstr "Risuluzione di prublemi"
 
 #: modules/codec/avcodec/avcodec.h:72
 msgid ""
@@ -11296,9 +11301,8 @@ msgid ""
 "Force skipping of frames to speed up decoding (-1=None, 0=Default, 1=B-"
 "frames, 2=P-frames, 3=B+P frames, 4=all frames)."
 msgstr ""
-"Sfurzà à tralascià certe sequenze per accelerà a discudificazione "
-"(-1=Nisuna, 0=Predefinita, 1=Sequenze B, 2=Sequenze P, 3=Sequenze B è P, "
-"4=tutte e sequenze)."
+"Sfurzà à tralascià certe trame per accelerà a discudificazione (-1=nisuna, "
+"0=predefinita, 1=trame B, 2=trame P, 3=trame B è P, 4=tutte e trame)."
 
 #: modules/codec/avcodec/avcodec.h:98
 msgid "Skip idct (default=0)"
@@ -11309,9 +11313,9 @@ msgid ""
 "Force skipping of idct to speed up decoding for frame types (-1=None, "
 "0=Default, 1=B-frames, 2=P-frames, 3=B+P frames, 4=all frames)."
 msgstr ""
-"Sfurzà à tralascià l’idct per accelerà a discudificazione per tipi di "
-"sequenza (-1=Nisuna, 0=Predefinita, 1=Sequenze B, 2=Sequenze P, 3=Sequenze B "
-"è P, 4=tutte e sequenze)."
+"Sfurzà à tralascià l’idct per accelerà a discudificazione per i tipi di "
+"sequenza (-1=nisuna, 0=predefinita, 1=trame B, 2=trame P, 3=trame B è P, "
+"4=tutte e trame)."
 
 #: modules/codec/avcodec/avcodec.h:103
 msgid "Debug mask"
@@ -11363,23 +11367,23 @@ msgstr ""
 
 #: modules/codec/avcodec/avcodec.h:125
 msgid "Ratio of key frames"
-msgstr ""
+msgstr "Prupurzione di fiure chjave"
 
 #: modules/codec/avcodec/avcodec.h:126
 msgid "Number of frames that will be coded for one key frame."
-msgstr ""
+msgstr "Numeru di fiure chì seranu cudificate per una fiura chjave."
 
 #: modules/codec/avcodec/avcodec.h:129
 msgid "Ratio of B frames"
-msgstr ""
+msgstr "Prupurzione di fiure B"
 
 #: modules/codec/avcodec/avcodec.h:130
 msgid "Number of B frames that will be coded between two reference frames."
-msgstr ""
+msgstr "Numeru di fiure chì seranu cudificate trà duie fiure di referenza."
 
 #: modules/codec/avcodec/avcodec.h:133
 msgid "Video bitrate tolerance"
-msgstr ""
+msgstr "Tulleranza di u flussu binariu video"
 
 #: modules/codec/avcodec/avcodec.h:134
 msgid "Video bitrate tolerance in kbit/s."
@@ -11395,33 +11399,34 @@ msgstr "Permette cudificazioni particulare per e sequenze bucinate."
 
 #: modules/codec/avcodec/avcodec.h:140
 msgid "Interlaced motion estimation"
-msgstr ""
+msgstr "Estimazione di mossa intricciata"
 
 #: modules/codec/avcodec/avcodec.h:141
 msgid "Enable interlaced motion estimation algorithms. This requires more CPU."
 msgstr ""
-"Enable interlaced motion estimation algorithms. Què richiede più di CPU."
+"Attivà e cudificazioni d’estimazione di mossa intricciata. Què richiede più "
+"di CPU."
 
 #: modules/codec/avcodec/avcodec.h:144
 msgid "Pre-motion estimation"
-msgstr ""
+msgstr "Estimazione di mossa preliminare"
 
 #: modules/codec/avcodec/avcodec.h:145
 msgid "Enable the pre-motion estimation algorithm."
-msgstr ""
+msgstr "Attivà a cudificazione d’estimazione di mossa preliminare."
 
 #: modules/codec/avcodec/avcodec.h:148
 msgid "Rate control buffer size"
-msgstr "Dimensione di stampone di cuntrollu di cadenza"
+msgstr "Dimensione di stampone di cuntrollu di frequenza"
 
 #: modules/codec/avcodec/avcodec.h:149
 msgid ""
 "Rate control buffer size (in kbytes). A bigger buffer will allow for better "
 "rate control, but will cause a delay in the stream."
 msgstr ""
-"Dimensione di stampone di cuntrollu di cadenza (in k-ottetti). A bigger "
-"buffer will allow for better rate control, but will cause a delay in the "
-"stream."
+"Dimensione di stampone di cuntrollu di frequenza (in k-ottetti). Un stampone "
+"più maiò permetterà un cuntrollu più fine di a frequenza ma cagiunerà un "
+"cumportu in u flussu."
 
 #: modules/codec/avcodec/avcodec.h:153
 msgid "Rate control buffer aggressiveness"
@@ -11440,6 +11445,8 @@ msgid ""
 "Quantization factor of I frames, compared with P frames (for instance 1.0 => "
 "same qscale for I and P frames)."
 msgstr ""
+"Fattore di quantificazione di e fiure I, paragunatu à i fiure P (per indettu "
+"1,0 => listessa qscale per e fiure I è P)."
 
 #: modules/codec/avcodec/avcodec.h:162 modules/codec/x264.c:363
 #: modules/demux/mod.c:79
@@ -11451,10 +11458,13 @@ msgid ""
 "Enable a simple noise reduction algorithm to lower the encoding length and "
 "bitrate, at the expense of lower quality frames."
 msgstr ""
+"Attivà una metoda di calculu simplice di riduzzione di trostu per riduce a "
+"longhezza è u flussu binariu di a cudificazione à dannu di fiure di qualità "
+"più basse."
 
 #: modules/codec/avcodec/avcodec.h:167
 msgid "MPEG4 quantization matrix"
-msgstr ""
+msgstr "Matrice di quantificazione MPEG4"
 
 #: modules/codec/avcodec/avcodec.h:168
 msgid ""
@@ -11462,6 +11472,9 @@ msgid ""
 "a better looking picture, while still retaining the compatibility with "
 "standard MPEG2 decoders."
 msgstr ""
+"Impiegà a matrice di quantificazione MPEG4 per a cudificazione MPEG2. Di "
+"regula, st’ozzione pruduce fiure d’un effettu più bellu, mantinendu a "
+"cumpatibilità cù i discudificatori MPEG2 classichi."
 
 #: modules/codec/avcodec/avcodec.h:173 modules/codec/jpeg.c:51
 msgid "Quality level"
@@ -11472,6 +11485,8 @@ msgid ""
 "Quality level for the encoding of motions vectors (this can slow down the "
 "encoding very much)."
 msgstr ""
+"Livellu di qualità per a cudificazione di i vettori di mossa (què pò "
+"rallentà assai assai a cudificazione)."
 
 #: modules/codec/avcodec/avcodec.h:179
 msgid ""
@@ -11480,22 +11495,27 @@ msgid ""
 "distortion of motion vectors (hq), and raise the noise reduction threshold "
 "to ease the encoder's task."
 msgstr ""
+"U cudificatore pò fà cumprumessi di volu nant’à a qualità s’è a vostra CPU "
+"ùn pò micca tene a frequenza di a cudificazione. Què disattiverà a "
+"quantificazione treillis, a disturzione di frequenza di i vettori di mossa "
+"(qualità alta), eppò aumenterà u sogliu di riduzzione di trostu per facilità "
+"a tacca di u cudificatore."
 
 #: modules/codec/avcodec/avcodec.h:185
 msgid "Minimum video quantizer scale"
-msgstr ""
+msgstr "Minimu di a scala di quantificazione video"
 
 #: modules/codec/avcodec/avcodec.h:186
 msgid "Minimum video quantizer scale."
-msgstr ""
+msgstr "Minimu di a scala di quantificazione video."
 
 #: modules/codec/avcodec/avcodec.h:189
 msgid "Maximum video quantizer scale"
-msgstr ""
+msgstr "Massimu di a scala di quantificazione video"
 
 #: modules/codec/avcodec/avcodec.h:190
 msgid "Maximum video quantizer scale."
-msgstr ""
+msgstr "Massimu di a scala di quantificazione video."
 
 #: modules/codec/avcodec/avcodec.h:193
 msgid "Trellis quantization"
@@ -11504,81 +11524,101 @@ msgstr "Quantificazione trellis"
 #: modules/codec/avcodec/avcodec.h:194
 msgid "Enable trellis quantization (rate distortion for block coefficients)."
 msgstr ""
+"Attivà a quantificazione treillis (disturzione di frequenza per i "
+"cuefficienti di bloccu)."
 
 #: modules/codec/avcodec/avcodec.h:197
 msgid "Fixed quantizer scale"
-msgstr ""
+msgstr "Scala fissa di quantificazione"
 
 #: modules/codec/avcodec/avcodec.h:198
 msgid ""
 "A fixed video quantizer scale for VBR encoding (accepted values: 0.01 to "
 "255.0)."
 msgstr ""
+"Una scala fissa di quantificazione video per a cudificazione VBR. I valori "
+"accettati sò da 0,01 à 255,0."
 
 #: modules/codec/avcodec/avcodec.h:201
 msgid "Strict standard compliance"
-msgstr ""
+msgstr "Cunfurmità severa di a norma"
 
 #: modules/codec/avcodec/avcodec.h:202
 msgid ""
 "Force a strict standard compliance when encoding (accepted values: -2 to 2)."
 msgstr ""
+"Sforza una cunfurmità severa di a norma durante a cudificazione. I valori "
+"accettati sò da -2 à 2."
 
 #: modules/codec/avcodec/avcodec.h:205
 msgid "Luminance masking"
-msgstr ""
+msgstr "Maschera di luminanza"
 
 #: modules/codec/avcodec/avcodec.h:206
 msgid "Raise the quantizer for very bright macroblocks (default: 0.0)."
 msgstr ""
+"Aumenta a quantificazione per i macroblocchi assai luminosi (predefinizione "
+"0,0)."
 
 #: modules/codec/avcodec/avcodec.h:209
 msgid "Darkness masking"
-msgstr ""
+msgstr "Maschera di bughjura"
 
 #: modules/codec/avcodec/avcodec.h:210
 msgid "Raise the quantizer for very dark macroblocks (default: 0.0)."
 msgstr ""
+"Aumenta a quantificazione per i macroblocchi assai scuri (predefinizione "
+"0,0)."
 
 #: modules/codec/avcodec/avcodec.h:213
 msgid "Motion masking"
-msgstr ""
+msgstr "Maschera di mossa"
 
 #: modules/codec/avcodec/avcodec.h:214
 msgid ""
 "Raise the quantizer for macroblocks with a high temporal complexity "
 "(default: 0.0)."
 msgstr ""
+"Aumenta a quantificazione per i macroblocchi cù un’alta cumplessità "
+"tempurale (predefinizione 0,0)."
 
 #: modules/codec/avcodec/avcodec.h:217
 msgid "Border masking"
-msgstr ""
+msgstr "Maschera di bordu"
 
 #: modules/codec/avcodec/avcodec.h:218
 msgid ""
 "Raise the quantizer for macroblocks at the border of the frame (default: "
 "0.0)."
 msgstr ""
+"Aumenta a quantificazione per i macroblocchi à u bordu di u quadru "
+"(predefinizione 0,0)."
 
 #: modules/codec/avcodec/avcodec.h:221
 msgid "Luminance elimination"
-msgstr ""
+msgstr "Eliminazione di luminanza"
 
 #: modules/codec/avcodec/avcodec.h:222
 msgid ""
 "Eliminates luminance blocks when the PSNR isn't much changed (default: 0.0). "
 "The H264 specification recommends -4."
 msgstr ""
+"Caccia i blocchi di luminanza quandu u raportu signale/trostu di piccu "
+"(PSNR) ùn hà troppu cambiatu (predefinizione 0,0). A specificazione H264 "
+"ricumandeghja u valore -4."
 
 #: modules/codec/avcodec/avcodec.h:226
 msgid "Chrominance elimination"
-msgstr ""
+msgstr "Eliminazione di a crominanza"
 
 #: modules/codec/avcodec/avcodec.h:227
 msgid ""
 "Eliminates chrominance blocks when the PSNR isn't much changed (default: "
 "0.0). The H264 specification recommends 7."
 msgstr ""
+"Caccia i blocchi di crominanza quandu u raportu signale/trostu di piccu "
+"(PSNR) ùn hà troppu cambiatu (predefinizione 0,0). A specificazione H264 "
+"ricumandeghja u valore 7."
 
 #: modules/codec/avcodec/avcodec.h:231
 msgid "Specify AAC audio profile to use"
@@ -11591,14 +11631,14 @@ msgid ""
 "(default: low). hev1 and hev2 are currently supported only with libfdk-aac "
 "enabled libavcodec"
 msgstr ""
-"Specificà u prufilu audio AAC à impiegà per a cudificazione di flussu di "
-"bits audio. It takes the following options: main, low, ssr (not "
-"supported),ltp, hev1, hev2 (default: low). hev1 and hev2 are currently "
-"supported only with libfdk-aac enabled libavcodec"
+"Specificà u prufilu audio AAC à impiegà per a cudificazione di flussu "
+"binariu audio. L’ozzioni accettate sò : « main », « low » (predefinizione), "
+"« ssr » (non accettata), « ltp », « hev1 » è « hev2 ». L’ozzioni « hev1 » è "
+"« hev2 » sò accettate solu cù libavcodec s’è libfdk-aac hè attivata"
 
 #: modules/codec/avcodec/d3d11va.c:67
 msgid "Direct3D11 Video Acceleration"
-msgstr ""
+msgstr "Accelerazione Video Direct3D11"
 
 #: modules/codec/avcodec/dxva2.c:55
 msgid "DirectX Video Acceleration (DXVA) 2.0"
@@ -11615,10 +11655,11 @@ msgid ""
 "This is not an error inside VLC media player.\n"
 "Do not contact the VideoLAN project about this issue.\n"
 msgstr ""
-"It seems your Libav/FFmpeg (libavcodec) installation lacks the following "
-"encoder:\n"
+"Pare chì a vostra installazione di Libav/FFmpeg (libavcodec) ùn cuntenghi "
+"quellu cudificatore :\n"
 "%s.\n"
-"If you don't know how to fix this, ask for support from your distribution.\n"
+"S’è vo ùn sapete micca cumu currege què, cuntattate a vostra squadra "
+"d’assistenza.\n"
 "\n"
 "Ùn hè micca un sbagliu dentru VLC media player.\n"
 "Ùn cuntattate micca u prughjettu VideoLAN per stu penseru.\n"
@@ -11650,11 +11691,11 @@ msgstr "Discudificatore video VA-API via DRM"
 
 #: modules/codec/avcodec/vaapi.c:393
 msgid "VA-API video decoder"
-msgstr ""
+msgstr "Discudificatore video VA-API"
 
 #: modules/codec/bpg.c:49
 msgid "BPG image decoder"
-msgstr ""
+msgstr "Discudificatore di fiura BPG"
 
 #: modules/codec/cc.c:51 modules/codec/zvbi.c:65
 #: modules/gui/macosx/VLCSimplePrefsController.m:361 modules/spu/marq.c:108
@@ -11665,6 +11706,7 @@ msgstr "Opacità"
 #: modules/codec/cc.c:52 modules/codec/zvbi.c:66
 msgid "Setting to true makes the text to be boxed and maybe easier to read."
 msgstr ""
+"Attivà st’ozzione per mette u testu in un quadru è facilità a so lettura."
 
 #: modules/codec/cc.c:56
 msgid "CC 608/708"
@@ -11672,7 +11714,7 @@ msgstr "CC 608/708"
 
 #: modules/codec/cc.c:57
 msgid "Closed Captions decoder"
-msgstr "Discudificatore di Sottutituli Ditagliati"
+msgstr "Discudificatore di sottutituli incavalcati"
 
 #: modules/codec/cdg.c:88
 msgid "CDG video decoder"
@@ -11694,90 +11736,98 @@ msgstr "Impacchittatore di sottutitulu di VCD Chaoji"
 #: modules/codec/theora.c:105 modules/codec/twolame.c:54
 #: modules/codec/vorbis.c:173
 msgid "Encoding quality"
-msgstr "Qualità di a cudificazione"
+msgstr "Qualità di cudificazione"
 
 #: modules/codec/daala.c:111
 msgid "Enforce a quality between 0 (lossless) and 511 (worst)."
-msgstr ""
+msgstr "Sforza una qualità trà 0 (senza perdita) è 511 (peghju)."
 
 #: modules/codec/daala.c:112
 msgid "Keyframe interval"
-msgstr ""
+msgstr "Intervallu di fiura chjave"
 
 #: modules/codec/daala.c:114
 msgid "Enforce a keyframe interval between 1 and 1000."
-msgstr ""
+msgstr "Sforza un intervallu di fiura chjave trà 1 è 1000."
 
 #: modules/codec/daala.c:120
 msgid "Daala video decoder"
-msgstr ""
+msgstr "Discudificatore video Daala"
 
 #: modules/codec/daala.c:125
 msgid "Daala video packetizer"
-msgstr ""
+msgstr "Impacchittatore video Daala"
 
 #: modules/codec/daala.c:132
 msgid "Daala video encoder"
-msgstr ""
+msgstr "Cudificatore video Daala"
 
 #: modules/codec/daala.c:143
 msgid "Chroma format"
-msgstr ""
+msgstr "Furmatu di crominanza"
 
 #: modules/codec/daala.c:144
 msgid ""
 "Picking chroma format will force a conversion of the video into that format"
 msgstr ""
+"Sceglie un furmatu di crominanza sfurzerà una cunversione di a video versu "
+"stu furmatu"
 
 #: modules/codec/dav1d.c:52
 msgid "Frames Threads"
-msgstr ""
+msgstr "Fili di fiure"
 
 #: modules/codec/dav1d.c:53
 msgid "Max number of threads used for frame decoding, default 0=auto"
 msgstr ""
+"Numeru massimu di fili impiegati per a discudificazione di fiura "
+"(predefinizioni : 0=autumaticu)"
 
 #: modules/codec/dav1d.c:54
 msgid "Tiles Threads"
-msgstr ""
+msgstr "Fili di musaiche"
 
 #: modules/codec/dav1d.c:55
 msgid "Max number of threads used for tile decoding, default 0=auto"
 msgstr ""
+"Numeru massimu di fili impiegati per a discudificazione di musaica "
+"(predefinizioni : 0=autumaticu)"
 
 #: modules/codec/dav1d.c:56
 msgid "All Layers"
-msgstr ""
+msgstr "Tutti i strati"
 
 #: modules/codec/dav1d.c:57
 msgid "Whether or not to display all spatial layers, default false"
-msgstr ""
+msgstr "Affissera - sì o nò - di tutti i strati spaciali, predefinizione : nò"
 
 #: modules/codec/dav1d.c:62
 msgid "Dav1d video decoder"
-msgstr ""
+msgstr "Discudificatore video Dav1d"
 
 #: modules/codec/dca.c:63
 msgid "DTS dynamic range compression"
-msgstr ""
+msgstr "Cumpressione d’intervallu dinamicu DTS"
 
 #: modules/codec/dca.c:75
 msgid "DTS Coherent Acoustics audio decoder"
-msgstr ""
+msgstr "Discudificatore audio DTS Coherent Acoustics"
 
 #: modules/codec/ddummy.c:36
 msgid "Save raw codec data"
-msgstr ""
+msgstr "Arregistrà i dati grossi di u cudecu"
 
 #: modules/codec/ddummy.c:38
 msgid ""
 "Save the raw codec data if you have selected/forced the dummy decoder in the "
 "main options."
 msgstr ""
+"Arregistrà i dati grossi di u cudecu s’è vo avete selezziunatu o sfurzatu u "
+"discudificatore fattiziu in l’ozzioni principale."
 
 #: modules/codec/ddummy.c:47
 msgid "Dummy decoder"
-msgstr ""
+msgstr "Discudificatore fattiziu"
 
 #: modules/codec/ddummy.c:64 modules/codec/ddummy.c:65
 msgid "Dump decoder"
@@ -11785,27 +11835,27 @@ msgstr ""
 
 #: modules/codec/dmo/dmo.c:91
 msgid "DirectMedia Object decoder"
-msgstr "Discudificatore d'Oggettu DirectMedia"
+msgstr "Discudificatore d’oggettu DirectMedia"
 
 #: modules/codec/dmo/dmo.c:105
 msgid "DirectMedia Object encoder"
-msgstr "Cudificatore d'Oggettu DirectMedia"
+msgstr "Cudificatore d’oggettu DirectMedia"
 
 #: modules/codec/dvbsub.c:83
 msgid "Decoding X coordinate"
-msgstr ""
+msgstr "Discudificazione di cuurdinate X"
 
 #: modules/codec/dvbsub.c:84
 msgid "X coordinate of the rendered subtitle"
-msgstr ""
+msgstr "Cuurdinate X di u sottutitulu restituitu"
 
 #: modules/codec/dvbsub.c:86
 msgid "Decoding Y coordinate"
-msgstr ""
+msgstr "Discudificazione di cuurdinate Y"
 
 #: modules/codec/dvbsub.c:87
 msgid "Y coordinate of the rendered subtitle"
-msgstr ""
+msgstr "Cuurdinate Y di u sottutitulu restituitu"
 
 #: modules/codec/dvbsub.c:89
 msgid "Subpicture position"
@@ -11823,19 +11873,19 @@ msgstr ""
 
 #: modules/codec/dvbsub.c:95
 msgid "Encoding X coordinate"
-msgstr ""
+msgstr "Cudificazione di cuurdinate X"
 
 #: modules/codec/dvbsub.c:96
 msgid "X coordinate of the encoded subtitle"
-msgstr ""
+msgstr "Cuurdinate X di u sottutitulu cudificatu"
 
 #: modules/codec/dvbsub.c:97
 msgid "Encoding Y coordinate"
-msgstr ""
+msgstr "Cudificazione di cuurdinate Y"
 
 #: modules/codec/dvbsub.c:98
 msgid "Y coordinate of the encoded subtitle"
-msgstr ""
+msgstr "Cuurdinate Y di u sottutitulu cudificatu"
 
 #: modules/codec/dvbsub.c:121
 msgid "DVB subtitles decoder"
@@ -11852,11 +11902,11 @@ msgstr "Cudificatore di sottutituli DVB"
 
 #: modules/codec/edummy.c:40
 msgid "Dummy encoder"
-msgstr ""
+msgstr "Cudificatore fattiziu"
 
 #: modules/codec/faad.c:59
 msgid "AAC audio decoder (using libfaad2)"
-msgstr "Cudificatore audio AAC (impieghendu libfaad2)"
+msgstr "Discudificatore audio AAC (impieghendu libfaad2)"
 
 #: modules/codec/faad.c:453
 msgid "AAC extension"
@@ -11864,19 +11914,19 @@ msgstr "Estensione AAC"
 
 #: modules/codec/fdkaac.c:67
 msgid "Encoder Profile"
-msgstr "Prufilu di Cudificatore"
+msgstr "Prufilu di u cudificatore"
 
 #: modules/codec/fdkaac.c:68
 msgid "Encoder Algorithm to use."
-msgstr ""
+msgstr "Formula di calculu à impiegà per u cudificatore."
 
 #: modules/codec/fdkaac.c:70
 msgid "Enable spectral band replication"
-msgstr ""
+msgstr "Attivà a ripruduzzione di striscia spettrale"
 
 #: modules/codec/fdkaac.c:71
 msgid "This is an optional feature only for the AAC-ELD profile."
-msgstr ""
+msgstr "Què hè una funzione ozzionale solu per u prufilu AAC-ELD."
 
 #: modules/codec/fdkaac.c:73
 msgid "VBR Quality"
@@ -11886,6 +11936,8 @@ msgstr "Qualità VBR"
 msgid ""
 "Quality of the VBR Encoding (0=cbr, 1-5 constant vbr quality, 5 is the best)."
 msgstr ""
+"Qualità di a cudificazione VBR (0=cbr, 1-5 qualità vbr custente, 5 hè u "
+"megliu)."
 
 #: modules/codec/fdkaac.c:76
 msgid "Enable afterburner library"
@@ -11896,16 +11948,20 @@ msgid ""
 "This library will produce higher quality audio at the expense of additional "
 "CPU usage (default is enabled)."
 msgstr ""
+"Sta biblioteca pruducerà una qualità audio più alta, à dannu d’un aghjovu "
+"CPU addiziunale (attivata da predefinizione)."
 
 #: modules/codec/fdkaac.c:79
 msgid "Signaling mode of the extension AOT"
-msgstr "Modu di signale di l’estensione AOT"
+msgstr "Modu di signalizazione di l’estensione AOT"
 
 #: modules/codec/fdkaac.c:80
 msgid ""
 "1 is explicit for SBR and implicit for PS (default), 2 is explicit "
 "hierarchical."
 msgstr ""
+"1 hè esplicitu per SBR è implicitu per PS (predefinizione), 2 hè una "
+"ierarchia esplicita."
 
 #: modules/codec/fdkaac.c:97
 msgid "AAC-LC"
@@ -11949,13 +12005,15 @@ msgstr "Coru"
 
 #: modules/codec/fluidsynth.c:53
 msgid "Synthesis gain"
-msgstr ""
+msgstr "Guadagnu di sintesi"
 
 #: modules/codec/fluidsynth.c:54
 msgid ""
 "This gain is applied to synthesis output. High values may cause saturation "
 "when many notes are played at a time."
 msgstr ""
+"Stu guadagnu hè appiecatu à l’esciuta di sintesi. I valori alti ponu cagiunà "
+"una saturazione quandu note numerose sò riprudute à u listessu tempu."
 
 #: modules/codec/fluidsynth.c:57
 msgid "Polyphony"
@@ -11966,6 +12024,8 @@ msgid ""
 "The polyphony defines how many voices can be played at a time. Larger values "
 "require more processing power."
 msgstr ""
+"A pulifunia definisce quantu voci ponu esse ripruduti à u listessu tempu. I "
+"valori più alti richiedenu più putenza di trattamentu."
 
 #: modules/codec/fluidsynth.c:62 modules/demux/mod.c:82
 msgid "Reverb"
@@ -11973,7 +12033,7 @@ msgstr "Riverberazione"
 
 #: modules/codec/fluidsynth.c:70
 msgid "FluidSynth MIDI synthesizer"
-msgstr ""
+msgstr "Sintetizatore MIDI FluidSynth"
 
 #: modules/codec/fluidsynth.c:72
 msgid "FluidSynth"
@@ -11981,7 +12041,7 @@ msgstr "FluidSynth"
 
 #: modules/codec/fluidsynth.c:160
 msgid "MIDI synthesis not set up"
-msgstr ""
+msgstr "A sintesi MIDI ùn hè micca definita"
 
 #: modules/codec/fluidsynth.c:161
 msgid ""
@@ -11989,9 +12049,9 @@ msgid ""
 "Please install a sound font and configure it from the VLC preferences "
 "(Input / Codecs > Audio codecs > FluidSynth).\n"
 msgstr ""
-"A sound font file (.SF2) is required for MIDI synthesis.\n"
-"Please install a sound font and configure it from the VLC preferences "
-"(Input / Codecs > audio codecs > FluidSynth).\n"
+"Un schedariu di banca di soni (.SF2) hè richiestu per a sintesi MIDI.\n"
+"Ci vole à installà un schedariu di banca di soni è cunfigurallu in e "
+"preferenze VLC (Entrata / Cudechi > Cudechi audio > FluidSynth).\n"
 
 #: modules/codec/g711.c:46
 msgid "G.711 decoder"
@@ -12004,6 +12064,8 @@ msgstr "Cudificatore G.711"
 #: modules/codec/gstreamer/gstdecode.c:76
 msgid "Uses GStreamer framework's plugins to decode the media codecs"
 msgstr ""
+"Impiegheghja i moduli d’estensione di a struttura GStreamer per discudificà "
+"i cudechi medià"
 
 #: modules/codec/gstreamer/gstdecode.c:79
 msgid "Use DecodeBin"
@@ -12016,15 +12078,22 @@ msgid ""
 "parsers which can provide more info such as codec profile, level and other "
 "attributes, in the form of GstCaps (Stream Capabilities) to decoder."
 msgstr ""
+"DecodeBin hè un elementu cuntenidore chì pò aghjunghje è amministrà parechji "
+"elementi. In più d’aghjunghje i discudificatori, DecodeBin aghjunghje dinù "
+"l’analizatori elementarii di flussu chì ponu furnì più infurmazioni, cum’è u "
+"prufilu di cudecu, u luvellu è d¹altri attributi sottu à forma GstCaps "
+"(capacità di flussu) à u discudificatore."
 
 #: modules/codec/gstreamer/gstdecode.c:93
 msgid "GStreamer Based Decoder"
-msgstr ""
+msgstr "Discudificatore basatu nant’à GStreamer"
 
 #: modules/codec/jpeg.c:52
 msgid ""
 "Quality level for encoding (this can enlarge or reduce output image size)."
 msgstr ""
+"Livellu di qualità di a cudificazione (ciò chì pò aumentà o riduce a "
+"dimensione di a fiura d’esciuta)."
 
 #: modules/codec/jpeg.c:111
 msgid "JPEG image decoder"
@@ -12036,7 +12105,7 @@ msgstr "Cudificatore di fiura JPEG"
 
 #: modules/codec/kate.c:191 modules/codec/subsusf.c:44
 msgid "Formatted Subtitles"
-msgstr ""
+msgstr "Sottutituli messi à u furmatu"
 
 #: modules/codec/kate.c:192
 msgid ""
@@ -12044,6 +12113,10 @@ msgid ""
 "can choose to disable all formatting. Note that this has no effect is "
 "rendering via Tiger is enabled."
 msgstr ""
+"I flussi Kate permettenu a messa à u furmatu di u testu. VLC mette in ballu "
+"sta funzione in parte, ma si pò sceglie di disattivà tutte e messe à u "
+"furmatu. Sappiate chì què ùn hà nisunu effettu s’è a restituzione via Tiger "
+"hè attivata."
 
 #: modules/codec/kate.c:199
 msgid "Shadow"
@@ -12147,23 +12220,28 @@ msgstr "Acqua"
 
 #: modules/codec/kate.c:211
 msgid "Use Tiger for rendering"
-msgstr ""
+msgstr "Impiegu Tiger par a restituzione"
 
 #: modules/codec/kate.c:212
 msgid ""
 "Kate streams can be rendered using the Tiger library. Disabling this will "
 "only render static text and bitmap based streams."
 msgstr ""
+"I flussi Kate ponu esse restituiti impieghendu a biblioteca Tiger. Disattivà "
+"st’ozzione restituiscerà solu u testu staticu è i flussi basati nant’à i "
+"bitmap."
 
 #: modules/codec/kate.c:216
 msgid "Rendering quality"
-msgstr ""
+msgstr "Qualità di restituzione"
 
 #: modules/codec/kate.c:217
 msgid ""
 "Select rendering quality, at the expense of speed. 0 is fastest, 1 is "
 "highest quality."
 msgstr ""
+"Selezziunà a qualità di restituzione, à dannu di a vitezza. 0 hè u più "
+"rapidu, 1 hè a qualità a più alta."
 
 #: modules/codec/kate.c:221
 msgid "Default font effect"
@@ -12174,10 +12252,12 @@ msgid ""
 "Add a font effect to text to improve readability against different "
 "backgrounds."
 msgstr ""
+"Aghjunghje un effettu di grafia à u testu per rendelu più leghjevule cù "
+"sfonduli sfarenti."
 
 #: modules/codec/kate.c:226
 msgid "Default font effect strength"
-msgstr "Forza di l’effettu predefinitu di a grafia"
+msgstr "Forza predefinita di l’effettu di grafia"
 
 #: modules/codec/kate.c:227
 msgid "How pronounced to make the chosen font effect (effect dependent)."
@@ -12193,6 +12273,9 @@ msgid ""
 "font parameters (name, size, etc) to use. A blank name will let Tiger choose "
 "font parameters where appropriate."
 msgstr ""
+"A discrizzione di grafia à impiegà s’è u flussu Kate ùn specificheghja micca "
+"parametri di grafia (nome, dimensione, ecc.). Lascià viotu u nome per "
+"dumandà à Tiger di sceglie i parametri di grafia chì cunvenenu."
 
 #: modules/codec/kate.c:237
 msgid "Default font color"
@@ -12203,36 +12286,44 @@ msgid ""
 "Default font color to use if the Kate stream does not specify a particular "
 "font color to use."
 msgstr ""
+"U culore di grafia predefinitu à impiegà s’è u flussu Kate ùn specificheghja "
+"alcunu culore di grafia."
 
 #: modules/codec/kate.c:242
 msgid "Default font alpha"
-msgstr ""
+msgstr "Alfa predefinitu per a grafia"
 
 #: modules/codec/kate.c:243
 msgid ""
 "Transparency of the default font color if the Kate stream does not specify a "
 "particular font color to use."
 msgstr ""
+"Trasparenza di u culore predefinitu di a grafia s’è u flussu Kate ùn "
+"specificheghja alcunu culore di grafia."
 
 #: modules/codec/kate.c:247
 msgid "Default background color"
-msgstr ""
+msgstr "Culore predefinitu di u sfondulu"
 
 #: modules/codec/kate.c:248
 msgid ""
 "Default background color if the Kate stream does not specify a background "
 "color to use."
 msgstr ""
+"U culore di sfondulu predefinitu à impiegà s’è u flussu Kate ùn "
+"specificheghja alcunu culore di sfondulu."
 
 #: modules/codec/kate.c:252
 msgid "Default background alpha"
-msgstr ""
+msgstr "Alfa predefinitu per a sfondulu"
 
 #: modules/codec/kate.c:253
 msgid ""
 "Transparency of the default background color if the Kate stream does not "
 "specify a particular background color to use."
 msgstr ""
+"Trasparenza di u culore predefinitu di u sfondulu s’è u flussu Kate ùn "
+"specificheghja alcunu culore di sfondulu."
 
 #: modules/codec/kate.c:259
 msgid ""
@@ -12243,6 +12334,13 @@ msgid ""
 "Note that changing settings below will not take effect until a new stream is "
 "played. This will hopefully be fixed soon."
 msgstr ""
+"Kate hè un cudecu per l’accavalcature basate nant’à u testu è a fiura.\n"
+"A biblioteca di restituzione Tiger hè richiesta per restituisce i flussi "
+"Kate cumplessi, ma VLC pò quantunque restituisce i sottutituli basati nant’à "
+"u testu è a fiura s’è sta biblioteca ùn hè micca dispunibule.\n"
+"Sappiate chì u cambiamentu di sti parametri quaghjò serà pigliatu in contu "
+"solu quandu un altu flussu serà lettu Stu penseru duveria esse currettu à "
+"mumenti."
 
 #: modules/codec/kate.c:268
 msgid "Kate"
@@ -12250,11 +12348,11 @@ msgstr "Kate"
 
 #: modules/codec/kate.c:269
 msgid "Kate overlay decoder"
-msgstr ""
+msgstr "Discudificatore d’accavalcatura Kate"
 
 #: modules/codec/kate.c:288
 msgid "Tiger rendering defaults"
-msgstr ""
+msgstr "Predefinizioni di restituzione Tiger"
 
 #: modules/codec/kate.c:323
 msgid "Kate text subtitles packetizer"
@@ -12262,86 +12360,88 @@ msgstr "Impacchittatore di sottutituli di testu Kate"
 
 #: modules/codec/libass.c:60
 msgid "Additional fonts directory"
-msgstr ""
+msgstr "Cartulare di e grafie addiziunale"
 
 #: modules/codec/libass.c:63
 msgid "Subtitles (advanced)"
-msgstr ""
+msgstr "Sottutituli (espertu)"
 
 #: modules/codec/libass.c:64
 msgid "Subtitle renderers using libass"
-msgstr ""
+msgstr "Restituzione di sottutitulu impieghendu libass"
 
 #: modules/codec/libass.c:261
 #: modules/text_renderer/freetype/fonts/fontconfig.c:78
 msgid "Building font cache"
-msgstr ""
+msgstr "Custruzzione di l’impiatta per e grafie"
 
 #: modules/codec/libass.c:262
 msgid ""
 "Please wait while your font cache is rebuilt.\n"
 "This should take less than a minute."
 msgstr ""
+"Aspettate per piacè chì l’impiatta per e grafie sia ricustruita.\n"
+"St’azzione duveria durà menu d’un minutu."
 
 #: modules/codec/libmpeg2.c:140
 msgid "MPEG I/II video decoder (using libmpeg2)"
-msgstr ""
+msgstr "Discudificatore video MPEG I/II (impieghendu libmpeg2)"
 
 #: modules/codec/lpcm.c:60
 msgid "Linear PCM audio decoder"
-msgstr ""
+msgstr "Discudificatore audio PCM lineare"
 
 #: modules/codec/lpcm.c:65
 msgid "Linear PCM audio packetizer"
-msgstr "Impacchittatore lineare audio PCM"
+msgstr "Impacchittatore audio PCM lineare"
 
 #: modules/codec/lpcm.c:71
 msgid "Linear PCM audio encoder"
-msgstr "Cudificatore lineare audio PCM"
+msgstr "Cudificatore audio PCM lineare"
 
 #: modules/codec/mad.c:78
 msgid "MPEG audio layer I/II/III decoder"
-msgstr ""
+msgstr "Discudificatore MPEG audio stratu I/II/III"
 
 #: modules/codec/mft.c:66
 msgid "Media Foundation Transform decoder"
-msgstr ""
+msgstr "Discudificatore Media Foundation Transform"
 
 #: modules/codec/mpg123.c:67
 msgid "MPEG audio decoder using mpg123"
-msgstr ""
+msgstr "Discudificatore audio MPEG impieghendu mpg123"
 
 #: modules/codec/oggspots.c:86
 msgid "OggSpots video decoder"
-msgstr ""
+msgstr "Discudificatore video OggSpots"
 
 #: modules/codec/oggspots.c:92
 msgid "OggSpots video packetizer"
-msgstr ""
+msgstr "Impacchittatore video OggSpots"
 
 #: modules/codec/omxil/omxil.c:139
 msgid "OMX direct rendering"
-msgstr ""
+msgstr "Restituzione diretta OMX"
 
 #: modules/codec/omxil/omxil.c:141
 msgid "Enable OMX direct rendering."
-msgstr ""
+msgstr "Attivà a restituzione diretta OMX."
 
 #: modules/codec/omxil/omxil.c:145
 msgid "Audio/Video decoder (using OpenMAX IL)"
-msgstr ""
+msgstr "Discudificatore audio/video (impieghendu OpenMAX IL)"
 
 #: modules/codec/omxil/omxil.c:172
 msgid "Video encoder (using OpenMAX IL)"
-msgstr ""
+msgstr "Cudificatore video (impieghendu OpenMAX IL)"
 
 #: modules/codec/omxil/vout.c:49
 msgid "OpenMAX IL video output"
-msgstr ""
+msgstr "Esciuta video OpenMAX IL"
 
 #: modules/codec/opus.c:65
 msgid "Opus audio decoder"
-msgstr ""
+msgstr "Discudificatore audio Opus"
 
 #: modules/codec/opus.c:67 modules/codec/opus.c:74
 msgid "Opus"
@@ -12349,29 +12449,31 @@ msgstr "Opus"
 
 #: modules/codec/opus.c:72
 msgid "Opus audio encoder"
-msgstr ""
+msgstr "Cudificatore audio Opus"
 
 #: modules/codec/png.c:91
 msgid "PNG video decoder"
-msgstr ""
+msgstr "Discudificatore video PNG"
 
 #: modules/codec/png.c:100
 msgid "PNG video encoder"
-msgstr ""
+msgstr "Cudificatore video PNG"
 
 #: modules/codec/qsv.c:56
 msgid "Enable software mode"
-msgstr "Permette u modu software"
+msgstr "Permette u modu da prugramma"
 
 #: modules/codec/qsv.c:57
 msgid ""
 "Allow the use of the Intel Media SDK software implementation of the codecs "
 "if no QuickSync Video hardware acceleration is present on the system."
 msgstr ""
+"Permette l’impiegu di a messa in ballu di i cudechi da SDK Intel Media s’è "
+"nisuna accelerazione materiale video QuickSync hè presente in u sistema."
 
 #: modules/codec/qsv.c:61
 msgid "Codec Profile"
-msgstr "Prufilu Cudecu"
+msgstr "Prufilu di u cudecu"
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -12379,10 +12481,13 @@ msgid ""
 "the correct profile from other sources, such as resolution and bitrate. E.g. "
 "'high'"
 msgstr ""
+"Specificà u prufilu di u cudecu di manera esplicita. Osinnò, u cudecu "
+"determinerà u prufilu currettu à partesi di l’altre fonti, cum’è risuluzione "
+"è flussu binariu. Per indettu « high »"
 
 #: modules/codec/qsv.c:67
 msgid "Codec Level"
-msgstr "Livellu Cudecu"
+msgstr "Livellu di u cudecu"
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -12390,10 +12495,13 @@ msgid ""
 "the correct profile from other sources, such as resolution and bitrate. E.g. "
 "'4.2' for mpeg4-part10 or 'low' for mpeg2"
 msgstr ""
+"Specificà u livellu di u cudecu di manera esplicita. Osinnò, u cudecu "
+"determinerà u prufilu currettu à partesi di l’altre fonti, cum’è risuluzione "
+"è flussu binariu. Per indettu « 4.2 » per mpeg4-part10 or « low » for mpeg2"
 
 #: modules/codec/qsv.c:73
 msgid "Group of Picture size"
-msgstr ""
+msgstr "Dimensione di u gruppu di fiure"
 
 #: modules/codec/qsv.c:75
 msgid ""
@@ -12401,30 +12509,39 @@ msgid ""
 "GopPicSize=0, then the GOP size is unspecified. If GopPicSize=1, only I-"
 "frames are used."
 msgstr ""
+"Numeru di fiure dentru u GOP (gruppu di fiure) attuale. S’è GopPicSize=0, "
+"tandu a dimensione GOP ùn hè micca specificata. S’è GopPicSize=1, solu e "
+"trame I sò impiegate."
 
 #: modules/codec/qsv.c:79
 msgid "Group of Picture Reference Distance"
-msgstr ""
+msgstr "Distanza di referenza di u gruppu di fiure"
 
 #: modules/codec/qsv.c:81
 msgid ""
 "Distance between I- or P- key frames; if it is zero, the GOP structure is "
 "unspecified. Note: If GopRefDist = 1, there are no B-frames used."
 msgstr ""
+"Distanza trà e trame I o P. S’ella hè 0, a struttura di u gruppu di fiure ùn "
+"hè micca specificata. Nota : s’è GopRefDist=1, ùn ci hè alcuna trama B "
+"d’impiegata."
 
 #: modules/codec/qsv.c:85
 msgid "Target Usage"
-msgstr ""
+msgstr "Aghjovu sibulatu"
 
 #: modules/codec/qsv.c:86
 msgid ""
 "The target usage allow to choose between different trade-offs between "
 "quality and speed. Allowed values are: 'speed', 'balanced' and 'quality'."
 msgstr ""
+"L’aghjovu sibulatu vi permette di sceglie trà parechji cumprumessi trà "
+"qualità è vitezza. I valori permessi sò :« speed » (vitezza), « balanced » "
+"(bilanciatu) è « quality » (qualità)."
 
 #: modules/codec/qsv.c:90
 msgid "IDR interval"
-msgstr ""
+msgstr "Intervallu IDR"
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -12435,20 +12552,31 @@ msgid ""
 "the sequence header before every Nth I-frame. If IdrInterval=0 (default), "
 "SDK inserts the sequence header once at the beginning of the stream."
 msgstr ""
+"Per u H.264, IdrInterval specificheghja l’intervallu di e trame IDR in "
+"termine di trame I. S’è IdrInterval=0, tandu ogni trama I hè una trama IDR. "
+"S’è IdrInterval=1, tandu ogni altra trama I hè una trama IDR, ecc. Per "
+"MPEG2, IdrInterval definisce l’intervallu d’intestatura di a sequenza in "
+"termine di trame I. S’è IdrInterval=N, SDK framette l’intestatura di a "
+"sequenza prima di tutte e N trame. S’è IdrInterval=0 (predefinizione), SDK "
+"framette l’intestatura di a sequenza, solu una volta, à u principiu di u "
+"flussu."
 
 #: modules/codec/qsv.c:100
 msgid "Rate Control Method"
-msgstr ""
+msgstr "Metoda di cuntrollu di a frequenza"
 
 #: modules/codec/qsv.c:102
 msgid ""
 "The rate control method to use when encoding. Can be one of 'cbr', 'vbr', "
 "'qp', 'avbr'. 'qp' mode isn't supported for mpeg2."
 msgstr ""
+"A metoda di cuntrollu di frequenza à impiegà durante à cudificazione. I "
+"valori permessi sò : « cbr », « vbr », « qp », « avbr ». U modu « qp » ùn hè "
+"micca accettatu per mpeg2."
 
 #: modules/codec/qsv.c:105
 msgid "Quantization parameter"
-msgstr ""
+msgstr "Parametru di quantificazione"
 
 #: modules/codec/qsv.c:106
 msgid ""
@@ -12456,36 +12584,45 @@ msgid ""
 "qpp and qpb. It has less precedence than the forementionned parameters. Used "
 "only if rc_method is 'qp'."
 msgstr ""
+"U parametru di quantificazione per tutti tipi di trame. Stu parametru "
+"definisce qpi, qpp è qpb. It has less precedence than the forementionned "
+"parameters. Impiegatu solu s’è rc_method hè « qp »."
 
 #: modules/codec/qsv.c:110
 msgid "Quantization parameter for I-frames"
-msgstr ""
+msgstr "Parametru di quantificazione per e trame I"
 
 #: modules/codec/qsv.c:111
 msgid ""
 "Quantization parameter for I-frames. This parameter overrides any qp set "
 "globally. Used only if rc_method is 'qp'."
 msgstr ""
+"Parametru di quantificazione per e trame I. Stu parametru supraneghja tuttu "
+"qp definitu di manera glubale. Impiegatu solu s’è rc_method hè « qp »."
 
 #: modules/codec/qsv.c:114
 msgid "Quantization parameter for P-frames"
-msgstr ""
+msgstr "Parametru di quantificazione per e trame P"
 
 #: modules/codec/qsv.c:115
 msgid ""
 "Quantization parameter for P-frames. This parameter overrides any qp set "
 "globally. Used only if rc_method is 'qp'."
 msgstr ""
+"Parametru di quantificazione per e trame P. Stu parametru supraneghja tuttu "
+"qp definitu di manera glubale. Impiegatu solu s’è rc_method hè « qp »."
 
 #: modules/codec/qsv.c:118
 msgid "Quantization parameter for B-frames"
-msgstr ""
+msgstr "Parametru di quantificazione per e trame B"
 
 #: modules/codec/qsv.c:119
 msgid ""
 "Quantization parameter for B-frames. This parameter overrides any qp set "
 "globally. Used only if rc_method is 'qp'."
 msgstr ""
+"Parametru di quantificazione per e trame B. Stu parametru supraneghja tuttu "
+"qp definitu di manera glubale. Impiegatu solu s’è rc_method hè « qp »."
 
 #: modules/codec/qsv.c:122
 msgid "Maximum Bitrate"
@@ -12497,10 +12634,14 @@ msgid ""
 "method. If not set, this parameter is computed from other sources such as "
 "bitrate, profile, level, etc."
 msgstr ""
+"Definisce u flussu binariu massimu in kbps (1000 ottetti/s) per a metoda di "
+"cuntrollu di frequenza VBR. S’ellu ùn hè definitu, stu parametru hè "
+"calculatu à partesi d’altre fonti cum’è flussu binariu, prufilu, livellu, "
+"ecc."
 
 #: modules/codec/qsv.c:127
 msgid "Accuracy of RateControl"
-msgstr ""
+msgstr "Precisione di u cuntrollu di frequenza"
 
 #: modules/codec/qsv.c:128
 msgid ""
@@ -12509,20 +12650,28 @@ msgid ""
 "above 880 kbps and under  730 kbps. The targeted accuracy is only reached "
 "after a certained  convergence period. See the convergence parameter"
 msgstr ""
+"Tulleranza in percentuale di a metoda AVBR (flussu binariu variabile "
+"medianu). Esempiu : 10 cù un flussu binariu di 800 kbps vole si dì chì u "
+"cudificatore ùn anderà sopra 880 kbps è sottu 730 kbps. A precisione "
+"sibulata hè tocca solu dopu à un certu periodu di cunvergenza. Fighjate u "
+"parametru di cunvergenza"
 
 #: modules/codec/qsv.c:134
 msgid "Convergence time of 'avbr' RateControl"
-msgstr ""
+msgstr "Tempu di cunvergenza di u cuntrollu di frequenza AVBR"
 
 #: modules/codec/qsv.c:135
 msgid ""
 "Number of 100 frames before the 'avbr' rate control method reaches the "
 "requested bitrate with the requested accuracy. See the accuracy parameter."
 msgstr ""
+"Numeru di 100 trame prima chì a metoda di cuntrollu di frequenza AVBR tocchi "
+"u flussu binariu richiestu cù a precisione richiesta. Fighjate u parametru "
+"di precisione."
 
 #: modules/codec/qsv.c:139
 msgid "Number of slices per frame"
-msgstr ""
+msgstr "Numeru di fette à a fiura"
 
 #: modules/codec/qsv.c:140
 msgid ""
@@ -12530,14 +12679,18 @@ msgid ""
 "block rows. If numslice is not set, the encoder may choose any slice "
 "partitioning allowed by the codec standard."
 msgstr ""
+"Numeru di fette in ogni fiura di filmettu ; ogni fetta cuntene una o "
+"parechje linee di bloccu macro. S’è stu numeru ùn hè micca definitu, u "
+"cudificatore pò sceglie qualsiasi partizionamentu di fetta permessu da a "
+"norma di u cudecu."
 
 #: modules/codec/qsv.c:145 modules/codec/qsv.c:146 modules/codec/x264.c:137
 msgid "Number of reference frames"
-msgstr ""
+msgstr "Numeru di fiure di referenza"
 
 #: modules/codec/qsv.c:148
 msgid "Number of parallel operations"
-msgstr ""
+msgstr "Numeru d’operazioni parallele"
 
 #: modules/codec/qsv.c:149
 msgid ""
@@ -12545,58 +12698,63 @@ msgid ""
 "result. Higher numbers may result on better throughput depending on "
 "hardware. MPEG2 needs at least 1 here."
 msgstr ""
+"Definisce u numeru d’operazioni parallele di cudificazione prima di "
+"sincrunizà u risultatu. Numeri più alti ponu cagiunà un megliu transitu "
+"secondu à u materiale. MPEG2 richiede omancu 1 quì."
 
 #: modules/codec/qsv.c:193
 msgid "Intel QuickSync Video encoder for MPEG4-Part10/MPEG2 (aka H.264/H.262)"
 msgstr ""
+"Cudificatore di filmettu Intel QuickSync per MPEG4-Part10/MPEG2 (o H.264/"
+"H.262)"
 
 #: modules/codec/rawvideo.c:64
 msgid "Pseudo raw video decoder"
-msgstr ""
+msgstr "Discudificatore video pseudo grossu"
 
 #: modules/codec/rawvideo.c:71
 msgid "Pseudo raw video packetizer"
-msgstr "Impacchittatore video Pseudo raw"
+msgstr "Impacchittatore video pseudo grossu"
 
 #: modules/codec/rtpvideo.c:45
 msgid "Raw video encoder for RTP"
-msgstr ""
+msgstr "Cudificatore video grossu per RTP"
 
 #: modules/codec/scte18.c:41
 msgid "SCTE-18 decoder"
-msgstr ""
+msgstr "Discudificatore SCTE-18"
 
 #: modules/codec/scte18.c:42
 msgid "SCTE-18"
-msgstr ""
+msgstr "SCTE-18"
 
 #: modules/codec/scte18.h:24
 msgid "Emergency Alert Messaging for Cable"
-msgstr ""
+msgstr "Messaghju d’alerta d’urgenza per a cavu"
 
 #: modules/codec/scte27.c:42
 msgid "SCTE-27 decoder"
-msgstr ""
+msgstr "Discudificatore SCTE-27"
 
 #: modules/codec/scte27.c:43
 msgid "SCTE-27"
-msgstr ""
+msgstr "SCTE-27"
 
 #: modules/codec/sdl_image.c:60
 msgid "SDL Image decoder"
-msgstr ""
+msgstr "Discudificatore SDL Image"
 
 #: modules/codec/sdl_image.c:61
 msgid "SDL_image video decoder"
-msgstr ""
+msgstr "Discudificatore video SDL Image"
 
 #: modules/codec/shine.c:64
 msgid "MP3 fixed point audio encoder"
-msgstr ""
+msgstr "Cudificatore audio MP3 à puntu fissu"
 
 #: modules/codec/spdif.c:36
 msgid "S/PDIF pass-through decoder"
-msgstr ""
+msgstr "Discudificatore S/PDIF à traversata (pass-through)"
 
 #: modules/codec/speex.c:59 modules/codec/speex.c:1009
 #: modules/gui/macosx/VLCOpenWindowController.m:195
@@ -12607,11 +12765,11 @@ msgstr "Modu"
 
 #: modules/codec/speex.c:61
 msgid "Enforce the mode of the encoder."
-msgstr ""
+msgstr "Sfurzà u modu di u cudificatore."
 
 #: modules/codec/speex.c:65
 msgid "Enforce a quality between 0 (low) and 10 (high)."
-msgstr ""
+msgstr "Sfurzà a qualità trà 0 (bassa) è 10 (alta)."
 
 #: modules/codec/speex.c:67
 msgid "Encoding complexity"
@@ -12619,15 +12777,15 @@ msgstr "Cumplessità di a cudificazione"
 
 #: modules/codec/speex.c:69
 msgid "Enforce the complexity of the encoder."
-msgstr ""
+msgstr "Sfurzà a cumplessità di u cudificatore."
 
 #: modules/codec/speex.c:71
 msgid "Maximal bitrate"
-msgstr ""
+msgstr "Flussu binariu massimu"
 
 #: modules/codec/speex.c:73
 msgid "Enforce the maximal VBR bitrate"
-msgstr ""
+msgstr "Sfurzà u flussu binariu VBR massimu"
 
 #: modules/codec/speex.c:75 modules/codec/vorbis.c:183
 msgid "CBR encoding"
@@ -12638,16 +12796,20 @@ msgid ""
 "Enforce a constant bitrate encoding (CBR) instead of default variable "
 "bitrate encoding (VBR)."
 msgstr ""
+"Sfurzà una cudificazione à flussu binariu custente (CBR) invece d’una "
+"cudificazione predefinita à flussu binariu variabile (VBR)."
 
 #: modules/codec/speex.c:80
 msgid "Voice activity detection"
-msgstr ""
+msgstr "Scuperta di l’attività vucale"
 
 #: modules/codec/speex.c:82
 msgid ""
 "Enable voice activity detection (VAD). It is automatically activated in VBR "
 "mode."
 msgstr ""
+"Attivà a scuperta di l’attività vucale (VAD). Què hè attivatu "
+"autumaticamente in modu VBR."
 
 #: modules/codec/speex.c:85
 msgid "Discontinuous Transmission"
@@ -12655,23 +12817,23 @@ msgstr "Trasmissione discuntinua"
 
 #: modules/codec/speex.c:87
 msgid "Enable discontinuous transmission (DTX)."
-msgstr ""
+msgstr "Attivà a trasmissione discuntinua (DTX)."
 
 #: modules/codec/speex.c:91
 msgid "Narrow-band (8kHz)"
-msgstr ""
+msgstr "Striscia stretta (8kHz)"
 
 #: modules/codec/speex.c:91
 msgid "Wide-band (16kHz)"
-msgstr ""
+msgstr "Striscia larga (16kHz)"
 
 #: modules/codec/speex.c:91
 msgid "Ultra-wideband (32kHz)"
-msgstr ""
+msgstr "Striscia ultra larga (32kHz)"
 
 #: modules/codec/speex.c:98
 msgid "Speex audio decoder"
-msgstr ""
+msgstr "Discudificatore audio Speex"
 
 #: modules/codec/speex.c:100
 msgid "Speex"
@@ -12687,11 +12849,11 @@ msgstr "Cudificatore audio Speex"
 
 #: modules/codec/spudec/spudec.c:45
 msgid "Disable DVD subtitle transparency"
-msgstr ""
+msgstr "Disattivà a trasparenza di i sottutituli DVD"
 
 #: modules/codec/spudec/spudec.c:46
 msgid "Removes all transparency effects used in DVD subtitles."
-msgstr ""
+msgstr "Caccia tutti l’effetti di trasparenza impiegati in i sottutituli DVD."
 
 #: modules/codec/spudec/spudec.c:50
 msgid "DVD subtitles decoder"
@@ -12719,7 +12881,7 @@ msgstr "Predefinitu (Windows-1252)"
 
 #: modules/codec/subsdec.c:101
 msgid "System codeset"
-msgstr "Inseme di codice Sistema"
+msgstr "Inseme di codice di u sistema"
 
 #: modules/codec/subsdec.c:102
 msgid "Universal (UTF-8)"
@@ -12835,7 +12997,7 @@ msgstr "Celtu (Latin-8)"
 
 #: modules/codec/subsdec.c:148
 msgid "South-Eastern European (Latin-10)"
-msgstr "Europeanu di Sudeste (Latin-10)"
+msgstr "Europeanu di u Sudeste (Latin-10)"
 
 #: modules/codec/subsdec.c:150
 msgid "Simplified Chinese (ISO-2022-CN-EXT)"
@@ -12891,28 +13053,30 @@ msgstr "Cudificazione di u testu di i sottutituli"
 
 #: modules/codec/subsdec.c:171
 msgid "Set the encoding used in text subtitles"
-msgstr ""
+msgstr "Definisce a cudificazione impiegata in i sottutituli di testu"
 
 #: modules/codec/subsdec.c:172 modules/codec/ttml/ttml.c:36
 msgid "Subtitle justification"
-msgstr ""
+msgstr "Ghjustificazione di sottutitulu"
 
 #: modules/codec/subsdec.c:173 modules/codec/ttml/ttml.c:37
 msgid "Set the justification of subtitles"
-msgstr ""
+msgstr "Definisce a ghjustificazione di sottutitulu"
 
 #: modules/codec/subsdec.c:174
 msgid "UTF-8 subtitle autodetection"
-msgstr ""
+msgstr "Scuperta autumatica di sottutitulu UTF-8"
 
 #: modules/codec/subsdec.c:175
 msgid ""
 "This enables automatic detection of UTF-8 encoding within subtitle files."
 msgstr ""
+"Què attiveghja a scuperta autumatica di a cudificazione UTF-8 dentru i "
+"schedarii di sottutitulu."
 
 #: modules/codec/subsdec.c:183
 msgid "Text subtitle decoder"
-msgstr ""
+msgstr "Discudificatore di sottutitulu di testu"
 
 #. xgettext:
 #. The Windows ANSI code page most commonly used for this language.
@@ -12921,7 +13085,6 @@ msgstr ""
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -12934,18 +13097,21 @@ msgid ""
 "Some subtitle formats allow for text formatting. VLC partly implements this, "
 "but you can choose to disable all formatting."
 msgstr ""
+"Certi furmati di sottutitulu permettenu a messa à u furmatu di u testu. VLC "
+"mette in ballu sta funzione in parte, ma si pò sceglie di disattivà tutte e "
+"messe à u furmatu."
 
 #: modules/codec/subsusf.c:50
 msgid "USFSubs"
-msgstr ""
+msgstr "USFSubs"
 
 #: modules/codec/subsusf.c:51
 msgid "USF subtitles decoder"
-msgstr ""
+msgstr "Discudificatore di sottutituli USF"
 
 #: modules/codec/substx3g.c:41
 msgid "tx3g subtitles decoder"
-msgstr ""
+msgstr "Discudificatore di sottutituli tx3g"
 
 #: modules/codec/substx3g.c:42
 msgid "tx3g subtitles"
@@ -12953,7 +13119,7 @@ msgstr "Sottutituli tx3g"
 
 #: modules/codec/svcdsub.c:47
 msgid "Philips OGT (SVCD subtitle) decoder"
-msgstr ""
+msgstr "Discudificatore Philips OGT (sottutitulu SVCD)"
 
 #: modules/codec/svcdsub.c:48
 msgid "SVCD subtitles"
@@ -12969,7 +13135,7 @@ msgstr "Larghezza di fiura"
 
 #: modules/codec/svg.c:51
 msgid "Specify the width to decode the image too"
-msgstr ""
+msgstr "Specificà a larghezza per discudificà a fiura dinù"
 
 #: modules/codec/svg.c:52 modules/video_filter/scene.c:67
 msgid "Image height"
@@ -12977,19 +13143,19 @@ msgstr "Altezza di fiura"
 
 #: modules/codec/svg.c:53
 msgid "Specify the height to decode the image too"
-msgstr ""
+msgstr "Specificà l’altezza per discudificà a fiura dinù"
 
 #: modules/codec/svg.c:54
 msgid "Scale factor"
-msgstr ""
+msgstr "Fattore di scala"
 
 #: modules/codec/svg.c:55
 msgid "Scale factor to apply to image"
-msgstr ""
+msgstr "Fattore di scala da appiecà à a fiura"
 
 #: modules/codec/svg.c:63
 msgid "SVG video decoder"
-msgstr ""
+msgstr "Discudificatore video SVG"
 
 #: modules/codec/t140.c:36
 msgid "T.140 text encoder"
@@ -12997,7 +13163,7 @@ msgstr "Cudificatore di testu T.140"
 
 #: modules/codec/telx.c:54
 msgid "Override page"
-msgstr ""
+msgstr "Rimpiazzà a pagina"
 
 #: modules/codec/telx.c:55
 msgid ""
@@ -13005,18 +13171,23 @@ msgid ""
 "autodetect from TS, 0 = autodetect from teletext, >0 = actual page number, "
 "usually 888 or 889)."
 msgstr ""
+"Rimpiazzà a pagina indicata ; à pruvà quandu i vostri sottutituli ùn "
+"s’affissanu micca (-1 = scuperta autumatica da TS, 0 = scuperta autumatica "
+"da teletestu, >0 = numeru di pagina attuale, di regula 888 o 889)."
 
 #: modules/codec/telx.c:60
 msgid "Ignore subtitle flag"
-msgstr ""
+msgstr "Ignurà l’indicatore di sottutitulu"
 
 #: modules/codec/telx.c:61
 msgid "Ignore the subtitle flag, try this if your subtitles don't appear."
 msgstr ""
+"Ignurà l’indicatore di sottutitulu ; à pruvà quandu i vostri sottutituli ùn "
+"s’affissanu micca."
 
 #: modules/codec/telx.c:64
 msgid "Workaround for France"
-msgstr ""
+msgstr "Soluzione timpuraria per a Francia"
 
 #: modules/codec/telx.c:65
 msgid ""
@@ -13024,20 +13195,25 @@ msgid ""
 "historical interpretation mistake. Try using this wrong interpretation if "
 "your subtitles don't appear."
 msgstr ""
+"Certe catene francese ùn indicheghjanu micca bè e so pagine di sottutitulu "
+"per via d’un sbagliu storicu d’interpretazione. À pruvà quandu i vostri "
+"sottutituli ùn s’affissanu micca."
 
 #: modules/codec/telx.c:71
 msgid "Teletext subtitles decoder"
-msgstr ""
+msgstr "Discudificatore di sottutituli di teletestu"
 
 #: modules/codec/textst.c:49
 msgid "HDMV TextST subtitles decoder"
-msgstr ""
+msgstr "Discudificatore di sottutituli HDMV TextST"
 
 #: modules/codec/theora.c:107 modules/codec/vorbis.c:175
 msgid ""
 "Enforce a quality between 1 (low) and 10 (high), instead of specifying a "
 "particular bitrate. This will produce a VBR stream."
 msgstr ""
+"Sfurzà a qualità trà 1 (bassa) è 10 (alta) invece di specificà un flussu "
+"binariu particulare. Què pruducerà un flussu variabile VBR."
 
 #: modules/codec/theora.c:110 modules/video_filter/postproc.c:69
 msgid "Post processing quality"
@@ -13057,25 +13233,28 @@ msgstr "Cudificatore video Theora"
 
 #: modules/codec/ttml/ttml.c:45
 msgid "TTML decoder"
-msgstr ""
+msgstr "Discudificatore TTML"
 
 #: modules/codec/ttml/ttml.c:46
 msgid "TTML subtitles decoder"
-msgstr ""
+msgstr "Discudificatore di sottutituli TTML"
 
 #: modules/codec/ttml/ttml.c:53
 msgid "TTML"
-msgstr ""
+msgstr "TTML"
 
 #: modules/codec/ttml/ttml.c:54
 msgid "TTML demuxer"
-msgstr ""
+msgstr "Dimultiplessore TTML"
 
 #: modules/codec/twolame.c:56
 msgid ""
 "Force a specific encoding quality between 0.0 (high) and 50.0 (low), instead "
 "of specifying a particular bitrate. This will produce a VBR stream."
 msgstr ""
+"Sfurzà una qualità di cudificazione specifica trà 0,0 (alta) è 50,0 (bassa), "
+"invece di specificà un flussu binariu particulare. Què pruducerà un flussu "
+"variabile VBR."
 
 #: modules/codec/twolame.c:59
 msgid "Stereo mode"
@@ -13083,7 +13262,7 @@ msgstr "Modu stereo"
 
 #: modules/codec/twolame.c:60
 msgid "Handling mode for stereo streams"
-msgstr ""
+msgstr "Modu di ghjestione di i flussi stereo"
 
 #: modules/codec/twolame.c:61
 msgid "VBR mode"
@@ -13092,60 +13271,66 @@ msgstr "Modu VBR"
 #: modules/codec/twolame.c:63
 msgid "Use Variable BitRate. Default is to use Constant BitRate (CBR)."
 msgstr ""
+"Impiegà un flussu binariu variabile. U valore predefinitu hè l’impiegu d’un "
+"flussu binariu custente (CBR)."
 
 #: modules/codec/twolame.c:64
 msgid "Psycho-acoustic model"
-msgstr ""
+msgstr "Mudellu psico acusticu"
 
 #: modules/codec/twolame.c:66
 msgid "Integer from -1 (no model) to 4."
-msgstr ""
+msgstr "Valore interu da -1 (senza mudellu) à 4."
 
 #: modules/codec/twolame.c:70
 msgid "Joint stereo"
-msgstr ""
+msgstr "Stereo ghjunta"
 
 #: modules/codec/twolame.c:75
 msgid "Libtwolame audio encoder"
-msgstr ""
+msgstr "Cudificatore audio Libtwolame"
 
 #: modules/codec/uleaddvaudio.c:41
 msgid "Ulead DV audio decoder"
-msgstr ""
+msgstr "Discudificatore audio Ulead DV"
 
 #: modules/codec/videotoolbox.m:82
 msgid "Use Hardware decoders only"
-msgstr ""
+msgstr "Impiegà solu i discudificatori materiali"
 
 #: modules/codec/videotoolbox.m:90
 msgid "VideoToolbox video decoder"
-msgstr ""
+msgstr "Discudificatore video VideoToolbox"
 
 #: modules/codec/vorbis.c:177
 msgid "Maximum encoding bitrate"
-msgstr ""
+msgstr "Flussu binariu massimu di cudificazione"
 
 #: modules/codec/vorbis.c:179
 msgid "Maximum bitrate in kbps. This is useful for streaming applications."
 msgstr ""
+"Flussu binariu massimu in kbps. Què hè ghjuvevule per l’appiecazioni di "
+"lettura di cuntinuu."
 
 #: modules/codec/vorbis.c:180
 msgid "Minimum encoding bitrate"
-msgstr ""
+msgstr "Flussu binariu minimu di cudificazione"
 
 #: modules/codec/vorbis.c:182
 msgid ""
 "Minimum bitrate in kbps. This is useful for encoding for a fixed-size "
 "channel."
 msgstr ""
+"Flussu binariu minimu in kbps. Què hè ghjuvevule per a cudificazione d’un "
+"canale a dimensione fissa."
 
 #: modules/codec/vorbis.c:185
 msgid "Force a constant bitrate encoding (CBR)."
-msgstr ""
+msgstr "Sfurzà una cudificazione à flussu binariu custente (CBR)."
 
 #: modules/codec/vorbis.c:189
 msgid "Vorbis audio decoder"
-msgstr ""
+msgstr "Discudificatore audio Vorbis"
 
 #: modules/codec/vorbis.c:200
 msgid "Vorbis audio packetizer"
@@ -13157,7 +13342,7 @@ msgstr "Cudificatore audio Vorbis"
 
 #: modules/codec/vpx.c:53
 msgid "Quality mode"
-msgstr ""
+msgstr "Modu di qualità"
 
 #: modules/codec/vpx.c:54
 msgid ""
@@ -13166,34 +13351,38 @@ msgid ""
 " - 1: Realtime\n"
 " - 2: Best quality"
 msgstr ""
+"Parametru di qualità chì determinerà a durata massima di cudificazione\n"
+" - 0 : Bella qualità\n"
+" - 1 : Tempu reale\n"
+" - 2 : Megliora qualità"
 
 #: modules/codec/vpx.c:66
 msgid "WebM video decoder"
-msgstr ""
+msgstr "Discudificatore video WebM"
 
 #: modules/codec/vpx.c:75
 msgid "WebM video encoder"
-msgstr ""
+msgstr "Cudificatore video WebM"
 
 #: modules/codec/webvtt/webvtt.c:40
 msgid "WEBVTT decoder"
-msgstr ""
+msgstr "Discudificatore WEBVTT"
 
 #: modules/codec/webvtt/webvtt.c:41
 msgid "WEBVTT subtitles decoder"
-msgstr ""
+msgstr "Discudificatore di sottutituli WEBVTT"
 
 #: modules/codec/webvtt/webvtt.c:47 modules/codec/webvtt/webvtt.c:55
 msgid "WEBVTT subtitles parser"
-msgstr ""
+msgstr "Analizatore di sintassa di sottutituli WEBVTT"
 
 #: modules/codec/wmafixed/wma.c:83
 msgid "WMA v1/v2 fixed point audio decoder"
-msgstr ""
+msgstr "Discudificatore audio WMA v1/v2 à puntu fissu"
 
 #: modules/codec/x264.c:71
 msgid "Maximum GOP size"
-msgstr ""
+msgstr "Dimensione massima di GOP"
 
 #: modules/codec/x264.c:72
 msgid ""
@@ -13201,10 +13390,13 @@ msgid ""
 "improving quality for a given bitrate at the cost of seeking precision. Use "
 "-1 for infinite."
 msgstr ""
+"Definisce l’intervallu massimu trà e fiure IDR. I valori più maiò "
+"risparmianu u spaziu, cusì amendendu a qualità à flussu binariu uguale, à u "
+"costu d’una perdita di precizione di ricerca. Impiegà -1 per l’infinitu."
 
 #: modules/codec/x264.c:76
 msgid "Minimum GOP size"
-msgstr ""
+msgstr "Dimensione minima di GOP"
 
 #: modules/codec/x264.c:77
 msgid ""
@@ -13217,18 +13409,29 @@ msgid ""
 "If scenecuts appear within this interval, they are still encoded as I-"
 "frames, but do not start a new GOP."
 msgstr ""
+"Definisce l’intervallu minimu trà e fiure IDR. In H.264, e trame I ùn sò "
+"micca sempre alineate nant’à un GOP chjosu perchè hè permessu per una trama "
+"P d’esse prevista da più trame chè solu una nanzu à ella (fighjà dinù "
+"l’ozzione di trama di referenza). In cunsequenza, e trame I ùn sò micca "
+"necessariamente ricerchevule. E trame IDR pruibiscenu à e trame P chì venenu "
+"dopu di fà referenza qualsiasi trama chì precede sta trama IDR. \n"
+"S’ella ci hè cambiamenti di scena durante st’intervallu, sò sempre "
+"cudificati cum’è trame I, ma ùn principianu micca un GOP novu."
 
 #: modules/codec/x264.c:86
 msgid "Use recovery points to close GOPs"
-msgstr ""
+msgstr "Impiegà punti di ricuperazione per chjode i GOP"
 
 #: modules/codec/x264.c:87
 msgid "use open GOP, for bluray compatibility use also bluray-compat option"
 msgstr ""
+"impiegà un GOP apertu, per una cumpatibilità bluray, impiegà dinù l’ozzione "
+"di cumpatibilità bluray"
 
 #: modules/codec/x264.c:89
 msgid "Enable compatibility hacks for Blu-ray support"
 msgstr ""
+"Attivà e currezzioni di cumpatibilità per a pigliata in carica di Blu-ray"
 
 #: modules/codec/x264.c:90
 msgid ""
@@ -13236,10 +13439,13 @@ msgid ""
 "ray compatibility\n"
 "e.g. resolution, framerate, level"
 msgstr ""
+"Attivà e currezzioni per piglià in carica u Blu-ray ; què ùn sforza micca "
+"ogni aspettu\n"
+"di a cumpatibilità Blu-ray, p. i. : risuluzione, frequenza di fiure, livellu"
 
 #: modules/codec/x264.c:93
 msgid "Extra I-frames aggressivity"
-msgstr ""
+msgstr "Aggressività di e trame I addiziunale"
 
 #: modules/codec/x264.c:94
 msgid ""
@@ -13251,38 +13457,50 @@ msgid ""
 "other keyint frames, which probably leads to ugly encoding artifacts. Range "
 "1 to 100."
 msgstr ""
+"Scuperta di i cambiamenti di scena. Cuntrolleghja l’inserzione di e trame I "
+"addiziunale. Cù valori chjuchi di cambiamentu di scena, u cudecu deve "
+"aspessu sfurzà una trama I quandu si eccede u valore di keyint. Valori boni "
+"di cambiamentu di scena ponu truvà una pusizione megliu per a trama I. "
+"Valori maiò impieganu più trame I chè ci hè bisognu, dunque sciuppendu "
+"ottetti. -1 disattiveghja a scuperta di i cambiamenti di scena, dunque e "
+"trame I sò inserite solu ogni altre trame keyint, ciò chì cagiuneria forse "
+"effetti parassiti di cudificazione. Intervallu da 1 à 100."
 
 #: modules/codec/x264.c:105
 msgid "B-frames between I and P"
-msgstr ""
+msgstr "Trame B trà e trame I è P"
 
 #: modules/codec/x264.c:106
 msgid "Number of consecutive B-frames between I and P-frames. Range 1 to 16."
-msgstr ""
+msgstr "Numeru di trame B cunsecutive trà e trame I è P. Intervallu da 1 à 16."
 
 #: modules/codec/x264.c:109
 msgid "Adaptive B-frame decision"
-msgstr ""
+msgstr "Decisione di e trame B adattive"
 
 #: modules/codec/x264.c:110
 msgid ""
 "Force the specified number of consecutive B-frames to be used, except "
 "possibly before an I-frame. Range 0 to 2."
 msgstr ""
+"Sfurzà u numeru specificatu di e trame B cunsecutive da impiegà, fora "
+"eventualmente di una trame I. Intervallu da 0 à 2."
 
 #: modules/codec/x264.c:114
 msgid "Influence (bias) B-frames usage"
-msgstr ""
+msgstr "Influenza (scartu) l’aghjovu di e trame B"
 
 #: modules/codec/x264.c:115
 msgid ""
 "Bias the choice to use B-frames. Positive values cause more B-frames, "
 "negative values cause less B-frames."
 msgstr ""
+"Influenza a scelta di l’aghjovu di e trame B I valori pusitivi aumentanu u "
+"numeru di trame B è i valori nigativi u diminuicenu."
 
 #: modules/codec/x264.c:119
 msgid "Keep some B-frames as references"
-msgstr ""
+msgstr "Cunservà certe trame B cum’è referenze"
 
 #: modules/codec/x264.c:120
 msgid ""
@@ -13293,22 +13511,25 @@ msgid ""
 " - strict: Strictly hierarchical pyramid\n"
 " - normal: Non-strict (not Blu-ray compatible)\n"
 msgstr ""
-"Allows B-frames to be used as references for predicting other frames. Keeps "
-"the middle of 2+ consecutive B-frames as a reference, and reorders frame "
-"appropriately.\n"
-" - none: Disabled\n"
-" - strict: Strictly hierarchical pyramid\n"
-" - normal: Non-strict (not Blu-ray compatible)\n"
+"Permette l’aghjovu di e trame B cum’è referenze per a predizzione d’altre "
+"trame. Cunserveghja a mediana di omancu duie trame B cunsecutive cum’è una "
+"referenza è riurdineghja e trame di manera apposta.\n"
+" - nisunu : disattivatu\n"
+" - severu : piramida ierarchica severa\n"
+" - nurmale : non severu (micca cumpatibile Blu-ray)\n"
 
 #: modules/codec/x264.c:128
 msgid "Use fullrange instead of TV colorrange"
-msgstr ""
+msgstr "Impiegà a gamma cumpleta invece di quella di i culori TV"
 
 #: modules/codec/x264.c:129
 msgid ""
 "TV-range is usually used colorrange, defining this to true will enable "
 "libx264 to use full colorrange on encoding"
 msgstr ""
+"A gamma di i culori TV hè quella impiegata di regula. Definiscendu què à "
+"veru attiverà libx264 per impiegà a gama di i culori cumpleta per a "
+"cudificazione"
 
 #: modules/codec/x264.c:132
 msgid "CABAC"
@@ -13319,6 +13540,9 @@ msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
 msgstr ""
+"CABAC (Cudificazione aritmetica binaria adattata à u cuntestu). Rallenteghja "
+"appena a cudificazione è a discudificazione ma duveria risparmià u flussu "
+"binariu da 10 à 15 %."
 
 #: modules/codec/x264.c:138
 msgid ""
@@ -13326,24 +13550,30 @@ msgid ""
 "but seems to make little difference in live-action source material. Some "
 "decoders are unable to deal with large frameref values. Range 1 to 16."
 msgstr ""
+"Numeru di trame precedente à impiegà per a predizzione. Què hè efficace per "
+"e fiure mosse, ma pare fà una chjuca sfarenza per e scene d’azzione reale. "
+"Certi discudificatori ùn sò micca capace di trattà valori maiò di frameref. "
+"Intervallu da 1 à 16."
 
 #: modules/codec/x264.c:143
 msgid "Skip loop filter"
-msgstr ""
+msgstr "Tralascià u filtru d’iterazione"
 
 #: modules/codec/x264.c:144
 msgid "Deactivate the deblocking loop filter (decreases quality)."
-msgstr ""
+msgstr "Disattivà u filtru d’iterazione di sblucchime (diminuisce a qualità)."
 
 #: modules/codec/x264.c:146
 msgid "Loop filter AlphaC0 and Beta parameters alpha:beta"
-msgstr ""
+msgstr "Parametri AlphaC0 è Beta di u filtru d’iterazione alpha:beta"
 
 #: modules/codec/x264.c:147
 msgid ""
 "Loop filter AlphaC0 and Beta parameters. Range -6 to 6 for both alpha and "
 "beta parameters. -6 means light filter, 6 means strong."
 msgstr ""
+"Parametri AlphaC0 è Beta di u filtru d’iterazione. Intervallu da -6 à 6 per "
+"i parametri alpha è beta. -6 vole dì filtru legeru è 6 filtru forte."
 
 #: modules/codec/x264.c:151
 msgid "H.264 level"
@@ -13356,6 +13586,11 @@ msgid ""
 "the encoding options. Range 1 to 5.1 (10 to 51 is also allowed). Set to 0 "
 "for letting x264 set level."
 msgstr ""
+"Specificà u livellu H.264 (cum’è definitu in l’annessu di a norma). I "
+"livelli ùn sò micca sfurzati ; ghjè à l’utilizatore di selezziunà un livellu "
+"cumpatibile cù u restu di l’ozzioni di cudificazione. Intervallu da 1 à 5.1 "
+"(da 10 à 51 hè permessu dinù). Definisce à 0 per lascià x264 sceglie u "
+"livellu."
 
 #: modules/codec/x264.c:157
 msgid "H.264 profile"
@@ -13364,18 +13599,19 @@ msgstr "Prufilu H.264"
 #: modules/codec/x264.c:158
 msgid "Specify H.264 profile which limits are enforced over other settings"
 msgstr ""
+"Specificà u prufilu H.264 induve e cunfine supraneghjanu l’altri parametri"
 
 #: modules/codec/x264.c:164
 msgid "Interlaced mode"
-msgstr ""
+msgstr "Modu d’intricciamentu"
 
 #: modules/codec/x264.c:165
 msgid "Pure-interlaced mode."
-msgstr ""
+msgstr "Modu intricciatu puru."
 
 #: modules/codec/x264.c:167
 msgid "Frame packing"
-msgstr ""
+msgstr "Pacchittime di trama"
 
 #: modules/codec/x264.c:168
 msgid ""
@@ -13387,126 +13623,145 @@ msgid ""
 " 4: top bottom - L is on top, R on bottom\n"
 " 5: frame alternation - one view per frame"
 msgstr ""
+"Definisce l’accunciamentu di trama per i filmetti stereoscopichi :\n"
+" 0 : scacchera - i pizzeli sò di manera alternativa da M è D\n"
+" 1 : alternanza di culonna - M è D sò intricciati da a culonna\n"
+" 2 : alternanza di linea - M è D sò intricciati da a linea\n"
+" 3 : pettu à pettu - M hè à manu manca, D à diritta\n"
+" 4 : altu bassu - M hè in altu, D in bassu\n"
+" 5 : alternanza di trama - una vista per ogni trama"
 
 #: modules/codec/x264.c:176
 msgid "Use Periodic Intra Refresh"
-msgstr ""
+msgstr "Impiegà a rinfriscata intra periodica"
 
 #: modules/codec/x264.c:177
 msgid "Use Periodic Intra Refresh instead of IDR frames"
-msgstr ""
+msgstr "Impiegà a rinfriscata intra periodica invece di e trame IDR"
 
 #: modules/codec/x264.c:179
 msgid "Use mb-tree ratecontrol"
-msgstr ""
+msgstr "Impiegà un cuntrollu di frequenza « mb-tree »"
 
 #: modules/codec/x264.c:180
 msgid "You can disable use of Macroblock-tree on ratecontrol"
 msgstr ""
+"Si pò disattivà l’impiegu di l’arburu di i macroblocchi nant’à u cuntrollu "
+"di frequenza"
 
 #: modules/codec/x264.c:182
 msgid "Force number of slices per frame"
-msgstr ""
+msgstr "Sfurzà u numeru di fette à a fiura"
 
 #: modules/codec/x264.c:183
 msgid "Force rectangular slices and is overridden by other slicing options"
 msgstr ""
+"Sfurzà e fette rettangulare è hè rimpiazzatu da l’altre ozzioni di tagliata"
 
 #: modules/codec/x264.c:185
 msgid "Limit the size of each slice in bytes"
-msgstr ""
+msgstr "Limità a dimensione d’ogni fetta in ottetti"
 
 #: modules/codec/x264.c:186
 msgid "Sets a maximum slice size in bytes, Includes NAL overhead in size"
 msgstr ""
+"Definisce in ottetti a dimensione massima di a fetta, includendu a "
+"supracarica NAL in a dimensione"
 
 #: modules/codec/x264.c:188
 msgid "Limit the size of each slice in macroblocks"
-msgstr ""
+msgstr "Limità a dimensione d’ogni fetta in macroblocchi"
 
 #: modules/codec/x264.c:189
 msgid "Sets a maximum number of macroblocks per slice"
-msgstr ""
+msgstr "Definisce un numeru massimu di macroblocchi per ogni fetta"
 
 #: modules/codec/x264.c:192
 msgid "Set QP"
-msgstr ""
+msgstr "Definisce QP"
 
 #: modules/codec/x264.c:193
 msgid ""
 "This selects the quantizer to use. Lower values result in better fidelity, "
 "but higher bitrates. 26 is a good default value. Range 0 (lossless) to 51."
 msgstr ""
+"Què selezziuneghja u quantificatore à impiegà. I valori inferiori danu una "
+"fidelità aumentata, ma ingenereghjanu flussi binarii superiori. 26 hè un "
+"bellu valore predefinitu. Intervallu da 0 (senza perdita) à 51."
 
 #: modules/codec/x264.c:197
 msgid "Quality-based VBR"
-msgstr ""
+msgstr "VBR basata nant’à a qualità"
 
 #: modules/codec/x264.c:198
 msgid "1-pass Quality-based VBR. Range 0 to 51."
-msgstr ""
+msgstr "VBR basata nant’à a qualità in un passagiu. Intervallu da 0 à 51."
 
 #: modules/codec/x264.c:200
 msgid "Min QP"
-msgstr ""
+msgstr "QP minimu"
 
 #: modules/codec/x264.c:201
 msgid "Minimum quantizer parameter. 15 to 35 seems to be a useful range."
 msgstr ""
+"Parametru minimu di u quantificatore. Da 15 à 35 pare esse un intervallu "
+"ghjuvevule."
 
 #: modules/codec/x264.c:204
 msgid "Max QP"
-msgstr ""
+msgstr "QP massimu"
 
 #: modules/codec/x264.c:205
 msgid "Maximum quantizer parameter."
-msgstr ""
+msgstr "Parametru massimu di u quantificatore."
 
 #: modules/codec/x264.c:207
 msgid "Max QP step"
-msgstr ""
+msgstr "Numeru massimu di passi QP"
 
 #: modules/codec/x264.c:208
 msgid "Max QP step between frames."
-msgstr ""
+msgstr "Numeru massimu di passi QP trà e trame."
 
 #: modules/codec/x264.c:210
 msgid "Average bitrate tolerance"
-msgstr ""
+msgstr "Tulleranza mediana di u flussu binariu"
 
 #: modules/codec/x264.c:211
 msgid "Allowed variance in average bitrate (in kbits/s)."
-msgstr ""
+msgstr "Variazione permessa di u flussu binariu medianu (in kbits/s)."
 
 #: modules/codec/x264.c:214
 msgid "Max local bitrate"
-msgstr ""
+msgstr "Flussu binariu lucale massimu"
 
 #: modules/codec/x264.c:215
 msgid "Sets a maximum local bitrate (in kbits/s)."
-msgstr ""
+msgstr "Definisce u flussu binariu lucale massimu (in kbits/s)."
 
 #: modules/codec/x264.c:217
 msgid "VBV buffer"
-msgstr ""
+msgstr "Stampone VBV"
 
 #: modules/codec/x264.c:218
 msgid "Averaging period for the maximum local bitrate (in kbits)."
-msgstr ""
+msgstr "Periodu medianu per u flussu binariu lucale massimu (in kbits)."
 
 #: modules/codec/x264.c:221
 msgid "Initial VBV buffer occupancy"
-msgstr ""
+msgstr "Occupazione iniziale di u stampone VBV"
 
 #: modules/codec/x264.c:222
 msgid ""
 "Sets the initial buffer occupancy as a fraction of the buffer size. Range "
 "0.0 to 1.0."
 msgstr ""
+"Definisce l’occupazione iniziale di u stampone cum’è una frazzione di a "
+"dimensione di u stampone. Intervallu da 0,0 à 1,0."
 
 #: modules/codec/x264.c:225
 msgid "How AQ distributes bits"
-msgstr ""
+msgstr "Cumu AQ distribuisce i bit"
 
 #: modules/codec/x264.c:226
 msgid ""
@@ -13516,10 +13771,15 @@ msgid ""
 " - 2: uses log(var)^2 instead of log(var) and attempts to adapt strength per "
 "frame"
 msgstr ""
+"Definisce u modu di distribuzione di i bit\n"
+" - 0 : disattivata\n"
+" - 1 : modu predefinitu x264 attuale\n"
+" - 2 : impiegeghja log(var)^2 invece di log(var) è prova d’adattà a forza à "
+"a trama"
 
 #: modules/codec/x264.c:231
 msgid "Strength of AQ"
-msgstr ""
+msgstr "Forza di AQ"
 
 #: modules/codec/x264.c:232
 msgid ""
@@ -13528,34 +13788,39 @@ msgid ""
 " - 0.5: weak AQ\n"
 " - 1.5: strong AQ"
 msgstr ""
+"Valore di forza per riduce u blucchime è u flosciu in l’aree piane è "
+"testurate\n"
+"valore predefinitu 1,0 è ricumandatu trà 0 è 2\n"
+" - 0,5 : AQ debule\n"
+" - 1,5 : AQ forte"
 
 #: modules/codec/x264.c:238
 msgid "QP factor between I and P"
-msgstr ""
+msgstr "Fattore QP trà I è P"
 
 #: modules/codec/x264.c:239
 msgid "QP factor between I and P. Range 1.0 to 2.0."
-msgstr ""
+msgstr "Fattore QP trà I è P. Intervallu da 1,0 à 2,0."
 
 #: modules/codec/x264.c:242
 msgid "QP factor between P and B"
-msgstr ""
+msgstr "Fattore QP trà P è B"
 
 #: modules/codec/x264.c:243
 msgid "QP factor between P and B. Range 1.0 to 2.0."
-msgstr ""
+msgstr "Fattore QP trà P è B. Intervallu da 1,0 à 2,0."
 
 #: modules/codec/x264.c:245
 msgid "QP difference between chroma and luma"
-msgstr ""
+msgstr "Sfarenza QP trà crominanza è luminanza"
 
 #: modules/codec/x264.c:246
 msgid "QP difference between chroma and luma."
-msgstr ""
+msgstr "Sfarenza QP trà crominanza è luminanza."
 
 #: modules/codec/x264.c:248
 msgid "Multipass ratecontrol"
-msgstr ""
+msgstr "Cuntrollu di frequenza multipassi"
 
 #: modules/codec/x264.c:249
 msgid ""
@@ -13564,34 +13829,42 @@ msgid ""
 " - 2: Last pass, does not overwrite stats file\n"
 " - 3: Nth pass, overwrites stats file\n"
 msgstr ""
+"Cuntrollu di frequenza multipassi.\n"
+" - 1 : primu passu, creazione di u schedariu di statistiche\n"
+" - 2 : ultimu passu, ùn rimpiazzeghja micca u schedariu di statistiche\n"
+" - 3 : n-esimu passu, rimpiazzeghja u schedariu di statistiche\n"
 
 #: modules/codec/x264.c:254
 msgid "QP curve compression"
-msgstr ""
+msgstr "Cumpressione di a curva QP"
 
 #: modules/codec/x264.c:255
 msgid "QP curve compression. Range 0.0 (CBR) to 1.0 (QCP)."
-msgstr ""
+msgstr "Cumpressione di a curva QP. Intervallu 0,0 (CBR) à 1,0 (QCP)."
 
 #: modules/codec/x264.c:257 modules/codec/x264.c:261
 msgid "Reduce fluctuations in QP"
-msgstr ""
+msgstr "Riduce e fluttuazioni in QP"
 
 #: modules/codec/x264.c:258
 msgid ""
 "This reduces the fluctuations in QP before curve compression. Temporally "
 "blurs complexity."
 msgstr ""
+"Què riduce e fluttuazioni in QP prima a cumpressione di a curva. Cumplessità "
+"di flosciu tempurale."
 
 #: modules/codec/x264.c:262
 msgid ""
 "This reduces the fluctuations in QP after curve compression. Temporally "
 "blurs quants."
 msgstr ""
+"Què riduce e fluttuazioni in QP dopu à a cumpressione di a curva. Quantità "
+"di flosciu tempurale."
 
 #: modules/codec/x264.c:267
 msgid "Partitions to consider"
-msgstr ""
+msgstr "Partizione da cunsiderà"
 
 #: modules/codec/x264.c:268
 msgid ""
@@ -13603,14 +13876,21 @@ msgid ""
 " - all   : i4x4,p8x8,(i8x8),b8x8,p4x4\n"
 "(p4x4 requires p8x8. i8x8 requires 8x8dct)."
 msgstr ""
+"Partizione da cunsiderà in modu d’analisa :\n"
+" - nisunu \n"
+" - rapidu : i4x4\n"
+" - nurmale : i4x4,p8x8,(i8x8)\n"
+" - lentu : i4x4,p8x8,(i8x8),b8x8\n"
+" - tuttu : i4x4,p8x8,(i8x8),b8x8,p4x4\n"
+"(p4x4 richiede p8x8. i8x8 richiede 8x8dct)."
 
 #: modules/codec/x264.c:276
 msgid "Direct MV prediction mode"
-msgstr ""
+msgstr "Modu di predizzione diretta di i vettori di mossa (MV)"
 
 #: modules/codec/x264.c:279
 msgid "Direct prediction size"
-msgstr ""
+msgstr "Dimensione di predizzione diretta"
 
 #: modules/codec/x264.c:280
 msgid ""
@@ -13619,6 +13899,10 @@ msgid ""
 " -  1: 8x8\n"
 " - -1: smallest possible according to level\n"
 msgstr ""
+"Dimensione di predizzione diretta :\n"
+" -  0 : 4x4\n"
+" -  1 : 8x8\n"
+" - -1 : u più chjucu pussibule secondu à u livellu\n"
 
 #: modules/codec/x264.c:285
 msgid "Weighted prediction for B-frames"
@@ -13639,10 +13923,14 @@ msgid ""
 " - 1: Blind offset\n"
 " - 2: Smart analysis\n"
 msgstr ""
+"Weighted prediction for P-frames:\n"
+" - 0 : disattivata\n"
+" - 1: Blind offset\n"
+" - 2 : analisa astuta\n"
 
 #: modules/codec/x264.c:294
 msgid "Integer pixel motion estimation method"
-msgstr ""
+msgstr "Metoda d’estimazione di mossa di pizzelu à numeru interu"
 
 #: modules/codec/x264.c:295
 msgid ""
@@ -13653,10 +13941,16 @@ msgid ""
 " - esa: exhaustive search (extremely slow, primarily for testing)\n"
 " - tesa: hadamard exhaustive search (extremely slow, primarily for testing)\n"
 msgstr ""
+"Selezziuneghja a metoda di calculu d’estimazione di mossa :\n"
+" - dia : ricerca in lusanga, raghju 1 (rapidu)\n"
+" - hex : ricerca esagunale, raghju 2\n"
+" - umh: uneven multi-hexagon search (better but slower)\n"
+" - esa : ricerca cumpleta (lentu lentu, soprattuttu per pruvà)\n"
+" - tesa : ricerca cumpleta hadamard (lentu lentu, soprattuttu per pruvà)\n"
 
 #: modules/codec/x264.c:302
 msgid "Maximum motion vector search range"
-msgstr ""
+msgstr "Intervallu massimu di ricerca di u vettore di mossa"
 
 #: modules/codec/x264.c:303
 msgid ""
@@ -13664,29 +13958,38 @@ msgid ""
 "position(s). Default of 16 is good for most footage, high motion sequences "
 "may benefit from settings between 24 and 32. Range 0 to 64."
 msgstr ""
+"Distanza massima per a ricerca di l’estimazione di mossa, misurata à partesi "
+"di a(e) pusizione(i) prevista(e). U valore predefinitu di 16 cunvene à a "
+"maiò parte di e sequenze di filmu. E sequenze cù parechje mosse ponu sceglie "
+"un valore trà 24 è 32. Intervallu da 0 à 64."
 
 #: modules/codec/x264.c:308
 msgid "Maximum motion vector length"
-msgstr ""
+msgstr "Longhezza massima di u vettore di mossa"
 
 #: modules/codec/x264.c:309
 msgid ""
 "Maximum motion vector length in pixels. -1 is automatic, based on level."
 msgstr ""
+"Longhezza massima di u vettore di mossa in pizzeli. -1 vole dì autumatica, "
+"basata nant’à u livellu."
 
 #: modules/codec/x264.c:312
 msgid "Minimum buffer space between threads"
-msgstr ""
+msgstr "Spaziu minimu di u stampone trà i fili"
 
 #: modules/codec/x264.c:313
 msgid ""
 "Minimum buffer space between threads. -1 is automatic, based on number of "
 "threads."
 msgstr ""
+"Spaziu minimu di u stampone trà i fili. -1 vole dì autumaticu, basata nant’à "
+"u numeru di i fili."
 
 #: modules/codec/x264.c:316
 msgid "Strength of psychovisual optimization, default is \"1.0:0.0\""
 msgstr ""
+"Putenza di u migliuramentu psicovisuale ; u valore predefinitu hè « 1,0:0,0"
 
 #: modules/codec/x264.c:317
 msgid ""
@@ -13694,10 +13997,15 @@ msgid ""
 "Second parameter controls if Trellis is used on psychovisual optimization, "
 "default off"
 msgstr ""
+"U primu parametru cuntrolleghja s’è RD hè attivatu (subme>=6) o "
+"disattivatu.\n"
+"U secondu parametru cuntrolleghja s’è u treillis hè impiegatu per u "
+"migliuramentu psicovisuale ; disattivatu per predefinizione"
 
 #: modules/codec/x264.c:321
 msgid "Subpixel motion estimation and partition decision quality"
 msgstr ""
+"Qualità di l’estimazione di mossa subpizzelu è di a decisione di partizione"
 
 #: modules/codec/x264.c:323
 msgid ""
@@ -13705,44 +14013,53 @@ msgid ""
 "motion estimation decision process (lower = quicker and higher = better "
 "quality). Range 1 to 9."
 msgstr ""
+"Stu parametru cuntrolleghja i cumprumessi trà a qualità è a vitezza "
+"impiegati in u trattamentu decisionale d’estimazione di mossa (valore più "
+"bassi = più rapidu ; più alti = più bella qualità). Intervallu da 1 à 9."
 
 #: modules/codec/x264.c:327
 msgid "RD based mode decision for B-frames. This requires subme 6 (or higher)."
 msgstr ""
+"Decisione di u modu basatu nant’à RD per e trame B. Què richiede subme 6 (o "
+"superiore)."
 
 #: modules/codec/x264.c:330
 msgid "Decide references on a per partition basis"
-msgstr ""
+msgstr "Decide e referenze nant’à una basa à a partizione"
 
 #: modules/codec/x264.c:331
 msgid ""
 "Allows each 8x8 or 16x8 partition to independently select a reference frame, "
 "as opposed to only one ref per macroblock."
 msgstr ""
+"Permette à ogni partizione 8x8 o 16x8 di selezziunà una trama di referenza, "
+"invece à una referenza unica per macrobloccu."
 
 #: modules/codec/x264.c:335
 msgid "Chroma in motion estimation"
-msgstr ""
+msgstr "Crominanza in l’estimazione di mossa"
 
 #: modules/codec/x264.c:336
 msgid "Chroma ME for subpel and mode decision in P-frames."
-msgstr ""
+msgstr "Crominanza ME per sottupizzelu è decisione di modu in e trame P."
 
 #: modules/codec/x264.c:339
 msgid "Joint bidirectional motion refinement."
-msgstr ""
+msgstr "Perfezziunamentu ghjuntu di mossa bidirezziunale."
 
 #: modules/codec/x264.c:341
 msgid "Adaptive spatial transform size"
-msgstr ""
+msgstr "Dimensione di a trasfurmazione spaciale adattattiva"
 
 #: modules/codec/x264.c:343
 msgid "SATD-based decision for 8x8 transform in inter-MBs."
 msgstr ""
+"Decisione basata nant’à SATD per a trasfurmazione 8x8 in l’inter "
+"macroblocchi."
 
 #: modules/codec/x264.c:345
 msgid "Trellis RD quantization"
-msgstr ""
+msgstr "Quantificazione trellis RD"
 
 #: modules/codec/x264.c:346
 msgid ""
@@ -13752,54 +14069,69 @@ msgid ""
 " - 2: enabled on all mode decisions\n"
 "This requires CABAC."
 msgstr ""
+"Quantificazione trellis RD.\n"
+" - 0 : disattivata\n"
+" - 1 : attivata solu per a cudificazione finale d’un macrobloccu\n"
+" - 2 : attivata per tutte decisioni di modu\n"
+"Què richiede CABAC."
 
 #: modules/codec/x264.c:352
 msgid "Early SKIP detection on P-frames"
-msgstr ""
+msgstr "Scuperta anticipata di saltu nant’à e trame P"
 
 #: modules/codec/x264.c:353
 msgid "Early SKIP detection on P-frames."
-msgstr ""
+msgstr "Scuperta anticipata di saltu nant’à e trame P."
 
 #: modules/codec/x264.c:355
 msgid "Coefficient thresholding on P-frames"
-msgstr ""
+msgstr "Sogliu di cuefficiente nant’à e trame P"
 
 #: modules/codec/x264.c:356
 msgid ""
 "Coefficient thresholding on P-frames. Eliminate dct blocks containing only a "
 "small single coefficient."
 msgstr ""
+"Sogliu di cuefficiente nant’à e trame P. Eliminazione di i blocchi DCT "
+"cuntenendu solu un chjucu cuefficiente unicu."
 
 #: modules/codec/x264.c:359
 msgid "Use Psy-optimizations"
-msgstr ""
+msgstr "Impiegà l’ottimizazioni psico"
 
 #: modules/codec/x264.c:360
 msgid "Use all visual optimizations that can worsen both PSNR and SSIM"
 msgstr ""
+"Impiegà tutte l’ottimizazioni visuale chì ponu degradà inseme u raportu "
+"signale/trostu di piccu (PSNR) è a similarità strutturale (SSIM)"
 
 #: modules/codec/x264.c:364
 msgid ""
 "Dct-domain noise reduction. Adaptive pseudo-deadzone. 10 to 1000 seems to be "
 "a useful range."
 msgstr ""
+"Riduzzione di trostu di u duminiu DCT. Pseudo zona morta adattattiva. Da 10 "
+"à 1000 pare esse un intervallu ghjuvevule."
 
 #: modules/codec/x264.c:367
 msgid "Inter luma quantization deadzone"
-msgstr ""
+msgstr "Zona morta di quantificazione inter luminanza"
 
 #: modules/codec/x264.c:368
 msgid "Set the size of the inter luma quantization deadzone. Range 0 to 32."
 msgstr ""
+"Definisce a dimensione di a zona morta di quantificazione inter luminanza. "
+"Intervallu da 0 à 32."
 
 #: modules/codec/x264.c:371
 msgid "Intra luma quantization deadzone"
-msgstr ""
+msgstr "Zona morta di quantificazione intra luminanza"
 
 #: modules/codec/x264.c:372
 msgid "Set the size of the intra luma quantization deadzone. Range 0 to 32."
 msgstr ""
+"Definisce a dimensione di a zona morta di quantificazione intra luminanza. "
+"Intervallu da 0 à 32."
 
 #: modules/codec/x264.c:377
 msgid "Non-deterministic optimizations when threaded"
@@ -13807,47 +14139,53 @@ msgstr ""
 
 #: modules/codec/x264.c:378
 msgid "Slightly improve quality of SMP, at the cost of repeatability."
-msgstr ""
+msgstr "Amendamentu legeru di a qualità di SMP à u costu di a ripetizione."
 
 #: modules/codec/x264.c:381
 msgid "CPU optimizations"
-msgstr ""
+msgstr "Migliuramenti CPU"
 
 #: modules/codec/x264.c:382
 msgid "Use assembler CPU optimizations."
-msgstr ""
+msgstr "Impiegà i migliuramenti assembler CPU."
 
 #: modules/codec/x264.c:384
 msgid "Filename for 2 pass stats file"
-msgstr ""
+msgstr "Nome di schedariu di statistiche à 2 passagi"
 
 #: modules/codec/x264.c:385
 msgid "Filename for 2 pass stats file for multi-pass encoding."
 msgstr ""
+"Nome di schedariu di statistiche à 2 passagi per a cudificazione multi "
+"passagi."
 
 #: modules/codec/x264.c:387
 msgid "PSNR computation"
-msgstr ""
+msgstr "Calculu di u raportu signale/trostu di piccu (PSNR)"
 
 #: modules/codec/x264.c:388
 msgid ""
 "Compute and print PSNR stats. This has no effect on the actual encoding "
 "quality."
 msgstr ""
+"Calculà è stampà e statistiche PSNR. Què ùn hà alcunu effettu nant’à a "
+"qualità attuale di a cudificazione."
 
 #: modules/codec/x264.c:391
 msgid "SSIM computation"
-msgstr ""
+msgstr "Calculu di a similarità strutturale (SSIM)"
 
 #: modules/codec/x264.c:392
 msgid ""
 "Compute and print SSIM stats. This has no effect on the actual encoding "
 "quality."
 msgstr ""
+"Calculà è stampà e statistiche SSIM. Què ùn hà alcunu effettu nant’à a "
+"qualità attuale di a cudificazione."
 
 #: modules/codec/x264.c:395
 msgid "Quiet mode"
-msgstr ""
+msgstr "Modu chetu"
 
 #: modules/codec/x264.c:397 modules/gui/macosx/VLCPlaylistInfo.m:65
 #: modules/gui/qt/ui/streampanel.h:168
@@ -13856,21 +14194,23 @@ msgstr "Statistiche"
 
 #: modules/codec/x264.c:398
 msgid "Print stats for each frame."
-msgstr ""
+msgstr "Affissà e statistiche per ogni trama."
 
 #: modules/codec/x264.c:400
 msgid "SPS and PPS id numbers"
-msgstr ""
+msgstr "Numeri d’identificazione SPS è PPS"
 
 #: modules/codec/x264.c:401
 msgid ""
 "Set SPS and PPS id numbers to allow concatenating streams with different "
 "settings."
 msgstr ""
+"Definisce i numeri d’identificazione SPS è PPS per permette i flussi "
+"cuncatinati cù parametri sfarenti."
 
 #: modules/codec/x264.c:404
 msgid "Access unit delimiters"
-msgstr ""
+msgstr "Delimitatori d’unità d’accessu"
 
 #: modules/codec/x264.c:405
 msgid "Generate access unit delimiter NAL units."
@@ -13888,47 +14228,47 @@ msgstr ""
 
 #: modules/codec/x264.c:411
 msgid "HRD-timing information"
-msgstr ""
+msgstr "Infurmazione nant’à a durata HRD"
 
 #: modules/codec/x264.c:412
 msgid "Default tune setting used"
-msgstr ""
+msgstr "Parametru predefinitu impiegatu di rigatura"
 
 #: modules/codec/x264.c:413
 msgid "Default preset setting used"
-msgstr ""
+msgstr "Parametru predefinitu impiegatu di prerigatura"
 
 #: modules/codec/x264.c:415
 msgid "x264 advanced options"
-msgstr ""
+msgstr "Ozzioni esperti x264"
 
 #: modules/codec/x264.c:416
 msgid "x264 advanced options, in the form {opt=val,op2=val2}."
-msgstr ""
+msgstr "Ozzioni esperti x264, in a forma {opt=val,op2=val2}."
 
 #: modules/codec/x264.c:421
 msgid "dia"
-msgstr ""
+msgstr "dia"
 
 #: modules/codec/x264.c:421
 msgid "hex"
-msgstr ""
+msgstr "hex"
 
 #: modules/codec/x264.c:421
 msgid "umh"
-msgstr ""
+msgstr "umh"
 
 #: modules/codec/x264.c:421
 msgid "esa"
-msgstr ""
+msgstr "esa"
 
 #: modules/codec/x264.c:421
 msgid "tesa"
-msgstr ""
+msgstr "tesa"
 
 #: modules/codec/x264.c:429
 msgid "Fast"
-msgstr "Veloce"
+msgstr "Rapidu"
 
 #: modules/codec/x264.c:429 modules/gui/macosx/VLCMainMenu.m:290
 #: modules/gui/macosx/VLCMainMenu.m:392
@@ -13941,7 +14281,7 @@ msgstr "Nurmale"
 
 #: modules/codec/x264.c:429
 msgid "Slow"
-msgstr "Pianu"
+msgstr "Lentu"
 
 #: modules/codec/x264.c:434
 msgid "Spatial"
@@ -13953,27 +14293,27 @@ msgstr "Tempurale"
 
 #: modules/codec/x264.c:439
 msgid "checkerboard"
-msgstr ""
+msgstr "scacchera"
 
 #: modules/codec/x264.c:439
 msgid "column alternation"
-msgstr ""
+msgstr "alternanza di culonna"
 
 #: modules/codec/x264.c:439
 msgid "row alternation"
-msgstr ""
+msgstr "alternanza di linea"
 
 #: modules/codec/x264.c:439
 msgid "side by side"
-msgstr "affiancata"
+msgstr "pettu à pettu"
 
 #: modules/codec/x264.c:439
 msgid "top bottom"
-msgstr "insù inghjò"
+msgstr "altu bassu"
 
 #: modules/codec/x264.c:439
 msgid "frame alternation"
-msgstr ""
+msgstr "alternanza di trama"
 
 #: modules/codec/x264.c:439
 msgid "2D"
@@ -14028,7 +14368,7 @@ msgstr "Sottutituli di testu di Teletestu"
 
 #: modules/codec/zvbi.c:76
 msgid "Output teletext subtitles as text instead of as RGBA."
-msgstr ""
+msgstr "Affissà i sottutituli teletestu cum’è testu invece di RGBA."
 
 #: modules/codec/zvbi.c:79
 msgid "Presentation Level"
@@ -14088,7 +14428,7 @@ msgstr "VLC media player"
 
 #: modules/control/dummy.c:38 modules/control/oldrc.c:175
 msgid "Do not open a DOS command box interface"
-msgstr "Ùn micca apre una scatula di cumanda DOS"
+msgstr "Ùn micca apre un’interfaccia di cumanda DOS"
 
 #: modules/control/dummy.c:40
 msgid ""
@@ -14096,26 +14436,30 @@ msgid ""
 "the quiet mode will not bring this command box but can also be pretty "
 "annoying when you want to stop VLC and no video window is open."
 msgstr ""
+"U cumpurtamentu predefinitu di u modulu d’estensione fattiziu di "
+"l’interfaccia hè di lancià un’interfaccia di cumanda DOS. Cù u modu chetu "
+"st’interfaccia ùn hè micca lanciata ma què pò scumudà quandu ci vole à esce "
+"da VLC è chì ci hè nisuna finestra di filmettu d’aperta."
 
 #: modules/control/dummy.c:50
 msgid "Dummy interface"
-msgstr ""
+msgstr "Interfaccia fattizia"
 
 #: modules/control/gestures.c:73
 msgid "Motion threshold (10-100)"
-msgstr ""
+msgstr "Sogliu di mossa (da 10 à 100)"
 
 #: modules/control/gestures.c:75
 msgid "Amount of movement required for a mouse gesture to be recorded."
-msgstr ""
+msgstr "A quantità di muvimentu richiesta per arregistrà una mossa di topu."
 
 #: modules/control/gestures.c:77
 msgid "Trigger button"
-msgstr ""
+msgstr "Buttone per scruchjà"
 
 #: modules/control/gestures.c:79
 msgid "Trigger button for mouse gestures."
-msgstr ""
+msgstr "Buttone per scruchjà e mosse di u topu."
 
 #: modules/control/gestures.c:85
 msgid "Middle"
@@ -14123,33 +14467,33 @@ msgstr "Mezu"
 
 #: modules/control/gestures.c:88
 msgid "Gestures"
-msgstr "Gesti"
+msgstr "Mosse"
 
 #: modules/control/gestures.c:96
 msgid "Mouse gestures control interface"
-msgstr "Interfaccia di cuntrollu di mosse di topu"
+msgstr "Interfaccia di cuntrollu di e mosse di topu"
 
 #: modules/control/globalhotkeys/win32.c:47
 #: modules/control/globalhotkeys/xcb.c:50
 #: modules/gui/qt/components/preferences_widgets.cpp:1141
 msgid "Global Hotkeys"
-msgstr ""
+msgstr "Tasti d’accurtatoghju glubale"
 
 #: modules/control/globalhotkeys/win32.c:50
 #: modules/control/globalhotkeys/xcb.c:53
 msgid "Global Hotkeys interface"
-msgstr ""
+msgstr "Interfaccia di i tasti d’accurtatoghju glubale"
 
 #: modules/control/hotkeys.c:100
 #: modules/gui/macosx/VLCSimplePrefsController.m:251
 #: modules/gui/qt/components/preferences_widgets.cpp:1140
 #: modules/gui/qt/components/simple_preferences.cpp:258
 msgid "Hotkeys"
-msgstr "Tasti di scelta rapida"
+msgstr "Tasti d’accurtatoghju"
 
 #: modules/control/hotkeys.c:101
 msgid "Hotkeys management interface"
-msgstr ""
+msgstr "Interfaccia di ghjestione di i tasti d’accurtatoghju"
 
 #: modules/control/hotkeys.c:390
 msgid "One"
@@ -14158,17 +14502,17 @@ msgstr "Unu"
 #: modules/control/hotkeys.c:397
 #, c-format
 msgid "Loop: %s"
-msgstr ""
+msgstr "Ripetizione : %s"
 
 #: modules/control/hotkeys.c:404
 #, c-format
 msgid "Random: %s"
-msgstr ""
+msgstr "Aleatoriu : %s"
 
 #: modules/control/hotkeys.c:530
 #, c-format
 msgid "Audio Device: %s"
-msgstr ""
+msgstr "Apparechju audio : %s"
 
 #: modules/control/hotkeys.c:591
 msgid "Recording"
@@ -14176,42 +14520,43 @@ msgstr "Arregistramentu"
 
 #: modules/control/hotkeys.c:591
 msgid "Recording done"
-msgstr ""
+msgstr "Arregistramentu fattu"
 
 #: modules/control/hotkeys.c:606
 msgid "Sub sync: bookmarked audio time"
-msgstr ""
+msgstr "Sincrunizazione sottutituli : durata audio indettata"
 
 #: modules/control/hotkeys.c:621 modules/control/hotkeys.c:690
 msgid "No active subtitle"
-msgstr ""
+msgstr "Nisunu sottutitulu attivu"
 
 #: modules/control/hotkeys.c:627
 msgid "Sub sync: bookmarked subtitle time"
-msgstr ""
+msgstr "Sincrunizazione sottutituli : durata sottutitulu indettata"
 
 #: modules/control/hotkeys.c:647
 msgid "Sub sync: set bookmarks first!"
-msgstr ""
+msgstr "Sincrunizazione sottutituli : da prima, definisce l’indette !"
 
 #: modules/control/hotkeys.c:656
 #, c-format
 msgid "Sub sync: corrected %i ms (total delay = %i ms)"
 msgstr ""
+"Sincrunizazione sottutituli : curretta da %i ms (ritardu tutale = %i ms)"
 
 #: modules/control/hotkeys.c:669
 msgid "Sub sync: delay reset"
-msgstr ""
+msgstr "Sincrunizazione sottutituli : ritardu reiniziatu"
 
 #: modules/control/hotkeys.c:698
 #, c-format
 msgid "Subtitle delay %i ms"
-msgstr ""
+msgstr "Ritardu di u sottutitulu %i ms"
 
 #: modules/control/hotkeys.c:715
 #, c-format
 msgid "Audio delay %i ms"
-msgstr ""
+msgstr "Ritardu di l’audio %i ms"
 
 #: modules/control/hotkeys.c:751
 #, c-format
@@ -14222,7 +14567,7 @@ msgstr "Traccia audio : %s"
 #: modules/control/hotkeys.c:811 modules/control/hotkeys.c:847
 #, c-format
 msgid "Subtitle track: %s"
-msgstr ""
+msgstr "Traccia sottutitulu : %s"
 
 #: modules/control/hotkeys.c:772 modules/control/hotkeys.c:812
 #: modules/control/hotkeys.c:866
@@ -14232,61 +14577,61 @@ msgstr "M/D"
 #: modules/control/hotkeys.c:865 modules/control/hotkeys.c:897
 #, c-format
 msgid "Program Service ID: %s"
-msgstr ""
+msgstr "Ident. di serviziu di u prugramma : %s"
 
 #: modules/control/hotkeys.c:1040
 #, c-format
 msgid "Aspect ratio: %s"
-msgstr ""
+msgstr "Prupurzioni : %s"
 
 #: modules/control/hotkeys.c:1070
 #, c-format
 msgid "Crop: %s"
-msgstr ""
+msgstr "Runzicà : %s"
 
 #: modules/control/hotkeys.c:1144
 msgid "Zooming reset"
-msgstr ""
+msgstr "Reinizià l’ingrandamentu"
 
 #: modules/control/hotkeys.c:1151
 msgid "Scaled to screen"
-msgstr ""
+msgstr "Adattatu à u screnu"
 
 #: modules/control/hotkeys.c:1153
 msgid "Original Size"
-msgstr ""
+msgstr "Dimensione d'origine"
 
 #: modules/control/hotkeys.c:1222
 #, c-format
 msgid "Zoom mode: %s"
-msgstr ""
+msgstr "Modu d’ingrandamentu : %s"
 
 #: modules/control/hotkeys.c:1237 modules/control/hotkeys.c:1294
 msgid "Deinterlace off"
-msgstr ""
+msgstr "Disintricciamentu disattivatu"
 
 #: modules/control/hotkeys.c:1256 modules/control/hotkeys.c:1289
 msgid "Deinterlace on"
-msgstr ""
+msgstr "Disintricciamentu attivatu"
 
 #: modules/control/hotkeys.c:1319
 msgid "Subtitle position: no active subtitle"
-msgstr ""
+msgstr "Pusizione di i sottutituli : nisunu sottutitulu attivu"
 
 #: modules/control/hotkeys.c:1331
 #, c-format
 msgid "Subtitle position %d px"
-msgstr ""
+msgstr "Pusizione di i sottutituli %d px"
 
 #: modules/control/hotkeys.c:1356
 #, c-format
 msgid "Subtitle text scale %d%%"
-msgstr ""
+msgstr "Scala di u testu di i sottutituli %d%%"
 
 #: modules/control/hotkeys.c:1517
 #, c-format
 msgid "Speed: %.2fx"
-msgstr ""
+msgstr "Vitezza : %.2fx"
 
 #: modules/control/intromsg.h:34
 msgid ""
@@ -14295,67 +14640,75 @@ msgid ""
 "go to the directory where you installed VLC and run \"vlc -I qt\"\n"
 msgstr ""
 "\n"
-"Avertimentu : s’ellu ùn hè più pussibule d’accede à u GUI, aprite una "
+"Avertimentu : s’è l’interfaccia grafica ùn hè più accessibile, aprite una "
 "finestra di linea di cumanda, andate à u cartulare induve VLC hè installatu, "
-"è scrivite \"vlc -I qt\"\n"
+"è lanciate « vlc -I qt »\n"
 
 #: modules/control/lirc.c:47
 msgid "Change the lirc configuration file"
-msgstr ""
+msgstr "Cambià u schedariu di cunfigurazione lirc"
 
 #: modules/control/lirc.c:49
 msgid ""
 "Tell lirc to read this configuration file. By default it searches in the "
 "users home directory."
 msgstr ""
+"Indicheghja à lirc di leghje stu schedariu di cunfigurazione. U valore "
+"predefinitu hè di circà in u cartulare persunale di l’utilizatore."
 
 #: modules/control/lirc.c:59
 msgid "Infrared"
-msgstr ""
+msgstr "Infrarossu"
 
 #: modules/control/lirc.c:62
 msgid "Infrared remote control interface"
-msgstr ""
+msgstr "Interfaccia di cuntrollu à distanza da l’infrarossu"
 
 #: modules/control/motion.c:67
 msgid "motion"
-msgstr ""
+msgstr "mossa"
 
 #: modules/control/motion.c:70
 msgid "motion control interface"
-msgstr ""
+msgstr "interfaccia di cuntrollu di a mossa"
 
 #: modules/control/motion.c:71 modules/video_filter/rotate.c:62
 msgid ""
 "Use HDAPS, AMS, APPLESMC or UNIMOTION motion sensors to rotate the video"
 msgstr ""
+"Impiegà i cattori di mossa HDAPS, AMS, APPLESMC o UNIMOTION per fà girà u "
+"filmettu"
 
 #: modules/control/netsync.c:56
 msgid "Network master clock"
-msgstr ""
+msgstr "Arilogiu principale di a reta"
 
 #: modules/control/netsync.c:57
 msgid ""
 "When set, this VLC instance will act as the master clock for synchronization "
 "for clients listening"
 msgstr ""
+"S’è stu parametru hè definitu, st’istanza di VLC agiscerà cum’è l’arilogiu "
+"principale per a sincrunizazione di i clienti in ascolta"
 
 #: modules/control/netsync.c:61
 msgid "Master server IP address"
-msgstr ""
+msgstr "Indirizzu IP di u servitore principale"
 
 #: modules/control/netsync.c:62
 msgid ""
 "The IP address of the network master clock to use for clock synchronization."
 msgstr ""
+"L’indirizzu IP di l’arilogiu principale di a reta da impiegà per a "
+"sincrunizazione d’arilogiu."
 
 #: modules/control/netsync.c:65
 msgid "UDP timeout (in ms)"
-msgstr ""
+msgstr "Cumportu d’attesa UDP (in ms)"
 
 #: modules/control/netsync.c:66
 msgid "Length of time (in ms) until aborting data reception."
-msgstr ""
+msgstr "Durata in ms à aspettà prima d’interrompe a ricezzione di i dati."
 
 #: modules/control/netsync.c:70
 msgid "Network Sync"
@@ -14367,31 +14720,31 @@ msgstr "Sincrunizazione di a reta"
 
 #: modules/control/ntservice.c:46
 msgid "Install Windows Service"
-msgstr ""
+msgstr "Installà u serviziu Windows"
 
 #: modules/control/ntservice.c:48
 msgid "Install the Service and exit."
-msgstr ""
+msgstr "Installà u serviziu è esce."
 
 #: modules/control/ntservice.c:49
 msgid "Uninstall Windows Service"
-msgstr ""
+msgstr "Disinstallà u serviziu Windows"
 
 #: modules/control/ntservice.c:51
 msgid "Uninstall the Service and exit."
-msgstr ""
+msgstr "Disinstallà u serviziu è esce."
 
 #: modules/control/ntservice.c:52
 msgid "Display name of the Service"
-msgstr ""
+msgstr "Nome d’affissera di u serviziu"
 
 #: modules/control/ntservice.c:54
 msgid "Change the display name of the Service."
-msgstr ""
+msgstr "Cambià u nome d’affissera di u serviziu."
 
 #: modules/control/ntservice.c:55
 msgid "Configuration options"
-msgstr ""
+msgstr "Ozzioni di cunfigurazione"
 
 #: modules/control/ntservice.c:57
 msgid ""
@@ -14399,6 +14752,9 @@ msgid ""
 "foobar). It should be specified at install time so the Service is properly "
 "configured."
 msgstr ""
+"Ozzioni di cunfigurazione chì seranu impiegate da u serviziu (p.i. --foo=bar "
+"--no-foobar). Què deve esse specificatu durante l’installazione per chì u "
+"serviziu sia cunfiguratu currettamente."
 
 #: modules/control/ntservice.c:62
 msgid ""
@@ -14406,14 +14762,18 @@ msgid ""
 "install time so the Service is properly configured. Use a comma separated "
 "list of interface modules. (common values are: logger, sap, rc, http)"
 msgstr ""
+"Interfaccie addiziunale ingenerate da u serviziu. Què deve esse specificatu "
+"durante l’installazione per chì u serviziu sia cunfiguratu currettamente. "
+"Impiegà una lista di moduli d’interfaccia staccati da una virgula. (i valori "
+"cumuni sò : logger, sap, rc, http)"
 
 #: modules/control/ntservice.c:68
 msgid "NT Service"
-msgstr ""
+msgstr "Serviziu NT"
 
 #: modules/control/ntservice.c:69
 msgid "Windows Service interface"
-msgstr ""
+msgstr "Interfaccia di u serviziu Windows"
 
 #: modules/control/oldrc.c:68
 msgid "Initializing"
@@ -14421,7 +14781,7 @@ msgstr "Iniziu in corsu"
 
 #: modules/control/oldrc.c:69
 msgid "Opening"
-msgstr ""
+msgstr "Apertura"
 
 #: modules/control/oldrc.c:73 modules/logger/file.c:203
 msgid "Error"
@@ -14429,38 +14789,41 @@ msgstr "Sbagliu"
 
 #: modules/control/oldrc.c:159
 msgid "Show stream position"
-msgstr ""
+msgstr "Affissà a pusizione di u flussu"
 
 #: modules/control/oldrc.c:160
 msgid ""
 "Show the current position in seconds within the stream from time to time."
 msgstr ""
+"Affissà di quandu in quandu a pusizione attuale (in seconde) dentru u flussu."
 
 #: modules/control/oldrc.c:163
 msgid "Fake TTY"
-msgstr ""
+msgstr "TTY fattiziu"
 
 #: modules/control/oldrc.c:164
 msgid "Force the rc module to use stdin as if it was a TTY."
-msgstr ""
+msgstr "Sfurzà u modulu rc da impiegà stdin cum’è s’ellu fussi un TTY."
 
 #: modules/control/oldrc.c:166
 msgid "UNIX socket command input"
-msgstr ""
+msgstr "Entrata di cumanda da socket Unix"
 
 #: modules/control/oldrc.c:167
 msgid "Accept commands over a Unix socket rather than stdin."
-msgstr ""
+msgstr "Accettà e cumande da una socket Unix invece di stdin."
 
 #: modules/control/oldrc.c:170 modules/lua/vlc.c:73
 msgid "TCP command input"
-msgstr ""
+msgstr "Entrata di cumanda da TCP"
 
 #: modules/control/oldrc.c:171 modules/lua/vlc.c:74
 msgid ""
 "Accept commands over a socket rather than stdin. You can set the address and "
 "port the interface will bind to."
 msgstr ""
+"Accettà e cumande da una socket invece di stdin. Si pò definisce l’indirizzu "
+"è u portu nant’à quelli l’interfaccia hà da stà à sente."
 
 #: modules/control/oldrc.c:177
 msgid ""
@@ -14468,216 +14831,235 @@ msgid ""
 "the quiet mode will not bring this command box but can also be pretty "
 "annoying when you want to stop VLC and no video window is open."
 msgstr ""
+"U cumpurtamentu predefinitu di u modulu d’estensione di l’interfaccia rc hè "
+"di lancià un’interfaccia di cumanda DOS. Cù u modu chetu st’interfaccia ùn "
+"hè micca lanciata ma què pò scumudà quandu ci vole à esce da VLC è chì ci hè "
+"nisuna finestra di filmettu d’aperta."
 
 #: modules/control/oldrc.c:187
 msgid "RC"
-msgstr ""
+msgstr "RC"
 
 #: modules/control/oldrc.c:190
 msgid "Remote control interface"
-msgstr ""
+msgstr "Interfaccia di cuntrollu à distanza"
 
 #: modules/control/oldrc.c:370
 msgid "Remote control interface initialized. Type `help' for help."
 msgstr ""
+"Interfaccia di cuntrollu à distanza iniziata. Stampittà « help » per ottene "
+"un aiutu."
 
 #: modules/control/oldrc.c:769
 #, c-format
 msgid "Unknown command `%s'. Type `help' for help."
-msgstr ""
+msgstr "Cumanda scunnisciuta « %s ». Stampittà « help » per ottene un aiutu."
 
 #: modules/control/oldrc.c:787
 msgid "+----[ Remote control commands ]"
-msgstr ""
+msgstr "+----[ Cumande di cuntrollu à distanza ]"
 
 #: modules/control/oldrc.c:789
 msgid "| add XYZ  . . . . . . . . . . . . add XYZ to playlist"
-msgstr "| add XYZ  . . . . . . . . . . . . add XYZ to playlist"
+msgstr "| add XYZ  . . . . . . . . . . . . aghjunghje XYZ à a lista di lettura"
 
 #: modules/control/oldrc.c:790
 msgid "| enqueue XYZ  . . . . . . . . . queue XYZ to playlist"
-msgstr "| enqueue XYZ  . . . . . . . . . queue XYZ to playlist"
+msgstr "| enqueue XYZ  . . . . . . . . . mette XYZ in fila d’attesa"
 
 #: modules/control/oldrc.c:791
 msgid "| playlist . . . . .  show items currently in playlist"
-msgstr "| playlist . . . . .  show items currently in playlist"
+msgstr "| playlist . . . . .  affissà l’elementi attuali in a lista di lettura"
 
 #: modules/control/oldrc.c:792
 msgid "| play . . . . . . . . . . . . . . . . . . play stream"
-msgstr "| play . . . . . . . . . . . . . . . . . . play stream"
+msgstr "| play . . . . . . . . . . . . . . . . . . leghje u flussu"
 
 #: modules/control/oldrc.c:793
 msgid "| stop . . . . . . . . . . . . . . . . . . stop stream"
-msgstr "| stop . . . . . . . . . . . . . . . . . . stop stream"
+msgstr "| stop . . . . . . . . . . . . . . . . . . piantà u flussu"
 
 #: modules/control/oldrc.c:794
 msgid "| next . . . . . . . . . . . . . .  next playlist item"
-msgstr "| next . . . . . . . . . . . . . .  next playlist item"
+msgstr ""
+"| next . . . . . . . . . . . . . .  elementu seguente in a lista di lettura"
 
 #: modules/control/oldrc.c:795
 msgid "| prev . . . . . . . . . . . .  previous playlist item"
-msgstr "| prev . . . . . . . . . . . .  previous playlist item"
+msgstr ""
+"| prev . . . . . . . . . . . .  elementu precedente in a lista di lettura"
 
 #: modules/control/oldrc.c:796
 msgid "| goto . . . . . . . . . . . . . .  goto item at index"
-msgstr "| goto . . . . . . . . . . . . . .  goto item at index"
+msgstr "| goto . . . . . . . . . . . . . .  andà à l’elementu di l’indice"
 
 #: modules/control/oldrc.c:797
 msgid "| repeat [on|off] . . . .  toggle playlist item repeat"
-msgstr "| repeat [on|off] . . . .  toggle playlist item repeat"
+msgstr ""
+"| repeat [on|off] . . . .  attivà o disattivà a ripetizione di l’elementu"
 
 #: modules/control/oldrc.c:798
 msgid "| loop [on|off] . . . . . . . . . toggle playlist loop"
-msgstr "| loop [on|off] . . . . . . . . . toggle playlist loop"
+msgstr ""
+"| loop [on|off] . . . . . . . . . attivà o disattivà a ripetizione di a "
+"lista di lettura"
 
 #: modules/control/oldrc.c:799
 msgid "| random [on|off] . . . . . . .  toggle random jumping"
-msgstr "| random [on|off] . . . . . . .  toggle random jumping"
+msgstr "| random [on|off] . . . . . . .  Attivà o disattivà u saltu aleatoriu"
 
 #: modules/control/oldrc.c:800
 msgid "| clear . . . . . . . . . . . . . . clear the playlist"
-msgstr "| squassà . . . . . . . . . . . . . . viutà a lista di lettura"
+msgstr "| clear . . . . . . . . . . . . . . squassà a lista di lettura"
 
 #: modules/control/oldrc.c:801
 msgid "| status . . . . . . . . . . . current playlist status"
-msgstr "| statu . . . . . . . . . . . current playlist status"
+msgstr "| status . . . . . . . . . . . statu attuale di a lista di lettura"
 
 #: modules/control/oldrc.c:802
 msgid "| title [X]  . . . . . . set/get title in current item"
-msgstr "| title [X]  . . . . . . set/get title in current item"
+msgstr ""
+"| title [X]  . . . . . . definisce o affissà u titulu in l’elementu attuale"
 
 #: modules/control/oldrc.c:803
 msgid "| title_n  . . . . . . . .  next title in current item"
-msgstr "| title_n  . . . . . . . .  next title in current item"
+msgstr "| title_n  . . . . . . . .  titulu seguente in l’elementu attuale"
 
 #: modules/control/oldrc.c:804
 msgid "| title_p  . . . . . .  previous title in current item"
-msgstr "| title_p  . . . . . .  previous title in current item"
+msgstr "| title_p  . . . . . .  titulu precedente in l’elementu attuale"
 
 #: modules/control/oldrc.c:805
 msgid "| chapter [X]  . . . . set/get chapter in current item"
-msgstr "| chapter [X]  . . . . set/get chapter in current item"
+msgstr ""
+"| chapter [X]  . . . . definisce o affissà u capitulu in l’elementu attuale"
 
 #: modules/control/oldrc.c:806
 msgid "| chapter_n  . . . . . .  next chapter in current item"
-msgstr "| chapter_n  . . . . . .  next chapter in current item"
+msgstr "| chapter_n  . . . . . .  capitulu seguente in l’elementu attuale"
 
 #: modules/control/oldrc.c:807
 msgid "| chapter_p  . . . .  previous chapter in current item"
-msgstr "| chapter_p  . . . .  previous chapter in current item"
+msgstr "| chapter_p  . . . .  capitulu precedente in l’elementu attuale"
 
 #: modules/control/oldrc.c:809
 msgid "| seek X . . . seek in seconds, for instance `seek 12'"
-msgstr "| seek X . . . seek in seconds, for instance `seek 12'"
+msgstr "| seek X . . . pusiziunamentu in seconde, p. i. « seek 12 »"
 
 #: modules/control/oldrc.c:810
 msgid "| pause  . . . . . . . . . . . . . . . .  toggle pause"
-msgstr "| pause  . . . . . . . . . . . . . . . .  toggle pause"
+msgstr "| pause  . . . . . . . . . . . . . . . .  attivà o disattivà a pausa"
 
 #: modules/control/oldrc.c:811
 msgid "| fastforward  . . . . . . . .  .  set to maximum rate"
-msgstr "| avanzàinfuria  . . . . . . . .  .  set to maximum rate"
+msgstr "| fastforward  . . . . . . . .  .  definisce a vitezza massima"
 
 #: modules/control/oldrc.c:812
 msgid "| rewind  . . . . . . . . . . . .  set to minimum rate"
-msgstr "| ritrusà  . . . . . . . . . . . .  set to minimum rate"
+msgstr "| rewind  . . . . . . . . . . . .  definisce a vitezza minima"
 
 #: modules/control/oldrc.c:813
 msgid "| faster . . . . . . . . . .  faster playing of stream"
-msgstr "| faster . . . . . . . . . .  faster playing of stream"
+msgstr "| faster . . . . . . . . . .  lettura più rapida di u flussu"
 
 #: modules/control/oldrc.c:814
 msgid "| slower . . . . . . . . . .  slower playing of stream"
-msgstr "| slower . . . . . . . . . .  slower playing of stream"
+msgstr "| slower . . . . . . . . . .  lettura più lenta di u flussu"
 
 #: modules/control/oldrc.c:815
 msgid "| normal . . . . . . . . . .  normal playing of stream"
-msgstr "| normal . . . . . . . . . .  normal playing of stream"
+msgstr "| normal . . . . . . . . . .  lettura nurmale di u flussu"
 
 #: modules/control/oldrc.c:816
 msgid "| frame. . . . . . . . . .  play frame by frame"
-msgstr "| frame. . . . . . . . . .  sunà sequenza da sequenza"
+msgstr "| frame. . . . . . . . . .  lettura fiura dopu à fiura"
 
 #: modules/control/oldrc.c:817
 msgid "| f [on|off] . . . . . . . . . . . . toggle fullscreen"
-msgstr "| f [on|off] . . . . . . . . . . . . toggle fullscreen"
+msgstr "| f [on|off] . . . . . . . . . . . . attivà o disattivà u screnu sanu"
 
 #: modules/control/oldrc.c:818
 msgid "| info . . . . .  information about the current stream"
-msgstr "| info . . . . .  information about the current stream"
+msgstr "| info . . . . .  infurmazione nant’à u flussu attuale"
 
 #: modules/control/oldrc.c:819
 msgid "| stats  . . . . . . . .  show statistical information"
-msgstr "| stats  . . . . . . . .  show statistical information"
+msgstr "| stats  . . . . . . . .  affissà l’infurmazione di statistiche"
 
 #: modules/control/oldrc.c:820
 msgid "| get_time . . seconds elapsed since stream's beginning"
-msgstr "| get_time . . seconds elapsed since stream's beginning"
+msgstr "| get_time . . seconde scorse dapoi u principiu di u flussu"
 
 #: modules/control/oldrc.c:821
 msgid "| is_playing . . . .  1 if a stream plays, 0 otherwise"
-msgstr "| is_playing . . . .  1 if a stream plays, 0 otherwise"
+msgstr "| is_playing . . . .  1 s’è un flussu hè lettu, osinnò 0"
 
 #: modules/control/oldrc.c:822
 msgid "| get_title . . . . .  the title of the current stream"
-msgstr "| get_title . . . . .  the title of the current stream"
+msgstr "| get_title . . . . .  u titulu di u flussu attuale"
 
 #: modules/control/oldrc.c:823
 msgid "| get_length . . . .  the length of the current stream"
-msgstr "| get_length . . . .  the length of the current stream"
+msgstr "| get_length . . . .  a longhezza di u flussu attuale"
 
 #: modules/control/oldrc.c:825
 msgid "| volume [X] . . . . . . . . . .  set/get audio volume"
-msgstr "| volume [X] . . . . . . . . . .  set/get audio volume"
+msgstr "| volume [X] . . . . . . . . . .  definisce o affissà u vulume audio"
 
 #: modules/control/oldrc.c:826
 msgid "| volup [X]  . . . . . . .  raise audio volume X steps"
-msgstr "| volup [X]  . . . . . . .  raise audio volume X steps"
+msgstr "| volup [X]  . . . . . . .  aumentà u vulume audio da X passi"
 
 #: modules/control/oldrc.c:827
 msgid "| voldown [X]  . . . . . .  lower audio volume X steps"
-msgstr "| voldown [X]  . . . . . .  lower audio volume X steps"
+msgstr "| voldown [X]  . . . . . .  diminuisce u vulume audio da X passi"
 
 #: modules/control/oldrc.c:828
 msgid "| adev [device]  . . . . . . . .  set/get audio device"
-msgstr "| adev [device]  . . . . . . . .  set/get audio device"
+msgstr ""
+"| adev [device]  . . . . . . . .  definisce o affissà l’apparechju audio"
 
 #: modules/control/oldrc.c:829
 msgid "| achan [X]. . . . . . . . . .  set/get audio channels"
-msgstr "| achan [X]. . . . . . . . . .  set/get audio channels"
+msgstr "| achan [X]. . . . . . . . . .  definisce o affissà i canali audio"
 
 #: modules/control/oldrc.c:830
 msgid "| atrack [X] . . . . . . . . . . . set/get audio track"
-msgstr "| atrack [X] . . . . . . . . . . . set/get audio track"
+msgstr "| atrack [X] . . . . . . . . . . . definisce o affissà a traccia audio"
 
 #: modules/control/oldrc.c:831
 msgid "| vtrack [X] . . . . . . . . . . . set/get video track"
-msgstr "| vtrack [X] . . . . . . . . . . . set/get video track"
+msgstr "| vtrack [X] . . . . . . . . . . . definisce o affissà a traccia video"
 
 #: modules/control/oldrc.c:832
 msgid "| vratio [X]  . . . . . . . set/get video aspect ratio"
-msgstr "| vratio [X]  . . . . . . . set/get video aspect ratio"
+msgstr ""
+"| vratio [X]  . . . . . . . definisce o affissà a prupurzione di a video"
 
 #: modules/control/oldrc.c:833
 msgid "| vcrop [X]  . . . . . . . . . . .  set/get video crop"
-msgstr "| vcrop [X]  . . . . . . . . . . .  set/get video crop"
+msgstr ""
+"| vcrop [X]  . . . . . . . . . . .  definisce o affissà a runzicatura video"
 
 #: modules/control/oldrc.c:834
 msgid "| vzoom [X]  . . . . . . . . . . .  set/get video zoom"
-msgstr "| vzoom [X]  . . . . . . . . . . .  set/get video zoom"
+msgstr ""
+"| vzoom [X]  . . . . . . . . . . .  definisce o affissà l’ingrandamentu video"
 
 #: modules/control/oldrc.c:835
 msgid "| snapshot . . . . . . . . . . . . take video snapshot"
-msgstr ""
-"| fotò istantanea. . . . . . . . . . . . piglià una fotò istantanea di video"
+msgstr "| snapshot . . . . . . . . . . . . piglià una fotò istantanea di video"
 
 #: modules/control/oldrc.c:836
 msgid "| strack [X] . . . . . . . . .  set/get subtitle track"
-msgstr "| strack [X] . . . . . . . . .  set/get subtitle track"
+msgstr ""
+"| strack [X] . . . . . . . . .  definisce o affissà a traccia di sottutitulu"
 
 #: modules/control/oldrc.c:837
 msgid "| key [hotkey name] . . . . . .  simulate hotkey press"
-msgstr "| key [hotkey name] . . . . . .  simulate hotkey press"
+msgstr ""
+"| key [hotkey name] . . . . . .  simulà un appoghju nant’à un tastu "
+"d’accurtatoghju"
 
 #: modules/control/oldrc.c:839
 msgid "| help . . . . . . . . . . . . . . . this help message"
@@ -14685,28 +15067,28 @@ msgstr "| help . . . . . . . . . . . . . . . stu messaghju d’aiutu"
 
 #: modules/control/oldrc.c:840
 msgid "| logout . . . . . . .  exit (if in socket connection)"
-msgstr "| logout . . . . . . .  exit (if in socket connection)"
+msgstr "| logout . . . . . . .  esce (in casu di cunnessione da socket)"
 
 #: modules/control/oldrc.c:841
 msgid "| quit . . . . . . . . . . . . . . . . . . .  quit vlc"
-msgstr "| quit . . . . . . . . . . . . . . . . . . .  quit vlc"
+msgstr "| quit . . . . . . . . . . . . . . . . . . .  esce da vlc"
 
 #: modules/control/oldrc.c:843
 msgid "+----[ end of help ]"
-msgstr ""
+msgstr "+----[ fine di l’aiutu ]"
 
 #: modules/control/oldrc.c:970
 msgid "Press pause to continue."
-msgstr ""
+msgstr "Appughjà nant’à Pausa per cuntinuà."
 
 #: modules/control/oldrc.c:1194 modules/control/oldrc.c:1443
 #: modules/control/oldrc.c:1487
 msgid "Type 'pause' to continue."
-msgstr ""
+msgstr "Stampittà « pausa » per cuntinuà."
 
 #: modules/control/oldrc.c:1283
 msgid "Error: `goto' needs an argument greater than zero."
-msgstr ""
+msgstr "Sbagliu : « gogo » richiede un argumentu superiore à zeru."
 
 #: modules/control/oldrc.c:1293
 #, c-format
@@ -14717,123 +15099,123 @@ msgstr[1] "A lista di lettura hà solu %u elementi"
 
 #: modules/control/oldrc.c:1739 modules/gui/ncurses.c:810
 msgid "+-[Incoming]"
-msgstr ""
+msgstr "+-[Entrée]"
 
 #: modules/control/oldrc.c:1740 modules/gui/ncurses.c:812
 #, c-format
 msgid "| input bytes read : %8.0f KiB"
-msgstr ""
+msgstr "| ottetti letti d’entrata : %8.0f Kio"
 
 #: modules/control/oldrc.c:1742 modules/gui/ncurses.c:814
 #, c-format
 msgid "| input bitrate    :   %6.0f kb/s"
-msgstr ""
+msgstr "| flussu binariu d’entrata  : %6.0f kbit/s"
 
 #: modules/control/oldrc.c:1744 modules/gui/ncurses.c:816
 #, c-format
 msgid "| demux bytes read : %8.0f KiB"
-msgstr ""
+msgstr "| ottetti letti dimultiplessore : %8.0f Kio"
 
 #: modules/control/oldrc.c:1746 modules/gui/ncurses.c:818
 #, c-format
 msgid "| demux bitrate    :   %6.0f kb/s"
-msgstr ""
+msgstr "| flussu binariu dimultiplessore  : %6.0f kbit/s"
 
 #: modules/control/oldrc.c:1748
 #, c-format
 msgid "| demux corrupted  :    %5<PRIi64>"
-msgstr ""
+msgstr "| dimultiplessore deteriurati : %5<PRIi64>"
 
 #: modules/control/oldrc.c:1750
 #, c-format
 msgid "| discontinuities  :    %5<PRIi64>"
-msgstr ""
+msgstr "| discuntinuità : %5<PRIi64>"
 
 #: modules/control/oldrc.c:1754 modules/gui/ncurses.c:824
 msgid "+-[Video Decoding]"
-msgstr ""
+msgstr "+-[Discudificazione video]"
 
 #: modules/control/oldrc.c:1755 modules/gui/ncurses.c:826
 #, c-format
 msgid "| video decoded    :    %5<PRIi64>"
-msgstr ""
+msgstr "| video discudificata : %5<PRIi64>"
 
 #: modules/control/oldrc.c:1757 modules/gui/ncurses.c:828
 #, c-format
 msgid "| frames displayed :    %5<PRIi64>"
-msgstr ""
+msgstr "| trame affissate : %5<PRIi64>"
 
 #: modules/control/oldrc.c:1759 modules/gui/ncurses.c:830
 #, c-format
 msgid "| frames lost      :    %5<PRIi64>"
-msgstr ""
+msgstr "| trame perse : %5<PRIi64>"
 
 #: modules/control/oldrc.c:1763 modules/gui/ncurses.c:836
 msgid "+-[Audio Decoding]"
-msgstr ""
+msgstr "+-[Discudificazione audio]"
 
 #: modules/control/oldrc.c:1764 modules/gui/ncurses.c:838
 #, c-format
 msgid "| audio decoded    :    %5<PRIi64>"
-msgstr ""
+msgstr "| audio discudificata : %5<PRIi64>"
 
 #: modules/control/oldrc.c:1766 modules/gui/ncurses.c:840
 #, c-format
 msgid "| buffers played   :    %5<PRIi64>"
-msgstr ""
+msgstr "| stamponi affissati : %5<PRIi64>"
 
 #: modules/control/oldrc.c:1768 modules/gui/ncurses.c:842
 #, c-format
 msgid "| buffers lost     :    %5<PRIi64>"
-msgstr ""
+msgstr "| stamponi persi : %5<PRIi64>"
 
 #: modules/control/win_msg.c:192
 msgid "WinMsg"
-msgstr ""
+msgstr "WinMsg"
 
 #: modules/control/win_msg.c:193
 msgid "Windows messages interface"
-msgstr ""
+msgstr "Interfaccia di messaghji Windows"
 
 #: modules/demux/adaptive/adaptive.cpp:71
 msgid "Maximum device width"
-msgstr ""
+msgstr "Larghezza massima di l’apparechju"
 
 #: modules/demux/adaptive/adaptive.cpp:72
 msgid "Maximum device height"
-msgstr ""
+msgstr "Altezza massima di l’apparechju"
 
 #: modules/demux/adaptive/adaptive.cpp:74
 msgid "Fixed Bandwidth in KiB/s"
-msgstr ""
+msgstr "Larghezza di striscia fissa in Kio/s"
 
 #: modules/demux/adaptive/adaptive.cpp:75
 msgid "Preferred bandwidth for non adaptive streams"
-msgstr ""
+msgstr "Larghezza di striscia preferita per i flussi non adattattivi"
 
 #: modules/demux/adaptive/adaptive.cpp:77
 msgid "Live Playback delay (ms)"
-msgstr ""
+msgstr "Ritardu di lettura in vivu (ms)"
 
 #: modules/demux/adaptive/adaptive.cpp:78
 msgid "Tradeoff between stability and real time"
-msgstr ""
+msgstr "Cumprumessu trà a stabilità è u tempu reale"
 
 #: modules/demux/adaptive/adaptive.cpp:80
 msgid "Max buffering (ms)"
-msgstr ""
+msgstr "Stampone massimu (ms)"
 
 #: modules/demux/adaptive/adaptive.cpp:82
 msgid "Adaptive Logic"
-msgstr ""
+msgstr "Logica adattattiva"
 
 #: modules/demux/adaptive/adaptive.cpp:84
 msgid "Use regular HTTP modules"
-msgstr ""
+msgstr "Impiegà moduli HTTP regulari"
 
 #: modules/demux/adaptive/adaptive.cpp:85
 msgid "Connect using HTTP access instead of custom HTTP code"
-msgstr ""
+msgstr "Cunnessione via l’accessu HTTP invece di u codice HTTP persunalizatu"
 
 #: modules/demux/adaptive/adaptive.cpp:87
 #: modules/gui/qt/components/simple_preferences.cpp:713
@@ -14842,113 +15224,116 @@ msgstr "Cumportu d’attesa bassu"
 
 #: modules/demux/adaptive/adaptive.cpp:88
 msgid "Overrides low latency parameters"
-msgstr ""
+msgstr "Rimpiazzeghja i parametri di cumportu d’attesa bassu"
 
 #: modules/demux/adaptive/adaptive.cpp:109
 msgid "Predictive"
-msgstr ""
+msgstr "Predittiva"
 
 #: modules/demux/adaptive/adaptive.cpp:110
 msgid "Near Optimal"
-msgstr ""
+msgstr "Quasi ottimale"
 
 #: modules/demux/adaptive/adaptive.cpp:111
 msgid "Bandwidth Adaptive"
-msgstr ""
+msgstr "Larghezza di striscia adattattiva"
 
 #: modules/demux/adaptive/adaptive.cpp:112
 msgid "Fixed Bandwidth"
-msgstr ""
+msgstr "Larghezza di striscia fissa"
 
 #: modules/demux/adaptive/adaptive.cpp:113
 msgid "Lowest Bandwidth/Quality"
-msgstr ""
+msgstr "Larghezza di striscia / Qualità più bassa"
 
 #: modules/demux/adaptive/adaptive.cpp:114
 msgid "Highest Bandwidth/Quality"
-msgstr ""
+msgstr "Larghezza di striscia / Qualità più alta"
 
 #: modules/demux/adaptive/adaptive.cpp:125
 msgid "Force"
-msgstr "Sfurzà"
+msgstr "Forza"
 
 #: modules/demux/adaptive/adaptive.cpp:129
 msgid "Adaptive"
-msgstr ""
+msgstr "Adattattiva"
 
 #: modules/demux/adaptive/adaptive.cpp:130
 msgid "Unified adaptive streaming for DASH/HLS"
-msgstr ""
+msgstr "Diffusione adattattiva unificata per DASH/HLS"
 
 #: modules/demux/aiff.c:50
 msgid "AIFF demuxer"
-msgstr ""
+msgstr "Dimultiplessore AIFF"
 
 #: modules/demux/asf/asf.c:62
 msgid "ASF/WMV demuxer"
-msgstr ""
+msgstr "Dimultiplessore ASF/WMV"
 
 #: modules/demux/asf/asf.c:285 modules/demux/asf/asf.c:836
 msgid "Could not demux ASF stream"
-msgstr ""
+msgstr "Impussibule di dimultiplessà u flussu ASF"
 
 #: modules/demux/asf/asf.c:286
 msgid "VLC failed to load the ASF header."
-msgstr ""
+msgstr "VLC ùn hè micca riesciutu à caricà l’intestatura ASF."
 
 #: modules/demux/au.c:51
 msgid "AU demuxer"
-msgstr ""
+msgstr "Dimultiplessore AU"
 
 #: modules/demux/avformat/avformat.c:41
 msgid "Avformat demuxer"
-msgstr ""
+msgstr "Dimultiplessore Avformat"
 
 #: modules/demux/avformat/avformat.c:42
 msgid "Avformat"
-msgstr ""
+msgstr "Avformat"
 
 #: modules/demux/avformat/avformat.c:45
 msgid "Demuxer"
-msgstr ""
+msgstr "Dimultiplessore"
 
 #: modules/demux/avformat/avformat.c:54
 msgid "Avformat muxer"
-msgstr ""
+msgstr "Multiplessore Avformat"
 
 #: modules/demux/avformat/avformat.c:56 modules/stream_out/rtp.c:87
 msgid "Muxer"
-msgstr "Muxer"
+msgstr "Multiplessore"
 
 #: modules/demux/avformat/avformat.h:35
 msgid "Avformat mux"
-msgstr ""
+msgstr "Multiplezzione Avformat"
 
 #: modules/demux/avformat/avformat.h:36
 msgid "Force use of a specific avformat muxer."
-msgstr ""
+msgstr "Sfurzà l’impiegu d’un multiplessore avformat specificu."
 
 #: modules/demux/avformat/avformat.h:37
 msgid "Format name"
-msgstr ""
+msgstr "Nome di furmatu"
 
 #: modules/demux/avformat/avformat.h:38
 msgid "Internal libavcodec format name"
-msgstr ""
+msgstr "Nome di furmatu internu libavcodec"
 
 #: modules/demux/avi/avi.c:56
 msgid "Force interleaved method"
-msgstr ""
+msgstr "Sfurzà a metoda avvinculata"
 
 #: modules/demux/avi/avi.c:58
 msgid "Force index creation"
-msgstr ""
+msgstr "Sfurzà a creazione di l’indice"
 
 #: modules/demux/avi/avi.c:60
 msgid ""
 "Recreate a index for the AVI file. Use this if your AVI file is damaged or "
 "incomplete (not seekable)."
 msgstr ""
+"Ricreazione d’un indice per u schedariu AVI. Impiegà què s’è u vostru "
+"schedariu AVI hè dannighjatu o incumpletu (ùn permette micca u "
+"pusiziunamentu)."
 
 #: modules/demux/avi/avi.c:68
 msgid "Ask for action"
@@ -14968,7 +15353,7 @@ msgstr "Currege quandu necessariu"
 
 #: modules/demux/avi/avi.c:75
 msgid "AVI demuxer"
-msgstr ""
+msgstr "Dimultiplessore AVI"
 
 #: modules/demux/avi/avi.c:920 modules/demux/mp4/mp4.c:4382
 msgid ""
@@ -14979,138 +15364,144 @@ msgid ""
 "This step might take a long time on a large file.\n"
 "What do you want to do?"
 msgstr ""
-"Because this file index is broken or missing, seeking will not work "
-"correctly.\n"
-"VLC won't repair your file but can temporary fix this problem by building an "
-"index in memory.\n"
-"This step might take a long time on a large file.\n"
+"Perchè stu schedariu d’indice hè dannighjatu o assente, u pusiziunamentu ùn "
+"funziunerà micca currettamente.\n"
+"VLC ùn riparerà micca u vostru schedariu ma pò currege timpurariamente stu "
+"prublema custruiscendu un indice in memoria.\n"
+"Sta tappa pò durà un bellu pezzu cù un schedariu maiò.\n"
 "Cosa vulete fa ?"
 
 #: modules/demux/avi/avi.c:928
 msgid "Do not play"
-msgstr "Ùn sunà micca"
+msgstr "Ùn micca leghje"
 
 #: modules/demux/avi/avi.c:929
 msgid "Build index then play"
-msgstr ""
+msgstr "Custruisce l’indice eppò lancià a lettura"
 
 #: modules/demux/avi/avi.c:930
 msgid "Play as is"
-msgstr ""
+msgstr "Leghje tale è quale"
 
 #: modules/demux/avi/avi.c:931 modules/demux/mp4/mp4.c:4393
 msgid "Broken or missing Index"
-msgstr ""
+msgstr "Indice dannighjatu o assente"
 
 #: modules/demux/avi/avi.c:2889
 msgid "Broken or missing AVI Index"
-msgstr ""
+msgstr "Indice AVI dannighjatu o assente"
 
 #: modules/demux/avi/avi.c:2890
 msgid "Fixing AVI Index..."
-msgstr ""
+msgstr "Currezzione di l’indice AVI…"
 
 #: modules/demux/caf.c:53
 msgid "CAF demuxer"
-msgstr ""
+msgstr "Dimultiplessore CAF"
 
 #: modules/demux/cdg.c:43
 msgid "CDG demuxer"
-msgstr ""
+msgstr "Dimultiplessore CDG"
 
 #: modules/demux/demuxdump.c:32
 msgid "Dump module"
-msgstr ""
+msgstr "Modulu di viutatura"
 
 #: modules/demux/demuxdump.c:33
 msgid "Dump filename"
-msgstr ""
+msgstr "Nome di schedariu di viutatura"
 
 #: modules/demux/demuxdump.c:35
 msgid "Name of the file to which the raw stream will be dumped."
-msgstr ""
+msgstr "Nome di u schedariu induve u flussu grossu serà viutatu."
 
 #: modules/demux/demuxdump.c:36
 msgid "Append to existing file"
-msgstr ""
+msgstr "Aghjunghje à a fine di u schedariu esistente"
 
 #: modules/demux/demuxdump.c:38
 msgid "If the file already exists, it will not be overwritten."
-msgstr ""
+msgstr "S’ellu esiste dighjà, u schedariu serà rimpiazzatu."
 
 #: modules/demux/demuxdump.c:47
 msgid "File dumper"
-msgstr ""
+msgstr "Viutatore di schedariu"
 
 #: modules/demux/dirac.c:41
 msgid "Value to adjust dts by"
-msgstr ""
+msgstr "Valore per accumudà u dts"
 
 #: modules/demux/dirac.c:54
 msgid "Dirac video demuxer"
-msgstr ""
+msgstr "Dimultiplessore video Dirac"
 
 #: modules/demux/directory.c:94
 msgid "Directory import"
-msgstr ""
+msgstr "Impurtazione di cartulare"
 
 #: modules/demux/filter/noseek.c:79
 msgid "Seek prevention demux filter"
-msgstr ""
+msgstr "Filtru dimultiplessore di prevenimentu di u pusiziunamentu"
 
 #: modules/demux/flac.c:52
 msgid "FLAC demuxer"
-msgstr ""
+msgstr "Dimultiplessore FLAC"
 
 #: modules/demux/image.c:44
 msgid "ES ID"
-msgstr ""
+msgstr "Identificazione ES"
 
 #: modules/demux/image.c:52
 msgid "Decode"
-msgstr ""
+msgstr "Discudificà"
 
 #: modules/demux/image.c:54
 msgid "Decode at the demuxer stage"
-msgstr ""
+msgstr "Discudificà à u mumentu di u dimultiplessore"
 
 #: modules/demux/image.c:56
 msgid "Forced chroma"
-msgstr ""
+msgstr "Crominanza sfurzata"
 
 #: modules/demux/image.c:58
 msgid ""
 "If non empty and image-decode is true, the image will be converted to the "
 "specified chroma."
 msgstr ""
+"S’ella ùn hè micca viota è s’è a discudificazione di a fiura hè vera, tandu "
+"a fiura serà cunvertita à a crominanza specificata."
 
 #: modules/demux/image.c:61
 msgid "Duration in seconds"
-msgstr ""
+msgstr "Durata in seconde"
 
 #: modules/demux/image.c:63
 msgid ""
 "Duration in seconds before simulating an end of file. A negative value means "
 "an unlimited play time."
 msgstr ""
+"Durata in seconde prima di simulà una fine di schedariu. Un valore nigativu "
+"vole dì una durata di lettura senza limitu."
 
 #: modules/demux/image.c:68
 msgid "Frame rate of the elementary stream produced."
-msgstr ""
+msgstr "Frequenza di fiura di u flussu elementariu pruduttu."
 
 #: modules/demux/image.c:70
 msgid "Real-time"
-msgstr ""
+msgstr "Tempu reale"
 
 #: modules/demux/image.c:72
 msgid ""
 "Use real-time mode suitable for being used as a master input and real-time "
 "input slaves."
 msgstr ""
+"Impiegà u modu tempu reale chì hè apprupriatu per un entrata principale è "
+"entrate secundarie in tempu reale."
 
 #: modules/demux/image.c:76
 msgid "Image demuxer"
-msgstr ""
+msgstr "Dimultiplessore di fiura"
 
 #: modules/demux/image.c:77
 msgid "Image"
@@ -15121,150 +15512,165 @@ msgstr "Fiura"
 #: modules/demux/subtitle.c:78 modules/demux/vc1.c:43
 #: modules/gui/macosx/VLCOpenWindowController.m:208
 msgid "Frames per Second"
-msgstr ""
+msgstr "Trame à a seconda"
 
 #: modules/demux/mjpeg.c:47
 msgid ""
 "This is the desired frame rate when playing MJPEG from a file. Use 0 (this "
 "is the default value) for a live stream (from a camera)."
 msgstr ""
+"Què hè a sequenza di fiura vulsuta quandu si leghje un MJPEG da un "
+"schedariu. Impiegà 0 (valore predefinitu) per una diffusione in vivu (da un "
+"apparechju’fotò)."
 
 #: modules/demux/mjpeg.c:53
 msgid "M-JPEG camera demuxer"
-msgstr ""
+msgstr "Dimultiplessore d’apparechju-fotò M-JPEG"
 
 #: modules/demux/mkv/mkv.cpp:54
 msgid "Matroska stream demuxer"
-msgstr ""
+msgstr "Dimultiplessore di flussu Matroska"
 
 #: modules/demux/mkv/mkv.cpp:61
 msgid "Respect ordered chapters"
-msgstr ""
+msgstr "Rispettà l’ordine di i capituli"
 
 #: modules/demux/mkv/mkv.cpp:62
 msgid "Play chapters in the order specified in the segment."
-msgstr ""
+msgstr "Leghje i capituli in l’ordine specificatu in u segmentu."
 
 #: modules/demux/mkv/mkv.cpp:65
 msgid "Chapter codecs"
-msgstr ""
+msgstr "Cudecu di i capituli"
 
 #: modules/demux/mkv/mkv.cpp:66
 msgid "Use chapter codecs found in the segment."
-msgstr ""
+msgstr "Impiegà i cudechi di i capituli trovi in u segmentu."
 
 #: modules/demux/mkv/mkv.cpp:69 modules/gui/qt/ui/sprefs_input.h:367
 msgid "Preload MKV files in the same directory"
-msgstr ""
+msgstr "Precaricà i schedarii MKV in u listessu cartulare"
 
 #: modules/demux/mkv/mkv.cpp:70
 msgid ""
 "Preload matroska files in the same directory to find linked segments (not "
 "good for broken files)."
 msgstr ""
+"Precaricà i schedarii matroska in u listessu cartulare per truvà i segmenti "
+"ligati (non addattati à i schedarii dannighjati)."
 
 #: modules/demux/mkv/mkv.cpp:73 modules/demux/mpeg/ts.c:113
 msgid "Seek based on percent not time"
-msgstr ""
+msgstr "Pusiziunamentu basatu nant’à u percentuale è micca nant’à u tempu"
 
 #: modules/demux/mkv/mkv.cpp:74
 msgid "Seek based on percent not time."
-msgstr ""
+msgstr "Pusiziunamentu basatu nant’à u percentuale è micca nant’à u tempu."
 
 #: modules/demux/mkv/mkv.cpp:77
 msgid "Dummy Elements"
-msgstr ""
+msgstr "Elementi fattizii"
 
 #: modules/demux/mkv/mkv.cpp:78
 msgid "Read and discard unknown EBML elements (not good for broken files)."
 msgstr ""
+"Leghje è tralascià l’elementi EBML scunnisciuti (non addattati à i schedarii "
+"dannighjati)."
 
 #: modules/demux/mkv/mkv.cpp:81
 msgid "Preload clusters"
-msgstr ""
+msgstr "Precaricà l’unità d’allucamentu"
 
 #: modules/demux/mkv/mkv.cpp:82
 msgid ""
 "Find all cluster positions by jumping cluster-to-cluster before playback"
 msgstr ""
+"Truvà tutte e pusizioni d’unità d’allucamentu saltendu d’unità à unità prima "
+"a lettura"
 
 #: modules/demux/mod.c:55
 msgid "Enable noise reduction algorithm."
-msgstr ""
+msgstr "Attivà a metoda di calculu di riduzzione di trostu."
 
 #: modules/demux/mod.c:56
 msgid "Enable reverberation"
-msgstr ""
+msgstr "Attivà a riverberazione"
 
 #: modules/demux/mod.c:57
 msgid "Reverberation level (from 0 to 100, default value is 0)."
-msgstr ""
+msgstr "Livellu di riverberazione : da 0 (predefinitu) à 100."
 
 #: modules/demux/mod.c:59
 msgid "Reverberation delay, in ms. Usual values are from 40 to 200ms."
 msgstr ""
+"Ritardu di riverberazione, in milliseconde. I valori di solitu sò da 40 à "
+"200 ms."
 
 #: modules/demux/mod.c:61
 msgid "Enable megabass mode"
-msgstr ""
+msgstr "Attivà u modu megabassu"
 
 #: modules/demux/mod.c:62
 msgid "Megabass mode level (from 0 to 100, default value is 0)."
-msgstr ""
+msgstr "Livellu di u modu megabassu : da 0 (predefinitu) à 100."
 
 #: modules/demux/mod.c:64
 msgid ""
 "Megabass mode cutoff frequency, in Hz. This is the maximum frequency for "
 "which the megabass effect applies. Valid values are from 10 to 100 Hz."
 msgstr ""
+"Frequenza di tagliatura di u modu megabassu, in Hz. Què hè a frequenza "
+"massima per cui l’effettu megabassu s’appiecheghja. I valori accettevule sò "
+"da 10 à 100 Hz."
 
 #: modules/demux/mod.c:67
 msgid "Surround effect level (from 0 to 100, default value is 0)."
-msgstr ""
+msgstr "Livellu d’effettu Surround : da 0 (predefinitu) à 100."
 
 #: modules/demux/mod.c:69
 msgid "Surround delay, in ms. Usual values are from 5 to 40 ms."
 msgstr ""
+"Ritardu di Surround, in milliseconde. I valori di solitu sò da 5 à 40 ms."
 
 #: modules/demux/mod.c:74
 msgid "MOD demuxer (libmodplug)"
-msgstr ""
+msgstr "Dimultiplessore MOD (libmodplug)"
 
 #: modules/demux/mod.c:85
 msgid "Reverberation level"
-msgstr ""
+msgstr "Livellu di riverberazione"
 
 #: modules/demux/mod.c:87
 msgid "Reverberation delay"
-msgstr ""
+msgstr "Ritardu di riverberazione"
 
 #: modules/demux/mod.c:89
 msgid "Mega bass"
-msgstr ""
+msgstr "Magabassu"
 
 #: modules/demux/mod.c:92
 msgid "Mega bass level"
-msgstr ""
+msgstr "Livellu di megabassu"
 
 #: modules/demux/mod.c:94
 msgid "Mega bass cutoff"
-msgstr ""
+msgstr "Frequenza di tagliatura di magabassu"
 
 #: modules/demux/mod.c:96
 msgid "Surround"
-msgstr ""
+msgstr "Surround"
 
 #: modules/demux/mod.c:99
 msgid "Surround level"
-msgstr ""
+msgstr "Livellu di Surround"
 
 #: modules/demux/mod.c:101
 msgid "Surround delay (ms)"
-msgstr ""
+msgstr "Ritardu di Surround (ms)"
 
 #: modules/demux/mp4/meta.c:68
 msgid "Writer"
-msgstr ""
+msgstr "Autore"
 
 #: modules/demux/mp4/meta.c:69
 msgid "Composer"
@@ -15282,7 +15688,7 @@ msgstr "Infurmazione"
 
 #: modules/demux/mp4/meta.c:72
 msgid "Disclaimer"
-msgstr ""
+msgstr "Avisu di non rispunsabilità"
 
 #: modules/demux/mp4/meta.c:73
 msgid "Requirements"
@@ -15290,27 +15696,27 @@ msgstr "Cundizioni richieste"
 
 #: modules/demux/mp4/meta.c:74
 msgid "Original Format"
-msgstr ""
+msgstr "Furmatu uriginale"
 
 #: modules/demux/mp4/meta.c:75
 msgid "Display Source As"
-msgstr ""
+msgstr "Affissà a fonte cum’è"
 
 #: modules/demux/mp4/meta.c:76
 msgid "Host Computer"
-msgstr ""
+msgstr "Urdinatore ospite"
 
 #: modules/demux/mp4/meta.c:77
 msgid "Performers"
-msgstr ""
+msgstr "Interpreti"
 
 #: modules/demux/mp4/meta.c:78
 msgid "Original Performer"
-msgstr ""
+msgstr "Interprete uriginale"
 
 #: modules/demux/mp4/meta.c:79
 msgid "Providers Source Content"
-msgstr ""
+msgstr "Cuntenutu di a fonte di u furnidore"
 
 #: modules/demux/mp4/meta.c:80 modules/logger/file.c:203
 msgid "Warning"
@@ -15327,7 +15733,7 @@ msgstr "Parolle"
 
 #: modules/demux/mp4/meta.c:83
 msgid "Record Company"
-msgstr "Casa di discu"
+msgstr "Casa discografica"
 
 #: modules/demux/mp4/meta.c:84
 msgid "Model"
@@ -15351,7 +15757,7 @@ msgstr "Accunciatore"
 
 #: modules/demux/mp4/meta.c:90
 msgid "Art Director"
-msgstr "Direttore Artisticu"
+msgstr "Direttore artisticu"
 
 #: modules/demux/mp4/meta.c:91
 msgid "Copyright Acknowledgement"
@@ -15359,23 +15765,23 @@ msgstr "Ricunniscenza di diritti d’autore"
 
 #: modules/demux/mp4/meta.c:92
 msgid "Conductor"
-msgstr "Sceffu d'Orchestru"
+msgstr "Sceffu d'orchestru"
 
 #: modules/demux/mp4/meta.c:93
 msgid "Song Description"
-msgstr "Discrizzione di a Canzona"
+msgstr "Discrizzione di a canzona"
 
 #: modules/demux/mp4/meta.c:94
 msgid "Liner Notes"
-msgstr ""
+msgstr "Note di cuprendula"
 
 #: modules/demux/mp4/meta.c:95
 msgid "Phonogram Rights"
-msgstr ""
+msgstr "Diritti fonografichi"
 
 #: modules/demux/mp4/meta.c:97
 msgid "Sound Engineer"
-msgstr "Ingenieru di Sonu"
+msgstr "Ingenieru di u sonu"
 
 #: modules/demux/mp4/meta.c:98
 msgid "Soloist"
@@ -15387,11 +15793,11 @@ msgstr "Ringraziamenti"
 
 #: modules/demux/mp4/meta.c:100
 msgid "Executive Producer"
-msgstr "Pruduttore Esecutivu"
+msgstr "Pruduttore esecutivu"
 
 #: modules/demux/mp4/meta.c:102
 msgid "Encoding Params"
-msgstr "Parametri di Cudificazione"
+msgstr "Parametri di cudificazione"
 
 #: modules/demux/mp4/meta.c:103 modules/demux/mp4/meta.c:139
 msgid "Vendor"
@@ -15399,7 +15805,7 @@ msgstr "Venditore"
 
 #: modules/demux/mp4/meta.c:104
 msgid "Catalog Number"
-msgstr "Numeru di Catalogu"
+msgstr "Numeru di catalogu"
 
 #: modules/demux/mp4/meta.c:138 modules/mux/avi.c:57
 msgid "Keywords"
@@ -15419,11 +15825,11 @@ msgstr "Solu audio M4A"
 
 #: modules/demux/mp4/mp4.c:52
 msgid "Ignore non audio tracks from iTunes audio files"
-msgstr ""
+msgstr "Ignurà e traccie non audio in i schedarii audio iTunes"
 
 #: modules/demux/mp4/mp4.c:57
 msgid "MP4 stream demuxer"
-msgstr ""
+msgstr "Dimultiplessore di flussu MP4"
 
 #: modules/demux/mp4/mp4.c:58
 msgid "MP4"
@@ -15435,49 +15841,51 @@ msgstr "Ùn pusiziunà micca"
 
 #: modules/demux/mp4/mp4.c:4391
 msgid "Build index"
-msgstr "Custruzzione di l’indice"
+msgstr "Custruisce l’indice"
 
 #: modules/demux/mpc.c:63
 msgid "MusePack demuxer"
-msgstr ""
+msgstr "Dimultiplessore MusePack"
 
 #: modules/demux/mpeg/es.c:54
 msgid ""
 "This is the frame rate used as a fallback when playing MPEG video elementary "
 "streams."
 msgstr ""
+"Què hè a sequenza di fiura impiegata cum’è alternativa quandu si leghje i "
+"flussi elementarii video MPEG."
 
 #: modules/demux/mpeg/es.c:60
 msgid "MPEG-I/II/4 / A52 / DTS / MLP audio"
-msgstr ""
+msgstr "Audio MPEG-I/II/4 / A52 / DTS / MLP"
 
 #: modules/demux/mpeg/es.c:61
 msgid "Audio ES"
-msgstr ""
+msgstr "Audio ES"
 
 #: modules/demux/mpeg/es.c:73
 msgid "MPEG-4 video"
-msgstr ""
+msgstr "Video MPEG-4"
 
 #: modules/demux/mpeg/h26x.c:47
 msgid "Desired frame rate for the stream."
-msgstr ""
+msgstr "Sequenza di fiura vulsuta per u flussu."
 
 #: modules/demux/mpeg/h26x.c:53 modules/demux/mpeg/h26x.c:55
 msgid "H264 video demuxer"
-msgstr ""
+msgstr "Dimultiplessore video H264"
 
 #: modules/demux/mpeg/h26x.c:64 modules/demux/mpeg/h26x.c:66
 msgid "HEVC/H.265 video demuxer"
-msgstr ""
+msgstr "Dimultiplessore video HEVC/H.265"
 
 #: modules/demux/mpeg/mpgv.c:46
 msgid "MPEG-I/II video demuxer"
-msgstr ""
+msgstr "Dimultiplessore video MPEG-I/II"
 
 #: modules/demux/mpeg/ps.c:44
 msgid "Trust MPEG timestamps"
-msgstr ""
+msgstr "Fà cunfidenza à e stampiglie MPEG"
 
 #: modules/demux/mpeg/ps.c:45
 msgid ""
@@ -15485,26 +15893,31 @@ msgid ""
 "duration. However sometimes this might not be usable. Disable this option to "
 "calculate from the bitrate instead."
 msgstr ""
+"Di regula, impieghemu e stampiglie di i schedarii MPEG per calculà a "
+"pusizione è a durata. Sarrimanenti, ognitantu, ùn si pò micca impiegà què. "
+"Disattivà st’ozzione per calculà piuttostu da u flussu binariu."
 
 #: modules/demux/mpeg/ps.c:62 modules/demux/mpeg/ps.c:75
 msgid "MPEG-PS demuxer"
-msgstr ""
+msgstr "Dimultiplessore MPEG-PS"
 
 #: modules/demux/mpeg/ps.c:63
 msgid "PS"
-msgstr ""
+msgstr "PS"
 
 #: modules/demux/mpeg/ts.c:84
 msgid "Extra PMT"
-msgstr ""
+msgstr "PMT addiziunale"
 
 #: modules/demux/mpeg/ts.c:86
 msgid "Allows a user to specify an extra pmt (pmt_pid=pid:stream_type[,...])."
 msgstr ""
+"Permette à l’utilizatore di specificà un pmt addiziunale "
+"(pmt_pid=pid:tipu_di_flussu[,…])."
 
 #: modules/demux/mpeg/ts.c:88
 msgid "Set id of ES to PID"
-msgstr ""
+msgstr "Definisce u PID cum’è identificazione di l’ES"
 
 #: modules/demux/mpeg/ts.c:89
 msgid ""
@@ -15512,89 +15925,105 @@ msgid ""
 "value as the PID in the TS stream, instead of 1, 2, 3, etc. Useful to do "
 "'#duplicate{..., select=\"es=<pid>\"}'."
 msgstr ""
+"Definisce l’identificazione interna d’ogni flussu elementariu manighjata da "
+"VLC à u listessu valore di u PID in u flussu TS, invece di 1, 2, 3, ecc. "
+"Ghjuvevule per fà « #duplicate{..., select=\"es=<pid>\"} »."
 
 #: modules/demux/mpeg/ts.c:94 modules/mux/mpeg/ts.c:173
 msgid "CSA Key"
-msgstr ""
+msgstr "Chjave CSA"
 
 #: modules/demux/mpeg/ts.c:95 modules/mux/mpeg/ts.c:174
 msgid ""
 "CSA encryption key. This must be a 16 char string (8 hexadecimal bytes)."
 msgstr ""
+"Chjave di cifratura CSA. Deve esse una catena di 16 caratteri (8 ottetti "
+"esadecimali)."
 
 #: modules/demux/mpeg/ts.c:98 modules/mux/mpeg/ts.c:177
 msgid "Second CSA Key"
-msgstr ""
+msgstr "Seconda chjave CSA"
 
 #: modules/demux/mpeg/ts.c:99 modules/mux/mpeg/ts.c:178
 msgid ""
 "The even CSA encryption key. This must be a 16 char string (8 hexadecimal "
 "bytes)."
 msgstr ""
+"A chjave para di cifratura CSA. Deve esse una catena di 16 caratteri (8 "
+"ottetti esadecimali)."
 
 #: modules/demux/mpeg/ts.c:103
 msgid "Packet size in bytes to decrypt"
-msgstr ""
+msgstr "Dimensione di pacchettu da dicifrà, in ottetti"
 
 #: modules/demux/mpeg/ts.c:104
 msgid ""
 "Specify the size of the TS packet to decrypt. The decryption routines "
 "subtract the TS-header from the value before decrypting."
 msgstr ""
+"Specificà a dimensione di u pacchettu TS da dicifrà. E rutine di dicifratura "
+"suttraenu l’intestatura TS da u valore prima di dicifrà."
 
 #: modules/demux/mpeg/ts.c:108
 msgid "Separate sub-streams"
-msgstr ""
+msgstr "Staccà i sottuflussi"
 
 #: modules/demux/mpeg/ts.c:110
 msgid ""
 "Separate teletex/dvbs pages into independent ES. It can be useful to turn "
 "off this option when using stream output."
 msgstr ""
+"Staccà e pagine teletestu/dvbs in ES indipendenti. Si pò esse ghjuvevule di "
+"disattivà st’ozzione quandu s’impiegheghja un flussu d’esciuta."
 
 #: modules/demux/mpeg/ts.c:115
 msgid ""
 "Seek and position based on a percent byte position, not a PCR generated time "
 "position. If seeking doesn't work property, turn on this option."
 msgstr ""
+"Ricerca è pusizione basate nant’à un percentuale di pusizione d’ottettu, "
+"invece d’una pusizione di tempu PCR ingeneratu. S’è u pusiziunamentu ùn "
+"funziuneghja micca currettamente, attivà st’ozzione."
 
 #: modules/demux/mpeg/ts.c:126
 msgid "Trust in-stream PCR"
-msgstr ""
+msgstr "Fà cunfidenza à u flussu PCR in entrata"
 
 #: modules/demux/mpeg/ts.c:127
 msgid "Use the stream PCR as a reference."
-msgstr ""
+msgstr "Impiegà u flussu PCR cum’è una referenza."
 
 #: modules/demux/mpeg/ts.c:134 modules/mux/mpeg/ts.c:100
 msgid "Digital TV Standard"
-msgstr ""
+msgstr "Norma TV numerica"
 
 #: modules/demux/mpeg/ts.c:135
 msgid ""
 "Selects mode for digital TV standard. This feature affects EPG information "
 "and subtitles."
 msgstr ""
+"Selezziunà u modu per a norma di televisiò numerica. Sta funzione tocca "
+"l’infurmazioni EPG è i sottutituli."
 
 #: modules/demux/mpeg/ts.c:139
 msgid "MPEG Transport Stream demuxer"
-msgstr ""
+msgstr "Dimultiplessore di flussu di trasportu MPEG"
 
 #: modules/demux/mpeg/ts_psi.c:425
 msgid "Main audio"
-msgstr ""
+msgstr "Audio principale"
 
 #: modules/demux/mpeg/ts_psi.c:426
 msgid "Audio description for the visually impaired"
-msgstr ""
+msgstr "Discrizzione audio per i deficienti visuali"
 
 #: modules/demux/mpeg/ts_psi.c:427
 msgid "Clean audio for the hearing impaired"
-msgstr ""
+msgstr "Pulì l’audio per i deficienti auditivi"
 
 #: modules/demux/mpeg/ts_psi.c:428
 msgid "Spoken subtitles for the visually impaired"
-msgstr ""
+msgstr "Sottutituli parlati per i deficienti visuali"
 
 #: modules/demux/mpeg/ts_psi.c:610 modules/gui/macosx/VLCMainMenu.m:465
 #: modules/gui/qt/dialogs/toolbar.cpp:541
@@ -15611,170 +16040,175 @@ msgstr "Teletestu : infurmazione addizziunale"
 
 #: modules/demux/mpeg/ts_psi.c:613
 msgid "Teletext: program schedule"
-msgstr ""
+msgstr "Teletestu : pianificazione di prugramma"
 
 #: modules/demux/mpeg/ts_psi.c:614
 msgid "Teletext subtitles: hearing impaired"
-msgstr ""
+msgstr "Sottutituli di teletestu : deficienti auditivi"
 
 #: modules/demux/mpeg/ts_psi.c:831
 msgid "DVB subtitles: hearing impaired"
-msgstr ""
+msgstr "Sottutituli DVB : deficienti auditivi"
 
 #: modules/demux/mpeg/ts_psi.c:1340
 msgid "clean effects"
-msgstr ""
+msgstr "pulì l’effettu"
 
 #: modules/demux/mpeg/ts_psi.c:1341
 msgid "hearing impaired"
-msgstr ""
+msgstr "deficienti auditivi"
 
 #: modules/demux/mpeg/ts_psi.c:1342
 msgid "visual impaired commentary"
-msgstr ""
+msgstr "cummentu per i deficienti visuali"
 
 #: modules/demux/nsc.c:47
 msgid "Windows Media NSC metademux"
-msgstr ""
+msgstr "Metadimultiplessore Windows Media NSC"
 
 #: modules/demux/nsv.c:49
 msgid "NullSoft demuxer"
-msgstr ""
+msgstr "Dimultiplessore NullSoft"
 
 #: modules/demux/nuv.c:50
 msgid "Nuv demuxer"
-msgstr ""
+msgstr "Dimultiplessore Nuv"
 
 #: modules/demux/ogg.c:57
 msgid "OGG demuxer"
-msgstr ""
+msgstr "Dimultiplessore OGG"
 
 #: modules/demux/playlist/playlist.c:46
 msgid "Show shoutcast adult content"
-msgstr ""
+msgstr "Affissà u cuntenutu per i maiò nant’à shoutcast"
 
 #: modules/demux/playlist/playlist.c:47
 msgid "Show NC17 rated video streams when using shoutcast video playlists."
 msgstr ""
+"Affissà i flussi video valutati « NC17 » quandu s’impiegheghja e liste di "
+"lettura shoutcast."
 
 #: modules/demux/playlist/playlist.c:50
 msgid "Skip ads"
-msgstr ""
+msgstr "Tralascià e publicità"
 
 #: modules/demux/playlist/playlist.c:51
 msgid ""
 "Use playlist options usually used to prevent ads skipping to detect ads and "
 "prevent adding them to the playlist."
 msgstr ""
+"Impiegà l’ozzioni di e liste di lettura previste di solitu per impedisce u "
+"saltu di publicità, a scuperta di publicità è impedisce d’aghjunghjelle à a "
+"lista di lettura."
 
 #: modules/demux/playlist/playlist.c:67
 msgid "M3U playlist import"
-msgstr "Impurtà una lista di lettura M3U"
+msgstr "Impurtazione di lista di lettura M3U"
 
 #: modules/demux/playlist/playlist.c:72
 msgid "RAM playlist import"
-msgstr "Impurtà una lista di lettura RAM"
+msgstr "Impurtazione di lista di lettura RAM"
 
 #: modules/demux/playlist/playlist.c:76
 msgid "PLS playlist import"
-msgstr "Impurtà una lista di lettura PLS"
+msgstr "Impurtazione di lista di lettura PLS"
 
 #: modules/demux/playlist/playlist.c:80
 msgid "B4S playlist import"
-msgstr "Impurtà una lista di lettura B4S"
+msgstr "Impurtazione di lista di lettura B4S"
 
 #: modules/demux/playlist/playlist.c:85
 msgid "DVB playlist import"
-msgstr "Impurtà una lista di lettura DVB"
+msgstr "Impurtazione di lista di lettura DVB"
 
 #: modules/demux/playlist/playlist.c:90
 msgid "Podcast parser"
-msgstr ""
+msgstr "Analizatore di sintassa di podcast"
 
 #: modules/demux/playlist/playlist.c:95
 msgid "XSPF playlist import"
-msgstr ""
+msgstr "Impurtazione di lista di lettura XSPF"
 
 #: modules/demux/playlist/playlist.c:99
 msgid "New winamp 5.2 shoutcast import"
-msgstr ""
+msgstr "Impurtazione di u novu winamp 5.2 shoutcast"
 
 #: modules/demux/playlist/playlist.c:106
 msgid "ASX playlist import"
-msgstr ""
+msgstr "Impurtazione di lista di lettura ASX"
 
 #: modules/demux/playlist/playlist.c:110
 msgid "Kasenna MediaBase parser"
-msgstr ""
+msgstr "Analizatore di sintassa Kasenna MediaBase"
 
 #: modules/demux/playlist/playlist.c:115
 msgid "QuickTime Media Link importer"
-msgstr ""
+msgstr "Impurtadore di liami medià QuickTime"
 
 #: modules/demux/playlist/playlist.c:120
 msgid "Dummy IFO demux"
-msgstr ""
+msgstr "Dimultiplessore IFO fattiziu"
 
 #: modules/demux/playlist/playlist.c:124
 msgid "iTunes Music Library importer"
-msgstr ""
+msgstr "Impurtadore di biblioteca musicale iTunes"
 
 #: modules/demux/playlist/playlist.c:129
 msgid "WPL playlist import"
-msgstr ""
+msgstr "Impurtazione di lista di lettura WPL"
 
 #: modules/demux/playlist/podcast.c:230 modules/demux/playlist/podcast.c:242
 #: modules/demux/playlist/podcast.c:305 modules/demux/playlist/podcast.c:328
 msgid "Podcast Info"
-msgstr ""
+msgstr "Infurmazione nant’à u Podcast"
 
 #: modules/demux/playlist/podcast.c:232
 msgid "Podcast Link"
-msgstr ""
+msgstr "Liame di u podcast"
 
 #: modules/demux/playlist/podcast.c:233
 msgid "Podcast Copyright"
-msgstr ""
+msgstr "Dirittu d’autore di u podcast"
 
 #: modules/demux/playlist/podcast.c:234
 msgid "Podcast Category"
-msgstr ""
+msgstr "Categuria di u podcast"
 
 #: modules/demux/playlist/podcast.c:235 modules/demux/playlist/podcast.c:312
 msgid "Podcast Keywords"
-msgstr ""
+msgstr "Parolle chjave di u podcast"
 
 #: modules/demux/playlist/podcast.c:236 modules/demux/playlist/podcast.c:313
 msgid "Podcast Subtitle"
-msgstr ""
+msgstr "Sottutitulu di u podcast"
 
 #: modules/demux/playlist/podcast.c:242 modules/demux/playlist/podcast.c:314
 msgid "Podcast Summary"
-msgstr ""
+msgstr "Riassuntu di u podcast"
 
 #: modules/demux/playlist/podcast.c:308
 msgid "Podcast Publication Date"
-msgstr ""
+msgstr "Data di publicazione di u podcast"
 
 #: modules/demux/playlist/podcast.c:309
 msgid "Podcast Author"
-msgstr ""
+msgstr "Autore di u podcast"
 
 #: modules/demux/playlist/podcast.c:310
 msgid "Podcast Subcategory"
-msgstr ""
+msgstr "Sottucateguria di u podcast"
 
 #: modules/demux/playlist/podcast.c:311
 msgid "Podcast Duration"
-msgstr ""
+msgstr "Durata di u podcast"
 
 #: modules/demux/playlist/podcast.c:315
 msgid "Podcast Type"
-msgstr ""
+msgstr "Tiu di u podcast"
 
 #: modules/demux/playlist/podcast.c:329
 msgid "Podcast Size"
-msgstr ""
+msgstr "Dimensione di u podcast"
 
 #: modules/demux/playlist/podcast.c:330
 #, c-format
@@ -15783,11 +16217,11 @@ msgstr "%s ottetti"
 
 #: modules/demux/playlist/shoutcast.c:324
 msgid "Shoutcast"
-msgstr ""
+msgstr "Shoutcast"
 
 #: modules/demux/playlist/shoutcast.c:328
 msgid "Listeners"
-msgstr ""
+msgstr "Auditori"
 
 #: modules/demux/playlist/shoutcast.c:329
 msgid "Load"
@@ -15799,11 +16233,12 @@ msgstr "Durata tutale"
 
 #: modules/demux/pva.c:44
 msgid "PVA demuxer"
-msgstr ""
+msgstr "Dimultiplessore PVA"
 
 #: modules/demux/rawaud.c:44
 msgid "Audio sample rate in Hertz. Default is 48000 Hz."
-msgstr "Audio sample rate in Hertz. Predefinitu hè 48000 Hz."
+msgstr ""
+"Frequenza di campiunariu audio in Hertz. U valore predefinitu hè 48000 Hz."
 
 #: modules/demux/rawaud.c:46 modules/stream_out/transcode/transcode.c:100
 #: share/lua/http/dialogs/create_stream.html:316
@@ -15813,7 +16248,8 @@ msgstr "Canali audio"
 #: modules/demux/rawaud.c:47
 msgid "Audio channels in input stream. Numeric value >0. Default is 2."
 msgstr ""
-"Canali audio in u flussu d'Intrata. Valore numericu >0. Predefinitu hè 2."
+"Canali audio in u flussu d'entrata. Valore numericu >0. U valore predefinitu "
+"hè 2."
 
 #: modules/demux/rawaud.c:49
 msgid "FOURCC code of raw input format"
@@ -16671,7 +17107,7 @@ msgstr "Un esportu SDP hè richiestu, ma alcunu URL hè indicatu."
 #: modules/gui/macosx/VLCSimplePrefsController.m:1266
 #: modules/gui/qt/components/simple_preferences.cpp:711
 msgid "Custom"
-msgstr "Persunalizatu"
+msgstr "Persunalizà"
 
 #: modules/gui/macosx/VLCCoreDialogProvider.m:195
 msgid "Remember"
@@ -16909,7 +17345,7 @@ msgstr "Incullà"
 
 #: modules/gui/macosx/VLCMainMenu.m:371 modules/gui/macosx/VLCPlaylist.m:227
 msgid "Select All"
-msgstr "Selezziunà Tuttu"
+msgstr "Tuttu selezziunà"
 
 #: modules/gui/macosx/VLCMainMenu.m:372
 msgid "Find"
@@ -17048,11 +17484,11 @@ msgstr "Larghezza di cuntornu"
 
 #: modules/gui/macosx/VLCMainMenu.m:462 modules/gui/macosx/VLCMainMenu.m:463
 msgid "Background Opacity"
-msgstr ""
+msgstr "Opacità di u sfondulu"
 
 #: modules/gui/macosx/VLCMainMenu.m:464
 msgid "Background Color"
-msgstr "Culore di Fondu"
+msgstr "Culore di u sfondulu"
 
 #: modules/gui/macosx/VLCMainMenu.m:466
 msgid "Transparent"
@@ -17690,7 +18126,7 @@ msgstr "Parametri audio"
 #: modules/gui/qt/components/simple_preferences.cpp:252
 #: modules/gui/qt/components/simple_preferences.cpp:380
 msgid "Video Settings"
-msgstr "Parametri Video"
+msgstr "Parametri di video"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:247
 #: modules/gui/qt/components/simple_preferences.cpp:254
@@ -18664,7 +19100,7 @@ msgstr "Aspettu"
 
 #: modules/gui/macosx/macosx.m:167
 msgid "Behavior"
-msgstr "Cumportamentu"
+msgstr "Cumpurtamentu"
 
 #: modules/gui/macosx/macosx.m:180
 msgid "Apple Remote and media keys"
@@ -19526,7 +19962,7 @@ msgstr ""
 
 #: modules/gui/qt/components/open_panels.cpp:918
 msgid "Delivery system"
-msgstr ""
+msgstr "Sistema d’arricata"
 
 #: modules/gui/qt/components/open_panels.cpp:948
 msgid "Transponder/multiplex frequency"
@@ -19920,25 +20356,20 @@ msgstr ""
 "Cuntenenti (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:184
-#, fuzzy
 msgid "This module outputs the stream using the RIST protocol (TR06)."
 msgstr ""
-"Stu modulu manda u flussu trascudificatu ver di a reta via u protocollu mms."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:186
-#, fuzzy
 msgid "Destination Address"
-msgstr "Prefissu di destinazione"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:191
-#, fuzzy
 msgid "Destination Port"
-msgstr "Sceglie a destinazione"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:201
-#, fuzzy
 msgid "Stream Name"
-msgstr "Nome di u flussu"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:237
 msgid "This module outputs the transcoded stream to a network via HTTP."
@@ -20037,7 +20468,7 @@ msgstr "Schedariu di destinazione :"
 
 #: modules/gui/qt/dialogs/convert.cpp:82
 msgid "Browse"
-msgstr "Sfuglià"
+msgstr "Navigà"
 
 #: modules/gui/qt/dialogs/convert.cpp:90
 msgid "Multiple Files Selected."
@@ -20596,7 +21027,7 @@ msgstr "&Chjode"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:226
 msgid "Profile Name"
-msgstr "Nome di Prufilu"
+msgstr "Nome di prufilu"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:227
 msgid "Please enter the new profile name."
@@ -20604,7 +21035,7 @@ msgstr "Ci vole à stampittà u novu nome di prufilu."
 
 #: modules/gui/qt/dialogs/toolbar.cpp:423
 msgid "Spacer"
-msgstr ""
+msgstr "Intervallu"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:430
 msgid "Expanding Spacer"
@@ -22097,7 +22528,7 @@ msgstr "Industrial"
 
 #: modules/meta_engine/ID3Genres.h:53
 msgid "Alternative"
-msgstr "Alternative"
+msgstr "Alternativa"
 
 #: modules/meta_engine/ID3Genres.h:55
 msgid "Death Metal"
@@ -22676,7 +23107,7 @@ msgstr "&Interrompe"
 
 #: modules/misc/gnutls.c:499
 msgid "View certificate"
-msgstr ""
+msgstr "Affissà u certificatu"
 
 #: modules/misc/gnutls.c:500 modules/misc/gnutls.c:521
 #: modules/misc/securetransport.c:348
@@ -22863,7 +23294,7 @@ msgstr ""
 
 #: modules/misc/stats.c:221 modules/stream_out/stats.c:51
 msgid "Stats"
-msgstr ""
+msgstr "Statistiche"
 
 #: modules/misc/stats.c:223
 msgid "Stats encoder function"
@@ -23111,7 +23542,7 @@ msgstr ""
 
 #: modules/mux/mpeg/ts.c:143
 msgid "Use keyframes"
-msgstr ""
+msgstr "Impiegà fiure chjave"
 
 #: modules/mux/mpeg/ts.c:144
 msgid ""
@@ -23302,7 +23733,7 @@ msgstr "Impacchittatore video MPEG4"
 
 #: modules/packetizer/mpegaudio.c:88
 msgid "MPEG audio layer I/II/III packetizer"
-msgstr "Impacchittatore MPEG audio layer I/II/III"
+msgstr "Impacchittatore MPEG audio stratu I/II/III"
 
 #: modules/packetizer/mpegvideo.c:60
 msgid "Sync on Intra Frame"
@@ -23937,7 +24368,7 @@ msgstr ""
 
 #: modules/spu/mosaic.c:148
 msgid "Offsets in order"
-msgstr "Staccamenti in ordine"
+msgstr "Spustimi in ordine"
 
 #: modules/spu/mosaic.c:150
 msgid ""
@@ -23963,7 +24394,7 @@ msgstr "fissu"
 
 #: modules/spu/mosaic.c:166
 msgid "offsets"
-msgstr "staccamenti"
+msgstr "spustimi"
 
 #: modules/spu/mosaic.c:176
 msgid "Mosaic video sub source"
@@ -24843,8 +25274,8 @@ msgid ""
 "Default caching value for outbound RTP streams. This value should be set in "
 "milliseconds."
 msgstr ""
-"Default caching value for outbound RTP streams. Stu valore deve esse "
-"definitu in milliseconde."
+"Valore predefinitu di l’impiatta per i flussi RTP d’esciuta. Stu valore deve "
+"esse definitu in milliseconde."
 
 #: modules/stream_out/rtp.c:140
 msgid "Transport protocol"
@@ -25257,6 +25688,8 @@ msgid ""
 "Please wait while your font cache is rebuilt.\n"
 "This should take less than a few minutes."
 msgstr ""
+"Aspettate per piacè chì l’impiatta per e grafie sia ricustruita.\n"
+"This should take less than a few minutes."
 
 #: modules/text_renderer/freetype/freetype.c:81
 msgid "Monospace Font"
@@ -25339,7 +25772,7 @@ msgstr "Angulu di l’umbria"
 
 #: modules/text_renderer/freetype/freetype.c:116
 msgid "Shadow distance"
-msgstr "Distenza di l’umbria"
+msgstr "Distanza di l’umbria"
 
 #: modules/text_renderer/freetype/freetype.c:118
 msgid "Text direction"
@@ -28058,7 +28491,7 @@ msgstr ""
 
 #: share/lua/http/index.html:260
 msgid "Empty Playlist"
-msgstr "Viutà a Lista di Lettura"
+msgstr "Viutà a lista di lettura"
 
 #: share/lua/http/index.html:261
 msgid "Queue Selected"
@@ -28771,7 +29204,7 @@ msgstr " px"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:306
 msgid "Add a background"
-msgstr "Aghjunghje un fondu"
+msgstr "Aghjunghje un sfondulu"
 
 #: modules/gui/qt/ui/sprefs_video.h:313
 msgid "O&utput"
@@ -28998,124 +29431,3 @@ msgstr "AAAA ; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Lista di u Ghjestiunariu di Media"
-
-#~ msgid "RIST maximum packet size (bytes)"
-#~ msgstr "Dimensione massima di pacchettu RIST (ottetti)"
-
-#~ msgid "RIST latency (ms)"
-#~ msgstr "Cumportu d’attesa RIST (ms)"
-
-#~ msgid "RIST maximum retry count"
-#~ msgstr "Numeru massimu di tentativi RIST"
-
-#~ msgid "Use this to disable packet recovery"
-#~ msgstr "Impiegà què per disattivà a ricuperazione di pacchetti"
-
-#~ msgid "Do not check for a valid rtcp message from the encoder"
-#~ msgstr ""
-#~ "Ùn micca cuntrollà a presenza d’un messaghju rtcp accettevule da u "
-#~ "cudificatore"
-
-#~ msgid "16 bytes"
-#~ msgstr "16 ottetti"
-
-#~ msgid "24 bytes"
-#~ msgstr "24 ottetti"
-
-#~ msgid "32 bytes"
-#~ msgstr "32 ottetti"
-
-#~ msgid "RIST data output caching size (ms)"
-#~ msgstr "Dimensione di l’impiatta di l’esciuta di i dati RIST (ms)"
-
-#~ msgid ""
-#~ "Having this cache will guarantee that the packets going out are delivered "
-#~ "at a spacing determined by the chain timestamps thus ensuring a near "
-#~ "jitter free output. Be aware that this setting will also add to the "
-#~ "overall latency of the stream."
-#~ msgstr ""
-#~ "L’adopru di st’impiatta hè l’assicuranza chì i pacchetti chì sortenu sò "
-#~ "distribuiti à un spiazzamentu determinatu da e stampiglie di a catena, "
-#~ "ciò chì permette un’esciuta guasi senza saltichjime. Ma sapete chì stu "
-#~ "parametru aumenterà dinù u cumportu d’attesa glubale di u flussu."
-
-#~ msgid "RIST retry-buffer queue size (ms)"
-#~ msgstr ""
-#~ "Dimensione di a fila d’attesa di u stampone di ripetizione RIST (ms)"
-
-#~ msgid ""
-#~ "This must match the buffer size (latency) configured on the server side. "
-#~ "If you are not sure, leave the default of 0 which will set it the maximum "
-#~ "value and will use about 100MB of RAM"
-#~ msgstr ""
-#~ "Stu valore deve currisponde à a dimensione di u stampone (cumportu "
-#~ "d’attesa) cunfiguratu di u latu di u servitore. S’è ùn site micca sicuri, "
-#~ "lasciate u valore predefinitu di 0, ciò chì definiscerà u valore massimu "
-#~ "è impiegherà circa 100 Mo di RAM"
-
-#~ msgid "SSRC used in RTP output (default is random, i.e. 0)"
-#~ msgstr ""
-#~ "SSRC impiegatu in l’esciuta RTP (u valore predefinitu hè aleatoriu, i.e. "
-#~ "0)"
-
-#~ msgid ""
-#~ "Use this setting to specify a known SSRC for the RTP header. This is only "
-#~ "useful if your receiver acts on it. When using VLC as receiver, it is not."
-#~ msgstr ""
-#~ "Impiegà stu parametru per specificà un SSRC cunnisciutu per l’intestatura "
-#~ "RTP. Què hè ghjuvevule solu s’è u vostru ricevitore agisce nant’à ellu. "
-#~ "Quandu VLC hè impiegatu cum’è ricevitore, ùn hè micca u casu."
-
-#~ msgid ""
-#~ "This Stream name will be sent to the receiver using the rist RTCP channel"
-#~ msgstr ""
-#~ "Stu nome di flussu serà mandatu à u ricevitore impieghendu u canale rist "
-#~ "RTCP"
-
-#~ msgid "4:2:0"
-#~ msgstr "4:2:0"
-
-#~ msgid "4:2:2"
-#~ msgstr "4:2:2"
-
-#~ msgid "4:4:4"
-#~ msgstr "4:4:4"
-
-#~ msgid "Constant lambda mode"
-#~ msgstr "Modu custente lambda"
-
-#~ msgid "Constant error mode"
-#~ msgstr "Modu custente di sbagliu"
-
-#~ msgid "Constant quality mode"
-#~ msgstr "Modu custente di qualità"
-
-#~ msgid "GOP structure"
-#~ msgstr "Struttura GOP"
-
-#~ msgid "GOP length"
-#~ msgstr "Longhezza GOP"
-
-#~ msgid "Prefilter"
-#~ msgstr "Prefiltru"
-
-#~ msgid "No pre-filtering"
-#~ msgstr "Senza pre-filtratura"
-
-#~ msgid "Add Noise"
-#~ msgstr "Aghjunghje un trostu"
-
-#~ msgid "Amount of prefiltering"
-#~ msgstr "Quantità di prefiltratura"
-
-#~ msgid "Force Profile"
-#~ msgstr "Sfurzà un Prufilu"
-
-#~ msgid "VC2 Simple Profile"
-#~ msgstr "Prufilu Simplice VC2"
-
-#~ msgid "VC2 Main Profile"
-#~ msgstr "Prufilu Principale VC2"
-
-#~ msgid "Key: "
-#~ msgstr "Chjave : "
