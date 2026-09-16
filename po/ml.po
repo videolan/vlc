@@ -1,5 +1,5 @@
 # Malayalam translation
-# Copyright (C) 2016 VideoLAN
+# Copyright (C) 2026 VideoLAN
 # This file is distributed under the same license as the vlc package.
 #
 # Translators:
@@ -11,18 +11,19 @@
 # KiranS, 2020
 # akkuvijay <akkuvijay@aol.com>, 2020
 # Dilip Re, 2021
+# Michał Trzebiatowski <michtrz@gmail.com>, 2018
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22-rc1\n"
+"Project-Id-Version: vlc 3.0.24-beta1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2026-06-28 16:08+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: Dilip Re, 2021\n"
 "Language-Team: Malayalam (https://app.transifex.com/yaron/teams/16553/ml/)\n"
-"Language: ml\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: ml\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: include/vlc_common.h:1055
@@ -1033,24 +1034,20 @@ msgid "Decoded format"
 msgstr "ഡീകോഡെഡ് ഘടന"
 
 #: src/input/es_out.c:3207
-#, fuzzy
 msgid "Decoded channels"
-msgstr "ഓഡിയോ ചാനലുകള്‍"
+msgstr ""
 
 #: src/input/es_out.c:3212
-#, fuzzy
 msgid "Decoded sample rate"
-msgstr "ഓഡിയോ സാംപിള്‍ റേറ്റ്"
+msgstr ""
 
 #: src/input/es_out.c:3219
-#, fuzzy
 msgid "Decoded bits per sample"
-msgstr "പ്രതി സാംപിള്‍ ഓഡിയോ ബിറ്റുള്‍"
+msgstr ""
 
 #: src/input/es_out.c:3224
-#, fuzzy
 msgid "Decoded Bitrate"
-msgstr "ഡീകോഡെഡ് ഘടന"
+msgstr ""
 
 #: src/input/es_out.c:3237
 msgid "Track replay gain"
@@ -8101,9 +8098,8 @@ msgid "Bitmask"
 msgstr "ബിറ്റ്മാസ്ക്"
 
 #: modules/access/rist.c:313
-#, fuzzy
 msgid "Virtual Destination Port Filter"
-msgstr "ഉദ്ദിഷ്ടസ്ഥാന ഫയല്‍:"
+msgstr ""
 
 #: modules/access/rist.c:315
 msgid ""
@@ -8124,13 +8120,10 @@ msgid "RIST demux/decode maximum jitter (default is 5ms)"
 msgstr "റിസ്റ്റ് ഡീമാക്സ് / ഡീകോഡ് പരമാവധി എഡിറ്റർ (സ്ഥിരസ്ഥിതി 5 എംഎസ് )"
 
 #: modules/access/rist.c:328
-#, fuzzy
 msgid ""
 "This controls the maximum jitter that will be passed to the demux/decode "
 "chain. The lower the value, the more CPU cycles the module will consume"
 msgstr ""
-"ഇത് ഡെമക്സ് / ഡീകോഡ് ചെയിനിലേക്ക് കൈമാറുന്ന പരമാവധി ഞെട്ടലിനെ നിയന്ത്രിക്കുന്നു. മൂല്യം "
-"കുറയുന്നു, കൂടുതൽ സിപിയു ചക്രങ്ങൾ അൽഗോരിതം ഉപയോഗിക്കും"
 
 #: modules/access/rist.c:332
 msgid "RIST nack type, 0 = range, 1 = bitmask. Default is range"
@@ -8418,9 +8411,8 @@ msgid "SFTP port number to use on the server"
 msgstr "സര്‍വ്വറില്‍ ഉപയോഗിക്കേണ്ട എസ്എഫ്ടിപി പോര്‍ട്ട് നമ്പര്‍"
 
 #: modules/access/sftp.c:61
-#, fuzzy
 msgid "Private key file"
-msgstr "എഇഎസ് കീ ഫയല്‍"
+msgstr ""
 
 #: modules/access/sftp.c:62
 msgid ""
@@ -8570,9 +8562,8 @@ msgid "Password for stream encryption"
 msgstr "സ്ട്രീം എൻ‌ക്രിപ്ഷനുള്ള പാസ്‌വേഡ്"
 
 #: modules/access/srt.c:566
-#, fuzzy
 msgid "SRT Stream ID"
-msgstr "എസ് ആർ ടി സ്ട്രീം ഔട്ട് പുട്ട് "
+msgstr ""
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -9434,18 +9425,16 @@ msgid "Source port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:272
-#, fuzzy
 msgid "Virtual Destination Port"
-msgstr "സ്ട്രീം ലക്ഷ്യസ്ഥാനം"
+msgstr ""
 
 #: modules/access_output/rist.c:274
 msgid "Destination port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:281
-#, fuzzy
 msgid "Multipeer mode"
-msgstr "മള്‍ട്ടിപ്ലക്സര്‍"
+msgstr ""
 
 #: modules/access_output/rist.c:283
 msgid ""
@@ -9454,23 +9443,20 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Duplicate"
-msgstr "ആപ്ളിക്കേഷന്‍"
+msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Load balanced"
-msgstr "റെഡ് ബാലന്‍സ്"
+msgstr ""
 
 #: modules/access_output/rist.c:294
 msgid "RIST stream output"
 msgstr "റിസ്റ്റ് ഒഴുക്ക് ഔട്ട്പുട്ട് "
 
 #: modules/access_output/rist.c:299
-#, fuzzy
 msgid "RIST target payload size (bytes)"
-msgstr "റിസ്റ്റ് ലക്ഷ്യ പാക്കറ്റ് വലുപ്പം (ബൈറ്റുകൾ)"
+msgstr ""
 
 #: modules/access_output/shout.c:64
 #: modules/gui/qt/components/sout/sout_widgets.cpp:438
@@ -12786,7 +12772,6 @@ msgstr "ടെക്സ്റ്റ് ഉപശീര്‍ഷക ഡീക്�
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -13228,7 +13213,6 @@ msgid "CABAC"
 msgstr "സിഎബിഎസി"
 
 #: modules/codec/x264.c:133
-#, fuzzy
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -15071,11 +15055,11 @@ msgstr "ഫയല്‍ ഡംപര്‍"
 
 #: modules/demux/dirac.c:41
 msgid "Value to adjust dts by"
-msgstr "ഡി‌ടി‌എസ് മൂല്യം ക്രമീകരിക്കുക ഇത്രയാല്‍"
+msgstr ""
 
 #: modules/demux/dirac.c:54
 msgid "Dirac video demuxer"
-msgstr "ഡിറാക് വീഡിയോ ഡീമക്സര്‍"
+msgstr ""
 
 #: modules/demux/directory.c:94
 msgid "Directory import"
@@ -19852,36 +19836,32 @@ msgstr ""
 "നീക്കം ചെയ്യുന്നതിന് കീ ഇല്ലാതാക്കുക"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1405
-#, fuzzy
 msgid "Global Hotkey change"
-msgstr "ഹോട്ട്കീ മാറ്റം"
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1406
 msgid "Hotkey change"
 msgstr "ഹോട്ട്കീ മാറ്റം"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1410
-#, fuzzy
 msgid "Press the new key or combination for <b>%1</b>"
-msgstr "പുതിയ കീ അല്ലെങ്കില്‍ സംയോജനം അമര്‍ത്തുക ഇതിന്"
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1419
 msgid "Assign"
 msgstr "അസൈന്‍"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1455
-#, fuzzy
 msgid "Warning: this key or combination is already assigned to \"<b>%1</b>\""
-msgstr "മുന്നറിയിപ്പ്: ഈ കീ അല്ലെങ്കില്‍ സംയോജനം ഇതിനകം നിയോഗിക്കപ്പെട്ടിരിക്കുന്നത്"
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1467
 msgid "Warning: <b>%1</b> is already an application menu shortcut"
 msgstr "മുന്നറിയിപ്പ്: <b>%1</b> എന്നത് ഇതിനകം ഒരു ആപ്ലിക്കേഷന്‍ മെനു കുറുക്കുവഴിയാണ്"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1490
-#, fuzzy
 msgid "Key or combination: <b>%1</b>"
-msgstr "കീ അല്ലെങ്കില്‍ കോമ്പിനേഷന്‍"
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1498
 msgid "Key: <b>%1</b>"
@@ -20050,26 +20030,20 @@ msgstr ""
 "കണ്ടെയ്നറുകള്‍  (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:184
-#, fuzzy
 msgid "This module outputs the stream using the RIST protocol (TR06)."
 msgstr ""
-"ഈ മോഡ്യൂള്‍ ഒരു ട്രാന്‍സ്കോഡഡ് സ്ട്രീമിനെ എംഎംഎസ് പ്രോട്ടോകോളിലൂടെ ഒരു നെറ്റ്വര്‍ക്കിലേയ്ക്ക് ഔട്ട്പുട്ട് "
-"ചെയ്യുന്നു."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:186
-#, fuzzy
 msgid "Destination Address"
-msgstr "ഉപസര്‍ഗ്ഗപദ ഉദ്ദിഷ്ടസ്ഥാനം"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:191
-#, fuzzy
 msgid "Destination Port"
-msgstr "ലക്ഷ്യം"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:201
-#, fuzzy
 msgid "Stream Name"
-msgstr "സ്ട്രീം നാമം"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:237
 msgid "This module outputs the transcoded stream to a network via HTTP."
@@ -23573,7 +23547,7 @@ msgstr "പാക്കറ്റൈസര്‍ പകര്‍ത്തുക"
 
 #: modules/packetizer/dirac.c:87
 msgid "Dirac packetizer"
-msgstr "ഡിറക് പാക്കറ്റൈസര്‍"
+msgstr ""
 
 #: modules/packetizer/dts.c:47
 msgid "DTS audio packetizer"
@@ -29573,380 +29547,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "മീഡിയ മാനേജര്‍ ലിസ്റ്റ്"
-
-#~ msgid "RIST maximum packet size (bytes)"
-#~ msgstr "ആർഐഎസ് ടി പരമാവധി പാക്കറ്റ് വലിപ്പം (ബൈറ്റ്സ് )"
-
-#~ msgid "RIST latency (ms)"
-#~ msgstr "റിസ്റ്റ് ലേറ്റൻസി (എംഎസ് )"
-
-#~ msgid "RIST nack retry interval (ms)"
-#~ msgstr "റിസ്റ്റ് നാക് വീണ്ടും ശ്രമിക്കാനുള്ള ഇടവേള (എംഎസ് )"
-
-#~ msgid "RIST reorder buffer (ms)"
-#~ msgstr "റിസ്റ്റ് ബഫർ പുനഃക്രമീകരണം (എംഎസ് )"
-
-#~ msgid "RIST maximum retry count"
-#~ msgstr "റിസ്റ്റ് പരമാവധി വീണ്ടും ശ്രമിക്കൽ എണ്ണം"
-
-#~ msgid "Disable NACK output packets"
-#~ msgstr "NACK ഔട്ട്പുട്ട് പാക്കറ്റുകൾ അപ്രാപ്‌തമാക്കുക"
-
-#~ msgid "Use this to disable packet recovery"
-#~ msgstr "പാക്കറ്റ് വീണ്ടെടുക്കൽ അപ്രാപ്തമാക്കാൻ ഇത് ഉപയോഗിക്കുക"
-
-#~ msgid "Do not check for a valid rtcp message from the encoder"
-#~ msgstr "എൻ‌കോഡറിൽ‌ നിന്നും സാധുവായ ഒരു rtcp സന്ദേശത്തിനായി പരിശോധിക്കരുത്"
-
-#~ msgid ""
-#~ "Send nack messages even when we have not confirmed that the encoder is on "
-#~ "our local network."
-#~ msgstr ""
-#~ "ഞങ്ങളുടെ പ്രാദേശിക നെറ്റ്‌വർക്കിൽ എൻകോഡർ ഉണ്ടെന്ന് സ്ഥിരീകരിക്കാത്തപ്പോഴും നാക്ക് സന്ദേശങ്ങൾ "
-#~ "അയയ്‌ക്കുക."
-
-#~ msgid "16 bytes"
-#~ msgstr "16 bytes"
-
-#~ msgid "24 bytes"
-#~ msgstr "24 bytes"
-
-#~ msgid "32 bytes"
-#~ msgstr "32 bytes"
-
-#~ msgid "RIST data output caching size (ms)"
-#~ msgstr "റിസ്റ്റ് ഡാറ്റ ഔട്ട്പുട്ട് കാഷിംഗ് വലുപ്പം (എംഎസ് )"
-
-#~ msgid ""
-#~ "Having this cache will guarantee that the packets going out are delivered "
-#~ "at a spacing determined by the chain timestamps thus ensuring a near "
-#~ "jitter free output. Be aware that this setting will also add to the "
-#~ "overall latency of the stream."
-#~ msgstr ""
-#~ "ഈ കാഷെ ഉള്ളത് ചെയിൻ ടൈംസ്റ്റാമ്പുകൾ നിർണ്ണയിക്കുന്ന ഒരു സ്പേസിംഗിൽ നിന്ന് പുറത്തുപോകുന്ന "
-#~ "പാക്കറ്റുകൾ വിതരണം ചെയ്യുമെന്ന് ഉറപ്പുനൽകുന്നു, അങ്ങനെ അടുത്തുള്ള സ്വതന്ത്രമായ .ഔട്ട് പുട്ട് "
-#~ "ഉറപ്പാക്കുന്നു. ഈ ക്രമീകരണം സ്ട്രീമിന്റെ മൊത്തത്തിലുള്ള ലേറ്റൻസിയെ വർദ്ധിപ്പിക്കുമെന്നത് "
-#~ "അറിഞ്ഞിരിക്കുക."
-
-#~ msgid "RIST retry-buffer queue size (ms)"
-#~ msgstr "റിസ്റ്റ് വീണ്ടും ശ്രമിക്കുക-ബഫർ ക്യൂ വലുപ്പം (എംഎസ് )"
-
-#~ msgid ""
-#~ "This must match the buffer size (latency) configured on the server side. "
-#~ "If you are not sure, leave the default of 0 which will set it the maximum "
-#~ "value and will use about 100MB of RAM"
-#~ msgstr ""
-#~ "ഇത് സെർവർ ഭാഗത്ത് കോൺഫിഗർ ചെയ്‌തിരിക്കുന്ന ബഫർ വലുപ്പവുമായി (ലേറ്റൻസി) പൊരുത്തപ്പെടണം. "
-#~ "നിങ്ങൾക്ക് ഉറപ്പില്ലെങ്കിൽ, 0 ന്റെ സ്ഥിരസ്ഥിതി ഉപേക്ഷിക്കുക, അത് പരമാവധി മൂല്യം "
-#~ "സജ്ജമാക്കുകയും ഏകദേശം 100MB റാം ഉപയോഗിക്കുകയും ചെയ്യും"
-
-#~ msgid "SSRC used in RTP output (default is random, i.e. 0)"
-#~ msgstr ""
-#~ "ആർ‌ടി‌പി ഔട്ട് പുട്ടിൽ എസ്എസ്ആർസി ഉപയോഗിക്കുന്നു (സ്ഥിരസ്ഥിതി ക്രമരഹിതമാണ്, അതായത് 0)"
-
-#~ msgid ""
-#~ "Use this setting to specify a known SSRC for the RTP header. This is only "
-#~ "useful if your receiver acts on it. When using VLC as receiver, it is not."
-#~ msgstr ""
-#~ "ആർ‌ടി‌പി ഹെഡറിനായി അറിയപ്പെടുന്ന ഒരു SSRC വ്യക്തമാക്കാൻ ഈ ക്രമീകരണം ഉപയോഗിക്കുക. "
-#~ "നിങ്ങളുടെ റിസീവർ അതിൽ പ്രവർത്തിച്ചാൽ മാത്രമേ ഇത് ഉപയോഗപ്രദമാകൂ. വി‌എൽ‌സി റിസീവറായി "
-#~ "ഉപയോഗിക്കുമ്പോൾ, അങ്ങനെയല്ല."
-
-#~ msgid ""
-#~ "This Stream name will be sent to the receiver using the rist RTCP channel"
-#~ msgstr "റിസ്റ്റ് ആർ‌ടി‌സി‌പി ചാനൽ ഉപയോഗിച്ച് ഈ സ്ട്രീം നാമം റിസീവറിന് അയയ്ക്കും"
-
-#~ msgid "4:2:0"
-#~ msgstr "4:2:0"
-
-#~ msgid "4:2:2"
-#~ msgstr "4:2:2"
-
-#~ msgid "4:4:4"
-#~ msgstr "4:4:4"
-
-#~ msgid "Rate control method"
-#~ msgstr "റേറ്റ് കണ്ട്രോള്‍ രീതി"
-
-#~ msgid "Method used to encode the video sequence"
-#~ msgstr "വീഡിയോ ക്രമം എന്‍കോഡ് ചെയ്യാന്‍ ഉപയോഗിയ്ക്കുന്ന വഴി"
-
-#~ msgid "Constant noise threshold mode"
-#~ msgstr "സ്ഥിര നോയിസ് പരിധി രീതി"
-
-#~ msgid "Constant bitrate mode (CBR)"
-#~ msgstr "സ്ഥിര ബിറ്റ്തോത് രീതി (സി‌ബി‌ആര്‍)"
-
-#~ msgid "Low Delay mode"
-#~ msgstr "ലോ ഡിലേ മോഡ്"
-
-#~ msgid "Lossless mode"
-#~ msgstr "ലോസ്ലെസ് രീതി"
-
-#~ msgid "Constant lambda mode"
-#~ msgstr "കോണ്‍സ്റ്റന്റ് ലാംബഡ മോഡ്"
-
-#~ msgid "Constant error mode"
-#~ msgstr "കോണ്‍സ്റ്റെന്റ് പിശക് രീതി"
-
-#~ msgid "Constant quality mode"
-#~ msgstr "സ്ഥിരമായ ഗുണമേന്മ രീതി"
-
-#~ msgid "GOP structure"
-#~ msgstr "ജിഒപി ഘടന"
-
-#~ msgid "GOP structure used to encode the video sequence"
-#~ msgstr "വീഡിയോ ക്രമം എന്‍കോഡ് ചെയ്യാന്‍ ഉപയോഗിക്കുന്ന ജി‌ഓ‌പി ഘടന"
-
-#~ msgid ""
-#~ "No fixed gop structure. A picture can be intra or inter and refer to "
-#~ "previous or future pictures."
-#~ msgstr ""
-#~ "സ്ഥിര ജി‌ഓ‌പി ഘടന ഇല്ല . ഒരു ദൃശ്യരൂപം ഉള്ളില്‍/അന്യോന്യം കൂടാതെ മുമ്പിലത്തെ അല്ലെങ്കില്‍ "
-#~ "വരാനിരിക്കുന്ന ദൃഷ്യരൂപത്തോട് സംബന്ധിച്ച."
-
-#~ msgid "I-frame only sequence"
-#~ msgstr "ഐ-ഫ്രെയിം മാത്രം സീക്വന്‍സ്"
-
-#~ msgid "Inter pictures refere to previous pictures only"
-#~ msgstr "തമ്മിലുള്ള ദൃഷ്യരൂപങ്ങള്‍ മുമ്പിലത്തെ ദൃസ്യരൂപങ്ങളോടെ സംബന്ധിക്കപ്പെട്ടത്"
-
-#~ msgid "Inter pictures can refer to previous or future pictures"
-#~ msgstr ""
-#~ "തമ്മിലുള്ള ദൃഷ്യരൂപങ്ങള്‍ മുമ്പിലത്തെ അല്ലെങ്കില്‍ വരാനിരിക്കുന്ന ദൃസ്യരൂപങ്ങളോടെ സംബന്ധിക്കപ്പെട്ടത്"
-
-#~ msgid "Constant quality factor"
-#~ msgstr "സ്ഥിരമായ ഗുണമേന്മ ഘടകം"
-
-#~ msgid "Quality factor to use in constant quality mode"
-#~ msgstr "സ്ഥിര ഗുണ രീതിയില്‍ ഉപയോഗികേണ്ട ഗുണ അംശം"
-
-#~ msgid "Noise Threshold"
-#~ msgstr "നോയിസ് ത്രെഷ്ഹോള്‍ഡ്"
-
-#~ msgid "Noise threshold to use in constant noise threshold mode"
-#~ msgstr "നോയിസ് പരിധി രീതിയില്‍ ഉപയോഗികേണ്ട നോയിസ് പരിധി"
-
-#~ msgid "CBR bitrate (kbps)"
-#~ msgstr "സിബിആര്‍ ബിറ്റ്റേറ്റ്(കെബിപിഎസ്)"
-
-#~ msgid "Target bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "സ്ഥിരമായ ബിറ്റ്റേറ്റ് രീതിയില്‍  എന്‍കോഡ് ചെയ്യുമ്പോള്‍ കെബിപിഎസ്സിലുള്ള ടാര്‍ജറ്റ് ബിറ്റ്റേറ്റ് "
-
-#~ msgid "Maximum bitrate (kbps)"
-#~ msgstr "കൂടിയ ബിറ്റ്റേറ്റ്(കെബിപിഎസ്)"
-
-#~ msgid "Maximum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "സ്ഥിരമായ ബിറ്റ്റേറ്റ് രീതിയില്‍  എന്‍കോഡ് ചെയ്യുമ്പോള്‍ കെബിപിഎസ്സിലുള്ള പരമാവധി ബിറ്റ്റേറ്റ് "
-
-#~ msgid "Minimum bitrate (kbps)"
-#~ msgstr "കുറഞ്ഞ ബിറ്റ്റേറ്റ്(കെബിപിഎസ്)"
-
-#~ msgid "Minimum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "സ്ഥിരമായ ബിറ്റ്റേറ്റ് രീതിയില്‍  എന്‍കോഡ് ചെയ്യുമ്പോള്‍ കെബിപിഎസ്സിലുള്ള കുറഞ്ഞ ബിറ്റ്റേറ്റ് "
-
-#~ msgid "GOP length"
-#~ msgstr "ജിഒപി ദൈര്‍ഘ്യം"
-
-#~ msgid ""
-#~ "Number of pictures between successive sequence headers i.e. length of the "
-#~ "group of pictures"
-#~ msgstr ""
-#~ "തുടര്‍ച്ചയായുള്ള സീക്വന്‍സ് ഹെഡറുകള്‍ക്കിടയിലുള്ള ചിത്രങ്ങളുടെ എണ്ണം, അതായത് ചിത്രങ്ങളുടെ "
-#~ "ഗ്രൂപ്പിന്റെ നീളം"
-
-#~ msgid "Prefilter"
-#~ msgstr "പ്രീഫില്‍റ്റര്‍"
-
-#~ msgid "Enable adaptive prefiltering"
-#~ msgstr "അടാപ്റ്റീവ് പ്രീഫീല്‍റ്റേറിങ് പ്രവര്‍ത്തനക്ഷമമാകുക"
-
-#~ msgid "No pre-filtering"
-#~ msgstr "പ്രീ-ഫില്‍റ്ററിംഗ് ഇല്ല"
-
-#~ msgid "Centre Weighted Median"
-#~ msgstr "സെന്റര്‍ വെയിറ്റഡ് മീഡിയന്‍"
-
-#~ msgid "Gaussian Low Pass Filter"
-#~ msgstr "ഗൗസിയന്‍ ലോ പാസ് ഫില്‍റ്റര്‍"
-
-#~ msgid "Add Noise"
-#~ msgstr "നോയിസ് ചേര്‍ക്കുക"
-
-#~ msgid "Gaussian Adaptive Low Pass Filter"
-#~ msgstr "ഗോസ്സിയന്‍ അടാപ്ടീവ് ലോ പാസ് ഫില്‍ട്ടര്‍"
-
-#~ msgid "Low Pass Filter"
-#~ msgstr "ലോ പാസ് ഫില്‍റ്റര്‍"
-
-#~ msgid "Amount of prefiltering"
-#~ msgstr "പ്രീഫില്‍റ്ററിംഗ് തുക"
-
-#~ msgid "Higher value implies more prefiltering"
-#~ msgstr "വലിയ മൂല്യങ്ങള്‍ എന്നുവെച്ചാല്‍ കൂടുതല്‍ പ്രീഫീല്‍റ്ററിങ്"
-
-#~ msgid "Picture coding mode"
-#~ msgstr "പിക്ച്ചര്‍ കോഡിംഗ് മോഡ്"
-
-#~ msgid ""
-#~ "Field coding is where interlaced fields are coded separately as opposed "
-#~ "to a pseudo-progressive frame"
-#~ msgstr ""
-#~ "സ്യൂഡോ-പ്രോഗ്രസ്സീവ് ഫ്രെയിമിന് എതിരായി ഇന്റര്‍ലേസ്ഡ്  ഫീല്‍ഡുകള്‍ പ്രത്യേകമായി കോഡ് ചെയ്യുന്നതാണ് "
-#~ "ഫീല്‍ഡ് കോഡിംഗ്."
-
-#~ msgid "auto - let encoder decide based upon input (Best)"
-#~ msgstr "സ്വയം - ഇന്‍പുട്ട് അനുസരിച്ചു എന്‍കോഡര്‍ തീരുമാനിച്ചുകൊള്ളട്ടെ (നല്ലത്)"
-
-#~ msgid "force coding frame as single picture"
-#~ msgstr "കോഡിങ് ഫ്രെയിമിനെ ഒരു ദൃശ്യപടമായി നിര്‍ബന്ധപൂര്‍വം മാറ്റുന്നു"
-
-#~ msgid "force coding frame as separate interlaced fields"
-#~ msgstr "കോഡിങ് ഫ്രെയിമിനെ വേര്‍തിരിച്ച ഇടപിരിഞ്ഞ തലത്തെ നിര്‍ബന്ധപൂര്‍വം മാറ്റുന്നു"
-
-#~ msgid "Size of motion compensation blocks"
-#~ msgstr "ചലന പ്രതിഫല ബ്ലോക്കുകളുടെ വലിപ്പം"
-
-#~ msgid "automatic - let encoder decide based upon input (Best)"
-#~ msgstr "സ്വയം - ഇന്‍പുട്ട് അനുസരിച്ചു എന്‍കോഡര്‍ തീരുമാനിച്ചുകൊള്ളട്ടെ (നല്ലത്)"
-
-#~ msgid "small - use small motion compensation blocks"
-#~ msgstr "ചെറുത് - ചെറിയ ചലന പ്രതിഫല ബ്ലോക്കുകള്‍ ഉപയോഗിക്കുക"
-
-#~ msgid "medium - use medium motion compensation blocks"
-#~ msgstr "ഇടത്തരം - ഇടത്തര ചലന പ്രതിഫല ബ്ലോക്കുകള്‍ ഉപയോഗിക്കുക"
-
-#~ msgid "large - use large motion compensation blocks"
-#~ msgstr "വലുത് - വലിയ ചലന പ്രതിഫല ബ്ലോക്കുകള്‍ ഉപയോഗിക്കുക"
-
-#~ msgid "Overlap of motion compensation blocks"
-#~ msgstr "മേല്‍ക്കുമേലുള്ള ചലന പ്രതിഫല ബ്ലോക്കുകള്‍"
-
-#~ msgid "none - Motion compensation blocks do not overlap"
-#~ msgstr "ഒന്നുമില്ല - ചലന പ്രതിഫല ബ്ലോക്കുകള്‍ മേല്‍ക്കുമേലല്ല"
-
-#~ msgid "partial - Motion compensation blocks only partially overlap"
-#~ msgstr "ഭാഗികം - ചലന പ്രതിഫല ബ്ലോക്കുകള്‍ ഭാഗികമായി മേല്‍ക്കുമേല്‍"
-
-#~ msgid "full - Motion compensation blocks fully overlap"
-#~ msgstr "മുഴുവന്‍ - ചലന പ്രതിഫല ബ്ലോക്കുകള്‍ മുഴുവനും മേല്‍ക്കുമേല്‍"
-
-#~ msgid "Motion Vector precision"
-#~ msgstr "മോഷന്‍ വെക്ടര്‍ പ്രിസിഷന്‍"
-
-#~ msgid "Motion Vector precision in pels"
-#~ msgstr "പെല്‍സിലുള്ള ചലന വെക്റ്ററിന്റെ കൃത്യത"
-
-#~ msgid "Three component motion estimation"
-#~ msgstr "മൂന്നു ഭാഗ ചലന മൂല്യനിര്‍ണ്ണയം"
-
-#~ msgid "Use chroma as part of the motion estimation process"
-#~ msgstr "ചലന മൂല്യനിര്‍ണയ നടപടിക്രമത്തിന്റെ ഭാഗമായി ക്രോമ ഉപയോഗിക്കുക"
-
-#~ msgid "Intra picture DWT filter"
-#~ msgstr "ഇന്‍ട്രാ പിക്ച്ചര്‍ ഡിഡബ്ല്യുടി ഫില്‍റ്റര്‍"
-
-#~ msgid "Inter picture DWT filter"
-#~ msgstr "ഇന്റര്‍ പിക്ച്ചര്‍ ഡിബ്ല്യുടി ഫില്‍റ്റര്‍"
-
-#~ msgid "Number of DWT iterations"
-#~ msgstr "ഡി‌ഡബ്ല്യു‌ടി ആവര്‍ത്തനത്തിന്റെ എണ്ണം"
-
-#~ msgid "Also known as DWT levels"
-#~ msgstr "ഡി‌ഡബ്ല്യു‌ടി നിരകളായും അറിയപ്പെടുന്നു"
-
-#~ msgid "Enable multiple quantizers"
-#~ msgstr "മള്‍ട്ടിപ്പിള്‍ ക്വാണ്ടൈസേഴ്സ് സാധ്യമാക്കകു"
-
-#~ msgid "Enable multiple quantizers per subband (one per codeblock)"
-#~ msgstr "ഓരോ സബ് ബാന്‍ഡിലും ഒന്നിലധികം ക്വാന്‍ടൈസേര്‍സ് പ്രാപ്തമാക്കുക"
-
-#~ msgid "Disable arithmetic coding"
-#~ msgstr "അരിതമെറ്റിക് കോഡിംഗ് അസാധ്യമാക്കുക"
-
-#~ msgid "Use variable length codes instead, useful for very high bitrates"
-#~ msgstr ""
-#~ "പകരംവ്യത്യസ്തനീളമുള്ള കോഡുകള്‍ ഉപയോഗിക്കുക, വളരെ കൂടിയ ബിറ്റ്റേറ്റിന് ഉപയോഗപ്രദമാകുന്ന "
-#~ "വിധത്തില്‍"
-
-#~ msgid "perceptual weighting method"
-#~ msgstr "വ്യക്തമായ തൂക്കുന്ന വഴി"
-
-#~ msgid "perceptual distance"
-#~ msgstr "പെര്‍സെപ്ച്വല്‍ ദൂരം"
-
-#~ msgid "perceptual distance to calculate perceptual weight"
-#~ msgstr "വ്യക്തമായ തൂക്കം കണക്കാക്കാനുള്ള വ്യക്തമായ ദൂരം"
-
-#~ msgid "Horizontal slices per frame"
-#~ msgstr "ഒരു ഫ്രെയിമിലുള്ള തിരശ്ചീനമായ തുണ്ടുകള്‍"
-
-#~ msgid "Number of horizontal slices per frame in low delay mode"
-#~ msgstr "കുറഞ്ഞ താമസ രീതിയില്‍ ഒരു ഫ്രെയിമിലുള്ള തിരശ്ചീനമായ തുണ്ടുകള്‍"
-
-#~ msgid "Vertical slices per frame"
-#~ msgstr "ഒരു ഫ്രെയിമിലുള്ള ലംഭമായ തുണ്ടുകള്‍"
-
-#~ msgid "Number of vertical slices per frame in low delay mode"
-#~ msgstr "കുറഞ്ഞ താമസ രീതിയില്‍ ഒരു ഫ്രെയിമിലുള്ള ലംഭമായ തുണ്ടുകള്‍"
-
-#~ msgid "Size of code blocks in each subband"
-#~ msgstr "ഓരോ സബ്ബാന്‍റിലുമുള്ള കോഡ് ബ്ലോക്കുകളുടെ വലിപ്പം"
-
-#~ msgid "small - use small code blocks"
-#~ msgstr "ചെറുത് -  ചെറിയ കോഡ് ബ്ലോക്കുകള്‍ ഉപയോഗിക്കുക"
-
-#~ msgid "medium - use medium sized code blocks"
-#~ msgstr "ഇടത്തരം -  ഇടത്തര കോഡ് ബ്ലോക്കുകള്‍ ഉപയോഗിക്കുക"
-
-#~ msgid "large - use large code blocks"
-#~ msgstr "വലുത് -  വലിയ കോഡ് ബ്ലോക്കുകള്‍ ഉപയോഗിക്കുക"
-
-#~ msgid "full - One code block per subband"
-#~ msgstr "മുഴുവന്‍ - ഒരു സബ്ബാന്‍റില്‍ ഒരു കോഡ് ബ്ലോക്"
-
-#~ msgid "Enable hierarchical Motion Estimation"
-#~ msgstr "ക്രമമനുസരിച്ചുള്ള ചലന മൂല്യനിര്‍ണ്ണയം പ്രവര്‍ത്തനക്ഷമമാക്കുക"
-
-#~ msgid "Number of levels of downsampling"
-#~ msgstr "ഡൌണ്‍സംബ്ലിങ്ങുകളുടെ നിരകളുടെ എണ്ണം"
-
-#~ msgid ""
-#~ "Number of levels of downsampling in hierarchical motion estimation mode"
-#~ msgstr "ക്രമമനുസരിച്ചുള്ള ചലന മൂല്യനിര്‍ണ്ണയത്തില്‍ ഡൌണ്‍സംബ്ലിങ്ങുകളുടെ നിരകളുടെ എണ്ണം"
-
-#~ msgid "Enable Global Motion Estimation"
-#~ msgstr "ആഗോള ചലന മൂല്യനിര്‍ണ്ണയം പ്രവര്‍ത്തനക്ഷമമാക്കുക"
-
-#~ msgid "Enable Phase Correlation Estimation"
-#~ msgstr "ഫേസ് പരസ്പരബന്ധം മൂല്യനിര്‍ണ്ണയം പ്രവര്‍ത്തനക്ഷമമാക്കുക"
-
-#~ msgid "Enable Scene Change Detection"
-#~ msgstr "ദൃശ്യ മാറ്റം കണ്ടുപിടിക്കല്‍ പ്രവര്‍ത്തനക്ഷമമാക്കുക"
-
-#~ msgid "Force Profile"
-#~ msgstr "പ്രൊഫൈല്‍ ഫോഴ്സ് ചെയ്യുക"
-
-#~ msgid "VC2 Low Delay Profile"
-#~ msgstr "വിസി2 ലോ ഡിലേ പ്രൊഫൈല്‍"
-
-#~ msgid "VC2 Simple Profile"
-#~ msgstr "വിസി2 സാധാരണ പ്രൊഫൈല്‍"
-
-#~ msgid "VC2 Main Profile"
-#~ msgstr "വിസി2 പ്രധാന പ്രൊഫൈല്‍"
-
-#~ msgid "Main Profile"
-#~ msgstr "പ്രധാന പ്രൊഫൈല്‍"
-
-#~ msgid "Dirac video decoder using libschroedinger"
-#~ msgstr "ലിബ്ശ്ച്രൊഡിങര് ഉപയോഗിച്ചുള്ള ഡിറാക് വീഡിയോ ഡികോഡര്‍"
-
-#~ msgid "Dirac video encoder using libschroedinger"
-#~ msgstr "ലിബ്ശ്ച്രൊഡിങര് ഉപയോഗിച്ചുള്ള ഡിറാക് വീഡിയോ എന്‍കോഡര്‍"
-
-#~ msgid "Key: "
-#~ msgstr "കീ:"
