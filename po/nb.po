@@ -1,5 +1,5 @@
 # Norwegian Bokmål translation
-# Copyright (C) 2023 VideoLAN
+# Copyright (C) 2026 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -10,7 +10,7 @@
 # bobbaluba <bobbaluba@gmail.com>, 2013-2014
 # Christian, 2015
 # Harald H. <haarektrans@gmail.com>, 2014,2015
-# Imre Kristoffer Eilertsen <imreeil42@gmail.com>, 2016-2017
+# Imre Kristoffer Eilertsen <imreeil42@gmail.com>, 2016-2017,2024
 # Kristoffer Berge <kristoffer.berge@gmail.com>, 2015
 # Kurt-Håkon Eilertsen <kurt@kheds.com>, 2014,2016
 # Mathias Stang <mathias.stang@gmail.com>, 2015
@@ -25,19 +25,21 @@
 # _erty_ <inactive+_erty_@transifex.com>, 2014
 # Yomawaru, 2016
 # Alexander Jansen <bornxlo@gmail.com>, 2023
+# Michał Trzebiatowski <michtrz@gmail.com>, 2021
+# LarsMagnusHerland <lars.magnus@herland.priv.no>, 2023
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22-rc1\n"
+"Project-Id-Version: vlc 3.0.24-beta1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2026-06-28 16:08+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: Imre Kristoffer Eilertsen <imreeil42@gmail.com>, 2024\n"
 "Language-Team: Norwegian Bokmål (https://app.transifex.com/yaron/teams/16553/"
 "nb/)\n"
-"Language: nb\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: nb\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: include/vlc_common.h:1055
@@ -1084,24 +1086,20 @@ msgid "Decoded format"
 msgstr "Dekodet format"
 
 #: src/input/es_out.c:3207
-#, fuzzy
 msgid "Decoded channels"
-msgstr "Lydkanaler"
+msgstr ""
 
 #: src/input/es_out.c:3212
-#, fuzzy
 msgid "Decoded sample rate"
-msgstr "Lydsamplingsfrekvens"
+msgstr ""
 
 #: src/input/es_out.c:3219
-#, fuzzy
 msgid "Decoded bits per sample"
-msgstr "Lyd-bits per sampling"
+msgstr ""
 
 #: src/input/es_out.c:3224
-#, fuzzy
 msgid "Decoded Bitrate"
-msgstr "Dekodet format"
+msgstr ""
 
 #: src/input/es_out.c:3237
 msgid "Track replay gain"
@@ -8121,9 +8119,8 @@ msgid "Bitmask"
 msgstr "Bitmaske"
 
 #: modules/access/rist.c:313
-#, fuzzy
 msgid "Virtual Destination Port Filter"
-msgstr "Målfil:"
+msgstr ""
 
 #: modules/access/rist.c:315
 msgid ""
@@ -8435,9 +8432,8 @@ msgid "SFTP port number to use on the server"
 msgstr "SFTP-portnummeret som skal brukes på tjeneren"
 
 #: modules/access/sftp.c:61
-#, fuzzy
 msgid "Private key file"
-msgstr "AES-nøkkelfil"
+msgstr ""
 
 #: modules/access/sftp.c:62
 msgid ""
@@ -8585,9 +8581,8 @@ msgid "Password for stream encryption"
 msgstr "Passord for strømkryptering"
 
 #: modules/access/srt.c:566
-#, fuzzy
 msgid "SRT Stream ID"
-msgstr "SRT-kringkastingsutdata"
+msgstr ""
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -9446,18 +9441,16 @@ msgid "Source port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:272
-#, fuzzy
 msgid "Virtual Destination Port"
-msgstr "Kringkastingsdestinasjon"
+msgstr ""
 
 #: modules/access_output/rist.c:274
 msgid "Destination port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:281
-#, fuzzy
 msgid "Multipeer mode"
-msgstr "Multiplekser"
+msgstr ""
 
 #: modules/access_output/rist.c:283
 msgid ""
@@ -9466,23 +9459,20 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Duplicate"
-msgstr "Program"
+msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Load balanced"
-msgstr "Rødbalanse"
+msgstr ""
 
 #: modules/access_output/rist.c:294
 msgid "RIST stream output"
 msgstr "RIST-strømmingsutdata"
 
 #: modules/access_output/rist.c:299
-#, fuzzy
 msgid "RIST target payload size (bytes)"
-msgstr "RIST-målpakkestørrelse (byte)"
+msgstr ""
 
 #: modules/access_output/shout.c:64
 #: modules/gui/qt/components/sout/sout_widgets.cpp:438
@@ -12785,7 +12775,6 @@ msgstr "TXT-undertekstdekoder"
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -13223,7 +13212,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, fuzzy
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -15063,11 +15051,11 @@ msgstr "Fildumper"
 
 #: modules/demux/dirac.c:41
 msgid "Value to adjust dts by"
-msgstr "Verdier å justere DTS etter"
+msgstr ""
 
 #: modules/demux/dirac.c:54
 msgid "Dirac video demuxer"
-msgstr "Dirac-videodemultiplekser"
+msgstr ""
 
 #: modules/demux/directory.c:94
 msgid "Directory import"
@@ -19834,36 +19822,32 @@ msgstr ""
 "Trykk Delete-tasten for å fjerne."
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1405
-#, fuzzy
 msgid "Global Hotkey change"
-msgstr "Hurtigtastendring"
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1406
 msgid "Hotkey change"
 msgstr "Hurtigtastendring"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1410
-#, fuzzy
 msgid "Press the new key or combination for <b>%1</b>"
-msgstr "Trykk på den nye knappen eller kombinasjonen for"
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1419
 msgid "Assign"
 msgstr "Knytt"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1455
-#, fuzzy
 msgid "Warning: this key or combination is already assigned to \"<b>%1</b>\""
-msgstr "Advarsel: denne knappen eller kombinasjonen er allerede bundet til"
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1467
 msgid "Warning: <b>%1</b> is already an application menu shortcut"
 msgstr "Advarsel: <b>%1</b> er allerede en programmenysnarvei"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1490
-#, fuzzy
 msgid "Key or combination: <b>%1</b>"
-msgstr "Tast eller kombinasjon:"
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1498
 msgid "Key: <b>%1</b>"
@@ -20032,25 +20016,20 @@ msgstr ""
 "*.webm)"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:184
-#, fuzzy
 msgid "This module outputs the stream using the RIST protocol (TR06)."
 msgstr ""
-"Denne modulen kringkaster den omkodede strømmen til et nettverk via MMS."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:186
-#, fuzzy
 msgid "Destination Address"
-msgstr "Målbanens prefiks"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:191
-#, fuzzy
 msgid "Destination Port"
-msgstr "Mål"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:201
-#, fuzzy
 msgid "Stream Name"
-msgstr "Strømmens navn"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:237
 msgid "This module outputs the transcoded stream to a network via HTTP."
@@ -23531,7 +23510,7 @@ msgstr "Kopier innpakker"
 
 #: modules/packetizer/dirac.c:87
 msgid "Dirac packetizer"
-msgstr "Dirac-innpakker"
+msgstr ""
 
 #: modules/packetizer/dts.c:47
 msgid "DTS audio packetizer"
@@ -29566,323 +29545,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Mediebehandlerliste"
-
-#~ msgid "RIST latency (ms)"
-#~ msgstr "RIST-latens (ms)"
-
-#~ msgid "RIST nack retry interval (ms)"
-#~ msgstr "RIST nack gjenforsøksintervall (ms)"
-
-#~ msgid "RIST reorder buffer (ms)"
-#~ msgstr "RIST omorganisere buffer (ms)"
-
-#~ msgid "RIST maximum retry count"
-#~ msgstr "RIST maksimalt antall gjenforsøk"
-
-#~ msgid "16 bytes"
-#~ msgstr "16 bytes"
-
-#~ msgid "24 bytes"
-#~ msgstr "24 bytes"
-
-#~ msgid "32 bytes"
-#~ msgstr "32 bytes"
-
-#~ msgid "RIST data output caching size (ms)"
-#~ msgstr "RIST datautgang caching størrelse (ms)"
-
-#~ msgid "4:2:0"
-#~ msgstr "4:2:0"
-
-#~ msgid "4:2:2"
-#~ msgstr "4:2:2"
-
-#~ msgid "4:4:4"
-#~ msgstr "4:4:4"
-
-#~ msgid "Rate control method"
-#~ msgstr "Frekvenskontrollmetode"
-
-#~ msgid "Method used to encode the video sequence"
-#~ msgstr "Metoden brukt til å kode videosekvensen"
-
-#~ msgid "Constant noise threshold mode"
-#~ msgstr "Grensemodusen for konstant støy"
-
-#~ msgid "Constant bitrate mode (CBR)"
-#~ msgstr "Konstant bitfrekvensmodus (CBR)"
-
-#~ msgid "Low Delay mode"
-#~ msgstr "Modus for lite forsinkelse"
-
-#~ msgid "Lossless mode"
-#~ msgstr "Tapsfri modus"
-
-#~ msgid "Constant lambda mode"
-#~ msgstr "Konstant lambda-modus"
-
-#~ msgid "Constant error mode"
-#~ msgstr "Modus for konstante feil"
-
-#~ msgid "Constant quality mode"
-#~ msgstr "Modus for konstant kvalitet"
-
-#~ msgid "GOP structure"
-#~ msgstr "Bildegruppestruktur"
-
-#~ msgid "GOP structure used to encode the video sequence"
-#~ msgstr "Bildegruppestrukturen som ble brukt til å kode videosekvensen."
-
-#~ msgid ""
-#~ "No fixed gop structure. A picture can be intra or inter and refer to "
-#~ "previous or future pictures."
-#~ msgstr ""
-#~ "Ingen fastsatt bildegruppestruktur. Et bilde kan være internt eller "
-#~ "flerdekkende, og kan referere til foregående eller fremtidige bilder."
-
-#~ msgid "I-frame only sequence"
-#~ msgstr "Sekvens med kun İ-rammer."
-
-#~ msgid "Inter pictures refere to previous pictures only"
-#~ msgstr "Flerdekkende bilder kan kun referere til foregående bilder."
-
-#~ msgid "Inter pictures can refer to previous or future pictures"
-#~ msgstr ""
-#~ "Flerdekkende bilder kan referere til foregående eller fremtidige bilder."
-
-#~ msgid "Constant quality factor"
-#~ msgstr "Faktor for konstant kvalitet"
-
-#~ msgid "Quality factor to use in constant quality mode"
-#~ msgstr "Kvalitetsfaktoren som skal brukes i modusen for konstant kvalitet."
-
-#~ msgid "Noise Threshold"
-#~ msgstr "Støygrense"
-
-#~ msgid "Noise threshold to use in constant noise threshold mode"
-#~ msgstr "Støygrensen som skal brukes i grensemodusen for konstant støy."
-
-#~ msgid "CBR bitrate (kbps)"
-#~ msgstr "CBR-bitfrekvens (Kb/s)"
-
-#~ msgid "Target bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "Ønsket bitfrekvens i Kb/s ved koding i \"Konstant bitfrekvens\"-modus"
-
-#~ msgid "Maximum bitrate (kbps)"
-#~ msgstr "Maksimum bitfrekvens (Kb/s)"
-
-#~ msgid "Maximum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr "Maks bitfrekvens i Kb/s ved koding i \"Konstant bitfrekvens\"-modus"
-
-#~ msgid "Minimum bitrate (kbps)"
-#~ msgstr "Minimum bitfrekvens (Kb/s)"
-
-#~ msgid "Minimum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "Minimum bitfrekvens i Kb/s ved koding i \"Konstant bitfrekvens\"-modus"
-
-#~ msgid "GOP length"
-#~ msgstr "Bildegruppelengden"
-
-#~ msgid ""
-#~ "Number of pictures between successive sequence headers i.e. length of the "
-#~ "group of pictures"
-#~ msgstr ""
-#~ "Antall bilder mellom påfølgende sekvensoverskrifter, altså lengden til "
-#~ "bildegruppen."
-
-#~ msgid "Prefilter"
-#~ msgstr "Førfiltrering"
-
-#~ msgid "Enable adaptive prefiltering"
-#~ msgstr "Aktiver tilpassende førfiltrering"
-
-#~ msgid "No pre-filtering"
-#~ msgstr "Ingen førfiltrering"
-
-#~ msgid "Centre Weighted Median"
-#~ msgstr "Midtpunktvektlagt median"
-
-#~ msgid "Gaussian Low Pass Filter"
-#~ msgstr "Gaussians lavpassfilter"
-
-#~ msgid "Add Noise"
-#~ msgstr "Legg til støy"
-
-#~ msgid "Gaussian Adaptive Low Pass Filter"
-#~ msgstr "Gaussians tilpasningsdyktig lavpassfilter"
-
-#~ msgid "Low Pass Filter"
-#~ msgstr "Lavpassfilter"
-
-#~ msgid "Amount of prefiltering"
-#~ msgstr "Førfiltreringsstyrke"
-
-#~ msgid "Higher value implies more prefiltering"
-#~ msgstr "Et høyere tall indikerer mere førfiltrering"
-
-#~ msgid "Picture coding mode"
-#~ msgstr "Bildekodingsmodus"
-
-#~ msgid ""
-#~ "Field coding is where interlaced fields are coded separately as opposed "
-#~ "to a pseudo-progressive frame"
-#~ msgstr ""
-#~ "Områdekoding er når de linjeflettede rammene er kodet separat, i "
-#~ "motsetning til en imitasjonsprogressiv ramme."
-
-#~ msgid "auto - let encoder decide based upon input (Best)"
-#~ msgstr "Auto — La koderen bestemme utifra inndataen. (Best)"
-
-#~ msgid "force coding frame as single picture"
-#~ msgstr "Fremtving koding av rammer som ett enkelt bilde"
-
-#~ msgid "force coding frame as separate interlaced fields"
-#~ msgstr "Fremtving koding av rammer som separate linjeflettede områder."
-
-#~ msgid "Size of motion compensation blocks"
-#~ msgstr "Størrelsen til bevegelseskompensasjonsblokkene"
-
-#~ msgid "automatic - let encoder decide based upon input (Best)"
-#~ msgstr "Auto — La koderen bestemme utifra inndataen. (Best)"
-
-#~ msgid "small - use small motion compensation blocks"
-#~ msgstr "Liten — Bruk små bevegelseskompensasjonsblokker"
-
-#~ msgid "medium - use medium motion compensation blocks"
-#~ msgstr "Middles — Bruk middels store bevegelseskompensasjonsblokker"
-
-#~ msgid "large - use large motion compensation blocks"
-#~ msgstr "Stor — Bruk store bevegelseskompensasjonsblokker"
-
-#~ msgid "Overlap of motion compensation blocks"
-#~ msgstr "Overlappingen av bevegelseskompensasjonsblokker"
-
-#~ msgid "none - Motion compensation blocks do not overlap"
-#~ msgstr "Ingen — Bevegelseskompensasjonsblokker overlapper ikke"
-
-#~ msgid "partial - Motion compensation blocks only partially overlap"
-#~ msgstr "Delvis — Bevegelseskompensasjonsblokker overlapper kun delvis"
-
-#~ msgid "full - Motion compensation blocks fully overlap"
-#~ msgstr "Full — Bevegelseskompensasjonsblokker overlapper fullstendig"
-
-#~ msgid "Motion Vector precision"
-#~ msgstr "Bevegelsesvektor-nøyaktigheten."
-
-#~ msgid "Motion Vector precision in pels"
-#~ msgstr "Bevegelsesvektor-nøyaktigheten i bildepunkter"
-
-#~ msgid "Three component motion estimation"
-#~ msgstr "3-komponents bevegelsesantakelse"
-
-#~ msgid "Use chroma as part of the motion estimation process"
-#~ msgstr "Bruk kromineringen som en del av bevegelsesantakelsesprosessen"
-
-#~ msgid "Intra picture DWT filter"
-#~ msgstr "DWT-filter internt i bildet"
-
-#~ msgid "Inter picture DWT filter"
-#~ msgstr "DWT-filter mellom flere bilder"
-
-#~ msgid "Number of DWT iterations"
-#~ msgstr "Antall DWT-repeteringer"
-
-#~ msgid "Also known as DWT levels"
-#~ msgstr "Også kjent som DWT-nivåer"
-
-#~ msgid "Enable multiple quantizers"
-#~ msgstr "Aktiver flere kvantiserere"
-
-#~ msgid "Enable multiple quantizers per subband (one per codeblock)"
-#~ msgstr "Aktiver flere kvantiserere per underbånd (Én per kodeblokk)"
-
-#~ msgid "Disable arithmetic coding"
-#~ msgstr "Skru av hoderegningskoding"
-
-#~ msgid "Use variable length codes instead, useful for very high bitrates"
-#~ msgstr ""
-#~ "Bruk variable tidslengdekoder istedet, nyttig ved veldig høye "
-#~ "bitfrekvenser"
-
-#~ msgid "perceptual weighting method"
-#~ msgstr "Oppfattbar veiingsmetode"
-
-#~ msgid "perceptual distance"
-#~ msgstr "Oppfattbar distanse"
-
-#~ msgid "perceptual distance to calculate perceptual weight"
-#~ msgstr "Den oppfattbare distansen for å kalkulere oppfattbar vekt."
-
-#~ msgid "Horizontal slices per frame"
-#~ msgstr "Vannrette skiver per ramme"
-
-#~ msgid "Number of horizontal slices per frame in low delay mode"
-#~ msgstr "Antall vannrette skiver per ramme i lavforsinkelsesmodus"
-
-#~ msgid "Vertical slices per frame"
-#~ msgstr "Loddrette skiver per ramme"
-
-#~ msgid "Number of vertical slices per frame in low delay mode"
-#~ msgstr "Antall loddrette skiver per ramme i lavforsinkelsesmodus"
-
-#~ msgid "Size of code blocks in each subband"
-#~ msgstr "Størrelsen på kodeblokkene i hvert underbånd"
-
-#~ msgid "small - use small code blocks"
-#~ msgstr "Liten — Bruk små kodeblokker"
-
-#~ msgid "medium - use medium sized code blocks"
-#~ msgstr "Medium — Bruk middels store kodeblokker"
-
-#~ msgid "large - use large code blocks"
-#~ msgstr "Stor — Bruk store kodeblokker"
-
-#~ msgid "full - One code block per subband"
-#~ msgstr "Full — Én kodeblokk per underbånd."
-
-#~ msgid "Enable hierarchical Motion Estimation"
-#~ msgstr "Aktiver hierarkisk bevegelsesantakelse"
-
-#~ msgid "Number of levels of downsampling"
-#~ msgstr "Antall nivåer av nedsampling"
-
-#~ msgid ""
-#~ "Number of levels of downsampling in hierarchical motion estimation mode"
-#~ msgstr ""
-#~ "Antall nivåer av nedsampling i den hierarkiske "
-#~ "bevegelsesantakelsesmodusen."
-
-#~ msgid "Enable Global Motion Estimation"
-#~ msgstr "Aktiver heldekkende bevegelsesantakelse"
-
-#~ msgid "Enable Phase Correlation Estimation"
-#~ msgstr "Aktiver fasekorrelasjonsantakelse"
-
-#~ msgid "Enable Scene Change Detection"
-#~ msgstr "Aktiver sceneendringsoppdagelse"
-
-#~ msgid "Force Profile"
-#~ msgstr "Fremtving profil"
-
-#~ msgid "VC2 Low Delay Profile"
-#~ msgstr "VC2-profil for lav forsinkelse"
-
-#~ msgid "VC2 Simple Profile"
-#~ msgstr "Enkel VC2-profil"
-
-#~ msgid "VC2 Main Profile"
-#~ msgstr "VC2-hovedprofil"
-
-#~ msgid "Main Profile"
-#~ msgstr "Hovedprofil"
-
-#~ msgid "Dirac video decoder using libschroedinger"
-#~ msgstr "Dirac-videodekoder gjennom libschroedinger"
-
-#~ msgid "Dirac video encoder using libschroedinger"
-#~ msgstr "Dirac-videodekoder gjennom libschroedinger"
-
-#~ msgid "Key: "
-#~ msgstr "Tast: "
