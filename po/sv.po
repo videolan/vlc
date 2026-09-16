@@ -1,5 +1,5 @@
 # Swedish translation
-# Copyright (C) 2023 VideoLAN
+# Copyright (C) 2026 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -37,22 +37,25 @@
 # Sebastian Rasmussen <sebras@gmail.com>, 2019
 # Mat Mat <pprova2004@gmail.com>, 2019
 # M An <kichigaimikaeru@gmail.com>, 2019
-# Jonatan Nyberg, 2022
+# Jonatan Nyberg, 2022,2026
 # Tom Sawyer, 2022
-# A. Regnander <anton_r_3@hotmail.com>, 2023-2025
+# A. Regnander <anton_r_3@hotmail.com>, 2023-2026
+# Michał Trzebiatowski <michtrz@gmail.com>, 2018
+# Kristoffer Grundström <lovaren@gmail.com>, 2021
+# Luna Jernberg <droidbittin@gmail.com>, 2026
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22\n"
+"Project-Id-Version: vlc 3.0.24-beta1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2026-06-28 16:08+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
-"Last-Translator: Daniel Nylander <po@danielnylander.se>, 2025\n"
+"Last-Translator: Jonatan Nyberg, 2026\n"
 "Language-Team: Swedish (https://app.transifex.com/yaron/teams/16553/sv/)\n"
-"Language: sv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: sv\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: include/vlc_common.h:1055
@@ -835,38 +838,39 @@ msgid ""
 "  vlc://quit                     Special item to quit VLC\n"
 "\n"
 msgstr ""
-"Användning: %s [flaggor] [ström] ...\n"
+"Användning: %s [alternativ] [ström] ...\n"
 "Du kan ange flera strömmar på kommandoraden.\n"
-"De kommer att köläggas i spellistan.\n"
-"Första objektet som anges kommer att spelas upp först.\n"
+"De läggs i uppspelningskön.\n"
+"Det första angivna objektet spelas upp först.\n"
 "\n"
-"Flagghjälp:\n"
-"  --flagga  En global flagga som ställs in för längden på programmet.\n"
-"   -flagga  En enda bokstavsversion av en global --option.\n"
-"   :flagga  En flagga som endast gäller för strömmen direkt före den\n"
+"Alternativformat:\n"
+"  --option  Ett globalt alternativ som gäller så länge programmet körs.\n"
+"   -option  En enbokstavsversion av ett globalt --option.\n"
+"   :option  Ett alternativ som endast gäller strömmen direkt före det\n"
 "            och som åsidosätter tidigare inställningar.\n"
 "\n"
-"MRL-syntax för ström:\n"
-"  [[access][/demux]://]URL[@[titel][:kapitel][-[titel][:kapitel]]]\n"
-"  [:option=värde ...]\n"
+"MRL-syntax för strömmar:\n"
+"  [[access][/demux]://]URL[#[title][:chapter][-[title][:chapter]]]\n"
+"  [:option=value ...]\n"
 "\n"
-"  Många av de globala --flaggor kan även användas som MRL-"
-"specifika :flaggor.\n"
-"  Flera par av :flagga=värde kan anges.\n"
+"  Många globala --options kan även användas som MRL-specifika :options.\n"
+"  Flera par av typen :option=value kan anges.\n"
 "\n"
 "URL-syntax:\n"
-"  file:///sökväg/fil             Vanlig mediafil\n"
-"  http://värd[:port]/fil         HTTP URL\n"
-"  ftp://värd[:port]/fil          FTP URL\n"
-"  mms://värd[:port]/fil          MMS URL\n"
-"  screen://                      Skärmfångst\n"
-"  dvd://[enhet]                  DVD-enhet\n"
-"  vcd://[enhet]                  VCD-enhet\n"
-"  cdda://[enhet]                 Ljud-cd-enhet\n"
-"  udp://[[<källadress>]@[<bindadress>][:<bindport>]]\n"
-"                                 UDP-ström skickad av en strömningsserver\n"
-"  vlc://pause:<sekunder>         Pausa spellistan under en viss tid\n"
-"  vlc://quit                     Specialobjekt för att avsluta VLC\n"
+"  file:///path/file              Vanlig mediafil\n"
+"  http://host[:port]/file        HTTP-URL\n"
+"  ftp://host[:port]/file         FTP-URL\n"
+"  mms://host[:port]/file         MMS-URL\n"
+"  screen://                      Skärminspelning\n"
+"  dvd://[device]                 DVD-enhet\n"
+"  vcd://[device]                 VCD-enhet\n"
+"  cdda://[device]                Ljud-CD-enhet\n"
+"  udp://[[<source address>]@[<bind address>][:<bind port>]]\n"
+"                                 UDP-ström som skickas av en "
+"strömningsserver\n"
+"  vlc://pause:<seconds>          Pausa spellistan under en viss tid\n"
+"  vlc://quit                     Specialobjekt som avslutar VLC\n"
+"\n"
 
 #: src/config/help.c:490
 msgid "(default enabled)"
@@ -1940,10 +1944,10 @@ msgid ""
 "\"video filters\" modules section. You can also set many miscellaneous video "
 "options."
 msgstr ""
-"Dessa alternativ tillåter dig att ändra beteendet hos video output "
-"subsystem. Du kan t.ex. aktivera videofilter (deinterlacing, bildjustering "
-"m.m). Aktivera filtrena här och konfigurera dem i \"Video Filter\" module "
-"sektion. Du kan också ställa in många varierande videoinställningar."
+"Med de här alternativen kan du ändra videosystemets utmatningsbeteende. Du "
+"kan till exempel aktivera videofilter för avflätning och bildjustering. "
+"Aktivera filtren här och konfigurera dem i modulavsnittet ”Videofilter”. Du "
+"kan även ange andra videoalternativ."
 
 #: src/libvlc-module.c:253
 msgid "Video output module"
@@ -2331,8 +2335,8 @@ msgid ""
 "You can enforce the width of the video snapshot. By default it will keep the "
 "original width (-1). Using 0 will scale the width to keep the aspect ratio."
 msgstr ""
-"Du kan utöka vidden på video bild. Default är att behålla originalvidd. "
-"(-1). Användande av 0 kommer att ange vidden till sidförhållandet."
+"Du kan ange bredden på videoögonblicksbilden. Standardvärdet -1 behåller "
+"originalbredden. Värdet 0 skalar bredden så att bildförhållandet bevaras."
 
 #: src/libvlc-module.c:415
 msgid "Video snapshot height"
@@ -2344,8 +2348,8 @@ msgid ""
 "the original height (-1). Using 0 will scale the height to keep the aspect "
 "ratio."
 msgstr ""
-"Du kan utöka höjden på video bild. Default är att behålla originalhöjd (-1). "
-"Användande av 0 skalar höjden till sidförhållandet."
+"Du kan ange höjden på videoögonblicksbilden. Standardvärdet -1 behåller "
+"originalhöjden. Värdet 0 skalar höjden så att bildförhållandet bevaras."
 
 #: src/libvlc-module.c:421
 msgid "Video cropping"
@@ -2961,10 +2965,10 @@ msgid ""
 "filters here and configure them in the \"subsources filters\" modules "
 "section. You can also set many miscellaneous subpictures options."
 msgstr ""
-"Dessa inställningar låter dig ändra hur underbildssystemet beter sig. Du kan "
-"t.ex. aktivera källor till underbilder (logotyp, osv.). Aktivera dessa "
-"filter här och ställ dem in i avsnittet \"delkällorfilter\". Du kan också "
-"ställa in diverse alternativ för underbilder."
+"Med de här alternativen kan du ändra underbildssystemets beteende. Du kan "
+"exempelvis aktivera underbildskällor som logotyper. Aktivera filtren här och "
+"konfigurera dem i modulavsnittet för underbildskällor. Du kan även ange "
+"andra underbildsalternativ."
 
 #: src/libvlc-module.c:705 modules/gui/qt/ui/sprefs_subtitles.h:304
 msgid "Force subtitle position"
@@ -3029,8 +3033,8 @@ msgid ""
 "This adds so-called \"subpicture sources\". These filters overlay some "
 "images or text over the video (like a logo, arbitrary text, ...)."
 msgstr ""
-"Detta lägger till så-kallade \"underbildskällor\". Dessa filter lägger några "
-"bilder eller text ovanpå videon (som en logotyp, tillfällig text, ...)."
+"Det här lägger till så kallade underbildskällor. Filtren lägger bilder eller "
+"text ovanpå videon, exempelvis en logotyp eller valfri text."
 
 #: src/libvlc-module.c:731
 msgid "Subpictures filter module"
@@ -6385,9 +6389,7 @@ msgstr "Java hittades inte på ditt system."
 
 #: modules/access/bluray.c:949
 msgid "Failed to start bluray playback. Please try without menu support."
-msgstr ""
-"Misslyckades att starta Blu-ray-uppspelning. Var god prova utan stöd för "
-"menyer."
+msgstr "Det gick inte att starta Blu-ray-uppspelningen. Försök utan menystöd."
 
 #: modules/access/bluray.c:990 modules/access/bluray.c:2823
 #: modules/access/bluray.c:2828
@@ -6831,8 +6833,8 @@ msgid ""
 "AM Tuner mode. Can be one of Default (0), TV (1), AM Radio (2), FM Radio (3) "
 "or DSS (4)."
 msgstr ""
-"AM mottagarläge. Kan vara något av följande: Default (0), TV (1), AM Radio "
-"(2), FM Radio (3) eller DSS (4)."
+"AM-mottagarläge. Kan vara Standard (0), TV (1), AM-radio (2), FM-radio (3) "
+"eller DSS (4)."
 
 #: modules/access/dshow/dshow.cpp:199
 msgid ""
@@ -6876,7 +6878,8 @@ msgstr "Ingen video- eller ljudenhet har valts."
 
 #: modules/access/dshow/dshow.cpp:591
 msgid "VLC cannot open ANY capture device. Check the error log for details."
-msgstr "VLC kan inte öppna ALLA fångstenheter. Kolla felloggen för detaljer."
+msgstr ""
+"VLC kan inte öppna någon inspelningsenhet. Mer information finns i felloggen."
 
 #: modules/access/dshow/dshow.cpp:1055
 msgid ""
@@ -7473,8 +7476,7 @@ msgstr "Uppspelning misslyckades"
 msgid ""
 "VLC cannot set the DVD's title. It possibly cannot decrypt the entire disc."
 msgstr ""
-"VLC kan inte ange DVD-skivans titel. De är omöjligt att dekryptera hela "
-"skivan."
+"VLC kan inte ange DVD-skivans titel. Hela skivan kanske inte kan dekrypteras."
 
 #: modules/access/dvdread.c:84
 msgid "DVD without menus"
@@ -8195,15 +8197,17 @@ msgid "Bitmask"
 msgstr "Bitmask"
 
 #: modules/access/rist.c:313
-#, fuzzy
 msgid "Virtual Destination Port Filter"
-msgstr "Målfil:"
+msgstr "Virtuell destination portfilter"
 
 #: modules/access/rist.c:315
 msgid ""
 "Destination port to be used inside the reduced-mode of the main profile to "
 "filter incoming data. Use zero to allow all."
 msgstr ""
+"Destinationsporten som ska användas inuti det reducerade läget för "
+"huvudprofilen för att filtrera inkommande data. Använd noll för att tillåta "
+"alla."
 
 #: modules/access/rist.c:321 modules/access_output/rist.c:293
 msgid "RIST"
@@ -8218,13 +8222,12 @@ msgid "RIST demux/decode maximum jitter (default is 5ms)"
 msgstr "RIST demux/avkodning maximal jitter (standard är 5 ms)"
 
 #: modules/access/rist.c:328
-#, fuzzy
 msgid ""
 "This controls the maximum jitter that will be passed to the demux/decode "
 "chain. The lower the value, the more CPU cycles the module will consume"
 msgstr ""
-"Detta styr det maximala jitter som kommer att skickas till demux/decode-"
-"kedjan. Ju lägre värde, desto fler CPU-cykler kommer algoritmen att förbruka"
+"Detta styr det maximala jitter som skickas till demux/decode-kedjan. Ju "
+"lägre värde, desto fler CPU-cykler kommer modulen att förbruka. "
 
 #: modules/access/rist.c:332
 msgid "RIST nack type, 0 = range, 1 = bitmask. Default is range"
@@ -8512,9 +8515,8 @@ msgid "SFTP port number to use on the server"
 msgstr "SFTP-portnumret att använda på servern"
 
 #: modules/access/sftp.c:61
-#, fuzzy
 msgid "Private key file"
-msgstr "AES-nyckelfil"
+msgstr "Privat nyckelfil"
 
 #: modules/access/sftp.c:62
 msgid ""
@@ -8522,6 +8524,10 @@ msgid ""
 "assumed to be in the same directory with '.pub' appended. If unset, standard "
 "key paths will be attempted (e.g. '~/.ssh/id_rsa')."
 msgstr ""
+"Privat nyckelfil som används för SSH-autentisering med offentlig nyckel. "
+"Filen med offentlig nyckel antas finnas i samma katalog med '.pub' tillagd. "
+"Om den inte är inställd kommer standardnyckelsökvägar att försöka att "
+"användas (t.ex. '~/.ssh/id_rsa')."
 
 #: modules/access/sftp.c:68
 msgid "SFTP input"
@@ -8665,7 +8671,6 @@ msgid "Password for stream encryption"
 msgstr "Lösenord för strömkryptering"
 
 #: modules/access/srt.c:566
-#, fuzzy
 msgid "SRT Stream ID"
 msgstr " SRT ström-id"
 
@@ -9106,11 +9111,10 @@ msgid ""
 "{video_bitrate=6000000,audio_crc=0,stream_type=3} ). To list available "
 "controls, increase verbosity (-vv) or use the v4l2-ctl application."
 msgstr ""
-"Ställ in v4l2-drivrutinens kontroller till de värden som anges med en "
-"kommaseparerad lista, eventuellt inkapslad med hakparenteser (t.ex.: "
-"{video_bitrate=6000000,audio_crc=0,stream_type=3} ). För att lista "
-"tillgängliga kontroller, öka verbosity (-vv) eller använd programmet v4l2-"
-"ctl."
+"Ange v4l2-drivrutinens kontroller som en kommaseparerad lista, eventuellt "
+"omgiven av klammerparenteser (exempelvis "
+"{video_bitrate=6000000,audio_crc=0,stream_type=3}). Öka detaljnivån (-vv) "
+"eller använd v4l2-ctl för att visa tillgängliga kontroller."
 
 #: modules/access/v4l2/v4l2.c:242 modules/codec/avcodec/avcodec.c:50
 #: modules/codec/avcodec/avcodec.c:54 modules/codec/x264.c:429
@@ -9525,50 +9529,49 @@ msgstr "LiveHTTP"
 
 #: modules/access_output/rist.c:268
 msgid "Virtual Source Port"
-msgstr ""
+msgstr "Virtuell källport"
 
 #: modules/access_output/rist.c:270
 msgid "Source port to be used inside the reduced-mode of the main profile"
-msgstr ""
+msgstr "Källportom ska användas inuti det reducerade läget för huvudprofilen"
 
 #: modules/access_output/rist.c:272
-#, fuzzy
 msgid "Virtual Destination Port"
-msgstr "Strömplats"
+msgstr "Virtuell destination port"
 
 #: modules/access_output/rist.c:274
 msgid "Destination port to be used inside the reduced-mode of the main profile"
 msgstr ""
+"Destinationsport som ska användas inuti det reducerade läget för "
+"huvudprofilen"
 
 #: modules/access_output/rist.c:281
-#, fuzzy
 msgid "Multipeer mode"
-msgstr "Multiplexer"
+msgstr "Multipeer läge"
 
 #: modules/access_output/rist.c:283
 msgid ""
 "This allows you to select between duplicate or load balanced modes when "
 "sending data to multiple peers (several network paths)"
 msgstr ""
+"Detta låter dig välja mellan duplicerat eller belastningsbalanserat läge när "
+"du skickar data till flera peers (flera nätverksvägar)"
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Duplicate"
-msgstr "Program"
+msgstr "Duplicera"
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Load balanced"
-msgstr "Rödbalans"
+msgstr "Lastbalanserad"
 
 #: modules/access_output/rist.c:294
 msgid "RIST stream output"
 msgstr "RIST strömutdata"
 
 #: modules/access_output/rist.c:299
-#, fuzzy
 msgid "RIST target payload size (bytes)"
-msgstr "RIST målpaketets storlek (byte)"
+msgstr "RIST-målets nyttolaststorlek (byte)"
 
 #: modules/access_output/shout.c:64
 #: modules/gui/qt/components/sout/sout_widgets.cpp:438
@@ -12898,7 +12901,6 @@ msgstr "Avkodare för undertexttexter"
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -14164,7 +14166,7 @@ msgstr "Undertexter via text-tv"
 
 #: modules/codec/zvbi.c:76
 msgid "Output teletext subtitles as text instead of as RGBA."
-msgstr "Utmatning av text-TV-undertexter som text istället för RGBA."
+msgstr "Mata ut text-tv-undertexter som text i stället för RGBA."
 
 #: modules/codec/zvbi.c:79
 msgid "Presentation Level"
@@ -14596,7 +14598,7 @@ msgstr "Fusk-TTY"
 
 #: modules/control/oldrc.c:164
 msgid "Force the rc module to use stdin as if it was a TTY."
-msgstr "Tvinga rc-modulen att använda standard in som om det vore en TTY."
+msgstr "Tvinga rc-modulen att använda standardindata som om den vore en TTY."
 
 #: modules/control/oldrc.c:166
 msgid "UNIX socket command input"
@@ -14604,7 +14606,7 @@ msgstr "Kommandoinmatning från UNIX-uttag"
 
 #: modules/control/oldrc.c:167
 msgid "Accept commands over a Unix socket rather than stdin."
-msgstr "Acceptera kommandon över ett Unix-uttag hellre än standard in."
+msgstr "Ta emot kommandon via en Unix-socket i stället för standardindata."
 
 #: modules/control/oldrc.c:170 modules/lua/vlc.c:73
 msgid "TCP command input"
@@ -14615,8 +14617,8 @@ msgid ""
 "Accept commands over a socket rather than stdin. You can set the address and "
 "port the interface will bind to."
 msgstr ""
-"Acceptera kommandon över ett uttag istället för standard in. Du kan ställa "
-"in adress och port som gränssnittet ska bindas till."
+"Ta emot kommandon via en socket i stället för standardindata. Du kan ange "
+"den adress och port som gränssnittet ska bindas till."
 
 #: modules/control/oldrc.c:177
 msgid ""
@@ -14624,10 +14626,9 @@ msgid ""
 "the quiet mode will not bring this command box but can also be pretty "
 "annoying when you want to stop VLC and no video window is open."
 msgstr ""
-"Som standard kommer rc interface plugin att starta en DOS kommandoruta. Om "
-"du aktiverar det tysta läget visas inte denna kommandoruta, men det kan "
-"också vara ganska irriterande när du vill stoppa VLC och inget videofönster "
-"är öppet."
+"Som standard öppnar insticksmodulen för rc-gränssnittet ett DOS-"
+"kommandofönster. I tyst läge öppnas inte fönstret, vilket kan göra det "
+"svårare att avsluta VLC när inget videofönster är öppet."
 
 #: modules/control/oldrc.c:187
 msgid "RC"
@@ -16321,7 +16322,7 @@ msgstr "Visa endast installerade"
 #: modules/gui/macosx/VLCAddonsWindowController.m:118
 #: modules/gui/qt/dialogs/plugins.cpp:429
 msgid "Find more addons online"
-msgstr "Hitta fler tillägg online"
+msgstr "Hitta fler tillägg på nätet"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:128
 #: modules/gui/macosx/VLCMainMenu.m:345 modules/gui/qt/dialogs/plugins.cpp:85
@@ -16465,7 +16466,7 @@ msgstr "Spara"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:534
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:813
 msgid "Please enter a unique name for the new profile."
-msgstr "Var god ange ett unikt namn för den nya profilen."
+msgstr "Ange ett unikt namn för den nya profilen."
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:535
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:814
@@ -17963,7 +17964,7 @@ msgstr "Åtgärd"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:299
 msgid "Shortcut"
-msgstr "Genväg"
+msgstr "Kortkommando"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:302
 #: modules/gui/qt/ui/sprefs_input.h:364
@@ -20000,40 +20001,38 @@ msgstr ""
 "Tryck på Delete för att ta bort."
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1405
-#, fuzzy
 msgid "Global Hotkey change"
-msgstr "Ändra kortkommando"
+msgstr "Byt globalt kortkommando"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1406
 msgid "Hotkey change"
 msgstr "Ändra kortkommando"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1410
-#, fuzzy
 msgid "Press the new key or combination for <b>%1</b>"
-msgstr "Ange den nya tangenten eller kombinationen för "
+msgstr "Ange den nya tangenten eller kombinationen för <b>%1</b>"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1419
 msgid "Assign"
 msgstr "Tilldela"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1455
-#, fuzzy
 msgid "Warning: this key or combination is already assigned to \"<b>%1</b>\""
-msgstr "Varning: Denna tangent eller kombination är redan tilldelad till "
+msgstr ""
+"Varning: Denna tangent eller kombination är redan tilldelad till \"<b>%1</"
+"b>\""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1467
 msgid "Warning: <b>%1</b> is already an application menu shortcut"
-msgstr "Varning: <b>%1</b> är redan en menygenväg till en applikation"
+msgstr "Varning: <b>%1</b> används redan som kortkommando i en appmeny"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1490
-#, fuzzy
 msgid "Key or combination: <b>%1</b>"
-msgstr "Tangent eller kombination: "
+msgstr "Tangent eller kombination: <b>%1</b>"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1498
 msgid "Key: <b>%1</b>"
-msgstr ""
+msgstr "Tangent: <b>%1</b>"
 
 #: modules/gui/qt/components/simple_preferences.cpp:256
 #: modules/gui/qt/components/simple_preferences.cpp:636
@@ -20196,24 +20195,18 @@ msgstr ""
 "Behållare (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:184
-#, fuzzy
 msgid "This module outputs the stream using the RIST protocol (TR06)."
-msgstr ""
-"Denna modul matar ut den omkodade strömmen till ett nätverk via mms-"
-"protokollet."
+msgstr "Denna modul matar ut strömmen med hjälp av RIST-protokollet (TR06)."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:186
-#, fuzzy
 msgid "Destination Address"
-msgstr "Målprefix"
+msgstr "Destinationsadress."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:191
-#, fuzzy
 msgid "Destination Port"
-msgstr "Mål"
+msgstr "Destinationsport."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:201
-#, fuzzy
 msgid "Stream Name"
 msgstr "Strömnamn"
 
@@ -20308,11 +20301,11 @@ msgstr "Flera filer valda."
 
 #: modules/gui/qt/dialogs/convert.cpp:68 modules/stream_out/rtp.c:76
 msgid "Destination"
-msgstr "Mål"
+msgstr "Destination"
 
 #: modules/gui/qt/dialogs/convert.cpp:71 modules/gui/qt/ui/sprefs_audio.h:414
 msgid "Destination file:"
-msgstr "Målfil:"
+msgstr "Destination fil:"
 
 #: modules/gui/qt/dialogs/convert.cpp:82
 msgid "Browse"
@@ -20419,14 +20412,14 @@ msgid ""
 "p>\n"
 msgstr ""
 "<p>För att skydda din integritet samlar <i>VLC media player</i> <b>inte</b> "
-"in personliga uppgifter eller skickar dem, inte ens i anonymt format, till "
-"någon.</p>\n"
-"<p>Ändå kan <i>VLC</i> automatiskt samla in information om media i din "
-"spellista från tredjeparts Internetbaserade tjänster. Detta inkluderar "
-"albumomslag, spårnamn, artistnamn och annan metadata.</p>\n"
-"Det kan innebära att en del av din mediafiler identifieras till "
-"tredjepartsföretag. Därför behöver <i>VLCs</i> utvecklare ditt uttryckliga "
-"samtycke till att mediaspelaren ansluter till Internet automatiskt.</p>\n"
+"in personuppgifter eller skickar dem till någon, inte ens i anonymiserad "
+"form.</p>\n"
+"<p><i>VLC</i> kan ändå automatiskt hämta information om media i spellistan "
+"från internetbaserade tredjepartstjänster. Det kan omfatta omslagsbilder, "
+"spårnamn, artistnamn och annan metadata.</p>\n"
+"<p>Det kan innebära att vissa av dina mediafiler identifieras för tredje "
+"part. VLC-utvecklarna behöver därför ditt uttryckliga samtycke innan "
+"mediaspelaren automatiskt ansluter till internet.</p>\n"
 
 #: modules/gui/qt/dialogs/firstrun.cpp:88
 msgid "Network Access Policy"
@@ -23342,9 +23335,9 @@ msgid ""
 "Windows Media Player will cache streamed content. Set to audio+video bitrate "
 "in bytes"
 msgstr ""
-"Försök inte att gissa ASF-bithastigheten. Om du ställer in detta kan du "
-"styra hur Windows Media Player ska cacha strömmat innehåll. Ställ in till "
-"ljud+videobitfrekvens i byte"
+"Försök inte uppskatta ASF-bithastigheten. Inställningen styr hur Windows "
+"Media Player cachelagrar strömmat innehåll. Ange den sammanlagda ljud- och "
+"videobithastigheten i byte."
 
 #: modules/mux/asf.c:73
 msgid "ASF muxer"
@@ -23480,8 +23473,8 @@ msgid ""
 "Assign a program number to each PMT. This requires \"Set PID to ID of ES\" "
 "to be enabled."
 msgstr ""
-"Tilldela ett programnummer till varje PMT. Detta kräver att \"Set PID to ID "
-"of ES\" är aktiverat."
+"Tilldela varje PMT ett programnummer. Alternativet ”Ange PID som ES-ID” "
+"måste vara aktiverat."
 
 #: modules/mux/mpeg/ts.c:120
 msgid "Mux PMT (requires --sout-ts-es-id-pid)"
@@ -23492,8 +23485,8 @@ msgid ""
 "Define the pids to add to each pmt. This requires \"Set PID to ID of ES\" to "
 "be enabled."
 msgstr ""
-"Definiera de pids som ska läggas till i varje pmt. Detta kräver att \"Set "
-"PID to ID of ES\" är aktiverat."
+"Ange vilka PID:er som ska läggas till i varje PMT. Alternativet ”Ange PID "
+"som ES-ID” måste vara aktiverat."
 
 #: modules/mux/mpeg/ts.c:124
 msgid "SDT Descriptors (requires --sout-ts-es-id-pid)"
@@ -23504,8 +23497,8 @@ msgid ""
 "Defines the descriptors of each SDT. This requires \"Set PID to ID of ES\" "
 "to be enabled."
 msgstr ""
-"Definierar deskriptorerna för varje SDT. Detta kräver att \"Set PID to ID of "
-"ES\" är aktiverat."
+"Definierar deskriptorerna för varje SDT. Alternativet ”Ange PID som ES-ID” "
+"måste vara aktiverat."
 
 #: modules/mux/mpeg/ts.c:128
 msgid "Set PID to ID of ES"
@@ -23724,7 +23717,7 @@ msgstr "Kopiera paketerare"
 
 #: modules/packetizer/dirac.c:87
 msgid "Dirac packetizer"
-msgstr "Dirac paketering"
+msgstr "Dirac paketerare"
 
 #: modules/packetizer/dts.c:47
 msgid "DTS audio packetizer"
@@ -23998,7 +23991,7 @@ msgstr "Anpassad SAT>IP-kanallista URL"
 #: modules/services_discovery/upnp.cpp:118
 #: modules/services_discovery/upnp.cpp:253
 msgid "Universal Plug'n'Play"
-msgstr "Universal Plug and Play"
+msgstr "Universal Plug and Play (UPnP)"
 
 #: modules/services_discovery/xcb_apps.c:48
 #: modules/services_discovery/xcb_apps.c:49
@@ -24083,7 +24076,7 @@ msgstr "Höjd i bildpunkt för den BarGraph som ska visas."
 
 #: modules/spu/audiobargraph_v.c:79 modules/spu/audiobargraph_v.c:98
 msgid "Audio Bar Graph Video sub source"
-msgstr "Audio Bar Graph Video subkälla"
+msgstr "Underbildskälla för ljudnivådiagram"
 
 #: modules/spu/audiobargraph_v.c:80
 msgid "Audio Bar Graph Video"
@@ -25081,8 +25074,8 @@ msgid ""
 "Casting this video requires conversion. This conversion can use all the "
 "available power and could quickly drain your battery."
 msgstr ""
-"Denna video måste konverteras för att castas. Denna konvertering kan använda "
-"all tillgänglig kraft och kan snabbt dränera ditt batteri."
+"Videon måste konverteras innan den kan castas. Konverteringen kan använda "
+"all tillgänglig processorkraft och snabbt tömma batteriet."
 
 #: modules/stream_out/chromecast/chromecast_demux.cpp:511
 msgid "Chromecast demux wrapper"
@@ -25543,8 +25536,8 @@ msgid ""
 "Address of the video prerender callback function. This function will set the "
 "buffer where render will be done."
 msgstr ""
-"Adress till callback-funktionen för video före rendering. Denna funktion "
-"ställer in bufferten där renderingen kommer att göras."
+"Adress till återanropsfunktionen före videorendering. Funktionen anger "
+"bufferten där renderingen ska utföras."
 
 #: modules/stream_out/smem.c:65
 msgid "Audio prerender callback"
@@ -25896,8 +25889,8 @@ msgid ""
 "Please wait while your font cache is rebuilt.\n"
 "This should take less than a few minutes."
 msgstr ""
-"Var god vänta tills din typsnittscache byggs upp.\n"
-"Detta borde ta mindre än några minuter."
+"Vänta medan teckensnittscachen byggs om.\n"
+"Det bör ta mindre än några minuter."
 
 #: modules/text_renderer/freetype/freetype.c:81
 msgid "Monospace Font"
@@ -27316,7 +27309,7 @@ msgstr "Inspelningsförhållande"
 msgid ""
 "Ratio of images to record. 3 means that one image out of three is recorded."
 msgstr ""
-"Förhållande för bilder att spela in. 3 innebär att en av tre bilder spelas "
+"Andel bilder som ska spelas in. Värdet 3 innebär att en av tre bilder spelas "
 "in."
 
 #: modules/video_filter/scene.c:76
@@ -29792,381 +29785,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Mediahanteringslista"
-
-#~ msgid "RIST maximum packet size (bytes)"
-#~ msgstr "RIST maximal paketstorlek (byte)"
-
-#~ msgid "RIST latency (ms)"
-#~ msgstr "RIST fördröjning (ms)"
-
-#~ msgid "RIST nack retry interval (ms)"
-#~ msgstr "RIST nack omprövningsintervall (ms)"
-
-#~ msgid "RIST reorder buffer (ms)"
-#~ msgstr "RIST buffert för omordning (ms)"
-
-#~ msgid "RIST maximum retry count"
-#~ msgstr "RIST maximalt antal omprövningar"
-
-#~ msgid "Disable NACK output packets"
-#~ msgstr "Avaktivera utgående NACK-paket"
-
-#~ msgid "Use this to disable packet recovery"
-#~ msgstr "Använd detta för att inaktivera paketåterhämtning"
-
-#~ msgid "Do not check for a valid rtcp message from the encoder"
-#~ msgstr ""
-#~ "Kontrollera inte om det finns ett giltigt rtcp-meddelande från kodaren"
-
-#~ msgid ""
-#~ "Send nack messages even when we have not confirmed that the encoder is on "
-#~ "our local network."
-#~ msgstr ""
-#~ "Skicka nack-meddelanden även när vi inte har bekräftat att kodaren finns "
-#~ "i vårt lokala nätverk."
-
-#~ msgid "16 bytes"
-#~ msgstr "16 byte"
-
-#~ msgid "24 bytes"
-#~ msgstr "24 byte"
-
-#~ msgid "32 bytes"
-#~ msgstr "32 byte"
-
-#~ msgid "RIST data output caching size (ms)"
-#~ msgstr "Storlek på cachelagring av RIST-data (ms)"
-
-#~ msgid ""
-#~ "Having this cache will guarantee that the packets going out are delivered "
-#~ "at a spacing determined by the chain timestamps thus ensuring a near "
-#~ "jitter free output. Be aware that this setting will also add to the "
-#~ "overall latency of the stream."
-#~ msgstr ""
-#~ "Med denna cache garanteras att paketen som skickas ut levereras med ett "
-#~ "avstånd som bestäms av kedjans tidsstämplar, vilket ger en nästan "
-#~ "jitterfri utdata. Tänk på att den här inställningen också ökar den totala "
-#~ "fördröjningen för strömmen."
-
-#~ msgid "RIST retry-buffer queue size (ms)"
-#~ msgstr "RIST retry-buffer köstorlek (ms)"
-
-#~ msgid ""
-#~ "This must match the buffer size (latency) configured on the server side. "
-#~ "If you are not sure, leave the default of 0 which will set it the maximum "
-#~ "value and will use about 100MB of RAM"
-#~ msgstr ""
-#~ "Detta måste matcha den buffertstorlek (latens) som konfigurerats på "
-#~ "serversidan. Om du inte är säker, lämna standardvärdet 0 som kommer att "
-#~ "ange det maximala värdet och använda cirka 100 MB RAM"
-
-#~ msgid "SSRC used in RTP output (default is random, i.e. 0)"
-#~ msgstr "SSRC som används i RTP-utdata (standard är slumpmässig, dvs. 0)"
-
-#~ msgid ""
-#~ "Use this setting to specify a known SSRC for the RTP header. This is only "
-#~ "useful if your receiver acts on it. When using VLC as receiver, it is not."
-#~ msgstr ""
-#~ "Använd den här inställningen för att ange en känd SSRC för RTP-rubriken. "
-#~ "Detta är endast användbart om din mottagare agerar på det. När du "
-#~ "använder VLC som mottagare är det inte det."
-
-#~ msgid ""
-#~ "This Stream name will be sent to the receiver using the rist RTCP channel"
-#~ msgstr ""
-#~ "Detta Stream-namn kommer att skickas till mottagaren med hjälp av rist "
-#~ "RTCP-kanalen"
-
-#~ msgid "4:2:0"
-#~ msgstr "4:2:0"
-
-#~ msgid "4:2:2"
-#~ msgstr "4:2:2"
-
-#~ msgid "4:4:4"
-#~ msgstr "4:4:4"
-
-#~ msgid "Rate control method"
-#~ msgstr "Metod för hastighetskontroll"
-
-#~ msgid "Method used to encode the video sequence"
-#~ msgstr "Metod som används för att koda videosekvensen"
-
-#~ msgid "Constant noise threshold mode"
-#~ msgstr "Tröskelvärde för konstant brus"
-
-#~ msgid "Constant bitrate mode (CBR)"
-#~ msgstr "Läge med konstant bitfrekvens (CBR)"
-
-#~ msgid "Low Delay mode"
-#~ msgstr "Lågt fördröjningsläge"
-
-#~ msgid "Lossless mode"
-#~ msgstr "Förlustfritt läge"
-
-#~ msgid "Constant lambda mode"
-#~ msgstr "Konstant lambdaläge"
-
-#~ msgid "Constant error mode"
-#~ msgstr "Konstant felläge"
-
-#~ msgid "Constant quality mode"
-#~ msgstr "Konstant kvalitetsläge"
-
-#~ msgid "GOP structure"
-#~ msgstr "GOP-struktur"
-
-#~ msgid "GOP structure used to encode the video sequence"
-#~ msgstr "GOP-struktur som används för att koda videosekvensen"
-
-#~ msgid ""
-#~ "No fixed gop structure. A picture can be intra or inter and refer to "
-#~ "previous or future pictures."
-#~ msgstr ""
-#~ "Ingen fast GOP-struktur. En bild kan vara intra eller inter och referera "
-#~ "till tidigare eller framtida bilder."
-
-#~ msgid "I-frame only sequence"
-#~ msgstr "Endast I-ram sekvens"
-
-#~ msgid "Inter pictures refere to previous pictures only"
-#~ msgstr "Inter bilder refererar endast till tidigare bilder"
-
-#~ msgid "Inter pictures can refer to previous or future pictures"
-#~ msgstr "Inter bilder kan hänvisa till tidigare eller framtida bilder"
-
-#~ msgid "Constant quality factor"
-#~ msgstr "Konstant kvalitetsfaktor"
-
-#~ msgid "Quality factor to use in constant quality mode"
-#~ msgstr "Kvalitetsfaktor som ska användas i konstant kvalitetsläge"
-
-#~ msgid "Noise Threshold"
-#~ msgstr "Bruströskel"
-
-#~ msgid "Noise threshold to use in constant noise threshold mode"
-#~ msgstr "Bruströskel att använda i konstant bruströskelläge"
-
-#~ msgid "CBR bitrate (kbps)"
-#~ msgstr "CBR-bitfrekvens (kbps)"
-
-#~ msgid "Target bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr "Målbitfrekvens i kbps när kodning görs i konstant bitfrekvensläge"
-
-#~ msgid "Maximum bitrate (kbps)"
-#~ msgstr "Maximal bitfrekvens (kbps)"
-
-#~ msgid "Maximum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr "Maximal bitfrekvens i kbps vid avkodning i konstant bitfrekvensläge"
-
-#~ msgid "Minimum bitrate (kbps)"
-#~ msgstr "Minimal bitfrekvens (kbps)"
-
-#~ msgid "Minimum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr "Minimal bitfrekvens i kbps vid avkodning i konstant bitfrekvensläge"
-
-#~ msgid "GOP length"
-#~ msgstr "GOP-längd"
-
-#~ msgid ""
-#~ "Number of pictures between successive sequence headers i.e. length of the "
-#~ "group of pictures"
-#~ msgstr ""
-#~ "Antal bilder mellan på varandra följande sekvensrubriker, dvs. längden på "
-#~ "gruppen av bilder"
-
-#~ msgid "Prefilter"
-#~ msgstr "Förfilter"
-
-#~ msgid "Enable adaptive prefiltering"
-#~ msgstr "Aktivera adaptiv förfiltrering"
-
-#~ msgid "No pre-filtering"
-#~ msgstr "Ingen förfiltrering"
-
-#~ msgid "Centre Weighted Median"
-#~ msgstr "Centrumviktad median"
-
-#~ msgid "Gaussian Low Pass Filter"
-#~ msgstr "Gausslågpassfilter"
-
-#~ msgid "Add Noise"
-#~ msgstr "Lägg till brus"
-
-#~ msgid "Gaussian Adaptive Low Pass Filter"
-#~ msgstr "Gaussanpassningsbart lågpassfilter"
-
-#~ msgid "Low Pass Filter"
-#~ msgstr "Lågpassfilter"
-
-#~ msgid "Amount of prefiltering"
-#~ msgstr "Förfiltreringsmängd"
-
-#~ msgid "Higher value implies more prefiltering"
-#~ msgstr "Högre värde innebär mer förfiltrering"
-
-#~ msgid "Picture coding mode"
-#~ msgstr "Bildkodningsläge"
-
-#~ msgid ""
-#~ "Field coding is where interlaced fields are coded separately as opposed "
-#~ "to a pseudo-progressive frame"
-#~ msgstr ""
-#~ "Fältkodning är när sammanflätade fält kodas separat i motsats till en "
-#~ "pseudo-progressiv ram"
-
-#~ msgid "auto - let encoder decide based upon input (Best)"
-#~ msgstr "auto - låt kodare avgöra baserad på inmatning (Bäst)"
-
-#~ msgid "force coding frame as single picture"
-#~ msgstr "tvinga kodningsramen som en enda bild"
-
-#~ msgid "force coding frame as separate interlaced fields"
-#~ msgstr "tvinga fram kodning av bildrutan som separata sammanflätade fält"
-
-#~ msgid "Size of motion compensation blocks"
-#~ msgstr "Storlek på block för rörelsekompensation"
-
-#~ msgid "automatic - let encoder decide based upon input (Best)"
-#~ msgstr "auto - låt kodare avgöra baserad på inmatning (Bäst)"
-
-#~ msgid "small - use small motion compensation blocks"
-#~ msgstr "small - använd små block för rörelsekompensation"
-
-#~ msgid "medium - use medium motion compensation blocks"
-#~ msgstr "medium - använd medelhög rörelsekompensation"
-
-#~ msgid "large - use large motion compensation blocks"
-#~ msgstr "large - använd stora block för rörelsekompensation"
-
-#~ msgid "Overlap of motion compensation blocks"
-#~ msgstr "Överlappning av block för rörelsekompensation"
-
-#~ msgid "none - Motion compensation blocks do not overlap"
-#~ msgstr "none - blocken för rörelsekompensation överlappar inte varandra"
-
-#~ msgid "partial - Motion compensation blocks only partially overlap"
-#~ msgstr ""
-#~ "partiell - blocken för rörelsekompensation överlappar varandra endast "
-#~ "delvis"
-
-#~ msgid "full - Motion compensation blocks fully overlap"
-#~ msgstr "full - blocken för rörelsekompensation överlappar varandra helt"
-
-#~ msgid "Motion Vector precision"
-#~ msgstr "Rörelsevektorprecision"
-
-#~ msgid "Motion Vector precision in pels"
-#~ msgstr "Motion Vector precision i pels"
-
-#~ msgid "Three component motion estimation"
-#~ msgstr "Rörelseuppskattning med tre komponenter"
-
-#~ msgid "Use chroma as part of the motion estimation process"
-#~ msgstr "Använd chroma som en del av rörelseuppskattningsprocessen"
-
-#~ msgid "Intra picture DWT filter"
-#~ msgstr "DWT-filter inom bilden"
-
-#~ msgid "Inter picture DWT filter"
-#~ msgstr "DWT-filter mellan bilder"
-
-#~ msgid "Number of DWT iterations"
-#~ msgstr "Antal DWT-iterationer"
-
-#~ msgid "Also known as DWT levels"
-#~ msgstr "Även kända som DWT-nivåer"
-
-#~ msgid "Enable multiple quantizers"
-#~ msgstr "Aktivera flera kvantiserare"
-
-#~ msgid "Enable multiple quantizers per subband (one per codeblock)"
-#~ msgstr "Aktivera flera kvantiserare per delband (en per kodblock)"
-
-#~ msgid "Disable arithmetic coding"
-#~ msgstr "Inaktivera aritmetisk kodning"
-
-#~ msgid "Use variable length codes instead, useful for very high bitrates"
-#~ msgstr ""
-#~ "Använd istället koder med variabel längd, användbara för mycket höga "
-#~ "bithastigheter"
-
-#~ msgid "perceptual weighting method"
-#~ msgstr "perceptuell viktningsmetod"
-
-#~ msgid "perceptual distance"
-#~ msgstr "perceptuellt avstånd"
-
-#~ msgid "perceptual distance to calculate perceptual weight"
-#~ msgstr "perceptuellt avstånd för att beräkna perceptuell vikt"
-
-#~ msgid "Horizontal slices per frame"
-#~ msgstr "Horisontella snitt per bildruta"
-
-#~ msgid "Number of horizontal slices per frame in low delay mode"
-#~ msgstr "Antal horisontella snitt per bildruta i läge med låg fördröjning"
-
-#~ msgid "Vertical slices per frame"
-#~ msgstr "Vertikala snitt per bildruta"
-
-#~ msgid "Number of vertical slices per frame in low delay mode"
-#~ msgstr "Antal vertikala snitt per bildruta i läge med låg fördröjning"
-
-#~ msgid "Size of code blocks in each subband"
-#~ msgstr "Antal kodblock i varje underband"
-
-#~ msgid "small - use small code blocks"
-#~ msgstr "liten - använd små kodblock"
-
-#~ msgid "medium - use medium sized code blocks"
-#~ msgstr "medel - använd medelstora kodblock"
-
-#~ msgid "large - use large code blocks"
-#~ msgstr "stor - använd stora kodblock"
-
-#~ msgid "full - One code block per subband"
-#~ msgstr "full - ett kodblock per underband"
-
-#~ msgid "Enable hierarchical Motion Estimation"
-#~ msgstr "Aktivera hierarkisk rörelseuppskattning"
-
-#~ msgid "Number of levels of downsampling"
-#~ msgstr "Antal nedsamplingsnivåer"
-
-#~ msgid ""
-#~ "Number of levels of downsampling in hierarchical motion estimation mode"
-#~ msgstr ""
-#~ "Antal nivåer av nedsampling i läget för hierarkisk rörelseuppskattning"
-
-#~ msgid "Enable Global Motion Estimation"
-#~ msgstr "Aktivera global rörelseuppskattning"
-
-#~ msgid "Enable Phase Correlation Estimation"
-#~ msgstr "Aktivera estimering av faskorrelation"
-
-#~ msgid "Enable Scene Change Detection"
-#~ msgstr "Aktivera detektering av scenförändring"
-
-#~ msgid "Force Profile"
-#~ msgstr "Tvinga profil"
-
-#~ msgid "VC2 Low Delay Profile"
-#~ msgstr "VC2 Låg fördröjningsprofil"
-
-#~ msgid "VC2 Simple Profile"
-#~ msgstr "VC2 Enkel profil"
-
-#~ msgid "VC2 Main Profile"
-#~ msgstr "VC2 Huvudprofil"
-
-#~ msgid "Main Profile"
-#~ msgstr "Huvudprofil"
-
-#~ msgid "Dirac video decoder using libschroedinger"
-#~ msgstr "Dirac videoavkodare med libschroedinger"
-
-#~ msgid "Dirac video encoder using libschroedinger"
-#~ msgstr "Dirac-videokodare med libschroedinger"
-
-#~ msgid "Key: "
-#~ msgstr "Tangent: "
