@@ -1,11 +1,12 @@
 # English (United Kingdom) translation
-# Copyright (C) 2023 VideoLAN
+# Copyright (C) 2026 VideoLAN
 # This file is distributed under the same license as the vlc package.
 #
 # Translators:
-# Andi Chandler <andi@gowling.com>, 2015-2023
+# Andi Chandler <andi@gowling.com>, 2015-2023,2026
 # Luke Hollins <luke@farcry.ca>, 2016
 # Sam Hocevar <sam@zoy.org>, 2002-2004
+# Michał Trzebiatowski <michtrz@gmail.com>, 2017
 #
 # Hints for this translation file:
 #  - or$ -> our$ (behavior, color)
@@ -20,17 +21,17 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22-rc1\n"
+"Project-Id-Version: vlc 3.0.24-beta1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2026-06-28 16:08+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
-"Last-Translator: Andi Chandler <andi@gowling.com>, 2025\n"
+"Last-Translator: Andi Chandler <andi@gowling.com>, 2026\n"
 "Language-Team: English (United Kingdom) (https://app.transifex.com/yaron/"
 "teams/16553/en_GB/)\n"
-"Language: en_GB\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: en_GB\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: include/vlc_common.h:1055
@@ -1068,24 +1069,20 @@ msgid "Decoded format"
 msgstr "Decoded format"
 
 #: src/input/es_out.c:3207
-#, fuzzy
 msgid "Decoded channels"
-msgstr "Audio channels"
+msgstr "Decoded channels"
 
 #: src/input/es_out.c:3212
-#, fuzzy
 msgid "Decoded sample rate"
-msgstr "Audio sample rate"
+msgstr "Decoded sample rate"
 
 #: src/input/es_out.c:3219
-#, fuzzy
 msgid "Decoded bits per sample"
-msgstr "Audio bits per sample"
+msgstr "Decoded bits per sample"
 
 #: src/input/es_out.c:3224
-#, fuzzy
 msgid "Decoded Bitrate"
-msgstr "Decoded format"
+msgstr "Decoded Bitrate"
 
 #: src/input/es_out.c:3237
 msgid "Track replay gain"
@@ -7194,6 +7191,11 @@ msgid ""
 "selected (1 to 4). If there is no uncommitted switch, this parameter should "
 "be 0."
 msgstr ""
+"If the satellite receiver is connected to multiple low noise block-"
+"downconverters (LNB) through a cascade formed from DiSEqC 1.1 uncommitted "
+"switch and DiSEqC 1.0 committed switch, the correct uncommitted LNB can be "
+"selected (1 to 4). If there is no uncommitted switch, this parameter should "
+"be 0."
 
 #: modules/access/dtv/access.c:227
 msgid "Network identifier"
@@ -8030,13 +8032,15 @@ msgstr "VLC could not read the file: %s"
 
 #: modules/access/nfs.c:49
 msgid "Set NFS uid/guid automatically"
-msgstr ""
+msgstr "Set NFS uid/guid automatically"
 
 #: modules/access/nfs.c:50
 msgid ""
 "If uid/gid are not specified in the url, VLC will automatically set a uid/"
 "gid."
 msgstr ""
+"If uid/gid are not specified in the URL, VLC will automatically set a uid/"
+"gid."
 
 #: modules/access/nfs.c:57
 msgid "NFS"
@@ -8080,6 +8084,8 @@ msgid ""
 "Pass pulse:// to open the default PulseAudio source, or pulse://SOURCE to "
 "open a specific source named SOURCE."
 msgstr ""
+"Pass pulse:// to open the default PulseAudio source, or pulse://SOURCE to "
+"open a specific source named SOURCE."
 
 #: modules/access/pulse.c:42
 msgid "PulseAudio"
@@ -8115,13 +8121,15 @@ msgstr "Bitmask"
 
 #: modules/access/rist.c:313
 msgid "Virtual Destination Port Filter"
-msgstr ""
+msgstr "Virtual Destination Port Filter"
 
 #: modules/access/rist.c:315
 msgid ""
 "Destination port to be used inside the reduced-mode of the main profile to "
 "filter incoming data. Use zero to allow all."
 msgstr ""
+"Destination port to be used inside the reduced-mode of the main profile to "
+"filter incoming data. Use zero to allow all."
 
 #: modules/access/rist.c:321 modules/access_output/rist.c:293
 msgid "RIST"
@@ -8140,6 +8148,8 @@ msgid ""
 "This controls the maximum jitter that will be passed to the demux/decode "
 "chain. The lower the value, the more CPU cycles the module will consume"
 msgstr ""
+"This controls the maximum jitter that will be passed to the demux/decode "
+"chain. The lower the value, the more CPU cycles the module will consume"
 
 #: modules/access/rist.c:332
 msgid "RIST nack type, 0 = range, 1 = bitmask. Default is range"
@@ -8166,6 +8176,8 @@ msgid ""
 "RTP packets will be authenticated and deciphered with this Secure RTP master "
 "shared secret key. This must be a 32-character-long hexadecimal string."
 msgstr ""
+"RTP packets will be authenticated and deciphered with this Secure RTP master "
+"shared secret key. This must be a 32-character-long hexadecimal string."
 
 #: modules/access/rtp/rtp.c:55 modules/stream_out/rtp.c:150
 msgid "SRTP salt (hexadecimal)"
@@ -8185,25 +8197,27 @@ msgstr "Maximum RTP sources"
 
 #: modules/access/rtp/rtp.c:62
 msgid "How many distinct active RTP sources are allowed at a time."
-msgstr ""
+msgstr "How many distinct active RTP sources are allowed at a time."
 
 #: modules/access/rtp/rtp.c:64
 msgid "RTP source timeout (sec)"
-msgstr ""
+msgstr "RTP source timeout (sec)"
 
 #: modules/access/rtp/rtp.c:66
 msgid "How long to wait for any packet before a source is expired."
-msgstr ""
+msgstr "How long to wait for any packet before a source is expired."
 
 #: modules/access/rtp/rtp.c:68
 msgid "Maximum RTP sequence number dropout"
-msgstr ""
+msgstr "Maximum RTP sequence number dropout"
 
 #: modules/access/rtp/rtp.c:70
 msgid ""
 "RTP packets will be discarded if they are too much ahead (i.e. in the "
 "future) by this many packets from the last received packet."
 msgstr ""
+"RTP packets will be discarded if they are too much ahead (i.e. in the "
+"future) by this many packets from the last received packet."
 
 #: modules/access/rtp/rtp.c:73
 msgid "Maximum RTP sequence number misordering"
@@ -8214,16 +8228,20 @@ msgid ""
 "RTP packets will be discarded if they are too far behind (i.e. in the past) "
 "by this many packets from the last received packet."
 msgstr ""
+"RTP packets will be discarded if they are too far behind (i.e. in the past) "
+"by this many packets from the last received packet."
 
 #: modules/access/rtp/rtp.c:78
 msgid "RTP payload format assumed for dynamic payloads"
-msgstr ""
+msgstr "RTP payload format assumed for dynamic payloads"
 
 #: modules/access/rtp/rtp.c:81
 msgid ""
 "This payload format will be assumed for dynamic payload types (between 96 "
 "and 127) if it can't be determined otherwise with out-of-band mappings (SDP)"
 msgstr ""
+"This payload format will be assumed for dynamic payload types (between 96 "
+"and 127) if it can't be determined otherwise with out-of-band mappings (SDP)"
 
 #: modules/access/rtp/rtp.c:95 modules/stream_out/rtp.c:187
 msgid "RTP"
@@ -8243,6 +8261,8 @@ msgid ""
 "A description in SDP format is required to receive the RTP stream. Note that "
 "rtp:// URIs cannot work with dynamic RTP payload format (%<PRIu8>)."
 msgstr ""
+"A description in SDP format is required to receive the RTP stream. Note that "
+"rtp:// URIs cannot work with dynamic RTP payload format (%<PRIu8>)."
 
 #: modules/access/rtsp/access.c:48 modules/access/rtsp/access.c:49
 msgid "Real RTSP"
@@ -8322,7 +8342,7 @@ msgstr "Region left column"
 
 #: modules/access/screen/screen.c:61 modules/access/screen/xcb.c:45
 msgid "Abscissa of the capture region in pixels."
-msgstr ""
+msgstr "Abscissa of the capture region in pixels."
 
 #: modules/access/screen/screen.c:63 modules/access/screen/xcb.c:51
 msgid "Capture region width"
@@ -8392,11 +8412,11 @@ msgstr "Pixel width of the capture region, or 0 for full width"
 
 #: modules/access/screen/xcb.c:57
 msgid "Pixel height of the capture region, or 0 for full height"
-msgstr ""
+msgstr "Pixel height of the capture region, or 0 for full height"
 
 #: modules/access/screen/xcb.c:71
 msgid "Screen capture (with X11/XCB)"
-msgstr ""
+msgstr "Screen capture (with X11/XCB)"
 
 #: modules/access/sdp.c:32 modules/stream_out/rtp.c:79
 msgid "SDP"
@@ -8404,19 +8424,19 @@ msgstr "SDP"
 
 #: modules/access/sdp.c:33
 msgid "Session Description Protocol"
-msgstr ""
+msgstr "Session Description Protocol"
 
 #: modules/access/sftp.c:53
 msgid "SFTP port"
-msgstr ""
+msgstr "SFTP port"
 
 #: modules/access/sftp.c:54
 msgid "SFTP port number to use on the server"
-msgstr ""
+msgstr "SFTP port number to use on the server"
 
 #: modules/access/sftp.c:61
 msgid "Private key file"
-msgstr ""
+msgstr "Private key file"
 
 #: modules/access/sftp.c:62
 msgid ""
@@ -8424,113 +8444,118 @@ msgid ""
 "assumed to be in the same directory with '.pub' appended. If unset, standard "
 "key paths will be attempted (e.g. '~/.ssh/id_rsa')."
 msgstr ""
+"Private-key file used for SSH public key authentication. Public-key file is "
+"assumed to be in the same directory with '.pub' appended. If unset, standard "
+"key paths will be attempted (e.g. '~/.ssh/id_rsa')."
 
 #: modules/access/sftp.c:68
 msgid "SFTP input"
-msgstr ""
+msgstr "SFTP input"
 
 #: modules/access/sftp.c:463
 msgid "SFTP authentication"
-msgstr ""
+msgstr "SFTP authentication"
 
 #: modules/access/sftp.c:464
 #, c-format
 msgid "Please enter a valid login and password for the sftp connexion to %s"
-msgstr ""
+msgstr "Please enter a valid login and password for the sftp connexion to %s"
 
 #: modules/access/shm.c:46 modules/access/vnc.c:58
 msgid "Frame buffer depth"
-msgstr ""
+msgstr "Frame buffer depth"
 
 #: modules/access/shm.c:48
 msgid "Pixel depth of the frame buffer, or zero for XWD file"
-msgstr ""
+msgstr "Pixel depth of the frame buffer, or zero for XWD file"
 
 #: modules/access/shm.c:50
 msgid "Frame buffer width"
-msgstr ""
+msgstr "Frame buffer width"
 
 #: modules/access/shm.c:52
 msgid "Pixel width of the frame buffer (ignored for XWD file)"
-msgstr ""
+msgstr "Pixel width of the frame buffer (ignored for XWD file)"
 
 #: modules/access/shm.c:54
 msgid "Frame buffer height"
-msgstr ""
+msgstr "Frame buffer height"
 
 #: modules/access/shm.c:56
 msgid "Pixel height of the frame buffer (ignored for XWD file)"
-msgstr ""
+msgstr "Pixel height of the frame buffer (ignored for XWD file)"
 
 #: modules/access/shm.c:58
 msgid "Frame buffer segment ID"
-msgstr ""
+msgstr "Frame buffer segment ID"
 
 #: modules/access/shm.c:60
 msgid ""
 "System V shared memory segment ID of the frame buffer (this is ignored if --"
 "shm-file is specified)."
 msgstr ""
+"System V shared memory segment ID of the frame buffer (this is ignored if --"
+"shm-file is specified)."
 
 #: modules/access/shm.c:63
 msgid "Frame buffer file"
-msgstr ""
+msgstr "Frame buffer file"
 
 #: modules/access/shm.c:65
 msgid "Path of the memory mapped file of the frame buffer"
-msgstr ""
+msgstr "Path of the memory mapped file of the frame buffer"
 
 #: modules/access/shm.c:75
 msgid "XWD file (autodetect)"
-msgstr ""
+msgstr "XWD file (autodetect)"
 
 #: modules/access/shm.c:76 modules/access/vnc.c:69
 msgid "8 bits"
-msgstr ""
+msgstr "8 bits"
 
 #: modules/access/shm.c:76
 msgid "15 bits"
-msgstr ""
+msgstr "15 bits"
 
 #: modules/access/shm.c:76 modules/access/vnc.c:69
 msgid "16 bits"
-msgstr ""
+msgstr "16 bits"
 
 #: modules/access/shm.c:76 modules/access/vnc.c:69
 msgid "24 bits"
-msgstr ""
+msgstr "24 bits"
 
 #: modules/access/shm.c:76 modules/access/vnc.c:69
 msgid "32 bits"
-msgstr ""
+msgstr "32 bits"
 
 #: modules/access/shm.c:83
 msgid "Framebuffer input"
-msgstr ""
+msgstr "Framebuffer input"
 
 #: modules/access/shm.c:84
 msgid "Shared memory framebuffer"
-msgstr ""
+msgstr "Shared memory framebuffer"
 
 #: modules/access/smb.c:65
 msgid "Samba (Windows network shares) input"
-msgstr ""
+msgstr "Samba (Windows network shares) input"
 
 #: modules/access/smb.c:68
 msgid "SMB input"
-msgstr ""
+msgstr "SMB input"
 
 #: modules/access/smb_common.h:27
 msgid "SMB domain"
-msgstr ""
+msgstr "SMB domain"
 
 #: modules/access/smb_common.h:28
 msgid "Domain/Workgroup that will be used for the connection."
-msgstr ""
+msgstr "Domain/Workgroup that will be used for the connection."
 
 #: modules/access/smb_common.h:34
 msgid "SMB authentication required"
-msgstr ""
+msgstr "SMB authentication required"
 
 #: modules/access/smb_common.h:35
 #, c-format
@@ -8539,35 +8564,37 @@ msgid ""
 "Please provide a username (ideally a domain name using the format "
 "DOMAIN;username) and a password."
 msgstr ""
+"The computer (%s) you are trying to connect to requires authentication.\n"
+"Please provide a username (ideally a domain name using the format "
+"DOMAIN;username) and a password."
 
 #: modules/access/srt.c:548 modules/access_output/srt.c:457
 msgid "SRT"
-msgstr ""
+msgstr "SRT"
 
 #: modules/access/srt.c:549
 msgid "SRT input"
-msgstr ""
+msgstr "SRT input"
 
 #: modules/access/srt.c:555 modules/access_output/srt.c:464
 msgid "Return poll wait after timeout milliseconds (-1 = infinite)"
-msgstr ""
+msgstr "Return poll wait after timeout milliseconds (-1 = infinite)"
 
 #: modules/access/srt.c:558 modules/access_output/srt.c:466
 msgid "SRT latency (ms)"
-msgstr ""
+msgstr "SRT latency (ms)"
 
 #: modules/access/srt.c:560 modules/access_output/srt.c:468
 msgid "Password for stream encryption"
-msgstr ""
+msgstr "Password for stream encryption"
 
 #: modules/access/srt.c:566
-#, fuzzy
 msgid "SRT Stream ID"
-msgstr "Stream %d"
+msgstr "SRT Stream ID"
 
 #: modules/access/tcp.c:116
 msgid "TCP"
-msgstr ""
+msgstr "TCP"
 
 #: modules/access/tcp.c:117
 msgid "TCP input"
@@ -8575,15 +8602,15 @@ msgstr "TCP input"
 
 #: modules/access/timecode.c:42
 msgid "Time code"
-msgstr ""
+msgstr "Time code"
 
 #: modules/access/timecode.c:43
 msgid "Time code subpicture elementary stream generator"
-msgstr ""
+msgstr "Time code subpicture elementary stream generator"
 
 #: modules/access/udp.c:61
 msgid "UDP Source timeout (sec)"
-msgstr ""
+msgstr "UDP Source timeout (sec)"
 
 #: modules/access/udp.c:64
 msgid "UDP"
@@ -8591,35 +8618,35 @@ msgstr "UDP"
 
 #: modules/access/udp.c:65
 msgid "UDP input"
-msgstr ""
+msgstr "UDP input"
 
 #: modules/access/v4l2/controls.c:770
 msgid "Reset defaults"
-msgstr ""
+msgstr "Reset defaults"
 
 #: modules/access/v4l2/v4l2.c:44
 msgid "Video capture device"
-msgstr ""
+msgstr "Video capture device"
 
 #: modules/access/v4l2/v4l2.c:45
 msgid "Video capture device node."
-msgstr ""
+msgstr "Video capture device node."
 
 #: modules/access/v4l2/v4l2.c:46
 msgid "VBI capture device"
-msgstr ""
+msgstr "VBI capture device"
 
 #: modules/access/v4l2/v4l2.c:48
 msgid "The device node where VBI data can be read (for closed captions)."
-msgstr ""
+msgstr "The device node where VBI data can be read (for closed captions)."
 
 #: modules/access/v4l2/v4l2.c:50 modules/stream_out/standard.c:92
 msgid "Standard"
-msgstr ""
+msgstr "Standard"
 
 #: modules/access/v4l2/v4l2.c:52
 msgid "Video standard (Default, SECAM, PAL, or NTSC)."
-msgstr ""
+msgstr "Video standard (Default, SECAM, PAL, or NTSC)."
 
 #: modules/access/v4l2/v4l2.c:55
 msgid ""
@@ -8628,88 +8655,94 @@ msgid ""
 "list: GREY, I240, RV16, RV15, RV24, RV32, YUY2, YUYV, UYVY, I41N, I422, "
 "I420, I411, I410, MJPG"
 msgstr ""
+"Force the Video4Linux2 video device to use a specific chroma format (eg. "
+"I420 or I422 for raw images, MJPG for M-JPEG compressed input). Complete "
+"list: GREY, I240, RV16, RV15, RV24, RV32, YUY2, YUYV, UYVY, I41N, I422, "
+"I420, I411, I410, MJPG"
 
 #: modules/access/v4l2/v4l2.c:61
 msgid "Input of the card to use (see debug)."
-msgstr ""
+msgstr "Input of the card to use (see debug)."
 
 #: modules/access/v4l2/v4l2.c:62
 msgid "Audio input"
-msgstr ""
+msgstr "Audio input"
 
 #: modules/access/v4l2/v4l2.c:64
 msgid "Audio input of the card to use (see debug)."
-msgstr ""
+msgstr "Audio input of the card to use (see debug)."
 
 #: modules/access/v4l2/v4l2.c:68
 msgid ""
 "The specified pixel resolution is forced (if both width and height are "
 "strictly positive)."
 msgstr ""
+"The specified pixel resolution is forced (if both width and height are "
+"strictly positive)."
 
 #: modules/access/v4l2/v4l2.c:71
 msgid "Maximum frame rate to use (0 = no limits)."
-msgstr ""
+msgstr "Maximum frame rate to use (0 = no limits)."
 
 #: modules/access/v4l2/v4l2.c:73
 msgid "Radio device"
-msgstr ""
+msgstr "Radio device"
 
 #: modules/access/v4l2/v4l2.c:74
 msgid "Radio tuner device node."
-msgstr ""
+msgstr "Radio tuner device node."
 
 #: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1074
 msgid "Frequency"
-msgstr ""
+msgstr "Frequency"
 
 #: modules/access/v4l2/v4l2.c:77
 msgid "Tuner frequency in Hz or kHz (see debug output)."
-msgstr ""
+msgstr "Tuner frequency in Hz or kHz (see debug output)."
 
 #: modules/access/v4l2/v4l2.c:78
 msgid "Audio mode"
-msgstr ""
+msgstr "Audio mode"
 
 #: modules/access/v4l2/v4l2.c:80
 msgid "Tuner audio mono/stereo and track selection."
-msgstr ""
+msgstr "Tuner audio mono/stereo and track selection."
 
 #: modules/access/v4l2/v4l2.c:82
 msgid "Reset controls"
-msgstr ""
+msgstr "Reset controls"
 
 #: modules/access/v4l2/v4l2.c:83
 msgid "Reset controls to defaults."
-msgstr ""
+msgstr "Reset controls to defaults."
 
 #: modules/access/v4l2/v4l2.c:84
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:206
 #: modules/gui/qt/ui/video_effects.h:1253
 msgid "Brightness"
-msgstr ""
+msgstr "Brightness"
 
 #: modules/access/v4l2/v4l2.c:85
 msgid "Picture brightness or black level."
-msgstr ""
+msgstr "Picture brightness or black level."
 
 #: modules/access/v4l2/v4l2.c:86
 msgid "Automatic brightness"
-msgstr ""
+msgstr "Automatic brightness"
 
 #: modules/access/v4l2/v4l2.c:88
 msgid "Automatically adjust the picture brightness."
-msgstr ""
+msgstr "Automatically adjust the picture brightness."
 
 #: modules/access/v4l2/v4l2.c:89
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:205
 #: modules/gui/qt/ui/video_effects.h:1255
 msgid "Contrast"
-msgstr ""
+msgstr "Contrast"
 
 #: modules/access/v4l2/v4l2.c:90
 msgid "Picture contrast or luma gain."
-msgstr ""
+msgstr "Picture contrast or luma gain."
 
 #: modules/access/v4l2/v4l2.c:91
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:208
@@ -8717,17 +8750,17 @@ msgstr ""
 #: modules/gui/qt/ui/video_effects.h:1256
 #: modules/gui/qt/ui/video_effects.h:1288
 msgid "Saturation"
-msgstr ""
+msgstr "Saturation"
 
 #: modules/access/v4l2/v4l2.c:92
 msgid "Picture saturation or chroma gain."
-msgstr ""
+msgstr "Picture saturation or chroma gain."
 
 #: modules/access/v4l2/v4l2.c:93
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:204
 #: modules/gui/qt/ui/video_effects.h:1252
 msgid "Hue"
-msgstr ""
+msgstr "Hue"
 
 #: modules/access/v4l2/v4l2.c:94
 msgid "Hue or color balance."
@@ -8735,15 +8768,15 @@ msgstr "Hue or colour balance."
 
 #: modules/access/v4l2/v4l2.c:95
 msgid "Automatic hue"
-msgstr ""
+msgstr "Automatic hue"
 
 #: modules/access/v4l2/v4l2.c:97
 msgid "Automatically adjust the picture hue."
-msgstr ""
+msgstr "Automatically adjust the picture hue."
 
 #: modules/access/v4l2/v4l2.c:98
 msgid "White balance temperature (K)"
-msgstr ""
+msgstr "White balance temperature (K)"
 
 #: modules/access/v4l2/v4l2.c:100
 msgid ""
@@ -8755,130 +8788,130 @@ msgstr ""
 
 #: modules/access/v4l2/v4l2.c:102
 msgid "Automatic white balance"
-msgstr ""
+msgstr "Automatic white balance"
 
 #: modules/access/v4l2/v4l2.c:104
 msgid "Automatically adjust the picture white balance."
-msgstr ""
+msgstr "Automatically adjust the picture white balance."
 
 #: modules/access/v4l2/v4l2.c:105
 msgid "Red balance"
-msgstr ""
+msgstr "Red balance"
 
 #: modules/access/v4l2/v4l2.c:107
 msgid "Red chroma balance."
-msgstr ""
+msgstr "Red chroma balance."
 
 #: modules/access/v4l2/v4l2.c:108
 msgid "Blue balance"
-msgstr ""
+msgstr "Blue balance"
 
 #: modules/access/v4l2/v4l2.c:110
 msgid "Blue chroma balance."
-msgstr ""
+msgstr "Blue chroma balance."
 
 #: modules/access/v4l2/v4l2.c:111
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:209
 #: modules/gui/qt/ui/video_effects.h:1257
 msgid "Gamma"
-msgstr ""
+msgstr "Gamma"
 
 #: modules/access/v4l2/v4l2.c:113
 msgid "Gamma adjust."
-msgstr ""
+msgstr "Gamma adjust."
 
 #: modules/access/v4l2/v4l2.c:114
 msgid "Automatic gain"
-msgstr ""
+msgstr "Automatic gain"
 
 #: modules/access/v4l2/v4l2.c:116
 msgid "Automatically set the video gain."
-msgstr ""
+msgstr "Automatically set the video gain."
 
 #: modules/access/v4l2/v4l2.c:117 modules/audio_filter/gain.c:62
 msgid "Gain"
-msgstr ""
+msgstr "Gain"
 
 #: modules/access/v4l2/v4l2.c:119
 msgid "Picture gain."
-msgstr ""
+msgstr "Picture gain."
 
 #: modules/access/v4l2/v4l2.c:120
 msgid "Sharpness"
-msgstr ""
+msgstr "Sharpness"
 
 #: modules/access/v4l2/v4l2.c:121
 msgid "Sharpness filter adjust."
-msgstr ""
+msgstr "Sharpness filter adjust."
 
 #: modules/access/v4l2/v4l2.c:122
 msgid "Chroma gain"
-msgstr ""
+msgstr "Chroma gain"
 
 #: modules/access/v4l2/v4l2.c:123
 msgid "Chroma gain control."
-msgstr ""
+msgstr "Chroma gain control."
 
 #: modules/access/v4l2/v4l2.c:124
 msgid "Automatic chroma gain"
-msgstr ""
+msgstr "Automatic chroma gain"
 
 #: modules/access/v4l2/v4l2.c:126
 msgid "Automatically control the chroma gain."
-msgstr ""
+msgstr "Automatically control the chroma gain."
 
 #: modules/access/v4l2/v4l2.c:127
 msgid "Power line frequency"
-msgstr ""
+msgstr "Power line frequency"
 
 #: modules/access/v4l2/v4l2.c:129
 msgid "Power line frequency anti-flicker filter."
-msgstr ""
+msgstr "Power line frequency anti-flicker filter."
 
 #: modules/access/v4l2/v4l2.c:137
 msgid "50 Hz"
-msgstr ""
+msgstr "50 Hz"
 
 #: modules/access/v4l2/v4l2.c:137
 #: modules/gui/qt/components/extended_panels.cpp:1132
 msgid "60 Hz"
-msgstr ""
+msgstr "60 Hz"
 
 #: modules/access/v4l2/v4l2.c:139
 msgid "Backlight compensation"
-msgstr ""
+msgstr "Backlight compensation"
 
 #: modules/access/v4l2/v4l2.c:141
 msgid "Band-stop filter"
-msgstr ""
+msgstr "Band-stop filter"
 
 #: modules/access/v4l2/v4l2.c:143
 msgid "Cut a light band induced by fluorescent lighting (unit undocumented)."
-msgstr ""
+msgstr "Cut a light band induced by fluorescent lighting (unit undocumented)."
 
 #: modules/access/v4l2/v4l2.c:144
 msgid "Horizontal flip"
-msgstr ""
+msgstr "Horizontal flip"
 
 #: modules/access/v4l2/v4l2.c:146
 msgid "Flip the picture horizontally."
-msgstr ""
+msgstr "Flip the picture horizontally."
 
 #: modules/access/v4l2/v4l2.c:147
 msgid "Vertical flip"
-msgstr ""
+msgstr "Vertical flip"
 
 #: modules/access/v4l2/v4l2.c:149
 msgid "Flip the picture vertically."
-msgstr ""
+msgstr "Flip the picture vertically."
 
 #: modules/access/v4l2/v4l2.c:150
 msgid "Rotate (degrees)"
-msgstr ""
+msgstr "Rotate (degrees)"
 
 #: modules/access/v4l2/v4l2.c:151
 msgid "Picture rotation angle (in degrees)."
-msgstr ""
+msgstr "Picture rotation angle (in degrees)."
 
 #: modules/access/v4l2/v4l2.c:152
 msgid "Color killer"
@@ -8902,91 +8935,91 @@ msgstr "Select a colour effect."
 
 #: modules/access/v4l2/v4l2.c:164
 msgid "Black & white"
-msgstr ""
+msgstr "Black & white"
 
 #: modules/access/v4l2/v4l2.c:164
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:256
 #: modules/video_filter/sepia.c:66 modules/gui/qt/ui/video_effects.h:1290
 msgid "Sepia"
-msgstr ""
+msgstr "Sepia"
 
 #: modules/access/v4l2/v4l2.c:164
 msgid "Negative"
-msgstr ""
+msgstr "Negative"
 
 #: modules/access/v4l2/v4l2.c:165
 msgid "Emboss"
-msgstr ""
+msgstr "Emboss"
 
 #: modules/access/v4l2/v4l2.c:165
 msgid "Sketch"
-msgstr ""
+msgstr "Sketch"
 
 #: modules/access/v4l2/v4l2.c:165
 msgid "Sky blue"
-msgstr ""
+msgstr "Sky blue"
 
 #: modules/access/v4l2/v4l2.c:166
 msgid "Grass green"
-msgstr ""
+msgstr "Grass green"
 
 #: modules/access/v4l2/v4l2.c:166
 msgid "Skin whiten"
-msgstr ""
+msgstr "Skin whiten"
 
 #: modules/access/v4l2/v4l2.c:166
 msgid "Vivid"
-msgstr ""
+msgstr "Vivid"
 
 #: modules/access/v4l2/v4l2.c:169 modules/audio_output/auhal.c:43
 #: modules/audio_output/directsound.c:69 modules/audio_output/mmdevice.c:1524
 #: modules/audio_output/waveout.c:145
 msgid "Audio volume"
-msgstr ""
+msgstr "Audio volume"
 
 #: modules/access/v4l2/v4l2.c:171
 msgid "Volume of the audio input."
-msgstr ""
+msgstr "Volume of the audio input."
 
 #: modules/access/v4l2/v4l2.c:172
 msgid "Audio balance"
-msgstr ""
+msgstr "Audio balance"
 
 #: modules/access/v4l2/v4l2.c:174
 msgid "Balance of the audio input."
-msgstr ""
+msgstr "Balance of the audio input."
 
 #: modules/access/v4l2/v4l2.c:175
 msgid "Bass level"
-msgstr ""
+msgstr "Bass level"
 
 #: modules/access/v4l2/v4l2.c:177
 msgid "Bass adjustment of the audio input."
-msgstr ""
+msgstr "Bass adjustment of the audio input."
 
 #: modules/access/v4l2/v4l2.c:178
 msgid "Treble level"
-msgstr ""
+msgstr "Treble level"
 
 #: modules/access/v4l2/v4l2.c:180
 msgid "Treble adjustment of the audio input."
-msgstr ""
+msgstr "Treble adjustment of the audio input."
 
 #: modules/access/v4l2/v4l2.c:183
 msgid "Mute the audio."
-msgstr ""
+msgstr "Mute the audio."
 
 #: modules/access/v4l2/v4l2.c:184
 msgid "Loudness mode"
-msgstr ""
+msgstr "Loudness mode"
 
 #: modules/access/v4l2/v4l2.c:186
 msgid "Loudness mode a.k.a. bass boost."
-msgstr ""
+msgstr "Loudness mode a.k.a. bass boost."
 
 #: modules/access/v4l2/v4l2.c:188
 msgid "v4l2 driver controls"
-msgstr ""
+msgstr "v4l2 driver controls"
 
 #: modules/access/v4l2/v4l2.c:190
 msgid ""
@@ -8995,6 +9028,10 @@ msgid ""
 "{video_bitrate=6000000,audio_crc=0,stream_type=3} ). To list available "
 "controls, increase verbosity (-vv) or use the v4l2-ctl application."
 msgstr ""
+"Set the v4l2 driver controls to the values specified using a comma-separated "
+"list optionally encapsulated by curly braces (e.g.: "
+"{video_bitrate=6000000,audio_crc=0,stream_type=3} ). To list available "
+"controls, increase verbosity (-vv) or use the v4l2-ctl application."
 
 #: modules/access/v4l2/v4l2.c:242 modules/codec/avcodec/avcodec.c:50
 #: modules/codec/avcodec/avcodec.c:54 modules/codec/x264.c:429
@@ -9004,231 +9041,233 @@ msgstr ""
 #: modules/gui/qt/dialogs/plugins.cpp:381
 #: modules/gui/qt/dialogs/preferences.cpp:79
 msgid "All"
-msgstr ""
+msgstr "All"
 
 #: modules/access/v4l2/v4l2.c:246
 msgid "Multichannel television sound (MTS)"
-msgstr ""
+msgstr "Multichannel television sound (MTS)"
 
 #: modules/access/v4l2/v4l2.c:247
 msgid "525 lines / 60 Hz"
-msgstr ""
+msgstr "525 lines / 60 Hz"
 
 #: modules/access/v4l2/v4l2.c:247
 msgid "625 lines / 50 Hz"
-msgstr ""
+msgstr "625 lines / 50 Hz"
 
 #: modules/access/v4l2/v4l2.c:255
 msgid "PAL N Argentina"
-msgstr ""
+msgstr "PAL N Argentina"
 
 #: modules/access/v4l2/v4l2.c:256
 msgid "NTSC M Japan"
-msgstr ""
+msgstr "NTSC M Japan"
 
 #: modules/access/v4l2/v4l2.c:256
 msgid "NTSC M South Korea"
-msgstr ""
+msgstr "NTSC M South Korea"
 
 #: modules/access/v4l2/v4l2.c:269
 msgid "Primary language"
-msgstr ""
+msgstr "Primary language"
 
 #: modules/access/v4l2/v4l2.c:270
 msgid "Secondary language or program"
-msgstr ""
+msgstr "Secondary language or program"
 
 #: modules/access/v4l2/v4l2.c:271 modules/codec/twolame.c:70
 msgid "Dual mono"
-msgstr ""
+msgstr "Dual mono"
 
 #: modules/access/v4l2/v4l2.c:275
 msgid "V4L"
-msgstr ""
+msgstr "V4L"
 
 #: modules/access/v4l2/v4l2.c:276
 msgid "Video4Linux input"
-msgstr ""
+msgstr "Video4Linux input"
 
 #: modules/access/v4l2/v4l2.c:280
 msgid "Video input"
-msgstr ""
+msgstr "Video input"
 
 #: modules/access/v4l2/v4l2.c:317
 msgid "Tuner"
-msgstr ""
+msgstr "Tuner"
 
 #: modules/access/v4l2/v4l2.c:332
 msgid "Controls"
-msgstr ""
+msgstr "Controls"
 
 #: modules/access/v4l2/v4l2.c:333
 msgid "Video capture controls (if supported by the device)"
-msgstr ""
+msgstr "Video capture controls (if supported by the device)"
 
 #: modules/access/v4l2/v4l2.c:424
 msgid "Video4Linux compressed A/V input"
-msgstr ""
+msgstr "Video4Linux compressed A/V input"
 
 #: modules/access/v4l2/v4l2.c:431
 msgid "Video4Linux radio tuner"
-msgstr ""
+msgstr "Video4Linux radio tuner"
 
 #: modules/access/vcd/vcd.c:47
 msgid "VCD"
-msgstr ""
+msgstr "VCD"
 
 #: modules/access/vcd/vcd.c:48
 msgid "VCD input"
-msgstr ""
+msgstr "VCD input"
 
 #: modules/access/vcd/vcd.c:54
 msgid "[vcd:][device][#[title][,[chapter]]]"
-msgstr ""
+msgstr "[vcd:][device][#[title][,[chapter]]]"
 
 #: modules/access/vdr.c:72
 msgid "Support for VDR recordings (http://www.tvdr.de/)."
-msgstr ""
+msgstr "Support for VDR recordings (http://www.tvdr.de/)."
 
 #: modules/access/vdr.c:74
 msgid "Chapter offset in ms"
-msgstr ""
+msgstr "Chapter offset in ms"
 
 #: modules/access/vdr.c:76
 msgid "Move all chapters. This value should be set in milliseconds."
-msgstr ""
+msgstr "Move all chapters. This value should be set in milliseconds."
 
 #: modules/access/vdr.c:80
 msgid "Default frame rate for chapter import."
-msgstr ""
+msgstr "Default frame rate for chapter import."
 
 #: modules/access/vdr.c:84
 msgid "VDR"
-msgstr ""
+msgstr "VDR"
 
 #: modules/access/vdr.c:87
 msgid "VDR recordings"
-msgstr ""
+msgstr "VDR recordings"
 
 #: modules/access/vdr.c:380
 #, c-format
 msgid "VLC could not read the file (%s)."
-msgstr ""
+msgstr "VLC could not read the file (%s)."
 
 #: modules/access/vdr.c:545
 #, c-format
 msgid "VLC could not open the file \"%s\" (%s)."
-msgstr ""
+msgstr "VLC could not open the file \"%s\" (%s)."
 
 #: modules/access/vdr.c:820
 msgid "VDR Cut Marks"
-msgstr ""
+msgstr "VDR Cut Marks"
 
 #: modules/access/vdr.c:886
 msgid "Start"
-msgstr ""
+msgstr "Start"
 
 #: modules/access/vnc.c:49
 msgid "X.509 Certificate Authority"
-msgstr ""
+msgstr "X.509 Certificate Authority"
 
 #: modules/access/vnc.c:50
 msgid "Certificate of the Authority to verify server's against"
-msgstr ""
+msgstr "Certificate of the Authority to verify server's against"
 
 #: modules/access/vnc.c:51
 msgid "X.509 Certificate Revocation List"
-msgstr ""
+msgstr "X.509 Certificate Revocation List"
 
 #: modules/access/vnc.c:52
 msgid "List of revoked servers certificates"
-msgstr ""
+msgstr "List of revoked servers certificates"
 
 #: modules/access/vnc.c:53
 msgid "X.509 Client certificate"
-msgstr ""
+msgstr "X.509 Client certificate"
 
 #: modules/access/vnc.c:54
 msgid "Certificate for client authentication"
-msgstr ""
+msgstr "Certificate for client authentication"
 
 #: modules/access/vnc.c:55
 msgid "X.509 Client private key"
-msgstr ""
+msgstr "X.509 Client private key"
 
 #: modules/access/vnc.c:56
 msgid "Private key for authentication by certificate"
-msgstr ""
+msgstr "Private key for authentication by certificate"
 
 #: modules/access/vnc.c:59
 msgid "RGB chroma (RV32, RV24, RV16, RGB2)"
-msgstr ""
+msgstr "RGB chroma (RV32, RV24, RV16, RGB2)"
 
 #: modules/access/vnc.c:62
 msgid "Compression level"
-msgstr ""
+msgstr "Compression level"
 
 #: modules/access/vnc.c:63
 msgid "Transfer compression level from 0 (none) to 9 (max)"
-msgstr ""
+msgstr "Transfer compression level from 0 (none) to 9 (max)"
 
 #: modules/access/vnc.c:64
 msgid "Image quality"
-msgstr ""
+msgstr "Image quality"
 
 #: modules/access/vnc.c:65
 msgid "Image quality 1 to 9 (max)"
-msgstr ""
+msgstr "Image quality 1 to 9 (max)"
 
 #: modules/access/vnc.c:79
 msgid "VNC"
-msgstr ""
+msgstr "VNC"
 
 #: modules/access/vnc.c:83
 msgid "VNC client access"
-msgstr ""
+msgstr "VNC client access"
 
 #: modules/access/wasapi.c:489
 msgid "Loopback mode"
-msgstr ""
+msgstr "Loopback mode"
 
 #: modules/access/wasapi.c:490
 msgid "Record an audio rendering endpoint."
-msgstr ""
+msgstr "Record an audio rendering endpoint."
 
 #: modules/access/wasapi.c:493
 msgid "WASAPI"
-msgstr ""
+msgstr "WASAPI"
 
 #: modules/access/wasapi.c:494
 msgid "Windows Audio Session API input"
-msgstr ""
+msgstr "Windows Audio Session API input"
 
 #: modules/access_output/dummy.c:43 modules/stream_out/dummy.c:50
 msgid "Dummy stream output"
-msgstr ""
+msgstr "Dummy stream output"
 
 #: modules/access_output/file.c:314
 msgid "Keep existing file"
-msgstr ""
+msgstr "Keep existing file"
 
 #: modules/access_output/file.c:315
 msgid "Overwrite"
-msgstr ""
+msgstr "Overwrite"
 
 #: modules/access_output/file.c:316
 msgid ""
 "The output file already exists. If recording continues, the file will be "
 "overridden and its content will be lost."
 msgstr ""
+"The output file already exists. If recording continues, the file will be "
+"overridden and its content will be lost."
 
 #: modules/access_output/file.c:374
 msgid "Overwrite existing file"
-msgstr ""
+msgstr "Overwrite existing file"
 
 #: modules/access_output/file.c:376
 msgid "If the file already exists, it will be overwritten."
-msgstr ""
+msgstr "If the file already exists, it will be overwritten."
 
 #: modules/access_output/file.c:377
 msgid "Append to file"
@@ -9236,23 +9275,23 @@ msgstr "Append to file"
 
 #: modules/access_output/file.c:378
 msgid "Append to file if it exists instead of replacing it."
-msgstr ""
+msgstr "Append to file if it exists instead of replacing it."
 
 #: modules/access_output/file.c:380
 msgid "Format time and date"
-msgstr ""
+msgstr "Format time and date"
 
 #: modules/access_output/file.c:381
 msgid "Perform ISO C time and date formatting on the file path"
-msgstr ""
+msgstr "Perform ISO C time and date formatting on the file path"
 
 #: modules/access_output/file.c:383
 msgid "Synchronous writing"
-msgstr ""
+msgstr "Synchronous writing"
 
 #: modules/access_output/file.c:384
 msgid "Open the file with synchronous writing."
-msgstr ""
+msgstr "Open the file with synchronous writing."
 
 #: modules/access_output/file.c:387
 msgid "File stream output"
@@ -9260,29 +9299,30 @@ msgstr "File stream output"
 
 #: modules/access_output/http.c:53 modules/stream_out/rtp.c:174
 msgid "Username that will be requested to access the stream."
-msgstr ""
+msgstr "Username that will be requested to access the stream."
 
 #: modules/access_output/http.c:56 modules/stream_out/rtp.c:177
 msgid "Password that will be requested to access the stream."
-msgstr ""
+msgstr "Password that will be requested to access the stream."
 
 #: modules/access_output/http.c:58 modules/demux/playlist/qtl.c:242
 #: modules/demux/playlist/shoutcast.c:326
 msgid "Mime"
-msgstr ""
+msgstr "MIME"
 
 #: modules/access_output/http.c:59
 msgid "MIME returned by the server (autodetected if not specified)."
-msgstr ""
+msgstr "MIME returned by the server (autodetected if not specified)."
 
 #: modules/access_output/http.c:61
 msgid "Metacube"
-msgstr ""
+msgstr "Metacube"
 
 #: modules/access_output/http.c:62
 msgid ""
 "Use the Metacube protocol. Needed for streaming to the Cubemap reflector."
 msgstr ""
+"Use the Metacube protocol. Needed for streaming to the Cubemap reflector."
 
 #: modules/access_output/http.c:67
 msgid "HTTP stream output"
@@ -9290,76 +9330,78 @@ msgstr "HTTP stream output"
 
 #: modules/access_output/livehttp.c:67
 msgid "Segment length"
-msgstr ""
+msgstr "Segment length"
 
 #: modules/access_output/livehttp.c:68
 msgid "Length of TS stream segments"
-msgstr ""
+msgstr "Length of TS stream segments"
 
 #: modules/access_output/livehttp.c:70
 msgid "Split segments anywhere"
-msgstr ""
+msgstr "Split segments anywhere"
 
 #: modules/access_output/livehttp.c:71
 msgid ""
 "Don't require a keyframe before splitting a segment. Needed for audio only."
 msgstr ""
+"Don't require a keyframe before splitting a segment. Needed for audio only."
 
 #: modules/access_output/livehttp.c:74
 msgid "Number of segments"
-msgstr ""
+msgstr "Number of segments"
 
 #: modules/access_output/livehttp.c:75
 msgid "Number of segments to include in index"
-msgstr ""
+msgstr "Number of segments to include in index"
 
 #: modules/access_output/livehttp.c:77
 msgid "Allow cache"
-msgstr ""
+msgstr "Allow cache"
 
 #: modules/access_output/livehttp.c:78
 msgid "Add EXT-X-ALLOW-CACHE:NO directive in playlist-file if this is disabled"
 msgstr ""
+"Add EXT-X-ALLOW-CACHE:NO directive in playlist-file if this is disabled"
 
 #: modules/access_output/livehttp.c:80
 msgid "Index file"
-msgstr ""
+msgstr "Index file"
 
 #: modules/access_output/livehttp.c:81
 msgid "Path to the index file to create"
-msgstr ""
+msgstr "Path to the index file to create"
 
 #: modules/access_output/livehttp.c:83
 msgid "Full URL to put in index file"
-msgstr ""
+msgstr "Full URL to put in index file"
 
 #: modules/access_output/livehttp.c:84
 msgid "Full URL to put in index file. Use #'s to represent segment number"
-msgstr ""
+msgstr "Full URL to put in index file. Use #'s to represent segment number"
 
 #: modules/access_output/livehttp.c:87
 msgid "Delete segments"
-msgstr ""
+msgstr "Delete segments"
 
 #: modules/access_output/livehttp.c:88
 msgid "Delete segments when they are no longer needed"
-msgstr ""
+msgstr "Delete segments when they are no longer needed"
 
 #: modules/access_output/livehttp.c:90
 msgid "Use muxers rate control mechanism"
-msgstr ""
+msgstr "Use muxers rate control mechanism"
 
 #: modules/access_output/livehttp.c:92
 msgid "AES key URI to place in playlist"
-msgstr ""
+msgstr "AES key URI to place in playlist"
 
 #: modules/access_output/livehttp.c:94
 msgid "AES key file"
-msgstr ""
+msgstr "AES key file"
 
 #: modules/access_output/livehttp.c:95
 msgid "File containing the 16 bytes encryption key"
-msgstr ""
+msgstr "File containing the 16 bytes encryption key"
 
 #: modules/access_output/livehttp.c:97
 msgid "File where vlc reads key-uri and keyfile-location"
@@ -9382,41 +9424,40 @@ msgstr ""
 
 #: modules/access_output/livehttp.c:105
 msgid "Number of first segment"
-msgstr ""
+msgstr "Number of first segment"
 
 #: modules/access_output/livehttp.c:106
 msgid "The number of the first segment generated"
-msgstr ""
+msgstr "The number of the first segment generated"
 
 #: modules/access_output/livehttp.c:109
 msgid "HTTP Live streaming output"
-msgstr ""
+msgstr "HTTP Live streaming output"
 
 #: modules/access_output/livehttp.c:110
 msgid "LiveHTTP"
-msgstr ""
+msgstr "LiveHTTP"
 
 #: modules/access_output/rist.c:268
 msgid "Virtual Source Port"
-msgstr ""
+msgstr "Virtual Source Port"
 
 #: modules/access_output/rist.c:270
 msgid "Source port to be used inside the reduced-mode of the main profile"
-msgstr ""
+msgstr "Source port to be used inside the reduced-mode of the main profile"
 
 #: modules/access_output/rist.c:272
-#, fuzzy
 msgid "Virtual Destination Port"
-msgstr "Output destination"
+msgstr "Virtual Destination Port"
 
 #: modules/access_output/rist.c:274
 msgid "Destination port to be used inside the reduced-mode of the main profile"
 msgstr ""
+"Destination port to be used inside the reduced-mode of the main profile"
 
 #: modules/access_output/rist.c:281
-#, fuzzy
 msgid "Multipeer mode"
-msgstr "AM Tuner mode"
+msgstr "Multipeer mode"
 
 #: modules/access_output/rist.c:283
 msgid ""
@@ -9426,20 +9467,19 @@ msgstr ""
 
 #: modules/access_output/rist.c:287
 msgid "Duplicate"
-msgstr ""
+msgstr "Duplicate"
 
 #: modules/access_output/rist.c:287
 msgid "Load balanced"
-msgstr ""
+msgstr "Load balanced"
 
 #: modules/access_output/rist.c:294
 msgid "RIST stream output"
-msgstr ""
+msgstr "RIST stream output"
 
 #: modules/access_output/rist.c:299
-#, fuzzy
 msgid "RIST target payload size (bytes)"
-msgstr "RIST maximum packet size (bytes)"
+msgstr "RIST target payload size (bytes)"
 
 #: modules/access_output/shout.c:64
 #: modules/gui/qt/components/sout/sout_widgets.cpp:438
@@ -9539,7 +9579,7 @@ msgstr ""
 
 #: modules/access_output/srt.c:480
 msgid " SRT Stream ID"
-msgstr ""
+msgstr " SRT Stream ID"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -12529,7 +12569,6 @@ msgstr ""
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -15050,15 +15089,15 @@ msgstr ""
 
 #: modules/demux/mpeg/es.c:61
 msgid "Audio ES"
-msgstr ""
+msgstr "Audio ES"
 
 #: modules/demux/mpeg/es.c:73
 msgid "MPEG-4 video"
-msgstr ""
+msgstr "MPEG-4 video"
 
 #: modules/demux/mpeg/h26x.c:47
 msgid "Desired frame rate for the stream."
-msgstr ""
+msgstr "Desired frame rate for the stream."
 
 #: modules/demux/mpeg/h26x.c:53 modules/demux/mpeg/h26x.c:55
 msgid "H264 video demuxer"
@@ -15066,7 +15105,7 @@ msgstr "H264 video demuxer"
 
 #: modules/demux/mpeg/h26x.c:64 modules/demux/mpeg/h26x.c:66
 msgid "HEVC/H.265 video demuxer"
-msgstr ""
+msgstr "HEVC/H.265 video demuxer"
 
 #: modules/demux/mpeg/mpgv.c:46
 msgid "MPEG-I/II video demuxer"
@@ -15074,7 +15113,7 @@ msgstr "MPEG-I/II video demuxer"
 
 #: modules/demux/mpeg/ps.c:44
 msgid "Trust MPEG timestamps"
-msgstr ""
+msgstr "Trust MPEG timestamps"
 
 #: modules/demux/mpeg/ps.c:45
 msgid ""
@@ -15082,18 +15121,21 @@ msgid ""
 "duration. However sometimes this might not be usable. Disable this option to "
 "calculate from the bitrate instead."
 msgstr ""
+"Normally we use the timestamps of the MPEG files to calculate position and "
+"duration. However sometimes this might not be usable. Disable this option to "
+"calculate from the bitrate instead."
 
 #: modules/demux/mpeg/ps.c:62 modules/demux/mpeg/ps.c:75
 msgid "MPEG-PS demuxer"
-msgstr ""
+msgstr "MPEG-PS demuxer"
 
 #: modules/demux/mpeg/ps.c:63
 msgid "PS"
-msgstr ""
+msgstr "PS"
 
 #: modules/demux/mpeg/ts.c:84
 msgid "Extra PMT"
-msgstr ""
+msgstr "Extra PMT"
 
 #: modules/demux/mpeg/ts.c:86
 msgid "Allows a user to specify an extra pmt (pmt_pid=pid:stream_type[,...])."
@@ -19461,19 +19503,16 @@ msgid "This module outputs the stream using the RIST protocol (TR06)."
 msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:186
-#, fuzzy
 msgid "Destination Address"
-msgstr "Destination video codec"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:191
-#, fuzzy
 msgid "Destination Port"
-msgstr "Destination video codec"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:201
-#, fuzzy
 msgid "Stream Name"
-msgstr "Stream %d"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:237
 msgid "This module outputs the transcoded stream to a network via HTTP."
@@ -22802,7 +22841,7 @@ msgstr "Copy packetiser"
 
 #: modules/packetizer/dirac.c:87
 msgid "Dirac packetizer"
-msgstr "Dirac packetiser"
+msgstr ""
 
 #: modules/packetizer/dts.c:47
 msgid "DTS audio packetizer"
@@ -23775,27 +23814,27 @@ msgstr ""
 
 #: modules/spu/subsdelay.c:274
 msgid "Subsdelay"
-msgstr ""
+msgstr "Subsdelay"
 
 #: modules/spu/subsdelay.c:291
 msgid "Overlap fix"
-msgstr ""
+msgstr "Overlap fix"
 
 #: modules/stream_extractor/archive.c:54
 msgid "libarchive based stream directory"
-msgstr ""
+msgstr "libarchive based stream directory"
 
 #: modules/stream_extractor/archive.c:58
 msgid "libarchive based stream extractor"
-msgstr ""
+msgstr "libarchive based stream extractor"
 
 #: modules/stream_filter/adf.c:42
 msgid "ADF stream filter"
-msgstr ""
+msgstr "ADF stream filter"
 
 #: modules/stream_filter/aribcam.c:45
 msgid "ARIB STD-B25 Cam module"
-msgstr ""
+msgstr "ARIB STD-B25 Cam module"
 
 #: modules/stream_filter/cache_block.c:498
 msgid "Block stream cache"
@@ -27971,67 +28010,67 @@ msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:718
 msgid "Chapters"
-msgstr ""
+msgstr "Chapters"
 
 #: modules/gui/qt/ui/profiles.h:721
 msgid "Menus"
-msgstr ""
+msgstr "Menus"
 
 #: modules/gui/qt/ui/profiles.h:728
 msgid "Fra&me Rate"
-msgstr ""
+msgstr "Fra&me Rate"
 
 #: modules/gui/qt/ui/profiles.h:729
 msgid "Same as source"
-msgstr ""
+msgstr "Same as source"
 
 #: modules/gui/qt/ui/profiles.h:731
 msgid " fps"
-msgstr ""
+msgstr " fps"
 
 #: modules/gui/qt/ui/profiles.h:732
 msgid "Custom options"
-msgstr ""
+msgstr "Custom options"
 
 #: modules/gui/qt/ui/profiles.h:733
 msgid "&Quality"
-msgstr ""
+msgstr "&Quality"
 
 #: modules/gui/qt/ui/profiles.h:734 modules/gui/qt/ui/profiles.h:735
 msgid "Not Used"
-msgstr ""
+msgstr "Not Used"
 
 #: modules/gui/qt/ui/profiles.h:736 modules/gui/qt/ui/profiles.h:755
 msgid " kb/s"
-msgstr ""
+msgstr " kb/s"
 
 #: modules/gui/qt/ui/profiles.h:737 modules/gui/qt/ui/profiles.h:757
 msgid "Encoding parameters"
-msgstr ""
+msgstr "Encoding parameters"
 
 #: modules/gui/qt/ui/profiles.h:740
 msgid "Frame size"
-msgstr ""
+msgstr "Frame size"
 
 #: modules/gui/qt/ui/profiles.h:743 modules/gui/qt/ui/profiles.h:746
 msgid "px"
-msgstr ""
+msgstr "px"
 
 #: modules/gui/qt/ui/profiles.h:756
 msgid "Sa&mple Rate"
-msgstr ""
+msgstr "Sa&mple Rate"
 
 #: modules/gui/qt/ui/profiles.h:764
 msgid "Profile &Name"
-msgstr ""
+msgstr "Profile &Name"
 
 #: modules/gui/qt/ui/sout.h:200
 msgid "Set up media sources to stream"
-msgstr ""
+msgstr "Set up media sources to stream"
 
 #: modules/gui/qt/ui/sout.h:202
 msgid "Destination Setup"
-msgstr ""
+msgstr "Destination Setup"
 
 #: modules/gui/qt/ui/sout.h:203
 msgid "Select destinations to stream to"
@@ -28049,7 +28088,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/sout.h:207
 msgid "Display locally"
-msgstr ""
+msgstr "Display locally"
 
 #: modules/gui/qt/ui/sout.h:209
 msgid "Transcoding Options"
@@ -28073,43 +28112,43 @@ msgstr ""
 
 #: modules/gui/qt/ui/sout.h:214
 msgid "Miscellaneous Options"
-msgstr ""
+msgstr "Miscellaneous Options"
 
 #: modules/gui/qt/ui/sout.h:215
 msgid "Stream all elementary streams"
-msgstr ""
+msgstr "Stream all elementary streams"
 
 #: modules/gui/qt/ui/sout.h:216
 msgid "Generated stream output string"
-msgstr ""
+msgstr "Generated stream output string"
 
 #: modules/gui/qt/ui/sprefs_audio.h:410
 msgid " %"
-msgstr ""
+msgstr " %"
 
 #: modules/gui/qt/ui/sprefs_audio.h:413
 msgid "Output module:"
-msgstr ""
+msgstr "Output module:"
 
 #: modules/gui/qt/ui/sprefs_audio.h:416
 msgid "Use S/PDIF when available"
-msgstr ""
+msgstr "Use S/PDIF when available"
 
 #: modules/gui/qt/ui/sprefs_audio.h:418
 msgid "Effects"
-msgstr ""
+msgstr "Effects"
 
 #: modules/gui/qt/ui/sprefs_audio.h:419
 msgid "Visualization:"
-msgstr ""
+msgstr "Visualisation:"
 
 #: modules/gui/qt/ui/sprefs_audio.h:420
 msgid "Enable Time-Stretching audio"
-msgstr ""
+msgstr "Enable Time-Stretching audio"
 
 #: modules/gui/qt/ui/sprefs_audio.h:421
 msgid "Replay gain mode:"
-msgstr ""
+msgstr "Replay gain mode:"
 
 #: modules/gui/qt/ui/sprefs_audio.h:422
 msgid "Normalize volume to:"
@@ -28117,7 +28156,7 @@ msgstr "Normalise volume to:"
 
 #: modules/gui/qt/ui/sprefs_audio.h:423
 msgid "Tracks"
-msgstr ""
+msgstr "Tracks"
 
 #: modules/gui/qt/ui/sprefs_audio.h:424
 msgid "Preferred audio language:"
@@ -28309,19 +28348,19 @@ msgstr ""
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:294
 msgid "Subtitle Language"
-msgstr ""
+msgstr "Subtitle Language"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:296
 msgid "Default encoding"
-msgstr ""
+msgstr "Default encoding"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:297
 msgid "Subtitle effects"
-msgstr ""
+msgstr "Subtitle effects"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:303
 msgid "Add a shadow"
-msgstr ""
+msgstr "Add a shadow"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:305
 #: modules/gui/qt/ui/video_effects.h:1266
@@ -28333,35 +28372,35 @@ msgstr ""
 #: modules/gui/qt/ui/video_effects.h:1320
 #: modules/gui/qt/ui/video_effects.h:1321
 msgid " px"
-msgstr ""
+msgstr " px"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:306
 msgid "Add a background"
-msgstr ""
+msgstr "Add a background"
 
 #: modules/gui/qt/ui/sprefs_video.h:313
 msgid "O&utput"
-msgstr ""
+msgstr "O&utput"
 
 #: modules/gui/qt/ui/sprefs_video.h:317
 msgid "DirectX"
-msgstr ""
+msgstr "DirectX"
 
 #: modules/gui/qt/ui/sprefs_video.h:319
 msgid "Accelerated video output (Overlay)"
-msgstr ""
+msgstr "Accelerated video output (Overlay)"
 
 #: modules/gui/qt/ui/sprefs_video.h:320
 msgid "KVA"
-msgstr ""
+msgstr "KVA"
 
 #: modules/gui/qt/ui/sprefs_video.h:324
 msgid "Deinterlacing"
-msgstr ""
+msgstr "Deinterlacing"
 
 #: modules/gui/qt/ui/sprefs_video.h:326
 msgid "Force Aspect Ratio"
-msgstr ""
+msgstr "Force Aspect Ratio"
 
 #: modules/gui/qt/ui/sprefs_video.h:331
 msgid "vlc-snap"
@@ -28564,27 +28603,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Media Manager List"
-
-#~ msgid "RIST latency (ms)"
-#~ msgstr "RIST latency (ms)"
-
-#~ msgid "RIST nack retry interval (ms)"
-#~ msgstr "RIST nack retry interval (ms)"
-
-#~ msgid "RIST reorder buffer (ms)"
-#~ msgstr "RIST reorder buffer (ms)"
-
-#~ msgid "RIST maximum retry count"
-#~ msgstr "RIST maximum retry count"
-
-#~ msgid "Disable NACK output packets"
-#~ msgstr "Disable NACK output packets"
-
-#~ msgid "Use this to disable packet recovery"
-#~ msgstr "Use this to disable packet recovery"
-
-#~ msgid "Enable multiple quantizers"
-#~ msgstr "Enable multiple quantisers"
-
-#~ msgid "Enable multiple quantizers per subband (one per codeblock)"
-#~ msgstr "Enable multiple quantisers per subband (one per codeblock)"
