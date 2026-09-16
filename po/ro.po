@@ -1,5 +1,5 @@
 # Romanian translation
-# Copyright (C) 2025 VideoLAN
+# Copyright (C) 2026 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -19,19 +19,21 @@
 # eduard pintilie <eduard.pintilie@gmail.com>, 2020
 # Vadim Severin <xvadimxtm@gmail.com>, 2021
 # Simona Iacob <s@zp1.net>, 2021
-# Andrei Miloiu <miloiuandrei@gmail.com>, 2025
+# Andrei Miloiu <miloiuandrei@gmail.com>, 2025-2026
+# Michał Trzebiatowski <michtrz@gmail.com>, 2019
+# Edward, 2020
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22\n"
+"Project-Id-Version: vlc 3.0.24-beta1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2026-06-28 16:08+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
-"Last-Translator: Andrei Miloiu <miloiuandrei@gmail.com>, 2025\n"
+"Last-Translator: Miloiu Andrei-Valentin <miloiuandrei@gmail.com>, 2026\n"
 "Language-Team: Romanian (https://app.transifex.com/yaron/teams/16553/ro/)\n"
-"Language: ro\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: ro\n"
 "Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?"
 "2:1));\n"
 
@@ -50,7 +52,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:33
 msgid "VLC preferences"
-msgstr "Preferințe VLC"
+msgstr "Preferințe pentru VLC"
 
 #: include/vlc_config_cat.h:35
 msgid "Select \"Advanced Options\" to see all options."
@@ -8271,15 +8273,17 @@ msgid "Bitmask"
 msgstr "Mască de biți"
 
 #: modules/access/rist.c:313
-#, fuzzy
 msgid "Virtual Destination Port Filter"
-msgstr "Fișier de destinație:"
+msgstr "Filtru de porturi de destinație virtuală"
 
 #: modules/access/rist.c:315
 msgid ""
 "Destination port to be used inside the reduced-mode of the main profile to "
 "filter incoming data. Use zero to allow all."
 msgstr ""
+"Portul de destinație care va fi utilizat în modul redus al profilului "
+"principal pentru filtrarea datelor primite. Folosește zero pentru a le "
+"permite pe toate."
 
 #: modules/access/rist.c:321 modules/access_output/rist.c:293
 msgid "RIST"
@@ -8294,14 +8298,13 @@ msgid "RIST demux/decode maximum jitter (default is 5ms)"
 msgstr "Jitter maxim de demux/decodare RIST (valoarea implicită este de 5 ms)"
 
 #: modules/access/rist.c:328
-#, fuzzy
 msgid ""
 "This controls the maximum jitter that will be passed to the demux/decode "
 "chain. The lower the value, the more CPU cycles the module will consume"
 msgstr ""
-"Aceasta controlează jitterul maxim care va fi transmis către lanțul de "
-"demuxare/decodificare. Cu cât valoarea este mai mică, cu atât mai multe "
-"cicluri CPU va consuma algoritmul"
+"Această opțiune controlează jitterul maxim care va fi transmis către lanțul "
+"de demuxare (demultiplexare)/decodare. Cu cât valoarea este mai mică, cu "
+"atât modulul va consuma mai multe cicluri ale CPU-ului."
 
 #: modules/access/rist.c:332
 msgid "RIST nack type, 0 = range, 1 = bitmask. Default is range"
@@ -8598,9 +8601,8 @@ msgid "SFTP port number to use on the server"
 msgstr "Numărul portului SFTP de utilizat pe server"
 
 #: modules/access/sftp.c:61
-#, fuzzy
 msgid "Private key file"
-msgstr "Fișier cheie AES"
+msgstr "Fișier cu cheie privată"
 
 #: modules/access/sftp.c:62
 msgid ""
@@ -8608,6 +8610,10 @@ msgid ""
 "assumed to be in the same directory with '.pub' appended. If unset, standard "
 "key paths will be attempted (e.g. '~/.ssh/id_rsa')."
 msgstr ""
+"Fișier cu cheie privată utilizat pentru autentificarea cu cheie publică SSH. "
+"Se presupune că fișierul cu cheie publică se află în același director cu "
+"extensia „.pub” adăugată. Dacă nu este setat, se vor încerca căi standard "
+"pentru chei (de exemplu, „~/.ssh/id_rsa”)."
 
 #: modules/access/sftp.c:68
 msgid "SFTP input"
@@ -8752,7 +8758,6 @@ msgid "Password for stream encryption"
 msgstr "Parola pentru criptarea fluxului"
 
 #: modules/access/srt.c:566
-#, fuzzy
 msgid "SRT Stream ID"
 msgstr "ID-ul fluxului SRT"
 
@@ -9620,50 +9625,51 @@ msgstr "LiveHTTP"
 
 #: modules/access_output/rist.c:268
 msgid "Virtual Source Port"
-msgstr ""
+msgstr "Portul sursei virtuale"
 
 #: modules/access_output/rist.c:270
 msgid "Source port to be used inside the reduced-mode of the main profile"
 msgstr ""
+"Portul sursă care va fi utilizat în modul redus al profilului principal"
 
 #: modules/access_output/rist.c:272
-#, fuzzy
 msgid "Virtual Destination Port"
-msgstr "Destinația fluxului"
+msgstr "Portul destinației virtuale"
 
 #: modules/access_output/rist.c:274
 msgid "Destination port to be used inside the reduced-mode of the main profile"
 msgstr ""
+"Portul de destinație care va fi utilizat în modul redus al profilului "
+"principal"
 
 #: modules/access_output/rist.c:281
-#, fuzzy
 msgid "Multipeer mode"
-msgstr "Multiplexor"
+msgstr "Modul multipeer"
 
 #: modules/access_output/rist.c:283
 msgid ""
 "This allows you to select between duplicate or load balanced modes when "
 "sending data to multiple peers (several network paths)"
 msgstr ""
+"Acest lucru îți permite să selectezi între modurile duplicat sau echilibrat "
+"al încărcării atunci când trimite date către mai mulți colegi (mai multe căi "
+"de rețea)"
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Duplicate"
-msgstr "Aplicație"
+msgstr "Duplică"
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Load balanced"
-msgstr "Balans la roșu"
+msgstr "Sarcină echilibrată"
 
 #: modules/access_output/rist.c:294
 msgid "RIST stream output"
 msgstr "Ieșirea fluxului RIST"
 
 #: modules/access_output/rist.c:299
-#, fuzzy
 msgid "RIST target payload size (bytes)"
-msgstr "Dimensiunea pachetului țintă RIST (bytes)"
+msgstr "Dimensiunea sarcinii utile țintă RIST (bytes/octeți)"
 
 #: modules/access_output/shout.c:64
 #: modules/gui/qt/components/sout/sout_widgets.cpp:438
@@ -13029,7 +13035,6 @@ msgstr "Decodificator de subtitrare text"
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -15370,7 +15375,7 @@ msgstr "Aruncător de fișiere"
 
 #: modules/demux/dirac.c:41
 msgid "Value to adjust dts by"
-msgstr "Valoarea cu care se ajustează dts"
+msgstr "Valoare cu care se ajustează dts-urile"
 
 #: modules/demux/dirac.c:54
 msgid "Dirac video demuxer"
@@ -20196,27 +20201,25 @@ msgstr ""
 "Tasta Delete pentru a șterge."
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1405
-#, fuzzy
 msgid "Global Hotkey change"
-msgstr "Schimbarea tastelor rapide"
+msgstr "Schimbare globală a tastelor rapide"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1406
 msgid "Hotkey change"
 msgstr "Schimbarea tastelor rapide"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1410
-#, fuzzy
 msgid "Press the new key or combination for <b>%1</b>"
-msgstr "Apăsați noua tastă sau combinație pentru "
+msgstr "Apasă noua tastă sau combinație pentru <b>%1</b>"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1419
 msgid "Assign"
 msgstr "Atribuiți"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1455
-#, fuzzy
 msgid "Warning: this key or combination is already assigned to \"<b>%1</b>\""
-msgstr "Atenție: această tastă sau combinație este deja atribuită la "
+msgstr ""
+"Atenție: această tastă sau combinație este deja atribuită tastei „<b>%1</b>”"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1467
 msgid "Warning: <b>%1</b> is already an application menu shortcut"
@@ -20224,13 +20227,12 @@ msgstr ""
 "Avertisment: <b>%1</b> este deja o comandă rapidă din meniul aplicației"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1490
-#, fuzzy
 msgid "Key or combination: <b>%1</b>"
-msgstr "Cheie sau combinație: "
+msgstr "Tasta sau combinația: <b>%1</b>"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1498
 msgid "Key: <b>%1</b>"
-msgstr ""
+msgstr "Tasta: <b>%1</b>"
 
 #: modules/gui/qt/components/simple_preferences.cpp:256
 #: modules/gui/qt/components/simple_preferences.cpp:636
@@ -20394,25 +20396,20 @@ msgstr ""
 "Containere (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:184
-#, fuzzy
 msgid "This module outputs the stream using the RIST protocol (TR06)."
-msgstr ""
-"Acest modul scoate fluxul transcodat către o rețea, prin protocolul MMS."
+msgstr "Acest modul transmite fluxul folosind protocolul RIST (TR06)."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:186
-#, fuzzy
 msgid "Destination Address"
-msgstr "Prefix de destinație"
+msgstr "Adresa de destinație"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:191
-#, fuzzy
 msgid "Destination Port"
-msgstr "Destinație"
+msgstr "Portul de destinație"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:201
-#, fuzzy
 msgid "Stream Name"
-msgstr "Nume flux"
+msgstr "Numele fluxului"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:237
 msgid "This module outputs the transcoded stream to a network via HTTP."
@@ -21313,7 +21310,7 @@ msgstr "Sub&titlu"
 
 #: modules/gui/qt/menus.cpp:342 modules/gui/qt/menus.cpp:1085
 msgid "Tool&s"
-msgstr "Instrument&s"
+msgstr "&Unelte"
 
 #: modules/gui/qt/menus.cpp:345 modules/gui/qt/menus.cpp:1092
 msgid "V&iew"
@@ -23938,7 +23935,7 @@ msgstr "Copiere pachetizor"
 
 #: modules/packetizer/dirac.c:87
 msgid "Dirac packetizer"
-msgstr "Pachetizor Dirac"
+msgstr "Pachetizorul Dirac"
 
 #: modules/packetizer/dts.c:47
 msgid "DTS audio packetizer"
@@ -30033,392 +30030,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Lista gestionarului media"
-
-#~ msgid "RIST maximum packet size (bytes)"
-#~ msgstr "Dimensiunea maximă a pachetului RIST (bytes)"
-
-#~ msgid "RIST latency (ms)"
-#~ msgstr "Latența RIST (ms)"
-
-#~ msgid "RIST nack retry interval (ms)"
-#~ msgstr "RIST nack retry interval (ms)"
-
-#~ msgid "RIST reorder buffer (ms)"
-#~ msgstr "Buffer de reordonare RIST (ms)"
-
-#~ msgid "RIST maximum retry count"
-#~ msgstr "Numărul maxim de reîncercări RIST"
-
-#~ msgid "Disable NACK output packets"
-#~ msgstr "Dezactivați pachetele de ieșire NACK"
-
-#~ msgid "Use this to disable packet recovery"
-#~ msgstr "Utilizați acest lucru pentru a dezactiva recuperarea pachetelor"
-
-#~ msgid "Do not check for a valid rtcp message from the encoder"
-#~ msgstr "Nu verificați dacă există un mesaj rtcp valid de la codificator."
-
-#~ msgid ""
-#~ "Send nack messages even when we have not confirmed that the encoder is on "
-#~ "our local network."
-#~ msgstr ""
-#~ "Trimiteți mesaje nack chiar și atunci când nu am confirmat că "
-#~ "codificatorul se află în rețeaua noastră locală."
-
-#~ msgid "16 bytes"
-#~ msgstr "16 octeți"
-
-#~ msgid "24 bytes"
-#~ msgstr "24 octeți"
-
-#~ msgid "32 bytes"
-#~ msgstr "32 octeți"
-
-#~ msgid "RIST data output caching size (ms)"
-#~ msgstr ""
-#~ "Dimensiunea de stocare în memoria cache a datelor de ieșire RIST (ms)"
-
-#~ msgid ""
-#~ "Having this cache will guarantee that the packets going out are delivered "
-#~ "at a spacing determined by the chain timestamps thus ensuring a near "
-#~ "jitter free output. Be aware that this setting will also add to the "
-#~ "overall latency of the stream."
-#~ msgstr ""
-#~ "Existența acestei memorii cache va garanta că pachetele care ies sunt "
-#~ "livrate la o distanță determinată de marcajele temporale ale lanțului, "
-#~ "asigurând astfel o ieșire aproape fără jitter. Rețineți că această setare "
-#~ "va crește, de asemenea, latența generală a fluxului."
-
-#~ msgid "RIST retry-buffer queue size (ms)"
-#~ msgstr "Dimensiunea listei de așteptare RIST retry-buffer (ms)"
-
-#~ msgid ""
-#~ "This must match the buffer size (latency) configured on the server side. "
-#~ "If you are not sure, leave the default of 0 which will set it the maximum "
-#~ "value and will use about 100MB of RAM"
-#~ msgstr ""
-#~ "Aceasta trebuie să corespundă cu dimensiunea bufferului (latență) "
-#~ "configurată pe partea serverului. Dacă nu sunteți sigur, lăsați valoarea "
-#~ "implicită de 0, care va fi setată la valoarea maximă și va utiliza "
-#~ "aproximativ 100 MB de RAM"
-
-#~ msgid "SSRC used in RTP output (default is random, i.e. 0)"
-#~ msgstr ""
-#~ "SSRC utilizat în ieșirea RTP (valoarea implicită este aleatorie, adică 0)"
-
-#~ msgid ""
-#~ "Use this setting to specify a known SSRC for the RTP header. This is only "
-#~ "useful if your receiver acts on it. When using VLC as receiver, it is not."
-#~ msgstr ""
-#~ "Utilizați această setare pentru a specifica un SSRC cunoscut pentru "
-#~ "antetul RTP. Acest lucru este util numai dacă receptorul dumneavoastră "
-#~ "acționează în acest sens. Atunci când se utilizează VLC ca receptor, nu "
-#~ "este."
-
-#~ msgid ""
-#~ "This Stream name will be sent to the receiver using the rist RTCP channel"
-#~ msgstr ""
-#~ "Acest nume de flux va fi trimis către receptor folosind canalul rist RTCP."
-
-#~ msgid "4:2:0"
-#~ msgstr "4:2:0"
-
-#~ msgid "4:2:2"
-#~ msgstr "4:2:2"
-
-#~ msgid "4:4:4"
-#~ msgstr "4:4:4"
-
-#~ msgid "Rate control method"
-#~ msgstr "Metoda de control al ratei"
-
-#~ msgid "Method used to encode the video sequence"
-#~ msgstr "Metoda folosita pentru codarea secventei video "
-
-#~ msgid "Constant noise threshold mode"
-#~ msgstr "Mod cu prag de zgomot constant"
-
-#~ msgid "Constant bitrate mode (CBR)"
-#~ msgstr "Modul cu rată de biți constantă (CBR)"
-
-#~ msgid "Low Delay mode"
-#~ msgstr "Mod de întârziere redusă"
-
-#~ msgid "Lossless mode"
-#~ msgstr "Modul fără pierderi"
-
-#~ msgid "Constant lambda mode"
-#~ msgstr "Mod lambda constant"
-
-#~ msgid "Constant error mode"
-#~ msgstr "Modul de eroare constantă"
-
-#~ msgid "Constant quality mode"
-#~ msgstr "Modul de calitate constantă"
-
-#~ msgid "GOP structure"
-#~ msgstr "Structura GOP"
-
-#~ msgid "GOP structure used to encode the video sequence"
-#~ msgstr "Structura GOP folosita pentru codarea secventei video "
-
-#~ msgid ""
-#~ "No fixed gop structure. A picture can be intra or inter and refer to "
-#~ "previous or future pictures."
-#~ msgstr ""
-#~ "Nu există o structură fixă a gop. O imagine poate fi intra sau inter și "
-#~ "se poate referi la imagini anterioare sau viitoare."
-
-#~ msgid "I-frame only sequence"
-#~ msgstr "Secvență doar pentru cadrul I"
-
-#~ msgid "Inter pictures refere to previous pictures only"
-#~ msgstr "Imaginile intermediare se referă doar la imaginile anterioare"
-
-#~ msgid "Inter pictures can refer to previous or future pictures"
-#~ msgstr ""
-#~ "Imaginile intermediare se pot referi la imagini anterioare sau viitoare"
-
-#~ msgid "Constant quality factor"
-#~ msgstr "Factor de calitate constant"
-
-#~ msgid "Quality factor to use in constant quality mode"
-#~ msgstr "Factorul de calitate care trebuie utilizat în modul de calitate "
-
-#~ msgid "Noise Threshold"
-#~ msgstr "Prag pentru sunet"
-
-#~ msgid "Noise threshold to use in constant noise threshold mode"
-#~ msgstr "Pragul de zgomot utilizat în modul prag de zgomot constant"
-
-#~ msgid "CBR bitrate (kbps)"
-#~ msgstr "Rată de biți CBR (kbiți/s)"
-
-#~ msgid "Target bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "Rata de biți țintă în kbps atunci când se codifică în modul cu rată de "
-#~ "biți constantă"
-
-#~ msgid "Maximum bitrate (kbps)"
-#~ msgstr "Rată de biți maximă (kbps)"
-
-#~ msgid "Maximum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr "Rata maximă de biți în kbps la codificarea în mod constant bitrate"
-
-#~ msgid "Minimum bitrate (kbps)"
-#~ msgstr "Rată de biți minimă (kbps)"
-
-#~ msgid "Minimum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr "Rata minimă de biți în kbps la codificarea în mod constant bitrate"
-
-#~ msgid "GOP length"
-#~ msgstr "Lungime GOP"
-
-#~ msgid ""
-#~ "Number of pictures between successive sequence headers i.e. length of the "
-#~ "group of pictures"
-#~ msgstr ""
-#~ "Numărul de imagini dintre capetele de secvență succesive, adică lungimea "
-#~ "grupului de imagini"
-
-#~ msgid "Prefilter"
-#~ msgstr "Prefiltru"
-
-#~ msgid "Enable adaptive prefiltering"
-#~ msgstr "Activează prefiltrarea adaptivă"
-
-#~ msgid "No pre-filtering"
-#~ msgstr "Fără pre-filtrare"
-
-#~ msgid "Centre Weighted Median"
-#~ msgstr "Centrul Median Ponderat"
-
-#~ msgid "Gaussian Low Pass Filter"
-#~ msgstr "Gaussian filtru de trecere joasă"
-
-#~ msgid "Add Noise"
-#~ msgstr "Adaugă zgomot"
-
-#~ msgid "Gaussian Adaptive Low Pass Filter"
-#~ msgstr "Gaussian filtru de trecere joasă adaptiv"
-
-#~ msgid "Low Pass Filter"
-#~ msgstr "Filtru trece-jos"
-
-#~ msgid "Amount of prefiltering"
-#~ msgstr "Cantitatea de prefiltrare"
-
-#~ msgid "Higher value implies more prefiltering"
-#~ msgstr "Valorile înalte implică mai multă prefiltrare"
-
-#~ msgid "Picture coding mode"
-#~ msgstr "Mod de codare imagine"
-
-#~ msgid ""
-#~ "Field coding is where interlaced fields are coded separately as opposed "
-#~ "to a pseudo-progressive frame"
-#~ msgstr ""
-#~ "Câmpul de filtrare se află acolo unde câmpurile suprapuse interlaced, "
-#~ "sunt codate separat, în opoziţie cu un cadru preudo-progresiv"
-
-#~ msgid "auto - let encoder decide based upon input (Best)"
-#~ msgstr "automat - codorul va decide pe baza intrării (Cea mai bună) "
-
-#~ msgid "force coding frame as single picture"
-#~ msgstr "forţare cadru codare, ca şi imagine unică"
-
-#~ msgid "force coding frame as separate interlaced fields"
-#~ msgstr "forţare cadru codare, ca şi câmpuri suprapuse-interlaced, separate"
-
-#~ msgid "Size of motion compensation blocks"
-#~ msgstr "Dimensiunea blocurilor de compensare a mișcării"
-
-#~ msgid "automatic - let encoder decide based upon input (Best)"
-#~ msgstr ""
-#~ "automat - lasă codificatorul să decidă în funcție de datele de intrare "
-#~ "(cel mai bun)"
-
-#~ msgid "small - use small motion compensation blocks"
-#~ msgstr "mic - utilizați blocuri mici de compensare a mișcării"
-
-#~ msgid "medium - use medium motion compensation blocks"
-#~ msgstr "mediu - utilizați blocuri de compensare a mișcării medii"
-
-#~ msgid "large - use large motion compensation blocks"
-#~ msgstr "mare - utilizați blocuri mari de compensare a mișcării"
-
-#~ msgid "Overlap of motion compensation blocks"
-#~ msgstr "Suprapunerea blocurilor de compensare a mișcării"
-
-#~ msgid "none - Motion compensation blocks do not overlap"
-#~ msgstr "none - Blocurile de compensare a mișcării nu se suprapun"
-
-#~ msgid "partial - Motion compensation blocks only partially overlap"
-#~ msgstr ""
-#~ "parțial - blocurile de compensare a mișcării se suprapun doar parțial"
-
-#~ msgid "full - Motion compensation blocks fully overlap"
-#~ msgstr "full - blocurile de compensare a mișcării se suprapun complet"
-
-#~ msgid "Motion Vector precision"
-#~ msgstr "Precizia vectorului de mișcare"
-
-#~ msgid "Motion Vector precision in pels"
-#~ msgstr "Precizia vectorului de mișcare în pels"
-
-#~ msgid "Three component motion estimation"
-#~ msgstr "Estimare mişcare prin trei componente"
-
-#~ msgid "Use chroma as part of the motion estimation process"
-#~ msgstr ""
-#~ "Folosire saturaţie cromatică, ca şi parte a procesului de estimare a "
-#~ "mişcării"
-
-#~ msgid "Intra picture DWT filter"
-#~ msgstr "Filtru Intra imagine DWT"
-
-#~ msgid "Inter picture DWT filter"
-#~ msgstr "Filtru Inter imagine DWT"
-
-#~ msgid "Number of DWT iterations"
-#~ msgstr "Numărul de iterații DWT"
-
-#~ msgid "Also known as DWT levels"
-#~ msgstr "Cunoscut şi sub numele de nivele DWT"
-
-#~ msgid "Enable multiple quantizers"
-#~ msgstr "Activare cuantificări multiple"
-
-#~ msgid "Enable multiple quantizers per subband (one per codeblock)"
-#~ msgstr "Activează cuantificările multiple per sub-bandă (una per codeblock)"
-
-#~ msgid "Disable arithmetic coding"
-#~ msgstr "Dezactivare codare aritmetică"
-
-#~ msgid "Use variable length codes instead, useful for very high bitrates"
-#~ msgstr ""
-#~ "Folosire, în schimb, coduri cu lungime variabilă, util pentru rate de "
-#~ "biţi foarte înalte"
-
-#~ msgid "perceptual weighting method"
-#~ msgstr "metoda ponderării perceptuale"
-
-#~ msgid "perceptual distance"
-#~ msgstr "distanța de percepție"
-
-#~ msgid "perceptual distance to calculate perceptual weight"
-#~ msgstr "distanța perceptuală pentru calcularea ponderii perceptuale"
-
-#~ msgid "Horizontal slices per frame"
-#~ msgstr "Felii orizontale pe cadru"
-
-#~ msgid "Number of horizontal slices per frame in low delay mode"
-#~ msgstr ""
-#~ "Numărul de secțiuni orizontale pe cadru în modul cu întârziere redusă"
-
-#~ msgid "Vertical slices per frame"
-#~ msgstr "Secțiuni verticale pe cadru"
-
-#~ msgid "Number of vertical slices per frame in low delay mode"
-#~ msgstr ""
-#~ "Numărul de secțiuni verticale pe cadru în modul cu întârziere redusă"
-
-#~ msgid "Size of code blocks in each subband"
-#~ msgstr "Dimensiunea blocurilor de cod în fiecare subbandă"
-
-#~ msgid "small - use small code blocks"
-#~ msgstr "mic - folosiți blocuri mici de cod"
-
-#~ msgid "medium - use medium sized code blocks"
-#~ msgstr "mediu - utilizează blocuri de cod de dimensiuni medii"
-
-#~ msgid "large - use large code blocks"
-#~ msgstr "mare - utilizează blocuri de cod mari"
-
-#~ msgid "full - One code block per subband"
-#~ msgstr "complet - Un bloc de cod pe subbandă"
-
-#~ msgid "Enable hierarchical Motion Estimation"
-#~ msgstr "Activați estimarea ierarhică a mișcării"
-
-#~ msgid "Number of levels of downsampling"
-#~ msgstr "Numărul de niveluri de eșantionare redusă"
-
-#~ msgid ""
-#~ "Number of levels of downsampling in hierarchical motion estimation mode"
-#~ msgstr ""
-#~ "Numărul de niveluri de eșantionare redusă în modul de estimare ierarhică "
-#~ "a mișcării"
-
-#~ msgid "Enable Global Motion Estimation"
-#~ msgstr "Activați estimarea globală a mișcării"
-
-#~ msgid "Enable Phase Correlation Estimation"
-#~ msgstr "Activează estimarea corelației de fază"
-
-#~ msgid "Enable Scene Change Detection"
-#~ msgstr "Activați detectarea schimbării scenei"
-
-#~ msgid "Force Profile"
-#~ msgstr "Profilul de forță"
-
-#~ msgid "VC2 Low Delay Profile"
-#~ msgstr "Profilul de întârziere redusă VC2"
-
-#~ msgid "VC2 Simple Profile"
-#~ msgstr "Profil simplu VC2"
-
-#~ msgid "VC2 Main Profile"
-#~ msgstr "Profilul principal VC2"
-
-#~ msgid "Main Profile"
-#~ msgstr "Profil de baza "
-
-#~ msgid "Dirac video decoder using libschroedinger"
-#~ msgstr "decodor video Dirac folosind libschroedinger"
-
-#~ msgid "Dirac video encoder using libschroedinger"
-#~ msgstr "Codificator video Dirac folosind libschroedinger"
-
-#~ msgid "Key: "
-#~ msgstr "Tastă: "
