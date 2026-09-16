@@ -11,7 +11,7 @@ Release HOWTO
      · NEWS
    - Update important things and add them to the NEWS file
    - Close the milestone on Trac https://trac.videolan.org/vlc
-   - Update OpenGPG key embedded in include/vlc_update.h if needed
+   - Update OpenPGP key embedded in include/vlc_pgpkey.h if needed
    - Increase the libvlccore and libvlc revisions in src/Makefile.am
       _if_and_only_if_ the ABI number has not been increased instead, in
       which case the revision goes back to zero.
@@ -31,7 +31,9 @@ Release HOWTO
             for sum in md5 sha1 sha256; do
                 ${sum}sum --binary $file > $file.$sum
             done
-            gpg -sb -u VideoLAN\ Release --armor --force-v3-sigs $file
+            gpg --rfc4880 --no-textmode --armor --detach-sign \
+                -u VideoLAN\ Release --digest-algo SHA512 \
+                --output "$file.asc" -- "$file"
         done
 
  * Contribs
@@ -62,9 +64,13 @@ Release HOWTO
   - update the md5
 
  * "Check for updates" functionality
-  - edit update.videolan.org/vlc/status
-  - gpg -u VideoLAN\ Release -t --sign --detach --armor
-  - for i in *asc;do gpg --verify $i || echo $i;done
+  - Edit the appropriate status file under update.videolan.org/vlc/:
+    status-win-x86, status-win-x64 or status-win-arm64 for Windows.
+  - Sign with the same release key as the advertised installer, then verify:
+        file=status-win-x64
+        gpg --rfc4880 --no-textmode --armor --detach-sign \
+            -u VideoLAN\ Release --digest-algo SHA512 \
+            --output "$file.asc" -- "$file"
 
  * Mirrors
   - Forwarn the mirror admins (optional for any minor release)
