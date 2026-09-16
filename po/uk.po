@@ -1,23 +1,24 @@
 # Ukrainian translation
-# Copyright (C) 2023 VideoLAN
+# Copyright (C) 2026 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
 # Eugene Kutia <fossugn@gmail.com>, 2013
 # Oleksandr Natalenko <oleksandr@natalenko.name>, 2009-2012
 # Андрій Бандура <andriykopanytsia@gmail.com>, 2013-2017, 2021
+# Michał Trzebiatowski <michtrz@gmail.com>, 2018
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22-rc1\n"
+"Project-Id-Version: vlc 3.0.24-beta1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2026-06-28 16:08+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: Андрій Бандура <andriykopanytsia@gmail.com>, 2021\n"
 "Language-Team: Ukrainian (https://app.transifex.com/yaron/teams/16553/uk/)\n"
-"Language: uk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: uk\n"
 "Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != "
 "11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % "
 "100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || "
@@ -1065,24 +1066,20 @@ msgid "Decoded format"
 msgstr "Декодований формат"
 
 #: src/input/es_out.c:3207
-#, fuzzy
 msgid "Decoded channels"
-msgstr "Канали звуку"
+msgstr ""
 
 #: src/input/es_out.c:3212
-#, fuzzy
 msgid "Decoded sample rate"
-msgstr "Частота дискретизації звуку"
+msgstr ""
 
 #: src/input/es_out.c:3219
-#, fuzzy
 msgid "Decoded bits per sample"
-msgstr "Бітів на звуковий відлік"
+msgstr ""
 
 #: src/input/es_out.c:3224
-#, fuzzy
 msgid "Decoded Bitrate"
-msgstr "Декодований формат"
+msgstr ""
 
 #: src/input/es_out.c:3237
 msgid "Track replay gain"
@@ -8182,9 +8179,8 @@ msgid "Bitmask"
 msgstr "Бітова маска"
 
 #: modules/access/rist.c:313
-#, fuzzy
 msgid "Virtual Destination Port Filter"
-msgstr "Файл призначення:"
+msgstr ""
 
 #: modules/access/rist.c:315
 msgid ""
@@ -8206,14 +8202,10 @@ msgstr ""
 "Максимальне відхилення демультиплексування/декодування RIST (усталено 5 мс)"
 
 #: modules/access/rist.c:328
-#, fuzzy
 msgid ""
 "This controls the maximum jitter that will be passed to the demux/decode "
 "chain. The lower the value, the more CPU cycles the module will consume"
 msgstr ""
-"Цей параметр контролює найбільше відхилення, яке буде передано ланцюгу "
-"демультиплексування/декодування. Чим нижче значення, тим більше циклів "
-"процесора споживає алгоритм"
 
 #: modules/access/rist.c:332
 msgid "RIST nack type, 0 = range, 1 = bitmask. Default is range"
@@ -8507,9 +8499,8 @@ msgid "SFTP port number to use on the server"
 msgstr "Номер використовуваного на сервері порту SFTP"
 
 #: modules/access/sftp.c:61
-#, fuzzy
 msgid "Private key file"
-msgstr "файл ключа AES"
+msgstr ""
 
 #: modules/access/sftp.c:62
 msgid ""
@@ -8662,9 +8653,8 @@ msgid "Password for stream encryption"
 msgstr "Пароль для потокового шифрування"
 
 #: modules/access/srt.c:566
-#, fuzzy
 msgid "SRT Stream ID"
-msgstr "Вивід потоку по SRT"
+msgstr ""
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -9534,18 +9524,16 @@ msgid "Source port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:272
-#, fuzzy
 msgid "Virtual Destination Port"
-msgstr "Вивід потоку"
+msgstr ""
 
 #: modules/access_output/rist.c:274
 msgid "Destination port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:281
-#, fuzzy
 msgid "Multipeer mode"
-msgstr "Мультиплексор"
+msgstr ""
 
 #: modules/access_output/rist.c:283
 msgid ""
@@ -9554,23 +9542,20 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Duplicate"
-msgstr "Програма"
+msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Load balanced"
-msgstr "Баланс червоного"
+msgstr ""
 
 #: modules/access_output/rist.c:294
 msgid "RIST stream output"
 msgstr "Потоковий вивід RIST"
 
 #: modules/access_output/rist.c:299
-#, fuzzy
 msgid "RIST target payload size (bytes)"
-msgstr "Розмір цільового пакета RIST (у байтах)"
+msgstr ""
 
 #: modules/access_output/shout.c:64
 #: modules/gui/qt/components/sout/sout_widgets.cpp:438
@@ -12900,7 +12885,6 @@ msgstr "Декодер тексту субтитрів"
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -13345,7 +13329,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, fuzzy
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -15254,11 +15237,11 @@ msgstr "Дамп у файл"
 
 #: modules/demux/dirac.c:41
 msgid "Value to adjust dts by"
-msgstr "Значення для регулювання DTS"
+msgstr ""
 
 #: modules/demux/dirac.c:54
 msgid "Dirac video demuxer"
-msgstr "Демультиплексор відео Dirac"
+msgstr ""
 
 #: modules/demux/directory.c:94
 msgid "Directory import"
@@ -20055,36 +20038,32 @@ msgstr ""
 "Клавіша Delete для вилучення."
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1405
-#, fuzzy
 msgid "Global Hotkey change"
-msgstr "Змінити гарячу клавішу"
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1406
 msgid "Hotkey change"
 msgstr "Змінити гарячу клавішу"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1410
-#, fuzzy
 msgid "Press the new key or combination for <b>%1</b>"
-msgstr "Натисніть нову клавішу або комбінацію для "
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1419
 msgid "Assign"
 msgstr "Призначити"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1455
-#, fuzzy
 msgid "Warning: this key or combination is already assigned to \"<b>%1</b>\""
-msgstr "Попередження: клавіша або комбінація вже прив'язані до"
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1467
 msgid "Warning: <b>%1</b> is already an application menu shortcut"
 msgstr "Попередження: <b>%1</b> вже використовується у меню програми"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1490
-#, fuzzy
 msgid "Key or combination: <b>%1</b>"
-msgstr "Клавіша або комбінація:"
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1498
 msgid "Key: <b>%1</b>"
@@ -20252,25 +20231,20 @@ msgstr ""
 "Контейнери (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:184
-#, fuzzy
 msgid "This module outputs the stream using the RIST protocol (TR06)."
 msgstr ""
-"Цей модуль виводить перекодований потік у мережу за допомогою протоколу MMS."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:186
-#, fuzzy
 msgid "Destination Address"
-msgstr "Префікс призначення"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:191
-#, fuzzy
 msgid "Destination Port"
-msgstr "Призначення"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:201
-#, fuzzy
 msgid "Stream Name"
-msgstr "Назва потоку"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:237
 msgid "This module outputs the transcoded stream to a network via HTTP."
@@ -23774,7 +23748,7 @@ msgstr "Пакетувальник копіюванням"
 
 #: modules/packetizer/dirac.c:87
 msgid "Dirac packetizer"
-msgstr "Пакетувальник Dirac"
+msgstr ""
 
 #: modules/packetizer/dts.c:47
 msgid "DTS audio packetizer"
@@ -29797,384 +29771,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Список медіаменеджеру"
-
-#~ msgid "RIST maximum packet size (bytes)"
-#~ msgstr "Найбільший розмір пакету RIST (у байтах)"
-
-#~ msgid "RIST latency (ms)"
-#~ msgstr "Затримка RIST (мс)"
-
-#~ msgid "RIST nack retry interval (ms)"
-#~ msgstr "Інтервал повторення непідтверджень RIST (мс)"
-
-#~ msgid "RIST reorder buffer (ms)"
-#~ msgstr "Буфер перевпорядкування RIST (мс)"
-
-#~ msgid "RIST maximum retry count"
-#~ msgstr "Найбільше число спроб RIST"
-
-#~ msgid "Disable NACK output packets"
-#~ msgstr "Вимкнути вихідні пакети NACK"
-
-#~ msgid "Use this to disable packet recovery"
-#~ msgstr "Використовуйте це, щоб вимкнути відновлення пакетів"
-
-#~ msgid "Do not check for a valid rtcp message from the encoder"
-#~ msgstr "Не перевіряти на правильність повідомлення rctp від кодера"
-
-#~ msgid ""
-#~ "Send nack messages even when we have not confirmed that the encoder is on "
-#~ "our local network."
-#~ msgstr ""
-#~ "Відправляти повідомлення непідтвердження, навіть якщо нема впевненості, "
-#~ "що кодувальник перебуває в локальній мережі."
-
-#~ msgid "16 bytes"
-#~ msgstr "16 байтів"
-
-#~ msgid "24 bytes"
-#~ msgstr "24 байти"
-
-#~ msgid "32 bytes"
-#~ msgstr "32 байти"
-
-#~ msgid "RIST data output caching size (ms)"
-#~ msgstr "Розмір кешування виведення даних RIST (мс)"
-
-#~ msgid ""
-#~ "Having this cache will guarantee that the packets going out are delivered "
-#~ "at a spacing determined by the chain timestamps thus ensuring a near "
-#~ "jitter free output. Be aware that this setting will also add to the "
-#~ "overall latency of the stream."
-#~ msgstr ""
-#~ "Наявність цього кешу гарантуватиме, що пакети, що виходять, доставляються "
-#~ "з інтервалом, визначеним часовими позначками ланцюга, таким чином "
-#~ "забезпечуючи майже вільний вихід. Пам’ятайте, що це налаштування також "
-#~ "збільшить загальну затримку потоку."
-
-#~ msgid "RIST retry-buffer queue size (ms)"
-#~ msgstr "Розмір черги буфера спроб RIST (мс)"
-
-#~ msgid ""
-#~ "This must match the buffer size (latency) configured on the server side. "
-#~ "If you are not sure, leave the default of 0 which will set it the maximum "
-#~ "value and will use about 100MB of RAM"
-#~ msgstr ""
-#~ "Цей параметр мусить відповідати розміру буфера (затримці), налаштованому "
-#~ "на стороні сервера. Якщо ви не впевнені, залиште типовий 0, який буде "
-#~ "задавати максимальне значення та буде використовуватися приблизно 100МБ з "
-#~ "RAM"
-
-#~ msgid "SSRC used in RTP output (default is random, i.e. 0)"
-#~ msgstr "SSRC використаний у виводі RTP (усталено випадково, себто 0)"
-
-#~ msgid ""
-#~ "Use this setting to specify a known SSRC for the RTP header. This is only "
-#~ "useful if your receiver acts on it. When using VLC as receiver, it is not."
-#~ msgstr ""
-#~ "Використовуйте цей параметр, щоби вказати відомий SSRC для заголовку RTP. "
-#~ "Це корисно лише, якщо ваш одержувач працює на цьому. Коли "
-#~ "використовується VLC як одержувач, цей параметр не потрібний."
-
-#~ msgid ""
-#~ "This Stream name will be sent to the receiver using the rist RTCP channel"
-#~ msgstr ""
-#~ "Ця назва потоку буде надіслана одержувачу, використовуючи канал rist RTCP"
-
-#~ msgid "4:2:0"
-#~ msgstr "4:2:0"
-
-#~ msgid "4:2:2"
-#~ msgstr "4:2:2"
-
-#~ msgid "4:4:4"
-#~ msgstr "4:4:4"
-
-#~ msgid "Rate control method"
-#~ msgstr "Метод контролю частоти"
-
-#~ msgid "Method used to encode the video sequence"
-#~ msgstr "Метод кодування відеопослідовності"
-
-#~ msgid "Constant noise threshold mode"
-#~ msgstr "Режим постійного порогу шуму"
-
-#~ msgid "Constant bitrate mode (CBR)"
-#~ msgstr "Кодування з постійним бітрейтом (CBR)"
-
-#~ msgid "Low Delay mode"
-#~ msgstr "Режим низької затримки"
-
-#~ msgid "Lossless mode"
-#~ msgstr "Режим без втрати якості"
-
-#~ msgid "Constant lambda mode"
-#~ msgstr "Режим постійної лямбди"
-
-#~ msgid "Constant error mode"
-#~ msgstr "Режим постійної кількості помилок"
-
-#~ msgid "Constant quality mode"
-#~ msgstr "Режим постійної якості"
-
-#~ msgid "GOP structure"
-#~ msgstr "Структура GOP"
-
-#~ msgid "GOP structure used to encode the video sequence"
-#~ msgstr "Структура GOP для кодування відеопослідовності"
-
-#~ msgid ""
-#~ "No fixed gop structure. A picture can be intra or inter and refer to "
-#~ "previous or future pictures."
-#~ msgstr ""
-#~ "Немає фіксованої структури GOP. Зображення може бути внутрішнім або "
-#~ "проміжним і посилатися на попередні або наступні зображення."
-
-#~ msgid "I-frame only sequence"
-#~ msgstr "Послідовність тільки I-кадрів"
-
-#~ msgid "Inter pictures refere to previous pictures only"
-#~ msgstr "Проміжні зображення посилаються тільки на попередні"
-
-#~ msgid "Inter pictures can refer to previous or future pictures"
-#~ msgstr "Проміжні зображення можуть посилатися на попередні або наступні"
-
-#~ msgid "Constant quality factor"
-#~ msgstr "Постійний множник якості"
-
-#~ msgid "Quality factor to use in constant quality mode"
-#~ msgstr "Показник якості режиму постійної якості"
-
-#~ msgid "Noise Threshold"
-#~ msgstr "Поріг шуму"
-
-#~ msgid "Noise threshold to use in constant noise threshold mode"
-#~ msgstr "Поріг шуму в режимі постійного порогу шуму"
-
-#~ msgid "CBR bitrate (kbps)"
-#~ msgstr "Постійний бітрейт (кб/с)"
-
-#~ msgid "Target bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "Цільовий бітрейт у кбіт/с під час кодування в режимі постійного бітрейту"
-
-#~ msgid "Maximum bitrate (kbps)"
-#~ msgstr "Максимальний бітрейт (кбіт/с)"
-
-#~ msgid "Maximum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "Максимальний бітрейт у кбіт/с під час кодування в режимі постійного "
-#~ "бітрейту"
-
-#~ msgid "Minimum bitrate (kbps)"
-#~ msgstr "Мінімальний бітрейт (кбіт/с)"
-
-#~ msgid "Minimum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "Мінімальний бітрейт у кбіт/с під час кодування в режимі постійного "
-#~ "бітрейту"
-
-#~ msgid "GOP length"
-#~ msgstr "Довжина GOP"
-
-#~ msgid ""
-#~ "Number of pictures between successive sequence headers i.e. length of the "
-#~ "group of pictures"
-#~ msgstr ""
-#~ "Число зображень між послідовними заголовками, тобто довжина груп зображень"
-
-#~ msgid "Prefilter"
-#~ msgstr "Попередній фільтр"
-
-#~ msgid "Enable adaptive prefiltering"
-#~ msgstr "Вмикає адаптивне попереднє фільтрування"
-
-#~ msgid "No pre-filtering"
-#~ msgstr "Без попереднього фільтрування"
-
-#~ msgid "Centre Weighted Median"
-#~ msgstr "Середньозважена медіана"
-
-#~ msgid "Gaussian Low Pass Filter"
-#~ msgstr "Гаусовий фільтр низьких частот"
-
-#~ msgid "Add Noise"
-#~ msgstr "Додати шум"
-
-#~ msgid "Gaussian Adaptive Low Pass Filter"
-#~ msgstr "Адаптивний гаусовий фільтр низьких частот"
-
-#~ msgid "Low Pass Filter"
-#~ msgstr "Фільтр низьких частот"
-
-#~ msgid "Amount of prefiltering"
-#~ msgstr "Величина попереднього фільтрування"
-
-#~ msgid "Higher value implies more prefiltering"
-#~ msgstr "Вище значення означає більше попереднього фільтрування"
-
-#~ msgid "Picture coding mode"
-#~ msgstr "Режим кодування малюнку"
-
-#~ msgid ""
-#~ "Field coding is where interlaced fields are coded separately as opposed "
-#~ "to a pseudo-progressive frame"
-#~ msgstr ""
-#~ "Поле кодування — це там, де черезрядкові поля кодуються окремо, що "
-#~ "протиставляється псевдопрогресивному кадру"
-
-#~ msgid "auto - let encoder decide based upon input (Best)"
-#~ msgstr ""
-#~ "автоматично — дозволити кодеру вирішувати, спираючись на вхід (найкраще)"
-
-#~ msgid "force coding frame as single picture"
-#~ msgstr "примусове кодування кадру як одиничного малюнка"
-
-#~ msgid "force coding frame as separate interlaced fields"
-#~ msgstr "примусове кодування кадру як окремих черезрядкових полів"
-
-#~ msgid "Size of motion compensation blocks"
-#~ msgstr "Розмір блоків компенсації руху"
-
-#~ msgid "automatic - let encoder decide based upon input (Best)"
-#~ msgstr ""
-#~ "автоматично — дати змогу кодеру вирішувати на основі вводу (найкраще)"
-
-#~ msgid "small - use small motion compensation blocks"
-#~ msgstr "малий — використовувати малі блоки компенсації руху"
-
-#~ msgid "medium - use medium motion compensation blocks"
-#~ msgstr "середній — використовувати середні блоки компенсації руху"
-
-#~ msgid "large - use large motion compensation blocks"
-#~ msgstr "великий — використовувати великі блоки компенсації руху"
-
-#~ msgid "Overlap of motion compensation blocks"
-#~ msgstr "Перекривання блоків компенсації руху"
-
-#~ msgid "none - Motion compensation blocks do not overlap"
-#~ msgstr "жодний— блоки компенсації руху не перекриваються"
-
-#~ msgid "partial - Motion compensation blocks only partially overlap"
-#~ msgstr "частковий — блоки компенсації руху перекриваються частково"
-
-#~ msgid "full - Motion compensation blocks fully overlap"
-#~ msgstr "повний — блоки компенсації руху перекриваються повністю"
-
-#~ msgid "Motion Vector precision"
-#~ msgstr "Точність вектору руху"
-
-#~ msgid "Motion Vector precision in pels"
-#~ msgstr "Точність вектору руху в пікселях"
-
-#~ msgid "Three component motion estimation"
-#~ msgstr "Оцінка трійки компонентів руху"
-
-#~ msgid "Use chroma as part of the motion estimation process"
-#~ msgstr "Використовувати кольоровість як частину процесу оцінки руху"
-
-#~ msgid "Intra picture DWT filter"
-#~ msgstr "Фільтр дискретного перетворення Уолша усередині малюнку"
-
-#~ msgid "Inter picture DWT filter"
-#~ msgstr "Фільтр дискретного перетворення Уолша між малюнками"
-
-#~ msgid "Number of DWT iterations"
-#~ msgstr "Число кроків фільтру дискретного перетворення Уолша"
-
-#~ msgid "Also known as DWT levels"
-#~ msgstr "Також знаний як рівні фільтру дискретного перетворення Уолша"
-
-#~ msgid "Enable multiple quantizers"
-#~ msgstr "Увімкнути декілька квантифікаторів"
-
-#~ msgid "Enable multiple quantizers per subband (one per codeblock)"
-#~ msgstr ""
-#~ "Увімкнути декілька квантифікаторів на одну підгрупу (одна на кодовий блок)"
-
-#~ msgid "Disable arithmetic coding"
-#~ msgstr "Вимкнути арифметичне кодування"
-
-#~ msgid "Use variable length codes instead, useful for very high bitrates"
-#~ msgstr ""
-#~ "Використовувати коди змінної довжини, корисно для дуже високих бітрейтів"
-
-#~ msgid "perceptual weighting method"
-#~ msgstr "метод зваженого сприймання"
-
-#~ msgid "perceptual distance"
-#~ msgstr "відстань сприймання"
-
-#~ msgid "perceptual distance to calculate perceptual weight"
-#~ msgstr "відстань сприймання для обчислення ваги сприймання"
-
-#~ msgid "Horizontal slices per frame"
-#~ msgstr "Число горизонтальних частин на кадр"
-
-#~ msgid "Number of horizontal slices per frame in low delay mode"
-#~ msgstr "Число горизонтальних частин у кадрі в режимі низької затримки"
-
-#~ msgid "Vertical slices per frame"
-#~ msgstr "Число вертикальних частин на кадр"
-
-#~ msgid "Number of vertical slices per frame in low delay mode"
-#~ msgstr "Число вертикальних частин у кадрі в режимі низької затримки"
-
-#~ msgid "Size of code blocks in each subband"
-#~ msgstr "Розмір кодових блоків у кожній підсмузі"
-
-#~ msgid "small - use small code blocks"
-#~ msgstr "малий — використовувати малі кодові блоки"
-
-#~ msgid "medium - use medium sized code blocks"
-#~ msgstr "середній — використовувати середні кодові блоки"
-
-#~ msgid "large - use large code blocks"
-#~ msgstr "великий — використовувати великі кодові блоки"
-
-#~ msgid "full - One code block per subband"
-#~ msgstr "повний — один кодовий блок на підсмугу"
-
-#~ msgid "Enable hierarchical Motion Estimation"
-#~ msgstr "Увімкнути ієрархічне оцінювання руху"
-
-#~ msgid "Number of levels of downsampling"
-#~ msgstr "Число рівнів передискретизації вниз"
-
-#~ msgid ""
-#~ "Number of levels of downsampling in hierarchical motion estimation mode"
-#~ msgstr ""
-#~ "Число рівнів передискретизації вниз в режимі ієрархічного оцінювання руху"
-
-#~ msgid "Enable Global Motion Estimation"
-#~ msgstr "Увімкнути глобальне оцінювання руху"
-
-#~ msgid "Enable Phase Correlation Estimation"
-#~ msgstr "Увімкнути алгоритм оцінювання кореляції фази"
-
-#~ msgid "Enable Scene Change Detection"
-#~ msgstr "Увімкнути визначення зміни сцени"
-
-#~ msgid "Force Profile"
-#~ msgstr "Примусово профіль"
-
-#~ msgid "VC2 Low Delay Profile"
-#~ msgstr "Профіль низької затримки VC2"
-
-#~ msgid "VC2 Simple Profile"
-#~ msgstr "Простий профіль VC2"
-
-#~ msgid "VC2 Main Profile"
-#~ msgstr "Головний профіль VC2"
-
-#~ msgid "Main Profile"
-#~ msgstr "Головний профіль"
-
-#~ msgid "Dirac video decoder using libschroedinger"
-#~ msgstr "Відеодекодер Dirac, використовуючи бібліотеку libschroedinger"
-
-#~ msgid "Dirac video encoder using libschroedinger"
-#~ msgstr "Відеокодер Dirac, використовуючи бібліотеку libschroedinger"
-
-#~ msgid "Key: "
-#~ msgstr "Клавіша: "
