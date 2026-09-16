@@ -30,6 +30,7 @@ check_PROGRAMS = \
 	test_src_misc_bits \
 	test_src_misc_epg \
 	test_src_misc_keystore \
+	test_src_misc_renderer_discovery \
 	test_modules_packetizer_hxxx \
 	test_modules_demux_libmp4 \
 	test_modules_demux_timestamps \
@@ -125,6 +126,8 @@ test_src_misc_epg_SOURCES = src/misc/epg.c
 test_src_misc_epg_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_misc_keystore_SOURCES = src/misc/keystore.c
 test_src_misc_keystore_LDADD = $(LIBVLCCORE) $(LIBVLC)
+test_src_misc_renderer_discovery_SOURCES = src/misc/renderer_discovery.c
+test_src_misc_renderer_discovery_LDADD = $(LIBVLCCORE)
 test_src_interface_dialog_SOURCES = src/interface/dialog.c
 test_src_interface_dialog_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_modules_packetizer_hxxx_SOURCES = modules/packetizer/hxxx.c
