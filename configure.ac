@@ -5001,51 +5001,18 @@ dnl libgcrypt
 dnl
 AC_ARG_ENABLE([libgcrypt],
   AS_HELP_STRING([--disable-libgcrypt], [gcrypt support (default enabled)]))
-AC_ARG_VAR([GCRYPT_CFLAGS], [C compiler flags for gcrypt])
-AC_ARG_VAR([GCRYPT_LIBS], [linker flags flags for gcrypt])
-
-# require libgcrypt >= 1.6.0
+have_gcrypt="no"
 AS_IF([test "${enable_libgcrypt}" != "no"], [
-  AC_CACHE_CHECK([for gcrypt 1.6.0 or later], [ac_cv_lib_gcrypt], [
-    VLC_SAVE_FLAGS
-    CFLAGS="${CFLAGS} ${GCRYPT_CFLAGS}"
-    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
-[#include <gcrypt.h>
-#if GCRYPT_VERSION_NUMBER < 0x010600
-#error
-#endif]])], [
-      ac_cv_lib_gcrypt=yes
-    ], [
-      ac_cv_lib_gcrypt=no
-    ])
-    VLC_RESTORE_FLAGS
-  ])
-
-  AS_IF([test "${ac_cv_lib_gcrypt}" = "yes"], [
+  PKG_CHECK_MODULES([GCRYPT], [libgcrypt >= 1.6.0], [
+    have_gcrypt="yes"
     AC_DEFINE([HAVE_GCRYPT], 1, [Defined if having gcrypt])
-    PKG_CHECK_MODULES([GPGERROR], [gpg-error], [
-      have_gpg_error="yes"
-    ], [
-      have_gpg_error="no"
-    ])
   ], [
     AS_IF([test "${enable_libgcrypt}" = "yes"], [
       AC_MSG_ERROR([libgcrypt version 1.6.0 or higher not found. Install libgcrypt or pass --disable-libgcrypt.])
     ])
   ])
 ])
-
-AS_IF([test -z "$GCRYPT_LIBS"], [
-  AS_IF([test "${have_gpg_error}" = "yes"],[
-    GCRYPT_LIBS="-lgcrypt ${GPGERROR_LIBS}"
-  ],[
-    GCRYPT_LIBS="-lgcrypt -lgpg-error"
-  ])
-])
-
-AC_SUBST([GCRYPT_CFLAGS])
-AC_SUBST([GCRYPT_LIBS])
-AM_CONDITIONAL([HAVE_GCRYPT], [test "${ac_cv_lib_gcrypt}" = "yes"])
+AM_CONDITIONAL([HAVE_GCRYPT], [test "${have_gcrypt}" = "yes"])
 
 dnl
 dnl TLS/SSL
@@ -5101,7 +5068,7 @@ AC_ARG_ENABLE([update-check],
   AS_HELP_STRING([--enable-update-check], [update checking system (default disabled)]))
 if test "${enable_update_check}" = "yes"
 then
- AS_IF([test "${ac_cv_lib_gcrypt}" != "yes"],[
+ AS_IF([test "${have_gcrypt}" != "yes"],[
     AC_MSG_ERROR([libgcrypt is required for update checking system]) ])
 fi
 AM_CONDITIONAL([UPDATE_CHECK], [test "${enable_update_check}" = "yes"])
