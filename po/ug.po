@@ -1,22 +1,25 @@
 # Uighur translation
-# Copyright (C) 2023 VideoLAN
+# Copyright (C) 2026 VideoLAN
 # This file is distributed under the same license as the vlc package.
 #
 # Translators:
 # Abduqadir Abliz <sahran.ug@gmail.com>, 2015
 # eltikinuyghur <eltikinuyghur@hotmail.com>, 2015
+# Michał Trzebiatowski <michtrz@gmail.com>, 2017
+# Keram, 2024
+# Abduqadir Abliz <sahranbay@gmail.com>, 2026
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22-rc1\n"
+"Project-Id-Version: vlc 3.0.24-beta1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2026-06-28 16:08+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
-"Last-Translator: Keram, 2024\n"
+"Last-Translator: Abduqadir Abliz <sahranbay@gmail.com>, 2026\n"
 "Language-Team: Uyghur (https://app.transifex.com/yaron/teams/16553/ug/)\n"
-"Language: ug\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: ug\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: include/vlc_common.h:1055
@@ -401,7 +404,7 @@ msgstr "ئالىي"
 
 #: include/vlc_config_cat.h:185
 msgid "Advanced settings. Use with care..."
-msgstr "ئالىي تەڭشەكلەر. Use with care..."
+msgstr "ئالىي تەڭشەك. ئىشلىتىشتە ئېھتىيات قىلىڭ…"
 
 #: include/vlc_config_cat.h:187
 msgid "Advanced settings"
@@ -413,19 +416,19 @@ msgstr "ھۆججەت ئاچ(&O)…"
 
 #: include/vlc_intf_strings.h:47
 msgid "&Advanced Open..."
-msgstr "& Advanced Open ..."
+msgstr "ئالىي ئاچ(&A)…"
 
 #: include/vlc_intf_strings.h:48
 msgid "Open D&irectory..."
-msgstr "D & irectory نى ئېچىڭ ..."
+msgstr "مۇندەرىجە ئاچ(&I)…"
 
 #: include/vlc_intf_strings.h:49
 msgid "Open &Folder..."
-msgstr "ئېچىش ۋە ھۆججەت قىسقۇچ ..."
+msgstr "ئاچ ۋە قىسقۇچ(&F)…"
 
 #: include/vlc_intf_strings.h:50
 msgid "Select one or more files to open"
-msgstr "ئېچىش ئۈچۈن بىر ياكى بىر قانچە ھۆججەتنى تاللاڭ"
+msgstr "ئېچىش ئۈچۈن بىر ياكى بىر قانچە ھۆججەت تاللىنىدۇ"
 
 #: include/vlc_intf_strings.h:51
 msgid "Select Directory"
@@ -437,27 +440,27 @@ msgstr "قىسقۇچ تاللا"
 
 #: include/vlc_intf_strings.h:55
 msgid "Media &Information"
-msgstr "Media & Information"
+msgstr "ۋاسىتە ۋە ئۇچۇر"
 
 #: include/vlc_intf_strings.h:56
 msgid "&Codec Information"
-msgstr "& Codec ئۇچۇرلىرى"
+msgstr "كودلىغۇچ ئۇچۇرى(&C)"
 
 #: include/vlc_intf_strings.h:57
 msgid "&Messages"
-msgstr "& ئۇچۇرلار"
+msgstr "ئۇچۇر(&M)"
 
 #: include/vlc_intf_strings.h:58
 msgid "Jump to Specific &Time"
-msgstr "كونكرېت ۋە ۋاقىتقا ئاتلىنىڭ"
+msgstr "مۇئەييەن ۋاقىتقا ئاتلا(&T)"
 
 #: include/vlc_intf_strings.h:59
 msgid "Custom &Bookmarks"
-msgstr "Custom & Bookmarks"
+msgstr "ئىختىيارى خەتكۈش(&B)"
 
 #: include/vlc_intf_strings.h:60
 msgid "&VLM Configuration"
-msgstr "& VLM سەپلىمىسى"
+msgstr "&VLM سەپلىمىسى"
 
 #: include/vlc_intf_strings.h:62
 msgid "&About"
@@ -474,7 +477,7 @@ msgstr "ھەققىدە(&A)"
 #: modules/gui/qt/components/controller.hpp:107
 #: modules/gui/qt/dialogs/vlm.cpp:532 modules/gui/qt/ui/open.h:256
 msgid "Play"
-msgstr "قوي"
+msgstr "ياڭرات"
 
 #: include/vlc_intf_strings.h:66
 msgid "Remove Selected"
@@ -624,7 +627,7 @@ msgstr "ئاۋاز سۈزۈش مەغلۇب بولدى"
 #: src/audio_output/filters.c:268
 #, c-format
 msgid "The maximum number of filters (%u) was reached."
-msgstr "سۈزگۈچنىڭ ئەڭ كۆپ سانى (% u) گە يەتتى."
+msgstr "سۈزگۈچنىڭ ئەڭ كۆپ سانى (%u) گە يەتتى."
 
 #: src/audio_output/output.c:263 src/config/core.c:380 src/input/es_out.c:936
 #: src/libvlc-module.c:540 modules/demux/adaptive/adaptive.cpp:126
@@ -652,11 +655,11 @@ msgstr "VU مېتىر"
 
 #: src/audio_output/output.c:314 src/libvlc-module.c:201
 msgid "Audio filters"
-msgstr "ئۈن سۈزگۈچلەر"
+msgstr "ئۈن سۈزگۈچ"
 
 #: src/audio_output/output.c:327
 msgid "Replay gain"
-msgstr "پايدىنى قايتۇرۇڭ"
+msgstr "قايتۇرۇپ قويغاندا ئۆرلەت"
 
 #: src/audio_output/output.c:345 modules/gui/macosx/VLCMainMenu.m:420
 #: modules/gui/macosx/VLCMainMenu.m:421
@@ -824,11 +827,11 @@ msgstr ""
 
 #: src/config/help.c:490
 msgid "(default enabled)"
-msgstr "(سۈكۈتتىكى ھالەتتە)"
+msgstr " (كۆڭۈلدىكى قوزغىتىلغان)"
 
 #: src/config/help.c:491
 msgid "(default disabled)"
-msgstr "(سۈكۈتتىكى چەكلەنگەن)"
+msgstr " (كۆڭۈلدىكى چەكلەنگەن)"
 
 #: src/config/help.c:651 src/config/help.c:655
 msgid "Note:"
@@ -836,7 +839,7 @@ msgstr "دىققەت:"
 
 #: src/config/help.c:651
 msgid "add --advanced to your command line to see advanced options."
-msgstr "بۇيرۇق قۇرىڭىزغا قوشۇلۇپ ئىلغار تاللاشلارنى كۆرۈڭ."
+msgstr "«--advanced» بۇيرۇق قۇرىڭىزغا قوشۇپ ئالىي تاللاشنى كۆرگىلى بولىدۇ."
 
 #: src/config/help.c:656
 #, c-format
@@ -862,7 +865,7 @@ msgstr "VLC نەشرى% s (% s)\n"
 #: src/config/help.c:722
 #, c-format
 msgid "Compiled by %s on %s (%s)\n"
-msgstr "%s (%s) دىكى %s تەرىپىدىن تۈزۈلگەن\n"
+msgstr "%s (%s) دىكى%s تەرىپىدىن تۈزۈلگەن\n"
 
 #: src/config/help.c:724
 #, c-format
@@ -1050,24 +1053,20 @@ msgid "Decoded format"
 msgstr "كودلانغان فورماتى"
 
 #: src/input/es_out.c:3207
-#, fuzzy
 msgid "Decoded channels"
-msgstr "Audio channels"
+msgstr ""
 
 #: src/input/es_out.c:3212
-#, fuzzy
 msgid "Decoded sample rate"
-msgstr "ئاۋاز ئەۋرىشكىسى نىسبىتى"
+msgstr ""
 
 #: src/input/es_out.c:3219
-#, fuzzy
 msgid "Decoded bits per sample"
-msgstr "ھەر بىر ئەۋرىشكە ئۈچۈن ئاۋاز بىت"
+msgstr ""
 
 #: src/input/es_out.c:3224
-#, fuzzy
 msgid "Decoded Bitrate"
-msgstr "كودلانغان فورماتى"
+msgstr ""
 
 #: src/input/es_out.c:3237
 msgid "Track replay gain"
@@ -6322,7 +6321,7 @@ msgid ""
 "This Blu-ray disc requires Java for menus support.%s\n"
 "The disc will be played without menus."
 msgstr ""
-"بۇ كۆك نۇر دېسكىسى تىزىملىك قوللىشى ئۈچۈن Java نى تەلەپ قىلىدۇ. %s\n"
+"بۇ كۆك نۇر دېسكىسى تىزىملىك قوللىشى ئۈچۈن Java نى تەلەپ قىلىدۇ.%s\n"
 "دىسكا تىزىملىكسىز قويۇلىدۇ."
 
 #: modules/access/bluray.c:926
@@ -8153,9 +8152,8 @@ msgid "Bitmask"
 msgstr "Bitmask"
 
 #: modules/access/rist.c:313
-#, fuzzy
 msgid "Virtual Destination Port Filter"
-msgstr "نىشان ھۆججىتى:"
+msgstr ""
 
 #: modules/access/rist.c:315
 msgid ""
@@ -8176,14 +8174,10 @@ msgid "RIST demux/decode maximum jitter (default is 5ms)"
 msgstr "RIST demux / decode ئەڭ چوڭ jitter (سۈكۈت 5ms)"
 
 #: modules/access/rist.c:328
-#, fuzzy
 msgid ""
 "This controls the maximum jitter that will be passed to the demux/decode "
 "chain. The lower the value, the more CPU cycles the module will consume"
 msgstr ""
-"بۇ demux / decode زەنجىرىگە يەتكۈزۈلىدىغان ئەڭ چوڭ جىسىمنى كونترول قىلىدۇ. "
-"قىممىتى قانچە تۆۋەن بولسا ، ھېسابلاش ئۇسۇلى ئالگورىزىمنى شۇنچە كۆپ ئىستېمال "
-"قىلىدۇ"
 
 #: modules/access/rist.c:332
 msgid "RIST nack type, 0 = range, 1 = bitmask. Default is range"
@@ -8474,9 +8468,8 @@ msgid "SFTP port number to use on the server"
 msgstr "مۇلازىمېتىردا ئىشلىتىدىغان SFTP ئېغىز نومۇرى"
 
 #: modules/access/sftp.c:61
-#, fuzzy
 msgid "Private key file"
-msgstr "AES ئاچقۇچلۇق ھۆججەت"
+msgstr ""
 
 #: modules/access/sftp.c:62
 msgid ""
@@ -8626,9 +8619,8 @@ msgid "Password for stream encryption"
 msgstr "ئېقىن مەخپىيلەشتۈرۈشنىڭ پارولى"
 
 #: modules/access/srt.c:566
-#, fuzzy
 msgid "SRT Stream ID"
-msgstr "SRT ئېقىمى چىقىرىش"
+msgstr ""
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -9499,18 +9491,16 @@ msgid "Source port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:272
-#, fuzzy
 msgid "Virtual Destination Port"
-msgstr "Stream Destination"
+msgstr ""
 
 #: modules/access_output/rist.c:274
 msgid "Destination port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:281
-#, fuzzy
 msgid "Multipeer mode"
-msgstr "Multiplexer"
+msgstr ""
 
 #: modules/access_output/rist.c:283
 msgid ""
@@ -9519,23 +9509,20 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Duplicate"
-msgstr "پروگرامما"
+msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Load balanced"
-msgstr "قىزىل تەڭپۇڭلۇق"
+msgstr ""
 
 #: modules/access_output/rist.c:294
 msgid "RIST stream output"
 msgstr "RIST ئېقىن چىقىرىش"
 
 #: modules/access_output/rist.c:299
-#, fuzzy
 msgid "RIST target payload size (bytes)"
-msgstr "RIST نىشان بوغچا چوڭلۇقى (بايت)"
+msgstr ""
 
 #: modules/access_output/shout.c:64
 #: modules/gui/qt/components/sout/sout_widgets.cpp:438
@@ -10615,7 +10602,7 @@ msgid ""
 "The audio device \"%s\" could not be used:\n"
 "%s."
 msgstr ""
-"\"%s\" ئاۋاز ئۈسكۈنىسىنى ئىشلىتىشكە بولمىدى:\n"
+"«%s» ئاۋاز ئۈسكۈنىسىنى ئىشلىتىشكە بولمىدى:\n"
 "%s."
 
 #: modules/audio_output/amem.c:36
@@ -12867,7 +12854,6 @@ msgstr "Text subtitle decoder"
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -13312,7 +13298,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, fuzzy
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -14872,12 +14857,12 @@ msgstr "| demux bitrate:% 6.0f kb / s"
 #: modules/control/oldrc.c:1748
 #, c-format
 msgid "| demux corrupted  :    %5<PRIi64>"
-msgstr "| demux بۇزۇلغان: %5<PRIi64>"
+msgstr "| demux بۇزۇلغان:%5<PRIi64>"
 
 #: modules/control/oldrc.c:1750
 #, c-format
 msgid "| discontinuities  :    %5<PRIi64>"
-msgstr "| ئۈزۈلۈپ قېلىش: %5<PRIi64>"
+msgstr "| ئۈزۈلۈپ قېلىش:%5<PRIi64>"
 
 #: modules/control/oldrc.c:1754 modules/gui/ncurses.c:824
 msgid "+-[Video Decoding]"
@@ -14886,17 +14871,17 @@ msgstr "+ - [Video Decoding]"
 #: modules/control/oldrc.c:1755 modules/gui/ncurses.c:826
 #, c-format
 msgid "| video decoded    :    %5<PRIi64>"
-msgstr "| سىن يېشىش: %5<PRIi64>"
+msgstr "| سىن يېشىش:%5<PRIi64>"
 
 #: modules/control/oldrc.c:1757 modules/gui/ncurses.c:828
 #, c-format
 msgid "| frames displayed :    %5<PRIi64>"
-msgstr "| كۆرسىتىلگەن رامكىلار: %5<PRIi64>"
+msgstr "| كۆرسىتىلگەن رامكىلار:%5<PRIi64>"
 
 #: modules/control/oldrc.c:1759 modules/gui/ncurses.c:830
 #, c-format
 msgid "| frames lost      :    %5<PRIi64>"
-msgstr "| رامكىلار يوقاپ كەتتى: %5<PRIi64>"
+msgstr "| رامكىلار يوقاپ كەتتى:%5<PRIi64>"
 
 #: modules/control/oldrc.c:1763 modules/gui/ncurses.c:836
 msgid "+-[Audio Decoding]"
@@ -14905,17 +14890,17 @@ msgstr "+ - [Audio Decoding]"
 #: modules/control/oldrc.c:1764 modules/gui/ncurses.c:838
 #, c-format
 msgid "| audio decoded    :    %5<PRIi64>"
-msgstr "| ئاۋاز يېشىش: %5<PRIi64>"
+msgstr "| ئاۋاز يېشىش:%5<PRIi64>"
 
 #: modules/control/oldrc.c:1766 modules/gui/ncurses.c:840
 #, c-format
 msgid "| buffers played   :    %5<PRIi64>"
-msgstr "| بۇففېرلار ئوينىدى: %5<PRIi64>"
+msgstr "| بۇففېرلار ئوينىدى:%5<PRIi64>"
 
 #: modules/control/oldrc.c:1768 modules/gui/ncurses.c:842
 #, c-format
 msgid "| buffers lost     :    %5<PRIi64>"
-msgstr "| بۇففېرلار يوقاپ كەتتى: %5<PRIi64>"
+msgstr "| بۇففېرلار يوقاپ كەتتى:%5<PRIi64>"
 
 #: modules/control/win_msg.c:192
 msgid "WinMsg"
@@ -15176,11 +15161,11 @@ msgstr "ھۆججەت تاشلىغۇچى"
 
 #: modules/demux/dirac.c:41
 msgid "Value to adjust dts by"
-msgstr "Dts ئارقىلىق تەڭشەش قىممىتى"
+msgstr ""
 
 #: modules/demux/dirac.c:54
 msgid "Dirac video demuxer"
-msgstr "Dirac video demuxer"
+msgstr ""
 
 #: modules/demux/directory.c:94
 msgid "Directory import"
@@ -19971,36 +19956,32 @@ msgstr ""
 "ئۆچۈرۈش ئۈچۈن ئاچقۇچنى ئۆچۈرۈڭ."
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1405
-#, fuzzy
 msgid "Global Hotkey change"
-msgstr "Hotkey change"
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1406
 msgid "Hotkey change"
 msgstr "Hotkey change"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1410
-#, fuzzy
 msgid "Press the new key or combination for <b>%1</b>"
-msgstr "يېڭى كۇنۇپكىنى ياكى بىرلەشتۈرۈشنى بېسىڭ "
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1419
 msgid "Assign"
 msgstr "تاپشۇرۇق"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1455
-#, fuzzy
 msgid "Warning: this key or combination is already assigned to \"<b>%1</b>\""
-msgstr "ئاگاھلاندۇرۇش: بۇ ئاچقۇچ ياكى بىرلەشتۈرۈش ئاللىبۇرۇن تەقسىم قىلىنغان "
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1467
 msgid "Warning: <b>%1</b> is already an application menu shortcut"
 msgstr "ئاگاھلاندۇرۇش: <b>% 1 </b> ئاللىقاچان قوللىنىشچان تىزىملىك تېزلەتمىسى"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1490
-#, fuzzy
 msgid "Key or combination: <b>%1</b>"
-msgstr "ئاچقۇچ ياكى بىرلەشتۈرۈش: "
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1498
 msgid "Key: <b>%1</b>"
@@ -20168,24 +20149,20 @@ msgstr ""
 "* .flv * .webm)"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:184
-#, fuzzy
 msgid "This module outputs the stream using the RIST protocol (TR06)."
-msgstr "بۇ مودۇل ھالقىغان ئېقىننى mms كېلىشىمى ئارقىلىق تورغا چىقىرىدۇ."
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:186
-#, fuzzy
 msgid "Destination Address"
-msgstr "مەنزىل ئالدى قوشۇلغۇچىسى"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:191
-#, fuzzy
 msgid "Destination Port"
-msgstr "نىشان"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:201
-#, fuzzy
 msgid "Stream Name"
-msgstr "ئېقىم ئىسمى"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:237
 msgid "This module outputs the transcoded stream to a network via HTTP."
@@ -23225,10 +23202,10 @@ msgid ""
 "\n"
 "If in doubt, abort now.\n"
 msgstr ""
-"%s گە يەتمەكچى بولدىڭىز. ئەمما مۇلازىمېتىر تەمىنلىگەن بىخەتەرلىك گۇۋاھنامىسى "
-"نامەلۇم بولۇپ ، ئىشەنچلىك گۇۋاھنامە ئورگىنى تەرىپىدىن دەلىللەنمەيدۇ. بۇ "
-"مەسىلە بەلكىم سەپلىمە خاتالىقى ياكى بىخەتەرلىكىڭىزگە ياكى شەخسىي "
-"مەخپىيەتلىكىڭىزگە دەخلى-تەرۇز قىلىشقا ئۇرۇنۇشىدىن كېلىپ چىققان بولۇشى "
+"%s گە يەتمەكچى بولدىڭىز. ئەمما مۇلازىمېتىر تەمىنلىگەن بىخەتەرلىك "
+"گۇۋاھنامىسى نامەلۇم بولۇپ ، ئىشەنچلىك گۇۋاھنامە ئورگىنى تەرىپىدىن "
+"دەلىللەنمەيدۇ. بۇ مەسىلە بەلكىم سەپلىمە خاتالىقى ياكى بىخەتەرلىكىڭىزگە ياكى "
+"شەخسىي مەخپىيەتلىكىڭىزگە دەخلى-تەرۇز قىلىشقا ئۇرۇنۇشىدىن كېلىپ چىققان بولۇشى "
 "مۇمكىن.\n"
 "\n"
 "گۇمانلىق بولسا ، ھازىر ئەمەلدىن قالدۇرۇڭ.\n"
@@ -23690,7 +23667,7 @@ msgstr "بوغچا كۆچۈرۈش"
 
 #: modules/packetizer/dirac.c:87
 msgid "Dirac packetizer"
-msgstr "Dirac packetizer"
+msgstr ""
 
 #: modules/packetizer/dts.c:47
 msgid "DTS audio packetizer"
@@ -25171,7 +25148,7 @@ msgstr "ئېلېمېنت ئېقىمى چىقىرىش"
 #: modules/stream_out/es.c:350 modules/stream_out/es.c:363
 #, c-format
 msgid "There is no suitable stream-output access module for \"%s/%s://%s\"."
-msgstr "\"%s/%s://%s\" غا ماس كېلىدىغان ئېقىن چىقىرىش مودۇلى يوق."
+msgstr "\"%s /%s: //%s\" غا ماس كېلىدىغان ئېقىن چىقىرىش مودۇلى يوق."
 
 #: modules/stream_out/gather.c:45
 msgid "Gathering stream output"
@@ -29699,379 +29676,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Media Manager List"
-
-#~ msgid "RIST maximum packet size (bytes)"
-#~ msgstr "RIST ئەڭ چوڭ بولاق چوڭلۇقى (بايت)"
-
-#~ msgid "RIST latency (ms)"
-#~ msgstr "RIST كېچىكىشى (ms)"
-
-#~ msgid "RIST nack retry interval (ms)"
-#~ msgstr "RIST nack قايتا تەكشۈرۈش ئارىلىقى (ms)"
-
-#~ msgid "RIST reorder buffer (ms)"
-#~ msgstr "RIST رەت تەرتىپى بۇففېر (ms)"
-
-#~ msgid "RIST maximum retry count"
-#~ msgstr "RIST ئەڭ چوڭ قايتا تەكشۈرۈش سانى"
-
-#~ msgid "Disable NACK output packets"
-#~ msgstr "NACK چىقىرىش بولىقىنى چەكلەڭ"
-
-#~ msgid "Use this to disable packet recovery"
-#~ msgstr "بۇنى ئىشلىتىپ بولاقنىڭ ئەسلىگە كېلىشىنى چەكلەڭ"
-
-#~ msgid "Do not check for a valid rtcp message from the encoder"
-#~ msgstr "كودلىغۇچتىن ئۈنۈملۈك rtcp ئۇچۇرىنى تەكشۈرمەڭ"
-
-#~ msgid ""
-#~ "Send nack messages even when we have not confirmed that the encoder is on "
-#~ "our local network."
-#~ msgstr ""
-#~ "كودلاشتۇرغۇچنىڭ يەرلىك تورىمىزدا ئىكەنلىكىنى جەزملەشتۈرمىگەن تەقدىردىمۇ ، "
-#~ "nack ئۇچۇر ئەۋەتىڭ."
-
-#~ msgid "16 bytes"
-#~ msgstr "16 بايىت"
-
-#~ msgid "24 bytes"
-#~ msgstr "24 بايىت"
-
-#~ msgid "32 bytes"
-#~ msgstr "32 بايىت"
-
-#~ msgid "RIST data output caching size (ms)"
-#~ msgstr "RIST سانلىق مەلۇمات چىقىرىش غەملەك چوڭلۇقى (ms)"
-
-#~ msgid ""
-#~ "Having this cache will guarantee that the packets going out are delivered "
-#~ "at a spacing determined by the chain timestamps thus ensuring a near "
-#~ "jitter free output. Be aware that this setting will also add to the "
-#~ "overall latency of the stream."
-#~ msgstr ""
-#~ "بۇ غەملەكنىڭ بولۇشى بولاقلارنىڭ سىرتقا چىقىپ كېتىشىگە كاپالەتلىك قىلىدۇ "
-#~ "ھەمدە زەنجىرسىمان ۋاقىت تامغىسى بېكىتكەن بوشلۇقتا يەتكۈزۈلۈپ ، يېقىن "
-#~ "ئەتراپتىكى ئەخلەت ساندۇقىنىڭ ھەقسىز چىقىشىغا كاپالەتلىك قىلىدۇ. شۇنىڭغا "
-#~ "دىققەت قىلىڭكى ، بۇ تەڭشەك ئېقىننىڭ ئومۇمىي كېچىكىشىنىمۇ قوشىدۇ."
-
-#~ msgid "RIST retry-buffer queue size (ms)"
-#~ msgstr "RIST قايتا-قايتا بۇففېر ئۆچرەت چوڭلۇقى (ms)"
-
-#~ msgid ""
-#~ "This must match the buffer size (latency) configured on the server side. "
-#~ "If you are not sure, leave the default of 0 which will set it the maximum "
-#~ "value and will use about 100MB of RAM"
-#~ msgstr ""
-#~ "بۇ چوقۇم مۇلازىمېتىر تەرەپكە تەڭشەلگەن بۇففېرنىڭ چوڭلۇقى (كېچىكىشى) بىلەن "
-#~ "ماس كېلىشى كېرەك. ئەگەر ئىشەنمىسىڭىز ، سۈكۈتتىكى 0 نى قويۇپ قويۇڭ ، ئۇ "
-#~ "ئەڭ يۇقىرى قىممەتنى بەلگىلەيدۇ ھەمدە تەخمىنەن 100MB لىق ئىچكى ساقلىغۇچ "
-#~ "ئىشلىتىدۇ"
-
-#~ msgid "SSRC used in RTP output (default is random, i.e. 0)"
-#~ msgstr "RTP چىقىرىشتا ئىشلىتىلىدىغان SSRC (سۈكۈتتىكى ئىختىيارى ، يەنى 0)"
-
-#~ msgid ""
-#~ "Use this setting to specify a known SSRC for the RTP header. This is only "
-#~ "useful if your receiver acts on it. When using VLC as receiver, it is not."
-#~ msgstr ""
-#~ "بۇ تەڭشەكنى ئىشلىتىپ RTP ماۋزۇسىغا مەلۇم بولغان SSRC نى بەلگىلەڭ. "
-#~ "تاپشۇرۇۋالغۇچىڭىز ھەرىكەت قىلغاندىلا بۇ پايدىلىق. VLC نى قوبۇللىغۇچ قىلىپ "
-#~ "ئىشلەتكەندە ، ئۇنداق ئەمەس."
-
-#~ msgid ""
-#~ "This Stream name will be sent to the receiver using the rist RTCP channel"
-#~ msgstr "بۇ ئېقىم ئىسمى RTCP قانىلى ئارقىلىق قوبۇللىغۇچقا ئەۋەتىلىدۇ"
-
-#~ msgid "4:2:0"
-#~ msgstr "4: 2: 0"
-
-#~ msgid "4:2:2"
-#~ msgstr "4: 2: 2"
-
-#~ msgid "4:4:4"
-#~ msgstr "4: 4: 4"
-
-#~ msgid "Rate control method"
-#~ msgstr "باھانى كونترول قىلىش ئۇسۇلى"
-
-#~ msgid "Method used to encode the video sequence"
-#~ msgstr "سىن تەرتىپىنى كودلاشتا قوللىنىلغان ئۇسۇل"
-
-#~ msgid "Constant noise threshold mode"
-#~ msgstr "توختىماي شاۋقۇن چېكىش ھالىتى"
-
-#~ msgid "Constant bitrate mode (CBR)"
-#~ msgstr "تۇراقلىق بىت ھالىتى (CBR)"
-
-#~ msgid "Low Delay mode"
-#~ msgstr "تۆۋەن كېچىكىش ھالىتى"
-
-#~ msgid "Lossless mode"
-#~ msgstr "زىيانسىز ھالەت"
-
-#~ msgid "Constant lambda mode"
-#~ msgstr "تۇراقلىق لامبدا ھالىتى"
-
-#~ msgid "Constant error mode"
-#~ msgstr "دائىملىق خاتالىق ھالىتى"
-
-#~ msgid "Constant quality mode"
-#~ msgstr "دائىملىق سۈپەت ھالىتى"
-
-#~ msgid "GOP structure"
-#~ msgstr "GOP قۇرۇلمىسى"
-
-#~ msgid "GOP structure used to encode the video sequence"
-#~ msgstr "GOP قۇرۇلمىسى سىن تەرتىپىنى كودلاشتا ئىشلىتىلىدۇ"
-
-#~ msgid ""
-#~ "No fixed gop structure. A picture can be intra or inter and refer to "
-#~ "previous or future pictures."
-#~ msgstr ""
-#~ "مۇقىم غول قۇرۇلمىسى يوق. رەسىم ئىچكى ياكى ئارىلىق بولۇپ ، ئالدىنقى ياكى "
-#~ "كەلگۈسىدىكى رەسىملەرنى كۆرسىتىدۇ."
-
-#~ msgid "I-frame only sequence"
-#~ msgstr "مەن پەقەت تەرتىپلىك"
-
-#~ msgid "Inter pictures refere to previous pictures only"
-#~ msgstr "Inter رەسىملىرى پەقەت ئىلگىرىكى رەسىملەرنىلا كۆرسىتىدۇ"
-
-#~ msgid "Inter pictures can refer to previous or future pictures"
-#~ msgstr "ئارىلىق رەسىملەر ئىلگىرىكى ياكى كەلگۈسىدىكى رەسىملەرنى كۆرسىتىدۇ"
-
-#~ msgid "Constant quality factor"
-#~ msgstr "دائىملىق سۈپەت ئامىلى"
-
-#~ msgid "Quality factor to use in constant quality mode"
-#~ msgstr "دائىملىق سۈپەت ھالىتىدىكى سۈپەت ئامىلى"
-
-#~ msgid "Noise Threshold"
-#~ msgstr "شاۋقۇن بوسۇغىسى"
-
-#~ msgid "Noise threshold to use in constant noise threshold mode"
-#~ msgstr "توختىماي شاۋقۇن بوسۇغىسىدا ئىشلىتىدىغان شاۋقۇن بوسۇغىسى"
-
-#~ msgid "CBR bitrate (kbps)"
-#~ msgstr "CBR bitrate (kbps)"
-
-#~ msgid "Target bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr "دائىملىق bitrate ھالەتتە كودلاشتۇرغاندا kbps دىكى نىشان bitrate"
-
-#~ msgid "Maximum bitrate (kbps)"
-#~ msgstr "ئەڭ چوڭ bitrate (kbps)"
-
-#~ msgid "Maximum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr "دائىملىق bitrate ھالەتتە كودلاشتۇرغاندا kbps دىكى ئەڭ چوڭ bitrate"
-
-#~ msgid "Minimum bitrate (kbps)"
-#~ msgstr "ئەڭ تۆۋەن bitrate (kbps)"
-
-#~ msgid "Minimum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr "دائىملىق bitrate ھالەتتە كودلاشتۇرغاندا kbps دىكى ئەڭ تۆۋەن bitrate"
-
-#~ msgid "GOP length"
-#~ msgstr "GOP ئۇزۇنلۇقى"
-
-#~ msgid ""
-#~ "Number of pictures between successive sequence headers i.e. length of the "
-#~ "group of pictures"
-#~ msgstr ""
-#~ "ئۇدا تەرتىپلىك ماۋزۇلار ئارىسىدىكى رەسىم سانى يەنى رەسىم گۇرۇپپىسىنىڭ "
-#~ "ئۇزۇنلۇقى"
-
-#~ msgid "Prefilter"
-#~ msgstr "Prefilter"
-
-#~ msgid "Enable adaptive prefiltering"
-#~ msgstr "ماسلىشىشچان ئالدىن تاللاشنى قوزغىتىڭ"
-
-#~ msgid "No pre-filtering"
-#~ msgstr "ئالدىن سۈزۈش يوق"
-
-#~ msgid "Centre Weighted Median"
-#~ msgstr "Center Weighted Median"
-
-#~ msgid "Gaussian Low Pass Filter"
-#~ msgstr "Gaussian Low Pass Filter"
-
-#~ msgid "Add Noise"
-#~ msgstr "شاۋقۇن قوشۇڭ"
-
-#~ msgid "Gaussian Adaptive Low Pass Filter"
-#~ msgstr "گاۋسىيۇس ماسلىشىشچان تۆۋەن پاس سۈزگۈچ"
-
-#~ msgid "Low Pass Filter"
-#~ msgstr "تۆۋەن پاس سۈزگۈچ"
-
-#~ msgid "Amount of prefiltering"
-#~ msgstr "ئالدىن تاللاش مىقدارى"
-
-#~ msgid "Higher value implies more prefiltering"
-#~ msgstr "يۇقىرى قىممەت تېخىمۇ كۆپ مايىللىقنى كۆرسىتىدۇ"
-
-#~ msgid "Picture coding mode"
-#~ msgstr "رەسىم كودلاش ھالىتى"
-
-#~ msgid ""
-#~ "Field coding is where interlaced fields are coded separately as opposed "
-#~ "to a pseudo-progressive frame"
-#~ msgstr ""
-#~ "نەق مەيدان كودلاش بولسا ئۆز-ئارا مۇناسىۋەتلىك بۆلەكلەر ساختا ئىلگىرىلەش "
-#~ "رامكىسىغا ئوخشىمايدۇ"
-
-#~ msgid "auto - let encoder decide based upon input (Best)"
-#~ msgstr ""
-#~ "ئاپتوماتىك - كودلاشتۇرغۇچ كىرگۈزۈشنى ئاساس قىلىپ قارار قىلسۇن (ئەڭ ياخشى)"
-
-#~ msgid "force coding frame as single picture"
-#~ msgstr "كودلاش رامكىسىنى يەككە رەسىم قىلىپ زورلاڭ"
-
-#~ msgid "force coding frame as separate interlaced fields"
-#~ msgstr "كودلاش رامكىسىنى ئايرىم ئۆز-ئارا مۇناسىۋەتلىك ساھە قىلىپ زورلاڭ"
-
-#~ msgid "Size of motion compensation blocks"
-#~ msgstr "ھەرىكەت تولۇقلىمىسىنىڭ چوڭلۇقى"
-
-#~ msgid "automatic - let encoder decide based upon input (Best)"
-#~ msgstr ""
-#~ "ئاپتوماتىك - كودلاشتۇرغۇچ كىرگۈزۈشنى ئاساس قىلىپ قارار قىلسۇن (ئەڭ ياخشى)"
-
-#~ msgid "small - use small motion compensation blocks"
-#~ msgstr "كىچىك - كىچىك ھەرىكەت تولۇقلىما بۆلەكلىرىنى ئىشلىتىڭ"
-
-#~ msgid "medium - use medium motion compensation blocks"
-#~ msgstr "ئوتتۇراھال - ئوتتۇرا ھەرىكەت تولۇقلىما بۆلەكلىرىنى ئىشلىتىڭ"
-
-#~ msgid "large - use large motion compensation blocks"
-#~ msgstr "چوڭ - چوڭ ھەرىكەت تولۇقلىما بۆلەكلىرىنى ئىشلىتىڭ"
-
-#~ msgid "Overlap of motion compensation blocks"
-#~ msgstr "ھەرىكەت تولۇقلىما بۆلەكلىرىنىڭ قاپلىنىشى"
-
-#~ msgid "none - Motion compensation blocks do not overlap"
-#~ msgstr "ھېچقايسىسى - ھەرىكەت تولۇقلىمىسى بىر-بىرىنى قاپلىمايدۇ"
-
-#~ msgid "partial - Motion compensation blocks only partially overlap"
-#~ msgstr "قىسمەن - ھەرىكەت تولۇقلىمىسى پەقەت قىسمەن قاپلىنىدۇ"
-
-#~ msgid "full - Motion compensation blocks fully overlap"
-#~ msgstr "تولۇق - ھەرىكەت تولۇقلىمىسى تولۇق قاپلىنىدۇ"
-
-#~ msgid "Motion Vector precision"
-#~ msgstr "ھەرىكەت Vector ئېنىقلىقى"
-
-#~ msgid "Motion Vector precision in pels"
-#~ msgstr "پېلەكتىكى ھەرىكەت Vector ئېنىقلىقى"
-
-#~ msgid "Three component motion estimation"
-#~ msgstr "ئۈچ تەركىبلىك ھەرىكەت مۆلچەرى"
-
-#~ msgid "Use chroma as part of the motion estimation process"
-#~ msgstr "خىرومنى ھەرىكەت مۆلچەر جەريانىنىڭ بىر قىسمى سۈپىتىدە ئىشلىتىڭ"
-
-#~ msgid "Intra picture DWT filter"
-#~ msgstr "ئىچكى رەسىم DWT سۈزگۈچ"
-
-#~ msgid "Inter picture DWT filter"
-#~ msgstr "Inter picture DWT سۈزگۈچ"
-
-#~ msgid "Number of DWT iterations"
-#~ msgstr "DWT تەكرارلاش سانى"
-
-#~ msgid "Also known as DWT levels"
-#~ msgstr "DWT دەرىجىسى دەپمۇ ئاتىلىدۇ"
-
-#~ msgid "Enable multiple quantizers"
-#~ msgstr "كۆپ مىقدارلاشتۇرغۇچنى قوزغىتىڭ"
-
-#~ msgid "Enable multiple quantizers per subband (one per codeblock)"
-#~ msgstr "ھەر بىر تارماق بەلۋاغقا بىر قانچە مىقدارلاشتۇرغۇچنى قوزغىتىڭ."
-
-#~ msgid "Disable arithmetic coding"
-#~ msgstr "ھېسابلاش كودلاشنى چەكلەڭ"
-
-#~ msgid "Use variable length codes instead, useful for very high bitrates"
-#~ msgstr ""
-#~ "ئۇنىڭ ئورنىغا ئۆزگىرىشچان ئۇزۇنلۇق كودى ئىشلىتىڭ ، ئىنتايىن يۇقىرى "
-#~ "بىتراتلارغا پايدىلىق"
-
-#~ msgid "perceptual weighting method"
-#~ msgstr "ئىدراكلىق ئېغىرلىق ئۇسۇلى"
-
-#~ msgid "perceptual distance"
-#~ msgstr "ئىدراك ئارىلىقى"
-
-#~ msgid "perceptual distance to calculate perceptual weight"
-#~ msgstr "سېزىمچان ئېغىرلىقنى ھېسابلاش ئۈچۈن ئارىلىق"
-
-#~ msgid "Horizontal slices per frame"
-#~ msgstr "ھەر بىر رامكىنىڭ توغرىسىغا توغرىلىنىدۇ"
-
-#~ msgid "Number of horizontal slices per frame in low delay mode"
-#~ msgstr ""
-#~ "تۆۋەن كېچىكىش ھالىتىدىكى ھەر بىر رامكىنىڭ توغرىسىغا توغرىلانغان سانى"
-
-#~ msgid "Vertical slices per frame"
-#~ msgstr "ھەر بىر رامكىغا تىك كېسىش"
-
-#~ msgid "Number of vertical slices per frame in low delay mode"
-#~ msgstr "تۆۋەن كېچىكىش ھالىتىدىكى ھەر بىر رامكىغا تىك كېسىلگەن سان"
-
-#~ msgid "Size of code blocks in each subband"
-#~ msgstr "ھەر بىر تارماق بەلۋاغتىكى كود بۆلەكلىرىنىڭ چوڭلۇقى"
-
-#~ msgid "small - use small code blocks"
-#~ msgstr "كىچىك - كىچىك كود بۆلەكلىرىنى ئىشلىتىڭ"
-
-#~ msgid "medium - use medium sized code blocks"
-#~ msgstr "ئوتتۇراھال - ئوتتۇرا چوڭلۇقتىكى كود بۆلەكلىرىنى ئىشلىتىڭ"
-
-#~ msgid "large - use large code blocks"
-#~ msgstr "چوڭ - چوڭ كود بۆلەكلىرىنى ئىشلىتىڭ"
-
-#~ msgid "full - One code block per subband"
-#~ msgstr "تولۇق - ھەر بىر تارماق بەلۋاغقا بىر كود توسۇش"
-
-#~ msgid "Enable hierarchical Motion Estimation"
-#~ msgstr "قاتلاملىق ھەرىكەت مۆلچەرىنى قوزغىتىڭ"
-
-#~ msgid "Number of levels of downsampling"
-#~ msgstr "تۆۋەنگە چۈشۈش دەرىجىسىنىڭ سانى"
-
-#~ msgid ""
-#~ "Number of levels of downsampling in hierarchical motion estimation mode"
-#~ msgstr "قاتلاملىق ھەرىكەت مۆلچەر ھالىتىدىكى تۆۋەنلەش دەرىجىسىنىڭ سانى"
-
-#~ msgid "Enable Global Motion Estimation"
-#~ msgstr "يەرشارى ھەرىكەت مۆلچەرىنى قوزغىتىڭ"
-
-#~ msgid "Enable Phase Correlation Estimation"
-#~ msgstr "باسقۇچلۇق باغلىنىشنى مۆلچەرلەشنى قوزغىتىڭ"
-
-#~ msgid "Enable Scene Change Detection"
-#~ msgstr "مەنزىرە ئۆزگىرىشىنى بايقاشنى قوزغىتىڭ"
-
-#~ msgid "Force Profile"
-#~ msgstr "Force Profile"
-
-#~ msgid "VC2 Low Delay Profile"
-#~ msgstr "VC2 تۆۋەن كېچىكىش ئارخىپى"
-
-#~ msgid "VC2 Simple Profile"
-#~ msgstr "VC2 ئاددىي ئارخىپ"
-
-#~ msgid "VC2 Main Profile"
-#~ msgstr "VC2 ئاساسلىق ئارخىپى"
-
-#~ msgid "Main Profile"
-#~ msgstr "ئاساسلىق ئارخىپ"
-
-#~ msgid "Dirac video decoder using libschroedinger"
-#~ msgstr "Libschroedinger ئارقىلىق دىراك سىن كود يەشكۈچ"
-
-#~ msgid "Dirac video encoder using libschroedinger"
-#~ msgstr "Libschroedinger ئارقىلىق دىراك سىن كودلىغۇچ"
-
-#~ msgid "Key: "
-#~ msgstr "شىفىرلىق ئاچقۇچ: "
