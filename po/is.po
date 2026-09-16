@@ -1,5 +1,5 @@
 # Icelandic translation
-# Copyright (C) 2023 VideoLAN
+# Copyright (C) 2026 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -8,19 +8,21 @@
 # Hotellook, 2014
 # Magnus Magnusson <maggiymir@gmail.com>, 2013
 # Sveinn í Felli <sveinki@nett.is>, 2013-2022
+# Michał Trzebiatowski <michtrz@gmail.com>, 2018
+# Sveinn í Felli <sv1@fellsnet.is>, 2024
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22-rc1\n"
+"Project-Id-Version: vlc 3.0.24-beta1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2026-06-28 16:08+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: Sveinn í Felli <sv1@fellsnet.is>, 2024\n"
 "Language-Team: Icelandic (https://app.transifex.com/yaron/teams/16553/is/)\n"
-"Language: is\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: is\n"
 "Plural-Forms: nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);\n"
 
 #: include/vlc_common.h:1055
@@ -1027,24 +1029,20 @@ msgid "Decoded format"
 msgstr "Afkóðað snið"
 
 #: src/input/es_out.c:3207
-#, fuzzy
 msgid "Decoded channels"
-msgstr "Hljóðrásir"
+msgstr ""
 
 #: src/input/es_out.c:3212
-#, fuzzy
 msgid "Decoded sample rate"
-msgstr "Safntíðni hljóðs"
+msgstr ""
 
 #: src/input/es_out.c:3219
-#, fuzzy
 msgid "Decoded bits per sample"
-msgstr "Hljóðbitar á úrtak"
+msgstr ""
 
 #: src/input/es_out.c:3224
-#, fuzzy
 msgid "Decoded Bitrate"
-msgstr "Afkóðað snið"
+msgstr ""
 
 #: src/input/es_out.c:3237
 msgid "Track replay gain"
@@ -7753,9 +7751,8 @@ msgid "Bitmask"
 msgstr ""
 
 #: modules/access/rist.c:313
-#, fuzzy
 msgid "Virtual Destination Port Filter"
-msgstr "Úttaksskrá:"
+msgstr ""
 
 #: modules/access/rist.c:315
 msgid ""
@@ -8048,9 +8045,8 @@ msgid "SFTP port number to use on the server"
 msgstr "Númer SFTP-gáttar til að nota á þjóninum"
 
 #: modules/access/sftp.c:61
-#, fuzzy
 msgid "Private key file"
-msgstr "AES lykilskrá"
+msgstr ""
 
 #: modules/access/sftp.c:62
 msgid ""
@@ -8195,9 +8191,8 @@ msgid "Password for stream encryption"
 msgstr ""
 
 #: modules/access/srt.c:566
-#, fuzzy
 msgid "SRT Stream ID"
-msgstr "SRT-streymisúttak"
+msgstr ""
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -9039,18 +9034,16 @@ msgid "Source port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:272
-#, fuzzy
 msgid "Virtual Destination Port"
-msgstr "Áfangastaður streymis"
+msgstr ""
 
 #: modules/access_output/rist.c:274
 msgid "Destination port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:281
-#, fuzzy
 msgid "Multipeer mode"
-msgstr "Fléttari (multiplexer/mux)"
+msgstr ""
 
 #: modules/access_output/rist.c:283
 msgid ""
@@ -9059,14 +9052,12 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Duplicate"
-msgstr "Forrit"
+msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Load balanced"
-msgstr "Vægi rauðs"
+msgstr ""
 
 #: modules/access_output/rist.c:294
 msgid "RIST stream output"
@@ -12139,7 +12130,6 @@ msgstr "Afkóðari fyrir skjátexta"
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -14253,7 +14243,7 @@ msgstr ""
 
 #: modules/demux/dirac.c:54
 msgid "Dirac video demuxer"
-msgstr "Dirac myndmerkisaffléttari"
+msgstr ""
 
 #: modules/demux/directory.c:94
 msgid "Directory import"
@@ -18910,36 +18900,32 @@ msgstr ""
 "Eyða-lykill fjarlægir."
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1405
-#, fuzzy
 msgid "Global Hotkey change"
-msgstr "Breyting á flýtilykli"
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1406
 msgid "Hotkey change"
 msgstr "Breyting á flýtilykli"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1410
-#, fuzzy
 msgid "Press the new key or combination for <b>%1</b>"
-msgstr "Ýttu á nýjan lykil eða lyklasamsetningu fyrir "
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1419
 msgid "Assign"
 msgstr "Úthluta"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1455
-#, fuzzy
 msgid "Warning: this key or combination is already assigned to \"<b>%1</b>\""
-msgstr "Aðvörun: lyklinum hefur þegar verið úthlutað fyrir "
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1467
 msgid "Warning: <b>%1</b> is already an application menu shortcut"
 msgstr "Aðvörun: <b>%1</b> er þegar notað sem flýtilykill í valmynd"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1490
-#, fuzzy
 msgid "Key or combination: <b>%1</b>"
-msgstr "Lykill eða samsetning: "
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1498
 msgid "Key: <b>%1</b>"
@@ -19107,25 +19093,20 @@ msgstr ""
 "*.raw *.flv *.webm)"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:184
-#, fuzzy
 msgid "This module outputs the stream using the RIST protocol (TR06)."
 msgstr ""
-"Þessi eining sendir umbreytta streymið út á net í gegnum MMS-samskiptamátann."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:186
-#, fuzzy
 msgid "Destination Address"
-msgstr "Áfangastaður"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:191
-#, fuzzy
 msgid "Destination Port"
-msgstr "Áfangastaður"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:201
-#, fuzzy
 msgid "Stream Name"
-msgstr "Heiti streymis"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:237
 msgid "This module outputs the transcoded stream to a network via HTTP."
@@ -22496,7 +22477,7 @@ msgstr "Afritunarbitari"
 
 #: modules/packetizer/dirac.c:87
 msgid "Dirac packetizer"
-msgstr "Dirac bitari"
+msgstr ""
 
 #: modules/packetizer/dts.c:47
 msgid "DTS audio packetizer"
@@ -28210,57 +28191,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Listi fyrir miðlastjórnun"
-
-#~ msgid "16 bytes"
-#~ msgstr "16 bæti"
-
-#~ msgid "24 bytes"
-#~ msgstr "24 bæti"
-
-#~ msgid "32 bytes"
-#~ msgstr "32 bæti"
-
-#~ msgid "4:2:0"
-#~ msgstr "4:2:0"
-
-#~ msgid "4:2:2"
-#~ msgstr "4:2:2"
-
-#~ msgid "4:4:4"
-#~ msgstr "4:4:4"
-
-#~ msgid "Low Delay mode"
-#~ msgstr "Lágtafarhamur (low delay mode)"
-
-#~ msgid "Lossless mode"
-#~ msgstr "Taplaus hamur"
-
-#~ msgid "Noise Threshold"
-#~ msgstr "Suðmörk"
-
-#~ msgid "CBR bitrate (kbps)"
-#~ msgstr "CBR bitahraði (kb/sek)"
-
-#~ msgid "Maximum bitrate (kbps)"
-#~ msgstr "Hámarks bitahraði (kb/sek)"
-
-#~ msgid "Minimum bitrate (kbps)"
-#~ msgstr "Hámarks bitahraði (kb/sek)"
-
-#~ msgid "Prefilter"
-#~ msgstr "Forsía"
-
-#~ msgid "No pre-filtering"
-#~ msgstr "Engin forsíun"
-
-#~ msgid "Add Noise"
-#~ msgstr "Bæta við suði"
-
-#~ msgid "Force Profile"
-#~ msgstr "Þvinga snið"
-
-#~ msgid "Main Profile"
-#~ msgstr "Aðalsnið"
-
-#~ msgid "Key: "
-#~ msgstr "Lykill: "
