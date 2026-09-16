@@ -1,5 +1,5 @@
 # Arabic translation
-# Copyright (C) 2023 VideoLAN
+# Copyright (C) 2026 VideoLAN
 # This file is distributed under the same license as the vlc package.
 #
 # Translators:
@@ -28,19 +28,22 @@
 # Ammar Salem <amar_s1414@hotmail.com>, 2021
 # خليل مراطلة <meratkha@gmail.com>, 2021
 # Mohamed Alosman <aboosamah94@hotmail.com>, 2021
+# Michał Trzebiatowski <michtrz@gmail.com>, 2018
+# Thamer AlGhali <mr_thamer@hotmail.com>, 2024
+# tarak oueriache <igosad@protonmail.com>, 2024
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22-rc1\n"
+"Project-Id-Version: vlc 3.0.24-beta1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2026-06-28 16:08+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: tarak oueriache <igosad@protonmail.com>, 2024\n"
 "Language-Team: Arabic (https://app.transifex.com/yaron/teams/16553/ar/)\n"
-"Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: ar\n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
@@ -1076,24 +1079,20 @@ msgid "Decoded format"
 msgstr "صيغة مفك الشفرة"
 
 #: src/input/es_out.c:3207
-#, fuzzy
 msgid "Decoded channels"
-msgstr "القنوات السمعيه"
+msgstr ""
 
 #: src/input/es_out.c:3212
-#, fuzzy
 msgid "Decoded sample rate"
-msgstr "معدل العينه السمعيه "
+msgstr ""
 
 #: src/input/es_out.c:3219
-#, fuzzy
 msgid "Decoded bits per sample"
-msgstr "بتات الصوت لكل عينة"
+msgstr ""
 
 #: src/input/es_out.c:3224
-#, fuzzy
 msgid "Decoded Bitrate"
-msgstr "صيغة مفك الشفرة"
+msgstr ""
 
 #: src/input/es_out.c:3237
 msgid "Track replay gain"
@@ -8038,9 +8037,8 @@ msgid "Bitmask"
 msgstr "قناع نقطي"
 
 #: modules/access/rist.c:313
-#, fuzzy
 msgid "Virtual Destination Port Filter"
-msgstr "الملف المقصد:"
+msgstr ""
 
 #: modules/access/rist.c:315
 msgid ""
@@ -8061,14 +8059,10 @@ msgid "RIST demux/decode maximum jitter (default is 5ms)"
 msgstr "RIST demux/decode الحد الأقصى من الارتعاش (الافتراضي هو 5 مللي ثانية)"
 
 #: modules/access/rist.c:328
-#, fuzzy
 msgid ""
 "This controls the maximum jitter that will be passed to the demux/decode "
 "chain. The lower the value, the more CPU cycles the module will consume"
 msgstr ""
-"يتحكم هذا في الحد الأقصى من الارتعاش الذي سيتم تمريره إلى سلسلة فك دمج "
-"الاشارات/فك الترميز. كلما انخفضت القيمة، زاد عدد دورات وحدة المعالجة "
-"المركزية التي ستستهلكها الخوارزمية"
 
 #: modules/access/rist.c:332
 msgid "RIST nack type, 0 = range, 1 = bitmask. Default is range"
@@ -8354,9 +8348,8 @@ msgid "SFTP port number to use on the server"
 msgstr "رقم منفذ SFTP لإستخدامه على الخادم"
 
 #: modules/access/sftp.c:61
-#, fuzzy
 msgid "Private key file"
-msgstr "ملف مفتاح AES"
+msgstr ""
 
 #: modules/access/sftp.c:62
 msgid ""
@@ -8501,9 +8494,8 @@ msgid "Password for stream encryption"
 msgstr ""
 
 #: modules/access/srt.c:566
-#, fuzzy
 msgid "SRT Stream ID"
-msgstr "تدفق %d"
+msgstr ""
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -9341,18 +9333,16 @@ msgid "Source port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:272
-#, fuzzy
 msgid "Virtual Destination Port"
-msgstr "المقصد"
+msgstr ""
 
 #: modules/access_output/rist.c:274
 msgid "Destination port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:281
-#, fuzzy
 msgid "Multipeer mode"
-msgstr "AM نمط المستقبِل "
+msgstr ""
 
 #: modules/access_output/rist.c:283
 msgid ""
@@ -9361,23 +9351,20 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Duplicate"
-msgstr "تطبيق"
+msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Load balanced"
-msgstr "توازن الصوت"
+msgstr ""
 
 #: modules/access_output/rist.c:294
 msgid "RIST stream output"
 msgstr ""
 
 #: modules/access_output/rist.c:299
-#, fuzzy
 msgid "RIST target payload size (bytes)"
-msgstr "RIST الحد الأقصى لحجم الحزمة (بايت)"
+msgstr ""
 
 #: modules/access_output/shout.c:64
 #: modules/gui/qt/components/sout/sout_widgets.cpp:438
@@ -12499,7 +12486,6 @@ msgstr ""
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -12914,7 +12900,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, fuzzy
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -14685,7 +14670,7 @@ msgstr ""
 
 #: modules/demux/dirac.c:54
 msgid "Dirac video demuxer"
-msgstr "فاكك مزج إشارات ڤديو Dirac"
+msgstr ""
 
 #: modules/demux/directory.c:94
 msgid "Directory import"
@@ -19341,36 +19326,32 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1405
-#, fuzzy
 msgid "Global Hotkey change"
-msgstr "تغيّر مفتاح الاختصار"
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1406
 msgid "Hotkey change"
 msgstr "تغيّر مفتاح الاختصار"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1410
-#, fuzzy
 msgid "Press the new key or combination for <b>%1</b>"
-msgstr "اضغط المفتاح الجديد أو تجميعة المفاتيح لِ‍ "
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1419
 msgid "Assign"
 msgstr "أسنِد"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1455
-#, fuzzy
 msgid "Warning: this key or combination is already assigned to \"<b>%1</b>\""
-msgstr "تحذير: هذا المفتاح أو هذه التجميعة مُسندة بالفعل بِ‍ "
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1467
 msgid "Warning: <b>%1</b> is already an application menu shortcut"
 msgstr "تحذير: <b>%1</b> اختصار قائمة تطبيق بالفعل"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1490
-#, fuzzy
 msgid "Key or combination: <b>%1</b>"
-msgstr "المفتاح أو التجميعة: "
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1498
 msgid "Key: <b>%1</b>"
@@ -19533,24 +19514,20 @@ msgstr ""
 "‫الحاويات (‪*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm‬)‬"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:184
-#, fuzzy
 msgid "This module outputs the stream using the RIST protocol (TR06)."
-msgstr "هذه الوحدة تخرج التيار المُحوَّل ترميزه نحو الشبكة عبر بروتوكول mms."
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:186
-#, fuzzy
 msgid "Destination Address"
-msgstr "المقصد"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:191
-#, fuzzy
 msgid "Destination Port"
-msgstr "المقصد"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:201
-#, fuzzy
 msgid "Stream Name"
-msgstr "اسم الدفق"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:237
 msgid "This module outputs the transcoded stream to a network via HTTP."
@@ -28680,43 +28657,3 @@ msgstr "AAAA;"
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "قائمة مدير الوسائط"
-
-#~ msgid "RIST latency (ms)"
-#~ msgstr "زمن استجابة RIST (ملي ثانية)"
-
-#~ msgid "RIST nack retry interval (ms)"
-#~ msgstr "الفاصل الزمني لإعادة محاولة RIST (بالمللي ثانية)"
-
-#~ msgid "RIST reorder buffer (ms)"
-#~ msgstr "المخزن المؤقت لإعادة ترتيب RIST (ملي ثانية)"
-
-#~ msgid "RIST maximum retry count"
-#~ msgstr "الحد الأقصى لعدد مرات إعادة المحاولة للـ RIST"
-
-#~ msgid "Disable NACK output packets"
-#~ msgstr "تعطيل حزم الإخراج NACK"
-
-#~ msgid "Use this to disable packet recovery"
-#~ msgstr "استخدم هذا لتعطيل استرداد الحزمة"
-
-#~ msgid "Do not check for a valid rtcp message from the encoder"
-#~ msgstr "لا تتحقق من وجود رسالة rtcp صالحة من برنامج التشفير"
-
-#~ msgid ""
-#~ "Send nack messages even when we have not confirmed that the encoder is on "
-#~ "our local network."
-#~ msgstr ""
-#~ "أرسل رسائل nack حتى عندما لا نتأكد من وجود برنامج التشفير على شبكتنا "
-#~ "المحلية."
-
-#~ msgid "4:2:0"
-#~ msgstr "4:2:0"
-
-#~ msgid "4:2:2"
-#~ msgstr "4:2:2"
-
-#~ msgid "4:4:4"
-#~ msgstr "4:4:4"
-
-#~ msgid "Key: "
-#~ msgstr "المفتاح: "
