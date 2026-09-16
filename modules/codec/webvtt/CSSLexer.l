@@ -77,7 +77,7 @@ range		\?{1,6}|{h}(\?{0,5}|{h}(\?{0,4}|{h}(\?{0,3}|{h}(\?{0,2}|{h}(\??|{h})))))
 
 "@font-face"		{return FONT_FACE_SYM;}
 
-"!{w}important"		{return IMPORTANT_SYM;}
+"!"{w}important		{return IMPORTANT_SYM;}
 
 {num}em			{ VAL( us_strtof(yytext, &d), EMS ); return LENGTH;}
 {num}ex			{ VAL( atoi(yytext), EXS ); return LENGTH;}
