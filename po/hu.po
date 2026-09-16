@@ -1,5 +1,5 @@
 # Hungarian translation
-# Copyright (C) 2025 VideoLAN
+# Copyright (C) 2026 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -9,19 +9,20 @@
 # iskr <iscreamd@gmail.com>, 2013
 # Schafer Gergő <gergoschafer@gmail.com>, 2017
 # F E <efi99@freemail.hu>, 2021
-# Balázs Meskó <meskobalazs@mailbox.org>, 2022-2025
+# Balázs Meskó <meskobalazs@mailbox.org>, 2022-2026
+# Michał Trzebiatowski <michtrz@gmail.com>, 2018
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22\n"
+"Project-Id-Version: vlc 3.0.24-beta1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2026-06-28 16:08+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
-"Last-Translator: Balázs Meskó <meskobalazs@mailbox.org>, 2025\n"
+"Last-Translator: Balázs Meskó <meskobalazs@mailbox.org>, 2026\n"
 "Language-Team: Hungarian (https://app.transifex.com/yaron/teams/16553/hu/)\n"
-"Language: hu\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: hu\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: include/vlc_common.h:1055
@@ -8227,15 +8228,16 @@ msgid "Bitmask"
 msgstr "Bitmaszk"
 
 #: modules/access/rist.c:313
-#, fuzzy
 msgid "Virtual Destination Port Filter"
-msgstr "Célfájl:"
+msgstr "Virtuális célportok szűrője"
 
 #: modules/access/rist.c:315
 msgid ""
 "Destination port to be used inside the reduced-mode of the main profile to "
 "filter incoming data. Use zero to allow all."
 msgstr ""
+"A főprofil csökkentett módja esetén, a bejövő adatok szűréséhez használandó "
+"célport. Használjon nullát az összes engedélyezéséhez."
 
 #: modules/access/rist.c:321 modules/access_output/rist.c:293
 msgid "RIST"
@@ -8250,13 +8252,12 @@ msgid "RIST demux/decode maximum jitter (default is 5ms)"
 msgstr "RIST demux/ ekódolás maximális jitter (alapértelmezés: 5ms)"
 
 #: modules/access/rist.c:328
-#, fuzzy
 msgid ""
 "This controls the maximum jitter that will be passed to the demux/decode "
 "chain. The lower the value, the more CPU cycles the module will consume"
 msgstr ""
 "Ez vezérli a demux/dekódolási láncra továbbított maximális jittert. Minél "
-"alacsonyabb az érték, annál több CPU-ciklust igényel az algoritmus"
+"alacsonyabb az érték, annál több CPU-ciklust igényel a modul."
 
 #: modules/access/rist.c:332
 msgid "RIST nack type, 0 = range, 1 = bitmask. Default is range"
@@ -8549,9 +8550,8 @@ msgid "SFTP port number to use on the server"
 msgstr "A kiszolgálón használni kívánt SFTP port száma"
 
 #: modules/access/sftp.c:61
-#, fuzzy
 msgid "Private key file"
-msgstr "AES kulcsfájl"
+msgstr "Privátkulcsfájl"
 
 #: modules/access/sftp.c:62
 msgid ""
@@ -8559,6 +8559,10 @@ msgid ""
 "assumed to be in the same directory with '.pub' appended. If unset, standard "
 "key paths will be attempted (e.g. '~/.ssh/id_rsa')."
 msgstr ""
+"Az SSH nyilvános kulcsú hitelesítéséhez használ privátkulcsfájl. A "
+"nyilvánoskulcsfájl esetén az lesz feltételezve, hogy ugyanabban a "
+"könyvtárban van „.pub” utótaggal. Ha nincs megadva, akkor a szokásos "
+"kulcsútvonalak lesznek megpróbáljva (például „~/.ssh/id_rsa”)."
 
 #: modules/access/sftp.c:68
 msgid "SFTP input"
@@ -8705,9 +8709,8 @@ msgid "Password for stream encryption"
 msgstr "Jelszó az adatfolyam titkosításához"
 
 #: modules/access/srt.c:566
-#, fuzzy
 msgid "SRT Stream ID"
-msgstr "SRT adatfolyam-azonosító "
+msgstr "SRT adatfolyam-azonosító"
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -9572,50 +9575,47 @@ msgstr "Élő HTTP"
 
 #: modules/access_output/rist.c:268
 msgid "Virtual Source Port"
-msgstr ""
+msgstr "Virtuális forrásport"
 
 #: modules/access_output/rist.c:270
 msgid "Source port to be used inside the reduced-mode of the main profile"
-msgstr ""
+msgstr "A főprofil csökkentett módja esetén használandó forrásport"
 
 #: modules/access_output/rist.c:272
-#, fuzzy
 msgid "Virtual Destination Port"
-msgstr "Közvetítés célja"
+msgstr "Virtuális célport"
 
 #: modules/access_output/rist.c:274
 msgid "Destination port to be used inside the reduced-mode of the main profile"
-msgstr ""
+msgstr "A főprofil csökkentett módja esetén használandó célport"
 
 #: modules/access_output/rist.c:281
-#, fuzzy
 msgid "Multipeer mode"
-msgstr "Egyesítő"
+msgstr "Többpartneres mód"
 
 #: modules/access_output/rist.c:283
 msgid ""
 "This allows you to select between duplicate or load balanced modes when "
 "sending data to multiple peers (several network paths)"
 msgstr ""
+"Ez lehetővé teszi a duplikálásos vagy terheléselosztásos módok közti "
+"váltást, ha több partnernek (több hálózati útvonalon) küldi el az adatokat."
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Duplicate"
-msgstr "Alkalmazás"
+msgstr "Duplikálás"
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Load balanced"
-msgstr "Vörös-egyensúly"
+msgstr "Terheléselosztás"
 
 #: modules/access_output/rist.c:294
 msgid "RIST stream output"
 msgstr "RIST adatfolyam kimenet"
 
 #: modules/access_output/rist.c:299
-#, fuzzy
 msgid "RIST target payload size (bytes)"
-msgstr "RIST cél csomagméret (byte)"
+msgstr "RIST csomagméretcél (bájtban)"
 
 #: modules/access_output/shout.c:64
 #: modules/gui/qt/components/sout/sout_widgets.cpp:438
@@ -12967,7 +12967,6 @@ msgstr "Szöveg feliratdekódoló"
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -15293,11 +15292,11 @@ msgstr "Fájlkiírató"
 
 #: modules/demux/dirac.c:41
 msgid "Value to adjust dts by"
-msgstr "A DTS módosítása ennyivel"
+msgstr "A DTS módosítási értéke"
 
 #: modules/demux/dirac.c:54
 msgid "Dirac video demuxer"
-msgstr "Dirac videoszétválasztó"
+msgstr "Dirac videószétválasztó"
 
 #: modules/demux/directory.c:94
 msgid "Directory import"
@@ -20098,41 +20097,38 @@ msgstr ""
 "A Delete billentyűvel eltávolítható."
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1405
-#, fuzzy
 msgid "Global Hotkey change"
-msgstr "Gyorsbillentyű módosítása"
+msgstr "Globális gyorsbillentyű módosítása"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1406
 msgid "Hotkey change"
 msgstr "Gyorsbillentyű módosítása"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1410
-#, fuzzy
 msgid "Press the new key or combination for <b>%1</b>"
-msgstr "Nyomja le az új billentyűkombinációt: "
+msgstr "Nyomja le az új billentyűt vagy kombinációt: <b>%1</b>"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1419
 msgid "Assign"
 msgstr "Hozzárendelés"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1455
-#, fuzzy
 msgid "Warning: this key or combination is already assigned to \"<b>%1</b>\""
 msgstr ""
 "Figyelmeztetés: ez a billentyű vagy kombináció már társítva van ehhez: "
+"„<b>%1</b>”"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1467
 msgid "Warning: <b>%1</b> is already an application menu shortcut"
 msgstr "Figyelmeztetés: <b>%1</b> már egy alkalmazásmenü gyorsbillentyűje"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1490
-#, fuzzy
 msgid "Key or combination: <b>%1</b>"
-msgstr "Billentyű vagy kombináció: "
+msgstr "Billentyű vagy kombináció: <b>%1</b>"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1498
 msgid "Key: <b>%1</b>"
-msgstr ""
+msgstr "Billentyű: <b>%1</b>"
 
 #: modules/gui/qt/components/simple_preferences.cpp:256
 #: modules/gui/qt/components/simple_preferences.cpp:636
@@ -20296,24 +20292,21 @@ msgstr ""
 "Tárolók (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:184
-#, fuzzy
 msgid "This module outputs the stream using the RIST protocol (TR06)."
-msgstr "Ez a modul az átkódolt folyamt MMS protokollon kiküldi a hálózatra."
+msgstr ""
+"Ez a modul RIST protokoll (TR06) használatával küldi ki az adatfolyamot."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:186
-#, fuzzy
 msgid "Destination Address"
-msgstr "Célelőtag"
+msgstr "Célcím"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:191
-#, fuzzy
 msgid "Destination Port"
-msgstr "Célállomás"
+msgstr "Célport"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:201
-#, fuzzy
 msgid "Stream Name"
-msgstr "Folyam neve"
+msgstr "Adatfolyam neve"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:237
 msgid "This module outputs the transcoded stream to a network via HTTP."
@@ -27895,7 +27888,7 @@ msgstr "Videófeldolgozó"
 
 #: modules/video_output/win32/direct3d11.c:80
 msgid "Super Resolution"
-msgstr ""
+msgstr "Super Resolution"
 
 #: modules/video_output/win32/direct3d11.c:82
 msgid "HDR Output Mode"
@@ -29892,384 +29885,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Médiakezelési lista"
-
-#~ msgid "RIST maximum packet size (bytes)"
-#~ msgstr "RIST maximális csomagméret"
-
-#~ msgid "RIST latency (ms)"
-#~ msgstr "RIST késleltetés (ms)"
-
-#~ msgid "RIST nack retry interval (ms)"
-#~ msgstr "RIST újrapróbálkozási időköz (ms)"
-
-#~ msgid "RIST reorder buffer (ms)"
-#~ msgstr "RIST átrendező puffer (ms)"
-
-#~ msgid "RIST maximum retry count"
-#~ msgstr "RIST maximális újrapróbálkozás"
-
-#~ msgid "Disable NACK output packets"
-#~ msgstr "NACK kimeneti csomagok letiltása"
-
-#~ msgid "Use this to disable packet recovery"
-#~ msgstr "Ezzel letilthatja a csomagok helyreállítását"
-
-#~ msgid "Do not check for a valid rtcp message from the encoder"
-#~ msgstr "Ne ellenőrizze, hogy van-e érvényes rtcp üzenet a kódolótól"
-
-#~ msgid ""
-#~ "Send nack messages even when we have not confirmed that the encoder is on "
-#~ "our local network."
-#~ msgstr ""
-#~ "Küldjön nack üzeneteket akkor is, ha még nem erősítettük meg, hogy a "
-#~ "kódoló a helyi hálózatunkon van."
-
-#~ msgid "16 bytes"
-#~ msgstr "16 bájt"
-
-#~ msgid "24 bytes"
-#~ msgstr "24 bájt"
-
-#~ msgid "32 bytes"
-#~ msgstr "32 bájt"
-
-#~ msgid "RIST data output caching size (ms)"
-#~ msgstr "RIST adatkimeneti gyorsítótárméret (ms)"
-
-#~ msgid ""
-#~ "Having this cache will guarantee that the packets going out are delivered "
-#~ "at a spacing determined by the chain timestamps thus ensuring a near "
-#~ "jitter free output. Be aware that this setting will also add to the "
-#~ "overall latency of the stream."
-#~ msgstr ""
-#~ "Ennek a gyorsítótárnak a birtokában garantálható, hogy a kimenő csomagok "
-#~ "a lánc időbélyegzői által meghatározott távolságban kerülnek kiküldésre, "
-#~ "ezáltal biztosítva a közel jitter nélküli kimenetet. Ne feledje, hogy ez "
-#~ "a beállítás növeli az adatfolyam teljes késleltetését is."
-
-#~ msgid "RIST retry-buffer queue size (ms)"
-#~ msgstr "RIST újrapróbálkozási puffer sorméret (ms)"
-
-#~ msgid ""
-#~ "This must match the buffer size (latency) configured on the server side. "
-#~ "If you are not sure, leave the default of 0 which will set it the maximum "
-#~ "value and will use about 100MB of RAM"
-#~ msgstr ""
-#~ "Ennek meg kell egyeznie a szerver oldalon konfigurált puffer méretével "
-#~ "(késleltetésével). Ha nem biztos benne, hagyja az alapértelmezett 0 "
-#~ "értéken, ami a maximális értékre állítja azt, és körülbelül 100 MB RAM-ot "
-#~ "fog használni"
-
-#~ msgid "SSRC used in RTP output (default is random, i.e. 0)"
-#~ msgstr ""
-#~ "Az RTP kimenetben használt SSRC (az alapértelmezett véletlenszerű, azaz 0)"
-
-#~ msgid ""
-#~ "Use this setting to specify a known SSRC for the RTP header. This is only "
-#~ "useful if your receiver acts on it. When using VLC as receiver, it is not."
-#~ msgstr ""
-#~ "Ezzel a beállítással megadhat egy ismert SSRC-t az RTP fejléchez. Ez csak "
-#~ "akkor hasznos, ha a vevője műveletet hajt végre rajta. Ha a VLC-t "
-#~ "vevőként használja, nem az."
-
-#~ msgid ""
-#~ "This Stream name will be sent to the receiver using the rist RTCP channel"
-#~ msgstr ""
-#~ "Ez az adatfolyamnév elküldésre kerül a vevőnek a rist RTCP csatornán "
-#~ "keresztül"
-
-#~ msgid "4:2:0"
-#~ msgstr "4:2:0"
-
-#~ msgid "4:2:2"
-#~ msgstr "4:2:2"
-
-#~ msgid "4:4:4"
-#~ msgstr "4:4:4"
-
-#~ msgid "Rate control method"
-#~ msgstr "Sebességvezérlési módszer"
-
-#~ msgid "Method used to encode the video sequence"
-#~ msgstr "A videosorozat kódolásához használt módszer"
-
-#~ msgid "Constant noise threshold mode"
-#~ msgstr "Konstans zajküszöb mód"
-
-#~ msgid "Constant bitrate mode (CBR)"
-#~ msgstr "Állandó bitsebességű mód (CBR)"
-
-#~ msgid "Low Delay mode"
-#~ msgstr "Alacsony késleltetés mód"
-
-#~ msgid "Lossless mode"
-#~ msgstr "Veszteségmentes mód"
-
-#~ msgid "Constant lambda mode"
-#~ msgstr "Konstans lambda mód"
-
-#~ msgid "Constant error mode"
-#~ msgstr "Konstans hiba mód"
-
-#~ msgid "Constant quality mode"
-#~ msgstr "Állandó minőség mód"
-
-#~ msgid "GOP structure"
-#~ msgstr "GOP struktúra"
-
-#~ msgid "GOP structure used to encode the video sequence"
-#~ msgstr "A videosorozat kódolásához használt GOP struktúra"
-
-#~ msgid ""
-#~ "No fixed gop structure. A picture can be intra or inter and refer to "
-#~ "previous or future pictures."
-#~ msgstr ""
-#~ "Nincs rögzített GOP struktúra. A kép lehet intra vagy inter, és "
-#~ "hivatkozhat korábbi vagy későbbi képekre."
-
-#~ msgid "I-frame only sequence"
-#~ msgstr "Csak I-képkockák sorozata"
-
-#~ msgid "Inter pictures refere to previous pictures only"
-#~ msgstr "A köztes képek csak korábbi képekre hivatkoznak"
-
-#~ msgid "Inter pictures can refer to previous or future pictures"
-#~ msgstr "A köztes képek hivatkozhatnak korábbi vagy későbbi képekre"
-
-#~ msgid "Constant quality factor"
-#~ msgstr "Állandó minőségtényező"
-
-#~ msgid "Quality factor to use in constant quality mode"
-#~ msgstr "Az állandó minőségű módban használandó minőségi tényező"
-
-#~ msgid "Noise Threshold"
-#~ msgstr "Zajküszöb"
-
-#~ msgid "Noise threshold to use in constant noise threshold mode"
-#~ msgstr "A konstans zajküszöb módban használandó zajküszöb"
-
-#~ msgid "CBR bitrate (kbps)"
-#~ msgstr "CBR bitsebesség (kb/mp)"
-
-#~ msgid "Target bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr "Cél bitsebesség kbps-ben az állandó bitsebességű módban kódoláskor"
-
-#~ msgid "Maximum bitrate (kbps)"
-#~ msgstr "Legnagyobb bitsebesség (kbps)"
-
-#~ msgid "Maximum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "Maximális bitsebesség kbps-ben az állandó bitsebességű módban kódoláskor"
-
-#~ msgid "Minimum bitrate (kbps)"
-#~ msgstr "Minimális bitsebesség (kbps)"
-
-#~ msgid "Minimum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "Minimális bitsebesség kbps-ben az állandó bitsebességű módban kódoláskor"
-
-#~ msgid "GOP length"
-#~ msgstr "GOP hossz"
-
-#~ msgid ""
-#~ "Number of pictures between successive sequence headers i.e. length of the "
-#~ "group of pictures"
-#~ msgstr ""
-#~ "Képek száma egymást követő szakaszfejlécek közt, azaz a képcsoport (GOP) "
-#~ "hossza"
-
-#~ msgid "Prefilter"
-#~ msgstr "Előszűrő"
-
-#~ msgid "Enable adaptive prefiltering"
-#~ msgstr "Adaptív előszűrés engedélyezése"
-
-#~ msgid "No pre-filtering"
-#~ msgstr "Nincs előszűrés"
-
-#~ msgid "Centre Weighted Median"
-#~ msgstr "Középre súlyozott átlag"
-
-#~ msgid "Gaussian Low Pass Filter"
-#~ msgstr "Aluláteresztő Gauss-szűrő"
-
-#~ msgid "Add Noise"
-#~ msgstr "Zaj hozzáadása"
-
-#~ msgid "Gaussian Adaptive Low Pass Filter"
-#~ msgstr "Adaptív aluláteresztő Gauss-szűrő"
-
-#~ msgid "Low Pass Filter"
-#~ msgstr "Aluláteresztő szűrő"
-
-#~ msgid "Amount of prefiltering"
-#~ msgstr "Előszűrés mennyisége"
-
-#~ msgid "Higher value implies more prefiltering"
-#~ msgstr "A magasabb érték több előszűrést jelent"
-
-#~ msgid "Picture coding mode"
-#~ msgstr "Képkódolási mód"
-
-#~ msgid ""
-#~ "Field coding is where interlaced fields are coded separately as opposed "
-#~ "to a pseudo-progressive frame"
-#~ msgstr ""
-#~ "A mezőkódolás esetén a váltottsoros mezők külön vannak kódolva, szemben "
-#~ "az álprogresszív képkockával"
-
-#~ msgid "auto - let encoder decide based upon input (Best)"
-#~ msgstr "auto - a kódoló döntse el a megadott érték alapján (legjobb)"
-
-#~ msgid "force coding frame as single picture"
-#~ msgstr "kódoló képkocka kényszerítése egyetlen képként"
-
-#~ msgid "force coding frame as separate interlaced fields"
-#~ msgstr "kódoló képkocka kényszerítése külön váltottsoros mezőkként"
-
-#~ msgid "Size of motion compensation blocks"
-#~ msgstr "Mozgáskompenzációs blokkok mérete"
-
-#~ msgid "automatic - let encoder decide based upon input (Best)"
-#~ msgstr "automatikus - a kódoló döntse el a megadott érték alapján (legjobb)"
-
-#~ msgid "small - use small motion compensation blocks"
-#~ msgstr "kicsi - kis mozgáskompenzációs blokkok használata"
-
-#~ msgid "medium - use medium motion compensation blocks"
-#~ msgstr "közepes - közepes mozgáskompenzációs blokkok használata"
-
-#~ msgid "large - use large motion compensation blocks"
-#~ msgstr "nagy - nagy mozgáskompenzációs blokkok használata"
-
-#~ msgid "Overlap of motion compensation blocks"
-#~ msgstr "Mozgáskompenzációs blokkok átfedése"
-
-#~ msgid "none - Motion compensation blocks do not overlap"
-#~ msgstr "nincs - a mozgáskompenzációs blokkok nem fednek át"
-
-#~ msgid "partial - Motion compensation blocks only partially overlap"
-#~ msgstr "részleges - a mozgáskompenzációs blokkok csak részlegesen fednek át"
-
-#~ msgid "full - Motion compensation blocks fully overlap"
-#~ msgstr "teljes - a mozgáskompenzációs blokkok teljesen átfednek"
-
-#~ msgid "Motion Vector precision"
-#~ msgstr "Mozgásvektor pontossága"
-
-#~ msgid "Motion Vector precision in pels"
-#~ msgstr "Mozgásvektor pontossága"
-
-#~ msgid "Three component motion estimation"
-#~ msgstr "Háromkomponensű mozgásbecslés"
-
-#~ msgid "Use chroma as part of the motion estimation process"
-#~ msgstr "Színesség használata a mozgásbecslési folyamat részeként"
-
-#~ msgid "Intra picture DWT filter"
-#~ msgstr "Képen belüli DWT szűrő"
-
-#~ msgid "Inter picture DWT filter"
-#~ msgstr "Képek közti DWT szűrő"
-
-#~ msgid "Number of DWT iterations"
-#~ msgstr "DWT ismétlések száma"
-
-#~ msgid "Also known as DWT levels"
-#~ msgstr "DWT szintekként is ismert"
-
-#~ msgid "Enable multiple quantizers"
-#~ msgstr "Több kvantáló engedélyezése"
-
-#~ msgid "Enable multiple quantizers per subband (one per codeblock)"
-#~ msgstr "Több kvantáló engedélyezése alsávonként (kódblokkonként egy)"
-
-#~ msgid "Disable arithmetic coding"
-#~ msgstr "Aritmetikus kódolás tiltása"
-
-#~ msgid "Use variable length codes instead, useful for very high bitrates"
-#~ msgstr ""
-#~ "Változó hosszúságú kódok használata, magas bitsebesség esetén hasznos"
-
-#~ msgid "perceptual weighting method"
-#~ msgstr "látszólagos súlyozási módszer"
-
-#~ msgid "perceptual distance"
-#~ msgstr "látszólagos távolság"
-
-#~ msgid "perceptual distance to calculate perceptual weight"
-#~ msgstr "látszólagos távolság a látszólagos súly kiszámításához"
-
-#~ msgid "Horizontal slices per frame"
-#~ msgstr "Képkockánkénti vízszintes szeletek"
-
-#~ msgid "Number of horizontal slices per frame in low delay mode"
-#~ msgstr ""
-#~ "Vízszintes szeletek száma képkockánként alacsony késleltetésű módban"
-
-#~ msgid "Vertical slices per frame"
-#~ msgstr "Képkockánkénti függőleges szeletek"
-
-#~ msgid "Number of vertical slices per frame in low delay mode"
-#~ msgstr ""
-#~ "Függőleges szeletek száma képkockánként alacsony késleltetésű módban"
-
-#~ msgid "Size of code blocks in each subband"
-#~ msgstr "Kódblokkok mérete az egyes alsávokban"
-
-#~ msgid "small - use small code blocks"
-#~ msgstr "kicsi - kis kódblokkok használata"
-
-#~ msgid "medium - use medium sized code blocks"
-#~ msgstr "közepes - közepes méretű kódblokkok használata"
-
-#~ msgid "large - use large code blocks"
-#~ msgstr "nagy - nagy kódblokkok használata"
-
-#~ msgid "full - One code block per subband"
-#~ msgstr "teljes - egy kódblokk alsávonként"
-
-#~ msgid "Enable hierarchical Motion Estimation"
-#~ msgstr "Hierarchikus mozgásbecslés engedélyezése"
-
-#~ msgid "Number of levels of downsampling"
-#~ msgstr "Szintek száma az alulmintavételezéshez"
-
-#~ msgid ""
-#~ "Number of levels of downsampling in hierarchical motion estimation mode"
-#~ msgstr ""
-#~ "Szintek száma az alulmintavételezéshez a hierarchikus mozgásbecslési "
-#~ "módban"
-
-#~ msgid "Enable Global Motion Estimation"
-#~ msgstr "Globális mozgásbecslés engedélyezése"
-
-#~ msgid "Enable Phase Correlation Estimation"
-#~ msgstr "Fáziskorreláció-becslés engedélyezése"
-
-#~ msgid "Enable Scene Change Detection"
-#~ msgstr "Jelenetváltás érzékelésének engedélyezése"
-
-#~ msgid "Force Profile"
-#~ msgstr "Profil kényszerítése"
-
-#~ msgid "VC2 Low Delay Profile"
-#~ msgstr "VC2 alacsony késleltetésű profil"
-
-#~ msgid "VC2 Simple Profile"
-#~ msgstr "VC2 egyszerű profil"
-
-#~ msgid "VC2 Main Profile"
-#~ msgstr "VC2 főprofil"
-
-#~ msgid "Main Profile"
-#~ msgstr "Főprofil"
-
-#~ msgid "Dirac video decoder using libschroedinger"
-#~ msgstr "Dirac videodekódoló a libschroedinger függvénytár használatával"
-
-#~ msgid "Dirac video encoder using libschroedinger"
-#~ msgstr "Dirac videokódoló a libschroedinger függvénytár használatával"
-
-#~ msgid "Key: "
-#~ msgstr "Kulcs: "
