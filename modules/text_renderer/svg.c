@@ -232,21 +232,11 @@ static void svg_RescaletoFit(filter_t *p_filter, double *width, double *height)
 
 static bool svg_GetDimensionsInPixels( RsvgHandle *handle, double *width, double *height )
 {
-#if LIBRSVG_MAJOR_VERSION > 2 || (LIBRSVG_MAJOR_VERSION == 2 && LIBRSVG_MINOR_VERSION >= 52)
-    RsvgRectangle outRect;
-    if (!rsvg_handle_get_geometry_for_element( handle, NULL, &outRect, NULL, NULL ))
-        return false;
-
-    *width = outRect.width;
-    *height = outRect.height;
-    return true;
-#else
     RsvgDimensionData dim;
     rsvg_handle_get_dimensions( handle, &dim );
     *width = dim.width;
     *height = dim.height;
     return true;
-#endif
 }
 
 static picture_t * svg_RenderPicture( filter_t *p_filter,
@@ -278,7 +268,7 @@ static picture_t * svg_RenderPicture( filter_t *p_filter,
     fmt.i_bits_per_pixel = 32;
     fmt.i_chroma = VLC_CODEC_BGRA;
     fmt.i_width = fmt.i_visible_width = ceil(width);
-    fmt.i_height = fmt.i_visible_height = height;
+    fmt.i_height = fmt.i_visible_height = ceil(height);
     fmt.transfer = TRANSFER_FUNC_SRGB;
     fmt.primaries = COLOR_PRIMARIES_SRGB;
     fmt.space = COLOR_SPACE_SRGB;
