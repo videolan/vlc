@@ -1,5 +1,5 @@
 # Czech translation
-# Copyright (C) 2023 VideoLAN
+# Copyright (C) 2026 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -34,7 +34,7 @@
 # Petr Dolejší <dolejsi.petr@gmail.com>, 2019
 # Roman Horník <roman.hornik@debian-linux.cz>, 2020
 # Fourdee Foureight, 2020
-# Michal Várady <miko.vaji@gmail.com>, 2020
+# Michal Várady <miko.vaji@gmail.com>, 2020,2026
 # Jan Pechacek <jan386@gmail.com>, 2021
 # Vladim Štér <vladim.ster94@gmail.com>, 2021
 # Dan Čermák <dcermak@suse.com>, 2021
@@ -42,19 +42,20 @@
 # Hain Murmeltier, 2022
 # Adam Nový, 2022
 # Aleš Fiala <f.ales1@seznam.cz>, 2023
+# Aleš Fiala <ales.fiala.yakari1@seznam.cz>, 2026
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22-rc1\n"
+"Project-Id-Version: vlc 3.0.24-beta1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2026-06-28 16:08+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
-"Last-Translator: Aleš Fiala <f.ales1@seznam.cz>, 2025\n"
+"Last-Translator: Michal Várady <miko.vaji@gmail.com>, 2026\n"
 "Language-Team: Czech (https://app.transifex.com/yaron/teams/16553/cs/)\n"
-"Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: cs\n"
 "Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n "
 "<= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
 
@@ -1100,24 +1101,20 @@ msgid "Decoded format"
 msgstr "Dekódovaný formát"
 
 #: src/input/es_out.c:3207
-#, fuzzy
 msgid "Decoded channels"
-msgstr "Zvukové kanály"
+msgstr "Dekódované kanály"
 
 #: src/input/es_out.c:3212
-#, fuzzy
 msgid "Decoded sample rate"
-msgstr "Vzorkovací frekvence zvuku"
+msgstr "Dekódovaná vzorkovací frekvence"
 
 #: src/input/es_out.c:3219
-#, fuzzy
 msgid "Decoded bits per sample"
-msgstr "Bitová hloubka zvuku"
+msgstr "Bitová hloubka po dekódování"
 
 #: src/input/es_out.c:3224
-#, fuzzy
 msgid "Decoded Bitrate"
-msgstr "Dekódovaný formát"
+msgstr "Dekódovaný datový tok"
 
 #: src/input/es_out.c:3237
 msgid "Track replay gain"
@@ -6674,8 +6671,8 @@ msgid ""
 "Force the DirectShow video input to use a specific chroma format (eg. I420 "
 "(default), RV24, etc.)"
 msgstr ""
-"Vynutit vstup videa DirectShow použivat konkrétní barevné sytosti (např. "
-"I420 (výchozí), RV24 atd.)"
+"Vynutit, aby vstup videa DirectShow použil konkrétní formát chroma (např. "
+"I420 (výchozí), RV24 atd.)."
 
 #: modules/access/dshow/dshow.cpp:151
 msgid "Video input frame rate"
@@ -8158,15 +8155,16 @@ msgid "Bitmask"
 msgstr "Bitová maska"
 
 #: modules/access/rist.c:313
-#, fuzzy
 msgid "Virtual Destination Port Filter"
-msgstr "Cílový soubor:"
+msgstr "Filtr virtuálního cílového portu"
 
 #: modules/access/rist.c:315
 msgid ""
 "Destination port to be used inside the reduced-mode of the main profile to "
 "filter incoming data. Use zero to allow all."
 msgstr ""
+"Cílový port použitý v redukovaném režimu hlavního profilu k filtrování "
+"příchozích dat. Hodnota 0 povolí vše."
 
 #: modules/access/rist.c:321 modules/access_output/rist.c:293
 msgid "RIST"
@@ -8182,13 +8180,13 @@ msgstr ""
 "Maximální odchylka demultiplexeru/dekóderu RIST (výchozí hodnota je 5ms)"
 
 #: modules/access/rist.c:328
-#, fuzzy
 msgid ""
 "This controls the maximum jitter that will be passed to the demux/decode "
 "chain. The lower the value, the more CPU cycles the module will consume"
 msgstr ""
-"Tímto se nastavuje maximální odchylka, která se předá řetězci demultiplexeru/"
-"dekódování. Čím je hodnota nižší, tím více cyklů CPU spotřebuje algoritmus"
+"Určuje maximální kolísání zpoždění, které bude předáno řetězci "
+"demultiplexování/dekódování. Čím nižší hodnota, tím více cyklů CPU modul "
+"spotřebuje."
 
 #: modules/access/rist.c:332
 msgid "RIST nack type, 0 = range, 1 = bitmask. Default is range"
@@ -8376,7 +8374,7 @@ msgstr "Oblast horního řádku"
 
 #: modules/access/screen/screen.c:57 modules/access/screen/xcb.c:49
 msgid "Ordinate of the capture region in pixels."
-msgstr "Souřadnice zaznamenané oblasti v pixelech."
+msgstr "Souřadnice Y oblasti záznamu v pixelech."
 
 #: modules/access/screen/screen.c:59 modules/access/screen/xcb.c:43
 msgid "Region left column"
@@ -8384,7 +8382,7 @@ msgstr "Oblast levého sloupce"
 
 #: modules/access/screen/screen.c:61 modules/access/screen/xcb.c:45
 msgid "Abscissa of the capture region in pixels."
-msgstr "Úsek zaznamenané oblasti v pixelech."
+msgstr "Souřadnice X oblasti záznamu v pixelech."
 
 #: modules/access/screen/screen.c:63 modules/access/screen/xcb.c:51
 msgid "Capture region width"
@@ -8477,9 +8475,8 @@ msgid "SFTP port number to use on the server"
 msgstr "Port SFTP používaný na serveru"
 
 #: modules/access/sftp.c:61
-#, fuzzy
 msgid "Private key file"
-msgstr "Soubor klíče AES"
+msgstr "Soubor soukromého klíče"
 
 #: modules/access/sftp.c:62
 msgid ""
@@ -8487,6 +8484,10 @@ msgid ""
 "assumed to be in the same directory with '.pub' appended. If unset, standard "
 "key paths will be attempted (e.g. '~/.ssh/id_rsa')."
 msgstr ""
+"Soubor se soukromým klíčem používaný pro ověřování veřejným klíčem SSH. "
+"Předpokládá se, že soubor s veřejným klíčem je ve stejném adresáři s "
+"připojenou příponou '.pub'. Pokud není nastaven, zkusí se standardní cesty "
+"ke klíčům (např. '~/.ssh/id_rsa')."
 
 #: modules/access/sftp.c:68
 msgid "SFTP input"
@@ -8629,9 +8630,8 @@ msgid "Password for stream encryption"
 msgstr "Heslo pro šifrování proudu"
 
 #: modules/access/srt.c:566
-#, fuzzy
 msgid "SRT Stream ID"
-msgstr "ID streamu pro SRT"
+msgstr "ID streamu SRT"
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -9444,7 +9444,7 @@ msgstr "Použít mechanismus kontroly rychlosti multiplexerů"
 
 #: modules/access_output/livehttp.c:92
 msgid "AES key URI to place in playlist"
-msgstr "AES klíč URI pro umístění do seznamu skladeb"
+msgstr "URI klíče AES pro vložení do seznamu skladeb"
 
 #: modules/access_output/livehttp.c:94
 msgid "AES key file"
@@ -9494,50 +9494,47 @@ msgstr "LiveHTTP"
 
 #: modules/access_output/rist.c:268
 msgid "Virtual Source Port"
-msgstr ""
+msgstr "Virtuální zdrojový port"
 
 #: modules/access_output/rist.c:270
 msgid "Source port to be used inside the reduced-mode of the main profile"
-msgstr ""
+msgstr "Zdrojový port použitý v redukovaném režimu hlavního profilu"
 
 #: modules/access_output/rist.c:272
-#, fuzzy
 msgid "Virtual Destination Port"
-msgstr "Cíl proudu"
+msgstr "Virtuální cílový port"
 
 #: modules/access_output/rist.c:274
 msgid "Destination port to be used inside the reduced-mode of the main profile"
-msgstr ""
+msgstr "Cílový port použitý v redukovaném režimu hlavního profilu"
 
 #: modules/access_output/rist.c:281
-#, fuzzy
 msgid "Multipeer mode"
-msgstr "Multiplexer"
+msgstr "Režim s více peery"
 
 #: modules/access_output/rist.c:283
 msgid ""
 "This allows you to select between duplicate or load balanced modes when "
 "sending data to multiple peers (several network paths)"
 msgstr ""
+"Umožňuje vybrat mezi režimem duplikování a vyvažování zátěže při odesílání "
+"dat více peerům (přes několik síťových cest)."
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Duplicate"
-msgstr "Aplikace"
+msgstr "Duplikování"
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Load balanced"
-msgstr "Vyvážení červené"
+msgstr "Vyvažování zátěže"
 
 #: modules/access_output/rist.c:294
 msgid "RIST stream output"
 msgstr "Výstup RIST proudu"
 
 #: modules/access_output/rist.c:299
-#, fuzzy
 msgid "RIST target payload size (bytes)"
-msgstr "Velikost cílového paketu RIST (v bajtech)"
+msgstr "Cílová velikost užitečného zatížení RIST (v bajtech)"
 
 #: modules/access_output/shout.c:64
 #: modules/gui/qt/components/sout/sout_widgets.cpp:438
@@ -10013,11 +10010,11 @@ msgstr "Nastavit hodnotu RMS/špičky."
 
 #: modules/audio_filter/compressor.c:158
 msgid "Attack time"
-msgstr "Čas útoku"
+msgstr "Doba náběhu"
 
 #: modules/audio_filter/compressor.c:159
 msgid "Set the attack time in milliseconds."
-msgstr "Nastavit čas útoku v milisekundách."
+msgstr "Nastavit dobu náběhu v milisekundách."
 
 #: modules/audio_filter/compressor.c:161
 msgid "Release time"
@@ -10025,7 +10022,7 @@ msgstr "Čas vydání"
 
 #: modules/audio_filter/compressor.c:162
 msgid "Set the release time in milliseconds."
-msgstr "Nastavit čas vydání v milisekundách."
+msgstr "Nastavit dobu doběhu v milisekundách."
 
 #: modules/audio_filter/compressor.c:164
 msgid "Threshold level"
@@ -11416,8 +11413,8 @@ msgid ""
 "Eliminates chrominance blocks when the PSNR isn't much changed (default: "
 "0.0). The H264 specification recommends 7."
 msgstr ""
-"Eliminuje bloky jasu, pokud se PSNR příliš nezmění (výchozí: 0.0). "
-"Specifikace H264 doporučuje -7."
+"Eliminuje bloky chrominance, pokud se PSNR příliš nezmění (výchozí: 0.0). "
+"Specifikace H.264 doporučuje 7."
 
 #: modules/codec/avcodec/avcodec.h:231
 msgid "Specify AAC audio profile to use"
@@ -12860,7 +12857,6 @@ msgstr "Dekodér textových titulků"
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -13302,7 +13298,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, fuzzy
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -13406,11 +13401,12 @@ msgstr "Použít periodické obnovování Intra na snímky IDR"
 
 #: modules/codec/x264.c:179
 msgid "Use mb-tree ratecontrol"
-msgstr "Použít kontrolu rychlosti mb-strom"
+msgstr "Použít mb-tree při řízení datového toku"
 
 #: modules/codec/x264.c:180
 msgid "You can disable use of Macroblock-tree on ratecontrol"
-msgstr "Můžete zakázat používání stromu Macroblock při kontrole rychlosti"
+msgstr ""
+"Můžete zakázat použití stromu makrobloků (mb-tree) při řízení datového toku."
 
 #: modules/codec/x264.c:182
 msgid "Force number of slices per frame"
@@ -13439,15 +13435,15 @@ msgstr "Nastaví maximální počet makrobloků na pruhy"
 
 #: modules/codec/x264.c:192
 msgid "Set QP"
-msgstr "Nastavit par. kvan."
+msgstr "Nastavit QP"
 
 #: modules/codec/x264.c:193
 msgid ""
 "This selects the quantizer to use. Lower values result in better fidelity, "
 "but higher bitrates. 26 is a good default value. Range 0 (lossless) to 51."
 msgstr ""
-"Vybere kvantizer k použití. Při nižších hodnotách je výstup věrnější a má "
-"větší datový tok. 26 je dobrá hodnota. Rozsah od 0 (bezeztrátové) do 51."
+"Vybere použitý kvantizér. Nižší hodnoty dávají věrnější výstup, ale vyšší "
+"datový tok. 26 je dobrá výchozí hodnota. Rozsah 0 (bezeztrátově) až 51."
 
 #: modules/codec/x264.c:197
 msgid "Quality-based VBR"
@@ -13459,27 +13455,27 @@ msgstr "Jednoprůchodový VBR s důrazem na kvalitu. Od 0 do 51."
 
 #: modules/codec/x264.c:200
 msgid "Min QP"
-msgstr "Minimální par. kvan."
+msgstr "Minimální QP"
 
 #: modules/codec/x264.c:201
 msgid "Minimum quantizer parameter. 15 to 35 seems to be a useful range."
-msgstr "Minimální parametr kvantizeru. Dobrým užitečným rozsahem je 15 až 35."
+msgstr "Minimální kvantizační parametr. Užitečný rozsah bývá 15 až 35."
 
 #: modules/codec/x264.c:204
 msgid "Max QP"
-msgstr "Maximální par. kvan."
+msgstr "Maximální QP"
 
 #: modules/codec/x264.c:205
 msgid "Maximum quantizer parameter."
-msgstr "Maximální parametr kvantizeru."
+msgstr "Maximální kvantizační parametr."
 
 #: modules/codec/x264.c:207
 msgid "Max QP step"
-msgstr "Maximální krok par. kvan."
+msgstr "Maximální krok QP"
 
 #: modules/codec/x264.c:208
 msgid "Max QP step between frames."
-msgstr "Maximální krok par. kvan. mezi jednotlivými snímky."
+msgstr "Maximální krok QP mezi snímky."
 
 #: modules/codec/x264.c:210
 msgid "Average bitrate tolerance"
@@ -13487,15 +13483,15 @@ msgstr "Průměrná tolerance datového toku"
 
 #: modules/codec/x264.c:211
 msgid "Allowed variance in average bitrate (in kbits/s)."
-msgstr "Povolená odchylka průměrného datového toku (v kbitech/sec.)"
+msgstr "Povolená odchylka průměrného datového toku (v kbit/s)."
 
 #: modules/codec/x264.c:214
 msgid "Max local bitrate"
-msgstr "Max. lokální datový tok"
+msgstr "Maximální lokální datový tok"
 
 #: modules/codec/x264.c:215
 msgid "Sets a maximum local bitrate (in kbits/s)."
-msgstr "Nastaví maximální lokální bitrate (v kbits/s)."
+msgstr "Nastaví maximální lokální datový tok (v kbit/s)."
 
 #: modules/codec/x264.c:217
 msgid "VBV buffer"
@@ -13503,23 +13499,23 @@ msgstr "Vyrovánávací paměť VBV"
 
 #: modules/codec/x264.c:218
 msgid "Averaging period for the maximum local bitrate (in kbits)."
-msgstr "Průměrná perioda pro maximální lokální datový tok (v kbitech)."
+msgstr "Perioda průměrování pro maximální lokální datový tok (v kbit)."
 
 #: modules/codec/x264.c:221
 msgid "Initial VBV buffer occupancy"
-msgstr "Počáteční obsazení vyrovnávací paměti pro VBV"
+msgstr "Počáteční zaplnění zásobníku VBV"
 
 #: modules/codec/x264.c:222
 msgid ""
 "Sets the initial buffer occupancy as a fraction of the buffer size. Range "
 "0.0 to 1.0."
 msgstr ""
-"Nastaví počáteční obsazení vyrovnávací paměti jako zlomek její velikosti. "
-"Rozsah od 0.0 do 1.0."
+"Nastaví počáteční zaplnění zásobníku jako zlomek jeho velikosti. Rozsah 0.0 "
+"až 1.0."
 
 #: modules/codec/x264.c:225
 msgid "How AQ distributes bits"
-msgstr "Určuje, jak AQ distribuuje bity"
+msgstr "Způsob rozdělení bitů pomocí AQ"
 
 #: modules/codec/x264.c:226
 msgid ""
@@ -13529,15 +13525,15 @@ msgid ""
 " - 2: uses log(var)^2 instead of log(var) and attempts to adapt strength per "
 "frame"
 msgstr ""
-"Definuje režim distribuce bitů pro AQ, výchozí hodnota je 1\n"
-" - 0: Zakázáno\n"
-" - 1: Aktuální výchozí režim x264\n"
-" - 2: používat proměnnou log(var)^2 místo log(var) a pokusit se o "
-"přizpůsobení intenzity snímků"
+"Definuje režim rozdělení bitů pro AQ, výchozí hodnota je 1\n"
+"- 0: Zakázáno\n"
+"- 1: Aktuální výchozí režim x264\n"
+"- 2: používá log(var)^2 místo log(var) a pokouší se přizpůsobit intenzitu "
+"pro každý snímek"
 
 #: modules/codec/x264.c:231
 msgid "Strength of AQ"
-msgstr "Intenzita AQ"
+msgstr "Síla AQ"
 
 #: modules/codec/x264.c:232
 msgid ""
@@ -13546,10 +13542,11 @@ msgid ""
 " - 0.5: weak AQ\n"
 " - 1.5: strong AQ"
 msgstr ""
-"Intenzita blokování a rozmazávání v plochých\n"
-"a texturovaných oblastech, výchozí hodnota je 1.0, doporučená je mezi 0..2\n"
-" - 0.5: mírné AQ\n"
-" - 1.5: intenzivní AQ"
+"Síla omezení blokování a rozmazání v plochých\n"
+"a texturovaných oblastech, výchozí hodnota je 1.0, doporučený rozsah je "
+"0..2\n"
+"- 0.5: slabé AQ\n"
+"- 1.5: silné AQ"
 
 #: modules/codec/x264.c:238
 msgid "QP factor between I and P"
@@ -13577,7 +13574,7 @@ msgstr "Rozdíl kvantizačních parametrů mezi barevnou sytostí a jasem."
 
 #: modules/codec/x264.c:248
 msgid "Multipass ratecontrol"
-msgstr "Víceprůchodová kontrola rychlosti"
+msgstr "Víceprůchodové řízení datového toku"
 
 #: modules/codec/x264.c:249
 msgid ""
@@ -13586,38 +13583,35 @@ msgid ""
 " - 2: Last pass, does not overwrite stats file\n"
 " - 3: Nth pass, overwrites stats file\n"
 msgstr ""
-"Víceproudová kontrola rychlosti:\n"
-" - 1: První průchod, vytvořit statistický soubor\n"
-" - 2: Poslední průchod, nepřepisovat statistický soubor\n"
-" - 3: N-tý průchod, přepsat statistický soubor\n"
+"Víceprůchodové řízení datového toku:\n"
+"- 1: První průchod, vytvoří statistický soubor\n"
+"- 2: Poslední průchod, nepřepíše statistický soubor\n"
+"- 3: N-tý průchod, přepíše statistický soubor\n"
 
 #: modules/codec/x264.c:254
 msgid "QP curve compression"
-msgstr "Komprese křivky par. kvan."
+msgstr "Komprese křivky QP"
 
 #: modules/codec/x264.c:255
 msgid "QP curve compression. Range 0.0 (CBR) to 1.0 (QCP)."
-msgstr "Komprese křivky par. kvan. Rozsah od 0.0 (CBR) do 1.0 (QCP)."
+msgstr "Komprese křivky QP. Rozsah od 0.0 (CBR) do 1.0 (QCP)."
 
 #: modules/codec/x264.c:257 modules/codec/x264.c:261
 msgid "Reduce fluctuations in QP"
-msgstr "Snižovat kolísání v par. kvan."
+msgstr "Snižovat kolísání QP"
 
 #: modules/codec/x264.c:258
 msgid ""
 "This reduces the fluctuations in QP before curve compression. Temporally "
 "blurs complexity."
-msgstr ""
-"To snižuje kolísání par. kvan. před kompresí křivky. Dočasně rozmazává "
-"složitost."
+msgstr "Snižuje kolísání QP před kompresí křivky. Časově vyhlazuje složitost."
 
 #: modules/codec/x264.c:262
 msgid ""
 "This reduces the fluctuations in QP after curve compression. Temporally "
 "blurs quants."
 msgstr ""
-"To snižuje kolísání par. kvan. po kompresi křivky. Dočasně rozmazává "
-"množství."
+"Snižuje kolísání QP po kompresi křivky. Časově vyhlazuje kvantizační hodnoty."
 
 #: modules/codec/x264.c:267
 msgid "Partitions to consider"
@@ -13794,7 +13788,7 @@ msgstr "Barevná sytost při odhadování pohybu"
 
 #: modules/codec/x264.c:336
 msgid "Chroma ME for subpel and mode decision in P-frames."
-msgstr "barevná sytost ME na subpel a režim rozhodování v P-snímcích."
+msgstr "Chroma ME pro subpel a rozhodování režimu v P-snímcích."
 
 #: modules/codec/x264.c:339
 msgid "Joint bidirectional motion refinement."
@@ -14913,7 +14907,7 @@ msgstr "WinMsg"
 
 #: modules/control/win_msg.c:193
 msgid "Windows messages interface"
-msgstr "Rozhraní zprávy Windows"
+msgstr "Rozhraní zpráv Windows"
 
 #: modules/demux/adaptive/adaptive.cpp:71
 msgid "Maximum device width"
@@ -15166,7 +15160,7 @@ msgstr "Analyzátor souboru"
 
 #: modules/demux/dirac.c:41
 msgid "Value to adjust dts by"
-msgstr "Hodnota pro úpravu dts"
+msgstr "Hodnota pro posun DTS"
 
 #: modules/demux/dirac.c:54
 msgid "Dirac video demuxer"
@@ -15205,8 +15199,8 @@ msgid ""
 "If non empty and image-decode is true, the image will be converted to the "
 "specified chroma."
 msgstr ""
-"Pokud není prázdné a je nastavené dekódování obrázku, převede se obrázek na "
-"zadanou barevnou sytost."
+"Pokud není prázdné a je povoleno dekódování obrázku, obrázek se převede na "
+"zadané chroma."
 
 #: modules/demux/image.c:61
 msgid "Duration in seconds"
@@ -16345,12 +16339,12 @@ msgstr "Obnovit"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:226
 #: modules/gui/qt/components/extended_panels.cpp:1326
 msgid "Attack"
-msgstr "Útok"
+msgstr "Náběh"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:227
 #: modules/gui/qt/components/extended_panels.cpp:1327
 msgid "Release"
-msgstr "Vydání"
+msgstr "Doběh"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:228
 #: modules/gui/qt/components/extended_panels.cpp:1328
@@ -19952,40 +19946,36 @@ msgstr ""
 "Stisknutím klávesy Delete odstraníte."
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1405
-#, fuzzy
 msgid "Global Hotkey change"
-msgstr "Změna klávesových zkratek"
+msgstr "Změna globální klávesové zkratky"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1406
 msgid "Hotkey change"
 msgstr "Změna klávesových zkratek"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1410
-#, fuzzy
 msgid "Press the new key or combination for <b>%1</b>"
-msgstr "Stiskněte novou klávesu či nějakou kombinaci pro"
+msgstr "Stiskněte novou klávesu či nějakou kombinaci pro <b>%1</b>"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1419
 msgid "Assign"
 msgstr "Přiřadit"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1455
-#, fuzzy
 msgid "Warning: this key or combination is already assigned to \"<b>%1</b>\""
-msgstr "Pozor: Tato klávesa či kombinace je již použita u"
+msgstr "Pozor: Tato klávesa či kombinace je již použita u \"<b>%1</b>\""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1467
 msgid "Warning: <b>%1</b> is already an application menu shortcut"
 msgstr "Upozornění: <b>%1</b> je již zástupcem nabídky aplikace"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1490
-#, fuzzy
 msgid "Key or combination: <b>%1</b>"
-msgstr "Klávesa nebo kombinace:"
+msgstr "Klávesa nebo kombinace: <b>%1</b>"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1498
 msgid "Key: <b>%1</b>"
-msgstr ""
+msgstr "Klávesa: <b>%1</b>"
 
 #: modules/gui/qt/components/simple_preferences.cpp:256
 #: modules/gui/qt/components/simple_preferences.cpp:636
@@ -20148,22 +20138,18 @@ msgstr ""
 "Kontejnery (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:184
-#, fuzzy
 msgid "This module outputs the stream using the RIST protocol (TR06)."
-msgstr "Tento modul odesílá překódovaný tok do sítě přes protokol mms."
+msgstr "Tento modul odesílá proud pomocí protokolu RIST (TR06)."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:186
-#, fuzzy
 msgid "Destination Address"
-msgstr "Cílová předpona"
+msgstr "Cílová adresa"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:191
-#, fuzzy
 msgid "Destination Port"
-msgstr "Cíl"
+msgstr "Cílový port"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:201
-#, fuzzy
 msgid "Stream Name"
 msgstr "Název proudu"
 
@@ -22347,7 +22333,7 @@ msgstr "Složka s metadaty"
 
 #: modules/meta_engine/folder.c:75
 msgid "Album art filename"
-msgstr "Název souboru pro tento druh alba"
+msgstr "Název souboru obrázku alba"
 
 #: modules/meta_engine/folder.c:75
 msgid "Filename to look for album art in current directory"
@@ -24136,8 +24122,8 @@ msgid ""
 "Marquee text to display. (Available format strings: %Y = year, %m = month, "
 "%d = day, %H = hour, %M = minute, %S = second, ...)"
 msgstr ""
-"Zobrazit jezdící text. (Dostupné řetězce formátu:  %Y = rok, %m = měsíc, %d "
-"= den, %H = hodina, %M = minuta, %S = sekunda, ...)"
+"Běžící text k zobrazení. (Dostupné formátovací řetězce:  %Y = rok, %m = "
+"měsíc, %d = den, %H = hodina, %M = minuta, %S = sekunda, ...)"
 
 #: modules/spu/marq.c:94
 msgid "Text file"
@@ -24145,7 +24131,7 @@ msgstr "Textový soubor"
 
 #: modules/spu/marq.c:95
 msgid "File to read the marquee text from."
-msgstr "Soubor ke čtení jezdícího textu."
+msgstr "Soubor, ze kterého se má číst běžící text."
 
 #: modules/spu/marq.c:96 modules/spu/rss.c:140
 #: modules/stream_out/mosaic_bridge.c:128
@@ -24176,8 +24162,8 @@ msgid ""
 "Number of milliseconds the marquee must remain displayed. Default value is 0 "
 "(remains forever)."
 msgstr ""
-"Počet milisekund, po kterých musí být značka zobrazená. Výchozí hodnota je 0 "
-"(stále zobrazená)."
+"Počet milisekund, po které má běžící text zůstat zobrazený. Výchozí hodnota "
+"je 0 (zůstane zobrazený stále)."
 
 #: modules/spu/marq.c:104
 msgid "Refresh period in ms"
@@ -24223,7 +24209,7 @@ msgstr ""
 
 #: modules/spu/marq.c:121
 msgid "Marquee position"
-msgstr "Pozice značky"
+msgstr "Pozice běžícího textu"
 
 #: modules/spu/marq.c:123
 msgid ""
@@ -24231,9 +24217,9 @@ msgid ""
 "2=right, 4=top, 8=bottom, you can also use combinations of these values, eg "
 "6 = top-right)."
 msgstr ""
-"Můžete zarovnat pozici značky ve videu (0 = střed, 1 = nalevo, 2 = napravo, "
-"4 = nahoru, 8 = dolů; můžete také použít kombinaci těchto hodnot, např. "
-"6=zarovnání do pravého horního rohu)."
+"Můžete vynutit pozici běžícího textu ve videu (0 = střed, 1 = vlevo, 2 = "
+"vpravo, 4 = nahoře, 8 = dole; hodnoty lze také kombinovat, např. 6 = vpravo "
+"nahoře)."
 
 #: modules/spu/marq.c:134
 msgid "Display text above the video"
@@ -24241,11 +24227,11 @@ msgstr "Zobrazit text nad videem"
 
 #: modules/spu/marq.c:141
 msgid "Marquee"
-msgstr "Značka"
+msgstr "Běžící text"
 
 #: modules/spu/marq.c:142
 msgid "Marquee display"
-msgstr "Zobrazení značky"
+msgstr "Zobrazení běžícího textu"
 
 #: modules/spu/marq.c:168 modules/spu/rss.c:214
 msgid "Misc"
@@ -29708,385 +29694,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Seznam správců médií"
-
-#~ msgid "RIST maximum packet size (bytes)"
-#~ msgstr "Maximální velikost paketu RIST (v bajtech)"
-
-#~ msgid "RIST latency (ms)"
-#~ msgstr "Zpoždění RIST (ms)"
-
-#~ msgid "RIST nack retry interval (ms)"
-#~ msgstr "Interval opakování RIST nack (ms)"
-
-#~ msgid "RIST reorder buffer (ms)"
-#~ msgstr "Změna pořadí vyrovnávací paměti RIST (ms)"
-
-#~ msgid "RIST maximum retry count"
-#~ msgstr "Maximální počet opakování RIST"
-
-#~ msgid "Disable NACK output packets"
-#~ msgstr "Zakázat výstupní pakety NACK"
-
-#~ msgid "Use this to disable packet recovery"
-#~ msgstr "Použít k zakázání obnovy paketů"
-
-#~ msgid "Do not check for a valid rtcp message from the encoder"
-#~ msgstr "Neprověřovat platnou rtcp zprávu z kodéru"
-
-#~ msgid ""
-#~ "Send nack messages even when we have not confirmed that the encoder is on "
-#~ "our local network."
-#~ msgstr ""
-#~ "Odesílat zprávy nack i v případě, že jsme nepotvrdili výskyt kodéru v "
-#~ "naší lokální síti."
-
-#~ msgid "16 bytes"
-#~ msgstr "16 bajtů"
-
-#~ msgid "24 bytes"
-#~ msgstr "24 bajtů"
-
-#~ msgid "32 bytes"
-#~ msgstr "32 bitů"
-
-#~ msgid "RIST data output caching size (ms)"
-#~ msgstr "Velikost výstupní mezipaměti dat RIST (ms)"
-
-#~ msgid ""
-#~ "Having this cache will guarantee that the packets going out are delivered "
-#~ "at a spacing determined by the chain timestamps thus ensuring a near "
-#~ "jitter free output. Be aware that this setting will also add to the "
-#~ "overall latency of the stream."
-#~ msgstr ""
-#~ "Pokud tato mezipaměť zaručí, že odcházející pakety budou doručeny v "
-#~ "rozestupu určené časovými značky řetězce, čímž se zaručí výstup téměř bez "
-#~ "prodlevy. Uvědomte si, že tohle nastavení zvýší celkovou odezvu proudu."
-
-#~ msgid "RIST retry-buffer queue size (ms)"
-#~ msgstr "Velikost fronty opakování vyrovnávací paměti RIST (ms)"
-
-#~ msgid ""
-#~ "This must match the buffer size (latency) configured on the server side. "
-#~ "If you are not sure, leave the default of 0 which will set it the maximum "
-#~ "value and will use about 100MB of RAM"
-#~ msgstr ""
-#~ "Tato hodnota se musí shodovat s velikostí vyrovnávací paměti (odezvou), "
-#~ "která je nastavená na straně serveru. Pokud si nejste jisti, ponechte "
-#~ "výchozí hodnotu 0, která nastaví maximální hodnotu a použije cca 100MB "
-#~ "RAM."
-
-#~ msgid "SSRC used in RTP output (default is random, i.e. 0)"
-#~ msgstr ""
-#~ "SSRC zdroj synchronizace použitý ve výstupu RTP (výchozí hodnota je "
-#~ "náhodná, tj. 0)"
-
-#~ msgid ""
-#~ "Use this setting to specify a known SSRC for the RTP header. This is only "
-#~ "useful if your receiver acts on it. When using VLC as receiver, it is not."
-#~ msgstr ""
-#~ "Použijte toto nastavení k určení známého zdroje synchronizace SSRC pro "
-#~ "hlavičku RTP. To je užitečné tehdy, pokud na to váš přijímač pracuje. V "
-#~ "případě použití VLC tomu tak není."
-
-#~ msgid ""
-#~ "This Stream name will be sent to the receiver using the rist RTCP channel"
-#~ msgstr ""
-#~ "Tento název proudu bude odeslán přijímači používající rist kanál RTCP"
-
-#~ msgid "4:2:0"
-#~ msgstr "4:2:0"
-
-#~ msgid "4:2:2"
-#~ msgstr "4:2:2"
-
-#~ msgid "4:4:4"
-#~ msgstr "4:4:4"
-
-#~ msgid "Rate control method"
-#~ msgstr "Metoda kontroly rychlosti"
-
-#~ msgid "Method used to encode the video sequence"
-#~ msgstr "Metoda použitá pro kódování sekvence videa"
-
-#~ msgid "Constant noise threshold mode"
-#~ msgstr "Režim prahu konstantního šumu"
-
-#~ msgid "Constant bitrate mode (CBR)"
-#~ msgstr "Režim konstantního datového toku (CBR)"
-
-#~ msgid "Low Delay mode"
-#~ msgstr "Režim malého zpoždění"
-
-#~ msgid "Lossless mode"
-#~ msgstr "Bezeztrátový režim"
-
-#~ msgid "Constant lambda mode"
-#~ msgstr "Režim Constant lambda"
-
-#~ msgid "Constant error mode"
-#~ msgstr "Konstantní chybový režim"
-
-#~ msgid "Constant quality mode"
-#~ msgstr "Režim konstantní kvality"
-
-#~ msgid "GOP structure"
-#~ msgstr "Struktura GOP"
-
-#~ msgid "GOP structure used to encode the video sequence"
-#~ msgstr "Struktura GOP použitá pro kódování sekvence videa"
-
-#~ msgid ""
-#~ "No fixed gop structure. A picture can be intra or inter and refer to "
-#~ "previous or future pictures."
-#~ msgstr ""
-#~ "Žádná pevná struktura gop. Obrázek může být intra nebo inter a odkazovat "
-#~ "na předchozí nebo budoucí obrázky."
-
-#~ msgid "I-frame only sequence"
-#~ msgstr "Pouze sekvence I-snímků"
-
-#~ msgid "Inter pictures refere to previous pictures only"
-#~ msgstr "Meziobrázky odkazují pouze na předchozí obrázky"
-
-#~ msgid "Inter pictures can refer to previous or future pictures"
-#~ msgstr "Meziobrázky mohou odkazovat na předchozí nebo budoucí obrázky"
-
-#~ msgid "Constant quality factor"
-#~ msgstr "Faktor konstantní kvality"
-
-#~ msgid "Quality factor to use in constant quality mode"
-#~ msgstr "Faktor kvality použitý v režimu konstantní kvality"
-
-#~ msgid "Noise Threshold"
-#~ msgstr "Práh šumu"
-
-#~ msgid "Noise threshold to use in constant noise threshold mode"
-#~ msgstr "Práh hluku použit v režimu konstantního hluku"
-
-#~ msgid "CBR bitrate (kbps)"
-#~ msgstr "Datový tok CBR (kb/s)"
-
-#~ msgid "Target bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "Cílový datový tok v kb/s při kódování v režimu konstantního datového toku"
-
-#~ msgid "Maximum bitrate (kbps)"
-#~ msgstr "Maximální datový tok (kbps)"
-
-#~ msgid "Maximum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "Maximální datový tok v kb/s při kódování v režimu konstantního datového "
-#~ "toku"
-
-#~ msgid "Minimum bitrate (kbps)"
-#~ msgstr "Minimální datový tok (kbps)"
-
-#~ msgid "Minimum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "Minimální datový tok v kb/s při kódování v režimu konstantního datového "
-#~ "toku"
-
-#~ msgid "GOP length"
-#~ msgstr "Délka GOP"
-
-#~ msgid ""
-#~ "Number of pictures between successive sequence headers i.e. length of the "
-#~ "group of pictures"
-#~ msgstr ""
-#~ "Počet snímků mezi následujícími záhlavími sekvence, tj. délkou skupiny "
-#~ "snímků"
-
-#~ msgid "Prefilter"
-#~ msgstr "Předfiltrování"
-
-#~ msgid "Enable adaptive prefiltering"
-#~ msgstr "Povolit adaptivní předfiltrování"
-
-#~ msgid "No pre-filtering"
-#~ msgstr "Bez před-filtrování"
-
-#~ msgid "Centre Weighted Median"
-#~ msgstr "Vyvážený medián ve středu"
-
-#~ msgid "Gaussian Low Pass Filter"
-#~ msgstr "Gaussův nízkopropustný filtr"
-
-#~ msgid "Add Noise"
-#~ msgstr "Přidat šum"
-
-#~ msgid "Gaussian Adaptive Low Pass Filter"
-#~ msgstr "Gaussův adaptivní nízkopropustný filtr"
-
-#~ msgid "Low Pass Filter"
-#~ msgstr "Nízkopropustný filtr"
-
-#~ msgid "Amount of prefiltering"
-#~ msgstr "Množství předfiltrování"
-
-#~ msgid "Higher value implies more prefiltering"
-#~ msgstr "Vyšší hodnota znamená více předfiltrování"
-
-#~ msgid "Picture coding mode"
-#~ msgstr "Režim kódování obrazu"
-
-#~ msgid ""
-#~ "Field coding is where interlaced fields are coded separately as opposed "
-#~ "to a pseudo-progressive frame"
-#~ msgstr ""
-#~ "Kódování polí je tam, kde jsou prokládané pole kódovány odděleně, na "
-#~ "rozdíl od pseudo-progresivního snímku"
-
-#~ msgid "auto - let encoder decide based upon input (Best)"
-#~ msgstr "auto - nechat enkodér rozhodovat na základě vstupu (Nejlepší)"
-
-#~ msgid "force coding frame as single picture"
-#~ msgstr "vynutit kódovací snímky jako jeden obraz"
-
-#~ msgid "force coding frame as separate interlaced fields"
-#~ msgstr "vynutit kódovací snímek jako samostatné prokládané pole"
-
-#~ msgid "Size of motion compensation blocks"
-#~ msgstr "Šířka bloků pro kompenzaci pohybu"
-
-#~ msgid "automatic - let encoder decide based upon input (Best)"
-#~ msgstr ""
-#~ "automatické - nechat enkodér rozhodovat na základě vstupu (Nejlepší)"
-
-#~ msgid "small - use small motion compensation blocks"
-#~ msgstr "malé - použít malé bloky pro kompenzaci pohybu"
-
-#~ msgid "medium - use medium motion compensation blocks"
-#~ msgstr "střední - použít středně velké bloky pro kompenzaci pohybu"
-
-#~ msgid "large - use large motion compensation blocks"
-#~ msgstr "velké - použít velké bloky pro kompenzaci pohybu"
-
-#~ msgid "Overlap of motion compensation blocks"
-#~ msgstr "Překrývání bloků kompenzace pohybu"
-
-#~ msgid "none - Motion compensation blocks do not overlap"
-#~ msgstr "žádné - bloky kompenzace pohybu se nepřekrývají"
-
-#~ msgid "partial - Motion compensation blocks only partially overlap"
-#~ msgstr "částečné - bloky kompenzace pohybu se pouze částečně překrývají"
-
-#~ msgid "full - Motion compensation blocks fully overlap"
-#~ msgstr "plné - bloky kompenzace pohybu se úplně překrývají"
-
-#~ msgid "Motion Vector precision"
-#~ msgstr "Přesnost vektoru pohybu"
-
-#~ msgid "Motion Vector precision in pels"
-#~ msgstr "Přesnost vektoru pohybu (v jednotce pels)"
-
-#~ msgid "Three component motion estimation"
-#~ msgstr "Troj-složkové odhadování pohybu"
-
-#~ msgid "Use chroma as part of the motion estimation process"
-#~ msgstr "Použít barevnou sytost jako součást při odhadování pohybu"
-
-#~ msgid "Intra picture DWT filter"
-#~ msgstr "Filtr DWT intra obrázků"
-
-#~ msgid "Inter picture DWT filter"
-#~ msgstr "Filtr DWT inter obrázků"
-
-#~ msgid "Number of DWT iterations"
-#~ msgstr "Počet iterací DWT"
-
-#~ msgid "Also known as DWT levels"
-#~ msgstr "Také znám jako úrovně DWT"
-
-#~ msgid "Enable multiple quantizers"
-#~ msgstr "Povolit více kvantizerů"
-
-#~ msgid "Enable multiple quantizers per subband (one per codeblock)"
-#~ msgstr "Povolit více kvantizerů na jedno subpásmo (jeden na blok kódu)"
-
-#~ msgid "Disable arithmetic coding"
-#~ msgstr "Zakázat aritmetické kódování"
-
-#~ msgid "Use variable length codes instead, useful for very high bitrates"
-#~ msgstr ""
-#~ "Použít místo toho kódy s proměnnou délkou, užitečné pro velmi vysoké "
-#~ "datové toky"
-
-#~ msgid "perceptual weighting method"
-#~ msgstr "Metoda percepčního vážení"
-
-#~ msgid "perceptual distance"
-#~ msgstr "Perceptuální vzdálenost"
-
-#~ msgid "perceptual distance to calculate perceptual weight"
-#~ msgstr "Percepční vzdálenost pro výpočet percepční váhy"
-
-#~ msgid "Horizontal slices per frame"
-#~ msgstr "Horizontální pruhy na snímek"
-
-#~ msgid "Number of horizontal slices per frame in low delay mode"
-#~ msgstr "Počet horizontálních pruhů na snímek s malým zpožděním"
-
-#~ msgid "Vertical slices per frame"
-#~ msgstr "Vertikální pruhy na snímek"
-
-#~ msgid "Number of vertical slices per frame in low delay mode"
-#~ msgstr "Počet vertikálních pruhů na snímek s malým zpožděním"
-
-#~ msgid "Size of code blocks in each subband"
-#~ msgstr "velikost kódových bloků na každé podpásmo"
-
-#~ msgid "small - use small code blocks"
-#~ msgstr "malé - použít malé bloky kódu"
-
-#~ msgid "medium - use medium sized code blocks"
-#~ msgstr "střední - použít středně velké bloky kódu"
-
-#~ msgid "large - use large code blocks"
-#~ msgstr "velké - použít velké bloky kódu"
-
-#~ msgid "full - One code block per subband"
-#~ msgstr "plné - Jeden kódový block na podpásmo"
-
-#~ msgid "Enable hierarchical Motion Estimation"
-#~ msgstr "Povolit hierarchické odhadování pohybu"
-
-#~ msgid "Number of levels of downsampling"
-#~ msgstr "Počet úrovní převzorkování níž"
-
-#~ msgid ""
-#~ "Number of levels of downsampling in hierarchical motion estimation mode"
-#~ msgstr ""
-#~ "Počet úrovní převzorkování níž v režimu hierarchického odhadování pohybu"
-
-#~ msgid "Enable Global Motion Estimation"
-#~ msgstr "Povolit všeobecné odhadování pohybu"
-
-#~ msgid "Enable Phase Correlation Estimation"
-#~ msgstr "Povolit odhadování korelace fáze"
-
-#~ msgid "Enable Scene Change Detection"
-#~ msgstr "Povolit detekci změny scény"
-
-#~ msgid "Force Profile"
-#~ msgstr "Vynutit profil"
-
-#~ msgid "VC2 Low Delay Profile"
-#~ msgstr "Profil nízkého zpoždění VC2"
-
-#~ msgid "VC2 Simple Profile"
-#~ msgstr "Jednoduchý profil VC2"
-
-#~ msgid "VC2 Main Profile"
-#~ msgstr "Hlavní profil VC2"
-
-#~ msgid "Main Profile"
-#~ msgstr "Hlavní profil"
-
-#~ msgid "Dirac video decoder using libschroedinger"
-#~ msgstr "Dekóder videa Dirac použitím libschroedinger"
-
-#~ msgid "Dirac video encoder using libschroedinger"
-#~ msgstr "Kóder videa Dirac použitím libschroedinger"
-
-#~ msgid "Key: "
-#~ msgstr "Klávesa: "
