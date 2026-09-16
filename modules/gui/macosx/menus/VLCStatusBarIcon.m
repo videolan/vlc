@@ -28,6 +28,7 @@
 #import "main/VLCMain.h"
 #import "playqueue/VLCPlayQueueController.h"
 #import "playqueue/VLCPlayerController.h"
+#import "library/VLCLibraryImageCache.h"
 #import "library/VLCInputItem.h"
 #import "windows/VLCDetachedAudioWindow.h"
 
@@ -344,7 +345,7 @@
     [self updateCachedURLOfCurrentMedia:inputItem];
 
     if (inputItem) {
-        coverArtImage = [[NSImage alloc] initWithContentsOfURL:inputItem.artworkURL];
+        coverArtImage = NSImage.VLCNoArtImage;
         title = inputItem.title;
         nowPlaying = inputItem.nowPlaying;
         artist = inputItem.artist;
@@ -367,6 +368,20 @@
 
     // Set the metadata in the UI
     [self setMetadataTitle:title artist:artist album:album andCover:coverArtImage];
+
+    if (inputItem) {
+        __weak typeof(self) weakSelf = self;
+        [VLCLibraryImageCache thumbnailForInputItem:inputItem
+                                     withCompletion:^(NSImage * const thumbnail) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                VLCStatusBarIcon * const strongSelf = weakSelf;
+                if (!strongSelf || inputItem != playerController.currentMedia) {
+                    return;
+                }
+                strongSelf->coverImageView.image = thumbnail ?: NSImage.VLCNoArtImage;
+            });
+        }];
+    }
 }
 
 // Update dynamic copy/open menu item status

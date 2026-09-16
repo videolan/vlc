@@ -22,12 +22,14 @@
  *****************************************************************************/
 
 #import <MediaPlayer/MediaPlayer.h>
+#import "extensions/NSImage+VLCAdditions.h"
 
 #import "VLCRemoteControlService.h"
 #import "main/VLCMain.h"
 #import "main/CompatibilityFixes.h"
 #import "playqueue/VLCPlayQueueController.h"
 #import "playqueue/VLCPlayerController.h"
+#import "library/VLCLibraryImageCache.h"
 #import "library/VLCInputItem.h"
 #import "extensions/NSString+Helpers.h"
 
@@ -164,7 +166,7 @@ static inline NSArray * RemoteCommandCenterCommandsToHandle()
 
     NSURL * const artworkURL = inputItem.artworkURL;
     if (artworkURL) {
-        NSImage * const coverArtImage = [[NSImage alloc] initWithContentsOfURL:artworkURL];
+        NSImage * const coverArtImage = NSImage.VLCNoArtImage;
         if (coverArtImage) {
             MPMediaItemArtwork * const mpartwork = [[MPMediaItemArtwork alloc] initWithBoundsSize:coverArtImage.size
                                                                                    requestHandler:^NSImage* _Nonnull(CGSize __unused size) {
@@ -175,6 +177,28 @@ static inline NSArray * RemoteCommandCenterCommandsToHandle()
     }
 
     [MPNowPlayingInfoCenter defaultCenter].nowPlayingInfo = currentlyPlayingTrackInfo;
+
+    if (artworkURL) {
+        __weak typeof(self) weakSelf = self;
+        [VLCLibraryImageCache thumbnailForInputItem:inputItem
+                                     withCompletion:^(NSImage * const coverArtImage) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                VLCRemoteControlService * const strongSelf = weakSelf;
+                if (!strongSelf || inputItem != strongSelf->_playerController.currentMedia) {
+                    return;
+                }
+
+                MPMediaItemArtwork * const mpartwork = [[MPMediaItemArtwork alloc] initWithBoundsSize:coverArtImage.size
+                                                                                       requestHandler:^NSImage* _Nonnull(CGSize __unused size) {
+                    return coverArtImage;
+                }];
+                MPNowPlayingInfoCenter * const nowPlayingInfoCenter = MPNowPlayingInfoCenter.defaultCenter;
+                NSMutableDictionary * const updatedTrackInfo = [nowPlayingInfoCenter.nowPlayingInfo mutableCopy];
+                updatedTrackInfo[MPMediaItemPropertyArtwork] = mpartwork;
+                nowPlayingInfoCenter.nowPlayingInfo = updatedTrackInfo;
+            });
+        }];
+    }
 }
 
 - (void)setTimeInformationForDictionary:(NSMutableDictionary *)dictionary
