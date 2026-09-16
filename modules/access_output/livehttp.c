@@ -339,7 +339,7 @@ static int CryptSetup( sout_access_out_t *p_access, char *key_file )
                                          GCRY_CIPHER_MODE_CBC, 0 );
     if( err )
     {
-        msg_Err( p_access, "Opening AES Cipher failed: %s", gpg_strerror(err));
+        msg_Err( p_access, "Opening AES Cipher failed: %s", gcry_strerror(err));
         free( keyfile );
         return VLC_EGENERIC;
     }
@@ -368,7 +368,7 @@ static int CryptSetup( sout_access_out_t *p_access, char *key_file )
     err = gcry_cipher_setkey( p_sys->aes_ctx, key, 16 );
     if(err)
     {
-        msg_Err(p_access, "Setting AES key failed: %s", gpg_strerror(err));
+        msg_Err(p_access, "Setting AES key failed: %s", gcry_strerror(err));
         gcry_cipher_close( p_sys->aes_ctx );
         return VLC_EGENERIC;
     }
@@ -465,7 +465,7 @@ static int CryptKey( sout_access_out_t *p_access, uint32_t i_segment )
                                           p_sys->aes_ivs, 16);
     if( err )
     {
-        msg_Err(p_access, "Setting AES IVs failed: %s", gpg_strerror(err) );
+        msg_Err(p_access, "Setting AES IVs failed: %s", gcry_strerror(err) );
         gcry_cipher_close( p_sys->aes_ctx);
         return VLC_EGENERIC;
     }
@@ -720,7 +720,7 @@ static void closeCurrentSegment( sout_access_out_t *p_access, sout_access_out_sy
             gcry_error_t err = gcry_cipher_encrypt( p_sys->aes_ctx, p_sys->stuffing_bytes, 16, NULL, 0 );
 
             if( err ) {
-               msg_Err( p_access, "Couldn't encrypt 16 bytes: %s", gpg_strerror(err) );
+               msg_Err( p_access, "Couldn't encrypt 16 bytes: %s", gcry_strerror(err) );
             } else {
 
             int ret = vlc_write( p_sys->i_handle, p_sys->stuffing_bytes, 16 );
@@ -978,7 +978,7 @@ static ssize_t writeSegment( sout_access_out_t *p_access )
                                 output->p_buffer, output->i_buffer, NULL, 0 );
             if( err )
             {
-                msg_Err( p_access, "Encryption failure: %s ", gpg_strerror(err) );
+                msg_Err( p_access, "Encryption failure: %s ", gcry_strerror(err) );
                 return -1;
             }
             encrypted=true;

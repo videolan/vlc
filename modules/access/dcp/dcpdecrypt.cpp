@@ -547,7 +547,7 @@ int RSAKey::readDER( unsigned char const* ps_data_der, size_t length )
         err = gcry_mpi_scan( key_params + i, GCRYMPI_FMT_USG, ps_data_der, tag_inf.length, NULL );
         if( err )
         {
-            msg_Err( this->p_demux, "error scanning RSA parameter %d: %s", i, gpg_strerror( err ) );
+            msg_Err( this->p_demux, "error scanning RSA parameter %d: %s", i, gcry_strerror( err ) );
             goto error;
         }
         ps_data_der += tag_inf.length;
@@ -570,7 +570,7 @@ int RSAKey::readDER( unsigned char const* ps_data_der, size_t length )
                          key_params[3], key_params[4], key_params[7] );
     if( err )
     {
-        msg_Err( this->p_demux, "error building S-expression: %s", gpg_strerror( err ) );
+        msg_Err( this->p_demux, "error building S-expression: %s", gcry_strerror( err ) );
         goto error;
     }
 
