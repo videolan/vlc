@@ -194,11 +194,11 @@ if host_system == 'darwin' and skins2_feasible
     }
 endif
 
-if skins2_enabled
+if skins2_feasible
     if host_system == 'windows'
         skinsdatadir_path = prefix_path / 'skins'
     else
-        skinsdatadir_path = prefix_path / get_option('datadir')
+        skinsdatadir_path = pkgdatadir_path / 'skins2'
     endif
 
     install_data('../../../share/skins2/fonts/FreeSans.ttf',     install_dir: skinsdatadir_path / 'fonts')
