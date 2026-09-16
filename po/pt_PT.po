@@ -1,5 +1,5 @@
 # Portuguese translation
-# Copyright (C) 2025 VideoLAN
+# Copyright (C) 2026 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -26,22 +26,24 @@
 # Sérgio Marques <smarquespt@gmail.com>, 2019
 # Rui <xymarior@yandex.com>, 2019
 # Michel Morais <michel@mmspot.org>, 2021
-# Hugo Carvalho <hugokarvalho@hotmail.com>, 2022-2025
-# lecalam, 2023
+# Hugo Carvalho <hugokarvalho@hotmail.com>, 2022-2026
+# lecalam, 2023,2025
 # Manuela Silva <mmsrs@sky.com>, 2023-2025
+# Gonçalo Matos, 2017
+# Michał Trzebiatowski <michtrz@gmail.com>, 2018
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22-rc1\n"
+"Project-Id-Version: vlc 3.0.24-beta1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2026-06-28 16:08+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
-"Last-Translator: Hugo Carvalho <hugokarvalho@hotmail.com>, 2025\n"
+"Last-Translator: Hugo Carvalho <hugokarvalho@hotmail.com>, 2026\n"
 "Language-Team: Portuguese (Portugal) (https://app.transifex.com/yaron/teams/"
 "16553/pt_PT/)\n"
-"Language: pt_PT\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: pt_PT\n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % "
 "1000000 == 0 ? 1 : 2;\n"
 
@@ -1100,24 +1102,20 @@ msgid "Decoded format"
 msgstr "Formato descodificado"
 
 #: src/input/es_out.c:3207
-#, fuzzy
 msgid "Decoded channels"
-msgstr "Canais de áudio"
+msgstr "Canais descodificados"
 
 #: src/input/es_out.c:3212
-#, fuzzy
 msgid "Decoded sample rate"
-msgstr "Taxa de amostragem de áudio"
+msgstr "taxa de amostragem descodificada"
 
 #: src/input/es_out.c:3219
-#, fuzzy
 msgid "Decoded bits per sample"
-msgstr "Bits de áudio por amostra"
+msgstr "Bits descodificados por amostra"
 
 #: src/input/es_out.c:3224
-#, fuzzy
 msgid "Decoded Bitrate"
-msgstr "Formato descodificado"
+msgstr "Taxa de bits descodificada"
 
 #: src/input/es_out.c:3237
 msgid "Track replay gain"
@@ -8284,9 +8282,8 @@ msgid "Bitmask"
 msgstr "Máscara de bits"
 
 #: modules/access/rist.c:313
-#, fuzzy
 msgid "Virtual Destination Port Filter"
-msgstr "Ficheiro de destino:"
+msgstr ""
 
 #: modules/access/rist.c:315
 msgid ""
@@ -8307,14 +8304,10 @@ msgid "RIST demux/decode maximum jitter (default is 5ms)"
 msgstr "Desvio máximo de desmultiplexagem/descodificação RIST (o padrão é 5ms)"
 
 #: modules/access/rist.c:328
-#, fuzzy
 msgid ""
 "This controls the maximum jitter that will be passed to the demux/decode "
 "chain. The lower the value, the more CPU cycles the module will consume"
 msgstr ""
-"Controla o jitter máximo que será passado para a cadeia de desmultiplexagem/"
-"descodificação. Quanto mais baixo for o valor, mais ciclos de CPU o "
-"algoritmo consumirá"
 
 #: modules/access/rist.c:332
 msgid "RIST nack type, 0 = range, 1 = bitmask. Default is range"
@@ -8607,9 +8600,8 @@ msgid "SFTP port number to use on the server"
 msgstr "O número da porta SFTP a utilizar no servidor"
 
 #: modules/access/sftp.c:61
-#, fuzzy
 msgid "Private key file"
-msgstr "Ficheiro da chave AES"
+msgstr ""
 
 #: modules/access/sftp.c:62
 msgid ""
@@ -8766,9 +8758,8 @@ msgid "Password for stream encryption"
 msgstr "Palavra-passe para a encriptação de transmissão"
 
 #: modules/access/srt.c:566
-#, fuzzy
 msgid "SRT Stream ID"
-msgstr "ID de transmissão SRT"
+msgstr ""
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -9642,18 +9633,16 @@ msgid "Source port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:272
-#, fuzzy
 msgid "Virtual Destination Port"
-msgstr "Destino da transmissão"
+msgstr ""
 
 #: modules/access_output/rist.c:274
 msgid "Destination port to be used inside the reduced-mode of the main profile"
 msgstr ""
 
 #: modules/access_output/rist.c:281
-#, fuzzy
 msgid "Multipeer mode"
-msgstr "Multiplexador"
+msgstr ""
 
 #: modules/access_output/rist.c:283
 msgid ""
@@ -9662,23 +9651,20 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Duplicate"
-msgstr "Aplicação"
+msgstr ""
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Load balanced"
-msgstr "Balanço vermelho"
+msgstr ""
 
 #: modules/access_output/rist.c:294
 msgid "RIST stream output"
 msgstr "Saída de transmissão RIST"
 
 #: modules/access_output/rist.c:299
-#, fuzzy
 msgid "RIST target payload size (bytes)"
-msgstr "Tamanho do pacote de destino RIST (bytes)"
+msgstr ""
 
 #: modules/access_output/shout.c:64
 #: modules/gui/qt/components/sout/sout_widgets.cpp:438
@@ -13032,7 +13018,6 @@ msgstr "Descodificador do texto das legendas"
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -13478,7 +13463,6 @@ msgid "CABAC"
 msgstr "CABAC"
 
 #: modules/codec/x264.c:133
-#, fuzzy
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -15355,11 +15339,11 @@ msgstr "Descarregador de ficheiros"
 
 #: modules/demux/dirac.c:41
 msgid "Value to adjust dts by"
-msgstr "Valor para ajustar o dts"
+msgstr ""
 
 #: modules/demux/dirac.c:54
 msgid "Dirac video demuxer"
-msgstr "Desmultiplexador de vídeo Dirac"
+msgstr ""
 
 #: modules/demux/directory.c:94
 msgid "Directory import"
@@ -20168,40 +20152,36 @@ msgstr ""
 "Tecla Delete para remover."
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1405
-#, fuzzy
 msgid "Global Hotkey change"
-msgstr "Mudar tecla de atalho"
+msgstr "Alteração global das teclas de atalho"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1406
 msgid "Hotkey change"
 msgstr "Mudar tecla de atalho"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1410
-#, fuzzy
 msgid "Press the new key or combination for <b>%1</b>"
-msgstr "Pressione a nova tecla ou combinação para "
+msgstr "Prima a nova tecla ou combinação para <b>%1</b>"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1419
 msgid "Assign"
 msgstr "Atribuir"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1455
-#, fuzzy
 msgid "Warning: this key or combination is already assigned to \"<b>%1</b>\""
-msgstr "Aviso: esta tecla ou combinação de teclas já está atribuída a "
+msgstr "Aviso: esta tecla ou combinação já está atribuída a \"<b>%1</b>\""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1467
 msgid "Warning: <b>%1</b> is already an application menu shortcut"
 msgstr "Aviso: <b>%1</b> já é um atalho de menu da aplicação"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1490
-#, fuzzy
 msgid "Key or combination: <b>%1</b>"
-msgstr "Tecla ou combinação: "
+msgstr "Tecla ou combinação: <b>%1</b>"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1498
 msgid "Key: <b>%1</b>"
-msgstr ""
+msgstr "Tecla: <b>%1</b>"
 
 #: modules/gui/qt/components/simple_preferences.cpp:256
 #: modules/gui/qt/components/simple_preferences.cpp:636
@@ -20365,26 +20345,20 @@ msgstr ""
 "*.webm)"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:184
-#, fuzzy
 msgid "This module outputs the stream using the RIST protocol (TR06)."
 msgstr ""
-"Este módulo encaminha a transmissão transcodificada para uma rede, através "
-"do protocolo mms."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:186
-#, fuzzy
 msgid "Destination Address"
-msgstr "Prefixo do destino"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:191
-#, fuzzy
 msgid "Destination Port"
-msgstr "Destino"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:201
-#, fuzzy
 msgid "Stream Name"
-msgstr "Nome da transmissão"
+msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:237
 msgid "This module outputs the transcoded stream to a network via HTTP."
@@ -23914,7 +23888,7 @@ msgstr "Copiar empacotador"
 
 #: modules/packetizer/dirac.c:87
 msgid "Dirac packetizer"
-msgstr "Empacotador Dirac"
+msgstr ""
 
 #: modules/packetizer/dts.c:47
 msgid "DTS audio packetizer"
@@ -30007,384 +29981,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Lista do gestor multimédia"
-
-#~ msgid "RIST maximum packet size (bytes)"
-#~ msgstr "Tamanho máximo dos pacotes RIST (bytes)"
-
-#~ msgid "RIST latency (ms)"
-#~ msgstr "Latência RIST (ms)"
-
-#~ msgid "RIST nack retry interval (ms)"
-#~ msgstr "RIST nack intervalo entre tentativas (ms)"
-
-#~ msgid "RIST reorder buffer (ms)"
-#~ msgstr "Memória intermédia de reordenação RIST (ms)"
-
-#~ msgid "RIST maximum retry count"
-#~ msgstr "RIST número máximo de tentativas"
-
-#~ msgid "Disable NACK output packets"
-#~ msgstr "Desligar pacotes de saida NACK"
-
-#~ msgid "Use this to disable packet recovery"
-#~ msgstr "Usar isto para desligar recuperação de pacotes"
-
-#~ msgid "Do not check for a valid rtcp message from the encoder"
-#~ msgstr "Não verificar mensagem rtcp do codificador"
-
-#~ msgid ""
-#~ "Send nack messages even when we have not confirmed that the encoder is on "
-#~ "our local network."
-#~ msgstr ""
-#~ "Enviar mensagens NACK mesmo quando não foi verificado que o codificador "
-#~ "se encontra na rede local."
-
-#~ msgid "16 bytes"
-#~ msgstr "16 bytes"
-
-#~ msgid "24 bytes"
-#~ msgstr "24 bytes"
-
-#~ msgid "32 bytes"
-#~ msgstr "32 bytes"
-
-#~ msgid "RIST data output caching size (ms)"
-#~ msgstr "Tamanho da cache de saída de dados RIST (ms)"
-
-#~ msgid ""
-#~ "Having this cache will guarantee that the packets going out are delivered "
-#~ "at a spacing determined by the chain timestamps thus ensuring a near "
-#~ "jitter free output. Be aware that this setting will also add to the "
-#~ "overall latency of the stream."
-#~ msgstr ""
-#~ "Ter esta cache irá garantir que os pacotes que saem são entregues com um "
-#~ "espaçamento determinado pelos registos de tempo da cadeia, assegurando "
-#~ "assim uma saída quase sem jitter. Esteja ciente de que essa configuração "
-#~ "também aumentará a latência geral da transmissão."
-
-#~ msgid "RIST retry-buffer queue size (ms)"
-#~ msgstr "Tamanho da fila de espera do tampão de repetição RIST (ms)"
-
-#~ msgid ""
-#~ "This must match the buffer size (latency) configured on the server side. "
-#~ "If you are not sure, leave the default of 0 which will set it the maximum "
-#~ "value and will use about 100MB of RAM"
-#~ msgstr ""
-#~ "Este valor deve corresponder ao tamanho do buffer (latência) configurado "
-#~ "no lado do servidor. Se não tiver a certeza, deixe o padrão de 0, que o "
-#~ "colocará no valor máximo e utilizará cerca de 100 MB de RAM"
-
-#~ msgid "SSRC used in RTP output (default is random, i.e. 0)"
-#~ msgstr "SSRC utilizado na saída RTP (o padrão é aleatório, ou seja, 0)"
-
-#~ msgid ""
-#~ "Use this setting to specify a known SSRC for the RTP header. This is only "
-#~ "useful if your receiver acts on it. When using VLC as receiver, it is not."
-#~ msgstr ""
-#~ "Utilize esta definição para especificar um SSRC conhecido para o "
-#~ "cabeçalho RTP. Isto só é útil se o seu recetor o ativar. Quando se usa o "
-#~ "VLC como recetor, isso não acontece."
-
-#~ msgid ""
-#~ "This Stream name will be sent to the receiver using the rist RTCP channel"
-#~ msgstr ""
-#~ "Este nome da transmissão será enviado ao recetor utilizando o canal RTCP "
-#~ "rist"
-
-#~ msgid "4:2:0"
-#~ msgstr "4:2:0"
-
-#~ msgid "4:2:2"
-#~ msgstr "4:2:2"
-
-#~ msgid "4:4:4"
-#~ msgstr "4:4:4"
-
-#~ msgid "Rate control method"
-#~ msgstr "Método de controlo da taxa"
-
-#~ msgid "Method used to encode the video sequence"
-#~ msgstr "Método usado para codificar a sequência de vídeo"
-
-#~ msgid "Constant noise threshold mode"
-#~ msgstr "Modo de limite constante de ruído"
-
-#~ msgid "Constant bitrate mode (CBR)"
-#~ msgstr "Modo de taxa de dados constante (CBR)"
-
-#~ msgid "Low Delay mode"
-#~ msgstr "Modo de atraso curto"
-
-#~ msgid "Lossless mode"
-#~ msgstr "Modo sem perdas"
-
-#~ msgid "Constant lambda mode"
-#~ msgstr "Modo lambda constante"
-
-#~ msgid "Constant error mode"
-#~ msgstr "Modo de erro constante"
-
-#~ msgid "Constant quality mode"
-#~ msgstr "Modo de qualidade constante"
-
-#~ msgid "GOP structure"
-#~ msgstr "Estrutura GOP"
-
-#~ msgid "GOP structure used to encode the video sequence"
-#~ msgstr "Estrutura GOP usada para codificar a sequência de vídeo"
-
-#~ msgid ""
-#~ "No fixed gop structure. A picture can be intra or inter and refer to "
-#~ "previous or future pictures."
-#~ msgstr ""
-#~ "Sem estrutura gop fixa. Uma imagem pode ser intra ou inter, e se referir "
-#~ "a imagens anteriores ou futuras."
-
-#~ msgid "I-frame only sequence"
-#~ msgstr "Sequência de apenas fotogramas I"
-
-#~ msgid "Inter pictures refere to previous pictures only"
-#~ msgstr "Imagens inter se referem apenas a imagens anteriores"
-
-#~ msgid "Inter pictures can refer to previous or future pictures"
-#~ msgstr "Imagens inter podem se referir a imagens anteriores ou futuras"
-
-#~ msgid "Constant quality factor"
-#~ msgstr "Fator constante de qualidade"
-
-#~ msgid "Quality factor to use in constant quality mode"
-#~ msgstr "Fator de qualidade a ser usado no modo de qualidade constante"
-
-#~ msgid "Noise Threshold"
-#~ msgstr "Limite de ruído"
-
-#~ msgid "Noise threshold to use in constant noise threshold mode"
-#~ msgstr "Limiar de ruído a ser usado no modo de limiar de ruído constante"
-
-#~ msgid "CBR bitrate (kbps)"
-#~ msgstr "Taxa de dados CBR (kbps)"
-
-#~ msgid "Target bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr "A taxa de dados de destino ao codificar através da tecnologia CBR"
-
-#~ msgid "Maximum bitrate (kbps)"
-#~ msgstr "Taxa de dados máxima (kbps)"
-
-#~ msgid "Maximum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "A taxa de bits máxima em kbps ao codificar no modo de taxa de bits "
-#~ "constante (CBR)"
-
-#~ msgid "Minimum bitrate (kbps)"
-#~ msgstr "Taxa de dados mínima (kbps)"
-
-#~ msgid "Minimum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "A taxa de dados mínima de destino ao codificar através da tecnologia CBR"
-
-#~ msgid "GOP length"
-#~ msgstr "Duração GOP"
-
-#~ msgid ""
-#~ "Number of pictures between successive sequence headers i.e. length of the "
-#~ "group of pictures"
-#~ msgstr ""
-#~ "Número de imagens entre cabeçalhos de sequência sucessivos. I.e., "
-#~ "comprimento do grupo de imagens"
-
-#~ msgid "Prefilter"
-#~ msgstr "Pré-filtro"
-
-#~ msgid "Enable adaptive prefiltering"
-#~ msgstr "Ativar pré-filtro adaptativo"
-
-#~ msgid "No pre-filtering"
-#~ msgstr "Sem pré-filtro"
-
-#~ msgid "Centre Weighted Median"
-#~ msgstr "Mediana"
-
-#~ msgid "Gaussian Low Pass Filter"
-#~ msgstr "Filtro gaussiano de passagem baixa"
-
-#~ msgid "Add Noise"
-#~ msgstr "Adicionar ruído"
-
-#~ msgid "Gaussian Adaptive Low Pass Filter"
-#~ msgstr "Filtro gaussiano adaptativo de passagem baixa"
-
-#~ msgid "Low Pass Filter"
-#~ msgstr "Filtro de passagem baixa"
-
-#~ msgid "Amount of prefiltering"
-#~ msgstr "Quantidade de pré-filtragem"
-
-#~ msgid "Higher value implies more prefiltering"
-#~ msgstr "Os valores mais altos implicam mais pré-filtragem"
-
-#~ msgid "Picture coding mode"
-#~ msgstr "Modo de codificação de imagem"
-
-#~ msgid ""
-#~ "Field coding is where interlaced fields are coded separately as opposed "
-#~ "to a pseudo-progressive frame"
-#~ msgstr ""
-#~ "A codificação de campo é quando os campos entrelaçados são codificados "
-#~ "separadamente, ao contrário de um fotograma pseudo-progressivo"
-
-#~ msgid "auto - let encoder decide based upon input (Best)"
-#~ msgstr ""
-#~ "automático - deixa o codificador decidir baseado na entrada (melhor)"
-
-#~ msgid "force coding frame as single picture"
-#~ msgstr "força a codificação do fotograma como uma imagem única"
-
-#~ msgid "force coding frame as separate interlaced fields"
-#~ msgstr "força a codificação do fotograma como campos entrelaçados separados"
-
-#~ msgid "Size of motion compensation blocks"
-#~ msgstr "Tamanho dos blocos de compensação de movimento"
-
-#~ msgid "automatic - let encoder decide based upon input (Best)"
-#~ msgstr ""
-#~ "automático - deixa o codificador decidir baseado na entrada (melhor)"
-
-#~ msgid "small - use small motion compensation blocks"
-#~ msgstr "pequeno - usa pequenos blocos de compensação de movimento"
-
-#~ msgid "medium - use medium motion compensation blocks"
-#~ msgstr "médio - usa blocos médios de compensação de movimento"
-
-#~ msgid "large - use large motion compensation blocks"
-#~ msgstr "grande - usa grandes blocos de compensação de movimento"
-
-#~ msgid "Overlap of motion compensation blocks"
-#~ msgstr "Sobreposição dos blocos de compensação de movimento"
-
-#~ msgid "none - Motion compensation blocks do not overlap"
-#~ msgstr "nenhum - os blocos de compensação de movimento não se sobrepõem"
-
-#~ msgid "partial - Motion compensation blocks only partially overlap"
-#~ msgstr "parcial - Blocos de compensação de movimento apenas parcialmente"
-
-#~ msgid "full - Motion compensation blocks fully overlap"
-#~ msgstr "total - os blocos de compensação de movimento se sobrepõem-se"
-
-#~ msgid "Motion Vector precision"
-#~ msgstr "Precisão do vetor de movimento"
-
-#~ msgid "Motion Vector precision in pels"
-#~ msgstr "Precisão do vetor de movimentos em pels"
-
-#~ msgid "Three component motion estimation"
-#~ msgstr "Componente de árvore de estimativa de movimento"
-
-#~ msgid "Use chroma as part of the motion estimation process"
-#~ msgstr "Usar croma como parte do processo de estimativa de movimento"
-
-#~ msgid "Intra picture DWT filter"
-#~ msgstr "Filtro DWT entre imagens"
-
-#~ msgid "Inter picture DWT filter"
-#~ msgstr "Filtro DWT entre imagens"
-
-#~ msgid "Number of DWT iterations"
-#~ msgstr "Número de iterações do DWT"
-
-#~ msgid "Also known as DWT levels"
-#~ msgstr "Também conhecido como níveis DWT"
-
-#~ msgid "Enable multiple quantizers"
-#~ msgstr "Ativar múltiplos quantizadores"
-
-#~ msgid "Enable multiple quantizers per subband (one per codeblock)"
-#~ msgstr ""
-#~ "Ativa múltiplos quantizadores por sub-banda (um por bloco de código)"
-
-#~ msgid "Disable arithmetic coding"
-#~ msgstr "Desativar codificação aritmética"
-
-#~ msgid "Use variable length codes instead, useful for very high bitrates"
-#~ msgstr ""
-#~ "Usar códigos de comprimento variável. Útil para taxas de bits muito altas"
-
-#~ msgid "perceptual weighting method"
-#~ msgstr "método de ponderação percetual"
-
-#~ msgid "perceptual distance"
-#~ msgstr "distância percetual"
-
-#~ msgid "perceptual distance to calculate perceptual weight"
-#~ msgstr "distância percetível para calcular o peso percetível"
-
-#~ msgid "Horizontal slices per frame"
-#~ msgstr "Pedaços horizontais por fotograma"
-
-#~ msgid "Number of horizontal slices per frame in low delay mode"
-#~ msgstr "Número de partes horizontais por fotograma no modo de atraso baixo"
-
-#~ msgid "Vertical slices per frame"
-#~ msgstr "Pedaços verticais por fotograma"
-
-#~ msgid "Number of vertical slices per frame in low delay mode"
-#~ msgstr "Número de partes verticais por fotograma no modo atraso baixo"
-
-#~ msgid "Size of code blocks in each subband"
-#~ msgstr "Tamanho dos blocos de código em cada sub-banda"
-
-#~ msgid "small - use small code blocks"
-#~ msgstr "pequeno - usa pequenos blocos de código"
-
-#~ msgid "medium - use medium sized code blocks"
-#~ msgstr "médio - usa blocos de código de tamanho médio"
-
-#~ msgid "large - use large code blocks"
-#~ msgstr "grande - usa grandes blocos de código"
-
-#~ msgid "full - One code block per subband"
-#~ msgstr "completo - Um bloco de código por sub-banda"
-
-#~ msgid "Enable hierarchical Motion Estimation"
-#~ msgstr "Ativar estimativa de movimento hierárquica"
-
-#~ msgid "Number of levels of downsampling"
-#~ msgstr "Número de níveis de redução de amostragem"
-
-#~ msgid ""
-#~ "Number of levels of downsampling in hierarchical motion estimation mode"
-#~ msgstr ""
-#~ "Número de níveis de redução de taxa de dados no modo de estimação "
-#~ "hierárquica de movimento"
-
-#~ msgid "Enable Global Motion Estimation"
-#~ msgstr "Ativar estimativa de movimento global"
-
-#~ msgid "Enable Phase Correlation Estimation"
-#~ msgstr "Ativar estimativa de correlação de fase"
-
-#~ msgid "Enable Scene Change Detection"
-#~ msgstr "Ativar deteção de alteração de cena"
-
-#~ msgid "Force Profile"
-#~ msgstr "Forçar perfil"
-
-#~ msgid "VC2 Low Delay Profile"
-#~ msgstr "Perfil de atraso curto VC2"
-
-#~ msgid "VC2 Simple Profile"
-#~ msgstr "Perfil simplificado do VC2"
-
-#~ msgid "VC2 Main Profile"
-#~ msgstr "Perfil principal do VC2"
-
-#~ msgid "Main Profile"
-#~ msgstr "Perfil principal"
-
-#~ msgid "Dirac video decoder using libschroedinger"
-#~ msgstr "Descodificador de vídeo Dirac, usando a biblioteca libschroedinger"
-
-#~ msgid "Dirac video encoder using libschroedinger"
-#~ msgstr "Codificador de vídeo Dirac, usando a biblioteca libschroedinger"
-
-#~ msgid "Key: "
-#~ msgstr "Tecla: "
