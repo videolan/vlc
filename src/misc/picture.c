@@ -217,7 +217,8 @@ static picture_priv_t *picture_NewPrivate(const video_format_t *restrict p_fmt)
 
 picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_resource_t *p_resource )
 {
-    assert(p_resource != NULL);
+    if (unlikely(p_resource == NULL))
+        return picture_NewFromFormat(p_fmt);
 
     picture_priv_t *priv = picture_NewPrivate(p_fmt);
     if (unlikely(priv == NULL))
