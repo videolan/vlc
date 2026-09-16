@@ -1,5 +1,5 @@
 # Turkish translation
-# Copyright (C) 2025 VideoLAN
+# Copyright (C) 2026 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -17,19 +17,20 @@
 # Yaşar TAY <yasartay@yahoo.com>, 2009
 # Hasan Yıldız <hasanyildiz0@yaani.com>, 2021
 # Emin Tufan Çetin <etcetin@gmail.com>, 2023
-# Kaya Zeren <kayazeren@gmail.com>, 2025
+# Kaya Zeren <kayazeren@gmail.com>, 2025-2026
+# Hasan Yıldız <hasan@murena.io>, 2021
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22\n"
+"Project-Id-Version: vlc 3.0.24-beta1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2026-06-28 16:08+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
-"Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2025\n"
+"Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2026\n"
 "Language-Team: Turkish (https://app.transifex.com/yaron/teams/16553/tr/)\n"
-"Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: tr\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: include/vlc_common.h:1055
@@ -8197,15 +8198,16 @@ msgid "Bitmask"
 msgstr "Bit maskesi"
 
 #: modules/access/rist.c:313
-#, fuzzy
 msgid "Virtual Destination Port Filter"
-msgstr "Hedef dosya:"
+msgstr "Sanal hedef bağlantı noktası süzgeci"
 
 #: modules/access/rist.c:315
 msgid ""
 "Destination port to be used inside the reduced-mode of the main profile to "
 "filter incoming data. Use zero to allow all."
 msgstr ""
+"Gelen verileri süzmek için ana profilin azaltılmış kipinde kullanılacak "
+"hedef bağlantı noktası. Herkese izin verilmesi için sıfır kullanın."
 
 #: modules/access/rist.c:321 modules/access_output/rist.c:293
 msgid "RIST"
@@ -8220,13 +8222,12 @@ msgid "RIST demux/decode maximum jitter (default is 5ms)"
 msgstr "En büyük RST tekleme/kod çözme farklılığı (varsayılan 5ms)"
 
 #: modules/access/rist.c:328
-#, fuzzy
 msgid ""
 "This controls the maximum jitter that will be passed to the demux/decode "
 "chain. The lower the value, the more CPU cycles the module will consume"
 msgstr ""
 "Bu seçenek tekleme/kod çözme zincirine aktarılacak en büyük farklılık "
-"değerini belirler. Değer düştükçe algoritma daha fazla işlemci gücü kullanır"
+"değerini belirler. Değer düştükçe modül daha fazla işlemci gücü kullanır"
 
 #: modules/access/rist.c:332
 msgid "RIST nack type, 0 = range, 1 = bitmask. Default is range"
@@ -8512,9 +8513,8 @@ msgid "SFTP port number to use on the server"
 msgstr "Sunucunun kullandığı SFTP bağlantı noktası"
 
 #: modules/access/sftp.c:61
-#, fuzzy
 msgid "Private key file"
-msgstr "AES anahtar dosyası"
+msgstr "Kişisel anahtar dosyası"
 
 #: modules/access/sftp.c:62
 msgid ""
@@ -8522,6 +8522,10 @@ msgid ""
 "assumed to be in the same directory with '.pub' appended. If unset, standard "
 "key paths will be attempted (e.g. '~/.ssh/id_rsa')."
 msgstr ""
+"SSH herkese açık anahtar kimlik doğrulaması ile kullanılacak kişisel anahtar "
+"dosyası. Herkese açık anahtar dosyasının '.pub' uzantısı ile aynı klasörde "
+"olduğu varsayılır. Ayarlanmamışsa, standart anahtar yolları denenir (örnek: "
+"'~/.ssh/id_rsa')."
 
 #: modules/access/sftp.c:68
 msgid "SFTP input"
@@ -8667,9 +8671,8 @@ msgid "Password for stream encryption"
 msgstr "Akış şifreleme parolası"
 
 #: modules/access/srt.c:566
-#, fuzzy
 msgid "SRT Stream ID"
-msgstr " SRT akışı kimliği"
+msgstr "SRT akışı kimliği"
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -9532,48 +9535,45 @@ msgstr "HTTP canlı"
 
 #: modules/access_output/rist.c:268
 msgid "Virtual Source Port"
-msgstr ""
+msgstr "Sanal kaynak bağlantı noktası"
 
 #: modules/access_output/rist.c:270
 msgid "Source port to be used inside the reduced-mode of the main profile"
-msgstr ""
+msgstr "Ana profilin azaltılmış kipinde kullanılacak kaynak bağlantı noktası"
 
 #: modules/access_output/rist.c:272
-#, fuzzy
 msgid "Virtual Destination Port"
-msgstr "Akış hedefi"
+msgstr "Sanal hedef bağlantı noktası"
 
 #: modules/access_output/rist.c:274
 msgid "Destination port to be used inside the reduced-mode of the main profile"
-msgstr ""
+msgstr "Ana profilin azaltılmış kipinde kullanılacak hedef bağlantı noktası"
 
 #: modules/access_output/rist.c:281
-#, fuzzy
 msgid "Multipeer mode"
-msgstr "Çoklayıcı"
+msgstr "Çok eş kipi"
 
 #: modules/access_output/rist.c:283
 msgid ""
 "This allows you to select between duplicate or load balanced modes when "
 "sending data to multiple peers (several network paths)"
 msgstr ""
+"Bu seçenek, birden fazla eşe (birkaç ağ yolu) veri gönderirken yinelenen "
+"veya yük dengeleyen kipler arasında seçim yapmanızı sağlar."
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Duplicate"
-msgstr "Uygulama"
+msgstr "Çoğalt"
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Load balanced"
-msgstr "Kırmızı dengesi"
+msgstr "Yük dengeli"
 
 #: modules/access_output/rist.c:294
 msgid "RIST stream output"
 msgstr "RIST akış çıkışı"
 
 #: modules/access_output/rist.c:299
-#, fuzzy
 msgid "RIST target payload size (bytes)"
 msgstr "RIST hedef paketi boyutu (bayt)"
 
@@ -12906,7 +12906,6 @@ msgstr "Metin alt yazı kod çözücüsü"
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -18313,7 +18312,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:1462
 msgid "Invalid combination"
-msgstr "Kombinasyon geçersiz"
+msgstr "Tuşlar geçersiz"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:1463
 msgid "Regrettably, these keys cannot be assigned as hotkey shortcuts."
@@ -18322,7 +18321,7 @@ msgstr "Ne yazık ki bu tuşlar kısayol olarak atanamaz."
 #: modules/gui/macosx/VLCSimplePrefsController.m:1473
 #: modules/gui/macosx/VLCSimplePrefsController.m:1477
 msgid "This combination is already taken by \"%@\"."
-msgstr "Bu kombinasyon \"%@\" tarafından kullanılıyor."
+msgstr "Bu tuşlar \"%@\" tarafından kullanılıyor."
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:103
 msgid "Toggle Play/Pause"
@@ -20025,40 +20024,36 @@ msgstr ""
 "Silmek için delete tuşuna basın."
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1405
-#, fuzzy
 msgid "Global Hotkey change"
-msgstr "Kısayolu değiştir"
+msgstr "Genel kısayol tuşu değiştirme"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1406
 msgid "Hotkey change"
 msgstr "Kısayolu değiştir"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1410
-#, fuzzy
 msgid "Press the new key or combination for <b>%1</b>"
-msgstr "Şu eylem için yeni kısayol tuşlarına basın"
+msgstr "<b>%1</b> için yeni tuşa ya da tuşlara basın"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1419
 msgid "Assign"
 msgstr "Ata"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1455
-#, fuzzy
 msgid "Warning: this key or combination is already assigned to \"<b>%1</b>\""
-msgstr "Dikkat: bu tuş ya da tuş kombinasyonu zaten şu işleme atanmış"
+msgstr "Uyarı: Bu tuş ya da tuşlar zaten \"<b>%1</b>\" için ayarlanmış"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1467
 msgid "Warning: <b>%1</b> is already an application menu shortcut"
 msgstr "Dikkat: <b>%1</b> zaten bir uygulama menüsü kısayolu"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1490
-#, fuzzy
 msgid "Key or combination: <b>%1</b>"
-msgstr "Tuş ya da kombinasyon:"
+msgstr "Tuş ya da tuşlar: <b>%1</b>"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1498
 msgid "Key: <b>%1</b>"
-msgstr ""
+msgstr "Tuş: <b>%1</b>"
 
 #: modules/gui/qt/components/simple_preferences.cpp:256
 #: modules/gui/qt/components/simple_preferences.cpp:636
@@ -20224,22 +20219,18 @@ msgstr ""
 "*.webm)"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:184
-#, fuzzy
 msgid "This module outputs the stream using the RIST protocol (TR06)."
-msgstr "Bu modül dönüştürülen akışı, mms üzerinden bir ağa gönderir."
+msgstr "Bu modül dönüştürülen akışı, RIST iletişim kuralı (TR06) ile çıkartır."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:186
-#, fuzzy
 msgid "Destination Address"
-msgstr "Dosya ön eki"
+msgstr "Hedef adresi"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:191
-#, fuzzy
 msgid "Destination Port"
-msgstr "Hedef"
+msgstr "Hedef bağlantı noktası"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:201
-#, fuzzy
 msgid "Stream Name"
 msgstr "Akış adı"
 
@@ -29789,385 +29780,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "Ortam yöneticisi listesi"
-
-#~ msgid "RIST maximum packet size (bytes)"
-#~ msgstr "En büyük RIST paketi boyutu (bayt)"
-
-#~ msgid "RIST latency (ms)"
-#~ msgstr "RIST gecikmesi (ms)"
-
-#~ msgid "RIST nack retry interval (ms)"
-#~ msgstr "RIST nack yineleme aralığı (ms)"
-
-#~ msgid "RIST reorder buffer (ms)"
-#~ msgstr "RIST yeniden sıralama ara belleği (ms)"
-
-#~ msgid "RIST maximum retry count"
-#~ msgstr "RIST en fazla yineleme sayısı"
-
-#~ msgid "Disable NACK output packets"
-#~ msgstr "NACK çıkış paketleri kullanılmasın"
-
-#~ msgid "Use this to disable packet recovery"
-#~ msgstr "Paket kurtarmanın kullanılmaması için bunu kullanın"
-
-#~ msgid "Do not check for a valid rtcp message from the encoder"
-#~ msgstr "Kodlayıcıdan geçerli bir RTCP iletisi beklenmesin"
-
-#~ msgid ""
-#~ "Send nack messages even when we have not confirmed that the encoder is on "
-#~ "our local network."
-#~ msgstr ""
-#~ "Kodlayıcının yerel ağda olduğu doğrulanmamış olsa da NACK iletileri "
-#~ "gönderilir."
-
-#~ msgid "16 bytes"
-#~ msgstr "16 bayt"
-
-#~ msgid "24 bytes"
-#~ msgstr "24 bayt"
-
-#~ msgid "32 bytes"
-#~ msgstr "32 bayt"
-
-#~ msgid "RIST data output caching size (ms)"
-#~ msgstr "RIST veri çıktısı ön belleği boyutu (ms)"
-
-#~ msgid ""
-#~ "Having this cache will guarantee that the packets going out are delivered "
-#~ "at a spacing determined by the chain timestamps thus ensuring a near "
-#~ "jitter free output. Be aware that this setting will also add to the "
-#~ "overall latency of the stream."
-#~ msgstr ""
-#~ "Bu ön belleğin kullanılması, dışarı çıkan paketlerin zincir zaman "
-#~ "damgaları tarafından belirlenen bir aralıkta teslim edilmesini garanti "
-#~ "eder ve neredeyse titreşimsiz bir çıktı sağlar. Bu ayarın genel akış "
-#~ "gecikmesini de artıracağını unutmayın."
-
-#~ msgid "RIST retry-buffer queue size (ms)"
-#~ msgstr "RIST yineleme ara belleği kuyruğu boyutu (ms)"
-
-#~ msgid ""
-#~ "This must match the buffer size (latency) configured on the server side. "
-#~ "If you are not sure, leave the default of 0 which will set it the maximum "
-#~ "value and will use about 100MB of RAM"
-#~ msgstr ""
-#~ "Bu değer, sunucu tarafında yapılandırılan ara bellek boyutu (gecikme) ile "
-#~ "eşleşmelidir. Emin değilseniz, varsayılan değeri 0 olarak bırakın. "
-#~ "Böylece, en yüksek değer ayarlanır ve yaklaşık 100MB RAM kullanılır."
-
-#~ msgid "SSRC used in RTP output (default is random, i.e. 0)"
-#~ msgstr "RTP içinde kullanılan SSRC (varsayılan rastgeledir. 0 gibi)"
-
-#~ msgid ""
-#~ "Use this setting to specify a known SSRC for the RTP header. This is only "
-#~ "useful if your receiver acts on it. When using VLC as receiver, it is not."
-#~ msgstr ""
-#~ "RTP üst bilgisi için bilinen bir SSRC değeri belirtmek için bu seçeneği "
-#~ "kullanın. Bu seçenek, yalnızca alıcınız buna göre hareket ediyorsa "
-#~ "kullanışlıdır. VLC alıcı olarak kullanıldığında kullanışlı değildir."
-
-#~ msgid ""
-#~ "This Stream name will be sent to the receiver using the rist RTCP channel"
-#~ msgstr "Bu akış adı, alıcıya RIST RTCP kanalı kullanılarak gönderilir."
-
-#~ msgid "4:2:0"
-#~ msgstr "4:2:0"
-
-#~ msgid "4:2:2"
-#~ msgstr "4:2:2"
-
-#~ msgid "4:4:4"
-#~ msgstr "4:4:4"
-
-#~ msgid "Rate control method"
-#~ msgstr "Hız denetimi yöntemi"
-
-#~ msgid "Method used to encode the video sequence"
-#~ msgstr "Görüntü sıralamasını kodlamak için kullanılacak yöntem "
-
-#~ msgid "Constant noise threshold mode"
-#~ msgstr "Sabit gürültü eşiği kipi"
-
-#~ msgid "Constant bitrate mode (CBR)"
-#~ msgstr "Sabit bit hızı kipi (CBR) "
-
-#~ msgid "Low Delay mode"
-#~ msgstr "Düşük gecikme kipi"
-
-#~ msgid "Lossless mode"
-#~ msgstr "Kayıpsız kip"
-
-#~ msgid "Constant lambda mode"
-#~ msgstr "Sabit lambda kipi "
-
-#~ msgid "Constant error mode"
-#~ msgstr "Sabit hata kipi"
-
-#~ msgid "Constant quality mode"
-#~ msgstr "Sabit kalite kipi"
-
-#~ msgid "GOP structure"
-#~ msgstr "Görsel grubu yapısı"
-
-#~ msgid "GOP structure used to encode the video sequence"
-#~ msgstr ""
-#~ "Görüntü sıralamasını kodlamak için kullanılacak görsel grubu yapısı "
-
-#~ msgid ""
-#~ "No fixed gop structure. A picture can be intra or inter and refer to "
-#~ "previous or future pictures."
-#~ msgstr ""
-#~ "Sabit bir görsel grubu yapısı yok. Bir görüntü iç (intra) ya da ara "
-#~ "(inter) olabilir ve önceki ya da sonraki görüntülere dayanabilir. "
-
-#~ msgid "I-frame only sequence"
-#~ msgstr "Yalnızca I kareleri sıralaması"
-
-#~ msgid "Inter pictures refere to previous pictures only"
-#~ msgstr "Aragörüntüler yalnızca önceki görüntülere dayanır"
-
-#~ msgid "Inter pictures can refer to previous or future pictures"
-#~ msgstr "Aragörüntüler önceki ya da sonraki görüntülere dayanabilir "
-
-#~ msgid "Constant quality factor"
-#~ msgstr "Sabit kalite çarpanı"
-
-#~ msgid "Quality factor to use in constant quality mode"
-#~ msgstr "Sabit kalite kipinde kullanılacak kalite çarpanı "
-
-#~ msgid "Noise Threshold"
-#~ msgstr "Gürültü eşiği"
-
-#~ msgid "Noise threshold to use in constant noise threshold mode"
-#~ msgstr "Sabit gürültü eşiği kipinde kullanılacak gürültü eşiği "
-
-#~ msgid "CBR bitrate (kbps)"
-#~ msgstr "Sabit bit hızı (kb/s)"
-
-#~ msgid "Target bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "kb/s olarak, sabit bit hızı kipinde kodlama yapılırken hedef bit hızı"
-
-#~ msgid "Maximum bitrate (kbps)"
-#~ msgstr "En yüksek bit hızı (kb/s)"
-
-#~ msgid "Maximum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "kb/s olarak, sabit bit hızı kipinde kodlama yapılırken en yüksek bit hızı"
-
-#~ msgid "Minimum bitrate (kbps)"
-#~ msgstr "En düşük bit hızı (kb/s)"
-
-#~ msgid "Minimum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "kb/s olarak, sabit bit hızı kipinde kodlama yapılırken en düşük bit hızı"
-
-#~ msgid "GOP length"
-#~ msgstr "Görsel grubu uzunluğu"
-
-#~ msgid ""
-#~ "Number of pictures between successive sequence headers i.e. length of the "
-#~ "group of pictures"
-#~ msgstr ""
-#~ "Başarılı sıralama üst bilgileri arasındaki görüntü sayısı. Örneğin "
-#~ "görüntü grubunun uzunluğu"
-
-#~ msgid "Prefilter"
-#~ msgstr "Ön süzme"
-
-#~ msgid "Enable adaptive prefiltering"
-#~ msgstr "Açıldığında, uyumlu ön süzme kullanılır"
-
-#~ msgid "No pre-filtering"
-#~ msgstr "Ön süzme yok"
-
-#~ msgid "Centre Weighted Median"
-#~ msgstr "Orta ağırlıklı bölen"
-
-#~ msgid "Gaussian Low Pass Filter"
-#~ msgstr "Alçak geçiren Gauss süzgeci"
-
-#~ msgid "Add Noise"
-#~ msgstr "Gürültü ekleme"
-
-#~ msgid "Gaussian Adaptive Low Pass Filter"
-#~ msgstr "Alçak geçiren uyumlu Gauss süzgeci"
-
-#~ msgid "Low Pass Filter"
-#~ msgstr "Alçak geçiren süzgeç"
-
-#~ msgid "Amount of prefiltering"
-#~ msgstr "Ön süzme miktarı"
-
-#~ msgid "Higher value implies more prefiltering"
-#~ msgstr "Değer yükseldikçe ön süzme artar."
-
-#~ msgid "Picture coding mode"
-#~ msgstr "Görüntü kodlama kipi"
-
-#~ msgid ""
-#~ "Field coding is where interlaced fields are coded separately as opposed "
-#~ "to a pseudo-progressive frame"
-#~ msgstr ""
-#~ "Alan kodlaması, sözde ilerleyen kareye karşı gelen geçişli alanların ayrı "
-#~ "ayrı kodlanmasıdır."
-
-#~ msgid "auto - let encoder decide based upon input (Best)"
-#~ msgstr "otomatik - kodlayıcı girişe göre karar verir (En iyi)"
-
-#~ msgid "force coding frame as single picture"
-#~ msgstr "kodlama karesi tek bir görüntü olarak işlensin"
-
-#~ msgid "force coding frame as separate interlaced fields"
-#~ msgstr "kare kodlaması ayrı ayrı geçişli alanlar olarak işlensin"
-
-#~ msgid "Size of motion compensation blocks"
-#~ msgstr "Hareket dengeleme bloklarının boyutu"
-
-#~ msgid "automatic - let encoder decide based upon input (Best)"
-#~ msgstr "otomatik - kodlayıcı girişe göre karar verir (En iyi)"
-
-#~ msgid "small - use small motion compensation blocks"
-#~ msgstr "küçük - küçük hareket dengeleyici bloklar kullanılır"
-
-#~ msgid "medium - use medium motion compensation blocks"
-#~ msgstr "orta - orta hareket dengeleyici bloklar kullanılır"
-
-#~ msgid "large - use large motion compensation blocks"
-#~ msgstr "büyük - büyük hareket dengeleyici bloklar kullanılır"
-
-#~ msgid "Overlap of motion compensation blocks"
-#~ msgstr "Hareket dengeleme bloklarının örtüşmesi"
-
-#~ msgid "none - Motion compensation blocks do not overlap"
-#~ msgstr "hiç - hareket dengeleyici bloklar örtüşmesin"
-
-#~ msgid "partial - Motion compensation blocks only partially overlap"
-#~ msgstr "kısmen - hareket dengeleyici bloklar yalnızca kısmen örtüşebilir "
-
-#~ msgid "full - Motion compensation blocks fully overlap"
-#~ msgstr "tam - hareket dengeleyici bloklar tamamen örtüşebilir "
-
-#~ msgid "Motion Vector precision"
-#~ msgstr "Hareket vektörü duyarlılığı"
-
-#~ msgid "Motion Vector precision in pels"
-#~ msgstr "Pels olarak, hareket vektörü duyarlılığı"
-
-#~ msgid "Three component motion estimation"
-#~ msgstr "Üç bileşenli hareket kestirimi"
-
-#~ msgid "Use chroma as part of the motion estimation process"
-#~ msgstr ""
-#~ "Renk doygunluğunu da hareket kestirim işleminin bir parçası olarak "
-#~ "kullanılır"
-
-#~ msgid "Intra picture DWT filter"
-#~ msgstr "İç görüntü DWT süzgeci"
-
-#~ msgid "Inter picture DWT filter"
-#~ msgstr "Ara görüntü DWT süzgeci"
-
-#~ msgid "Number of DWT iterations"
-#~ msgstr "DWT iterasyonlarının sayısı"
-
-#~ msgid "Also known as DWT levels"
-#~ msgstr "DWT düzeyleri olarak da bilinir."
-
-#~ msgid "Enable multiple quantizers"
-#~ msgstr "Çoklu kuantalayıcılar kullanılsın"
-
-#~ msgid "Enable multiple quantizers per subband (one per codeblock)"
-#~ msgstr ""
-#~ "Açıldığında, her alt bant için çoklu kuantalayıcılar kullanılır (her kod "
-#~ "bloğu için bir tane)."
-
-#~ msgid "Disable arithmetic coding"
-#~ msgstr "Aritmetik kodlama kapatılsın"
-
-#~ msgid "Use variable length codes instead, useful for very high bitrates"
-#~ msgstr ""
-#~ "Bunun yerine değişken uzunluktaki kodlar kullanılır. Çok yüksek bit "
-#~ "hızlarında kullanışlıdır"
-
-#~ msgid "perceptual weighting method"
-#~ msgstr "algısal ağırlık yöntemi"
-
-#~ msgid "perceptual distance"
-#~ msgstr "algısal uzaklık "
-
-#~ msgid "perceptual distance to calculate perceptual weight"
-#~ msgstr "algısal ağırlığın hesaplanacağı algısal uzaklık "
-
-#~ msgid "Horizontal slices per frame"
-#~ msgstr "Bir karedeki yatay dilim sayısı"
-
-#~ msgid "Number of horizontal slices per frame in low delay mode"
-#~ msgstr "Düşük gecikme kipinde, bir karedeki yatay dilim sayısı"
-
-#~ msgid "Vertical slices per frame"
-#~ msgstr "Bir karedeki dikey dilim sayısı"
-
-#~ msgid "Number of vertical slices per frame in low delay mode"
-#~ msgstr "Düşük gecikme kipinde, bir karedeki dikey dilim sayısı "
-
-#~ msgid "Size of code blocks in each subband"
-#~ msgstr "Her bir alt banttaki kod bloklarının sayısı "
-
-#~ msgid "small - use small code blocks"
-#~ msgstr "küçük - küçük kod blokları kullanılır "
-
-#~ msgid "medium - use medium sized code blocks"
-#~ msgstr "orta - orta kod blokları kullanılır "
-
-#~ msgid "large - use large code blocks"
-#~ msgstr "büyük - büyük kod blokları kullanılır "
-
-#~ msgid "full - One code block per subband"
-#~ msgstr "tam - her bir alt band için bir kod bloğu kullanılır "
-
-#~ msgid "Enable hierarchical Motion Estimation"
-#~ msgstr "Hiyerarşik hareket kestirimi kullanılsın"
-
-#~ msgid "Number of levels of downsampling"
-#~ msgstr "Aşağı örneklenecek düzey sayısı"
-
-#~ msgid ""
-#~ "Number of levels of downsampling in hierarchical motion estimation mode"
-#~ msgstr ""
-#~ "Hiyerarşik hareket kestirimi kipinde aşağı örnekleme yapılacak düzey "
-#~ "sayısı"
-
-#~ msgid "Enable Global Motion Estimation"
-#~ msgstr "Genel hareket kestirimi kullanılsın"
-
-#~ msgid "Enable Phase Correlation Estimation"
-#~ msgstr "Faz ilişikili kestirim kullanılsın"
-
-#~ msgid "Enable Scene Change Detection"
-#~ msgstr " Sahne değişimi algılaması kullanılsın"
-
-#~ msgid "Force Profile"
-#~ msgstr "Bağlı kalınacak profil"
-
-#~ msgid "VC2 Low Delay Profile"
-#~ msgstr "VC2 düşük gecikme profili "
-
-#~ msgid "VC2 Simple Profile"
-#~ msgstr "VC2 basit profil"
-
-#~ msgid "VC2 Main Profile"
-#~ msgstr "VC2 asıl profil"
-
-#~ msgid "Main Profile"
-#~ msgstr "Asıl profil"
-
-#~ msgid "Dirac video decoder using libschroedinger"
-#~ msgstr "Libschroedinger kitaplığı kullanan Dirac görüntü kod çözücüsü"
-
-#~ msgid "Dirac video encoder using libschroedinger"
-#~ msgstr "Libschroedinger kitaplığı kullanan Dirac görüntü kodlayıcısı"
-
-#~ msgid "Key: "
-#~ msgstr "Tuş: "
