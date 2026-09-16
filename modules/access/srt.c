@@ -245,10 +245,12 @@ static bool srt_schedule_reconnect(stream_t *p_stream)
             failed = true; goto out;
         }
 
+#if SRT_VERSION_VALUE >= SRT_MAKE_VERSION(1, 3, 3) // SRTO_IPV6ONLY was added in 1.3.3
         /* If binding IPv6 configure the socket */
         if (res_local->ai_family == AF_INET6) {
             srt_setsockopt(p_sys->sock, 0, SRTO_IPV6ONLY, &(int) { 0 }, sizeof(int));
         }
+#endif
 
         srt_setsockopt(p_sys->sock, 0, SRTO_REUSEADDR, &(int) { 1 }, sizeof(int));
 
