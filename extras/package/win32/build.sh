@@ -609,6 +609,9 @@ if [ -n "$BUILD_MESON" ]; then
     if [ -z "$DISABLEGUI" ]; then
         printf 'qmake6 = '"'"'%s'"'"'\n' "${BUILD_PATH}/contrib/${CONTRIB_PREFIX}/bin/qmake6" >&3
     fi
+    if [ -x "$(command -v ${CONTRIB_PREFIX}-luac)" ]; then
+        printf 'luac = '"'"'%s'"'"'\n' "$(command -v ${CONTRIB_PREFIX}-luac)" >&3
+    fi
 
     printf '\n[host_machine]\n' >&3
     printf 'system = '"'"'windows'"'"'\n' >&3
