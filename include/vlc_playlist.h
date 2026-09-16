@@ -181,8 +181,7 @@ struct playlist_t
     DEF( SORT_RATING )\
     DEF( SORT_URI )\
     DEF( SORT_DISC_NUMBER )\
-    DEF( SORT_DATE )\
-    DEF( SORT_FILE_SIZE )
+    DEF( SORT_DATE )
 
 #define DEF( s ) s,
 enum
