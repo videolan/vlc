@@ -1,25 +1,27 @@
 # Japanese translation
-# Copyright (C) 2017 VideoLAN
+# Copyright (C) 2026 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Fumio Nakayama <fumio.n6a@gmail.com>, 2002,2009-2025
+# Fumio Nakayama <fumio.n6a@gmail.com>, 2002,2009-2026
 # Tadashi Jokagi <elf@elf.no-ip.org>, 2004-2009
 # ever_green, 2018
 # Tōen Androme Mitani, 2021
+# Michał Trzebiatowski <michtrz@gmail.com>, 2019
+# Felix Paul Kühne <fkuehne@gmail.com>, 2023
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.22\n"
+"Project-Id-Version: vlc 3.0.24-beta1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2026-06-28 16:08+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
-"Last-Translator: Fumio Nakayama <fumio.n6a@gmail.com>, 2025\n"
+"Last-Translator: Fumio Nakayama <fumio.n6a@gmail.com>, 2026\n"
 "Language-Team: Japanese (https://app.transifex.com/yaron/teams/16553/ja/)\n"
-"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #: include/vlc_common.h:1055
@@ -2310,12 +2312,12 @@ msgid ""
 "This forces the cropping of the source video. Accepted formats are x:y (4:3, "
 "16:9, etc.) expressing the global image aspect."
 msgstr ""
-"入力元のビデオのクロッピングをグローバルな画像のアスペクト比を示すX:Y(4:3, "
-"16:9など)の形式で指定します。"
+"ソースビデオのクロッピングをグローバルな画像のアスペクト比を示すX:Y(4:3, 16:9"
+"など)の形式で指定します。"
 
 #: src/libvlc-module.c:427
 msgid "Source aspect ratio"
-msgstr "ソースのアスペクト比"
+msgstr "ソースアスペクト比"
 
 #: src/libvlc-module.c:429
 msgid ""
@@ -2325,10 +2327,10 @@ msgid ""
 "x:y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
 "(1.25, 1.3333, etc.) expressing pixel squareness."
 msgstr ""
-"ソースのアスペクト比を固定化します。例えば、いくつかのDVDはアスペクト比が4:3"
-"の場合でも16:9にすることを要求します。この設定は、ムービーがアスペクト比の情"
-"報を保持していない場合のヒントとなります。設定は画像のアスペクト比を表現する"
-"一般的な x:y の形式(4:3, 16:9など)、または縦横の比率を示す浮動小数点の形式"
+"ソースアスペクト比を固定化します。例えば、いくつかのDVDはアスペクト比が4:3の"
+"場合でも16:9にすることを要求します。この設定は、ムービーがアスペクト比の情報"
+"を保持していない場合のヒントとなります。設定は画像のアスペクト比を表現する一"
+"般的な x:y の形式(4:3, 16:9など)、または縦横の比率を示す浮動小数点の形式"
 "(1.25, 1.3333など)で指定します。"
 
 #: src/libvlc-module.c:436
@@ -4609,11 +4611,11 @@ msgstr "使用可能な前のプログラムサービスID (SID) を切り替え
 
 #: src/libvlc-module.c:1401
 msgid "Cycle source aspect ratio"
-msgstr "ソースのアスペクト比の切り替え"
+msgstr "ソースアスペクト比の切り替え"
 
 #: src/libvlc-module.c:1402
 msgid "Cycle through a predefined list of source aspect ratios."
-msgstr "事前に定義されたソースのアスペクト比を切り替えます。"
+msgstr "事前に定義されたソースアスペクト比を切り替えます。"
 
 #: src/libvlc-module.c:1403
 msgid "Cycle video crop"
@@ -8104,15 +8106,16 @@ msgid "Bitmask"
 msgstr "ビットマスク"
 
 #: modules/access/rist.c:313
-#, fuzzy
 msgid "Virtual Destination Port Filter"
-msgstr "出力ファイル:"
+msgstr "仮想宛先ポートフィルター"
 
 #: modules/access/rist.c:315
 msgid ""
 "Destination port to be used inside the reduced-mode of the main profile to "
 "filter incoming data. Use zero to allow all."
 msgstr ""
+"メインプロファイルの削減モードにおいて入力データをフィルターするために内部で"
+"使用される宛先ポート。すべてを許可する場合、０を指定してください。"
 
 #: modules/access/rist.c:321 modules/access_output/rist.c:293
 msgid "RIST"
@@ -8127,13 +8130,12 @@ msgid "RIST demux/decode maximum jitter (default is 5ms)"
 msgstr "RISTデマルチプレクサ/デコード最大ジッター (デフォルトは5ms)"
 
 #: modules/access/rist.c:328
-#, fuzzy
 msgid ""
 "This controls the maximum jitter that will be passed to the demux/decode "
 "chain. The lower the value, the more CPU cycles the module will consume"
 msgstr ""
-"デマルチプレクサ/デコードのチェーンに受け渡される最大ジッターを制御します。小"
-"さな値はCPUのアルゴリズムサイクルをより消費します。"
+"これはデマルチプレクサ/デコーダーの処理系に渡されるジッターの最大値を制御しま"
+"す。この値が低いほど、モジュールが消費するCPUサイクル数は増加します。"
 
 #: modules/access/rist.c:332
 msgid "RIST nack type, 0 = range, 1 = bitmask. Default is range"
@@ -8421,9 +8423,8 @@ msgid "SFTP port number to use on the server"
 msgstr "サーバー上で使用するSFTPのポート番号を指定します。"
 
 #: modules/access/sftp.c:61
-#, fuzzy
 msgid "Private key file"
-msgstr "AESキーファイル"
+msgstr "プライベートキーファイル"
 
 #: modules/access/sftp.c:62
 msgid ""
@@ -8431,6 +8432,9 @@ msgid ""
 "assumed to be in the same directory with '.pub' appended. If unset, standard "
 "key paths will be attempted (e.g. '~/.ssh/id_rsa')."
 msgstr ""
+"SSH公開鍵認証に使用する秘密鍵ファイルです。対応する公開鍵ファイルは同じディレ"
+"クトリに拡張子 '.pub' を付加した名前で存在すると見做されます。指定がない場"
+"合、標準的な鍵のパス (例: '~/.ssh/id_rsa') が試行されます。"
 
 #: modules/access/sftp.c:68
 msgid "SFTP input"
@@ -8578,7 +8582,6 @@ msgid "Password for stream encryption"
 msgstr "ストリーム暗号化のパスワード"
 
 #: modules/access/srt.c:566
-#, fuzzy
 msgid "SRT Stream ID"
 msgstr " SRTストリームID"
 
@@ -9437,50 +9440,47 @@ msgstr "LiveHTTP"
 
 #: modules/access_output/rist.c:268
 msgid "Virtual Source Port"
-msgstr ""
+msgstr "仮想ソースポート"
 
 #: modules/access_output/rist.c:270
 msgid "Source port to be used inside the reduced-mode of the main profile"
-msgstr ""
+msgstr "メインプロファイルの削減モードにおいて内部で使用されるソースポート"
 
 #: modules/access_output/rist.c:272
-#, fuzzy
 msgid "Virtual Destination Port"
-msgstr "ストリーミングの宛先"
+msgstr "仮想宛先ポート"
 
 #: modules/access_output/rist.c:274
 msgid "Destination port to be used inside the reduced-mode of the main profile"
-msgstr ""
+msgstr "メインプロファイルの削減モードにおいて内部で使用される宛先ポート"
 
 #: modules/access_output/rist.c:281
-#, fuzzy
 msgid "Multipeer mode"
-msgstr "マルチプレクサー"
+msgstr "マルチピアモード"
 
 #: modules/access_output/rist.c:283
 msgid ""
 "This allows you to select between duplicate or load balanced modes when "
 "sending data to multiple peers (several network paths)"
 msgstr ""
+"複数のピア (複数のネットワークパス) にデータを送信する際、重複モードと負荷分"
+"散モードのいずれかを選択できます。"
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Duplicate"
-msgstr "アプリケーション"
+msgstr "重複"
 
 #: modules/access_output/rist.c:287
-#, fuzzy
 msgid "Load balanced"
-msgstr "赤色のバランス"
+msgstr "負荷分散"
 
 #: modules/access_output/rist.c:294
 msgid "RIST stream output"
 msgstr "RISTストリーム出力"
 
 #: modules/access_output/rist.c:299
-#, fuzzy
 msgid "RIST target payload size (bytes)"
-msgstr "RISTターゲットパケットサイズ (バイト)"
+msgstr "RISTターゲットペーロードサイズ (バイト)"
 
 #: modules/access_output/shout.c:64
 #: modules/gui/qt/components/sout/sout_widgets.cpp:438
@@ -12794,7 +12794,6 @@ msgstr "テキスト字幕デコーダー"
 #. Western European languages normally use "CP1252", which is a
 #. Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
 #. Other scripts use other code pages.
-#.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
 #: modules/codec/subsdec.c:292 modules/demux/avi/avi.c:99
@@ -15757,7 +15756,7 @@ msgstr "DVBプレイリストのインポート"
 
 #: modules/demux/playlist/playlist.c:90
 msgid "Podcast parser"
-msgstr "Podcastパーサー"
+msgstr "ポッドキャストパーサー"
 
 #: modules/demux/playlist/playlist.c:95
 msgid "XSPF playlist import"
@@ -15794,55 +15793,55 @@ msgstr "WPLプレイリストのインポート"
 #: modules/demux/playlist/podcast.c:230 modules/demux/playlist/podcast.c:242
 #: modules/demux/playlist/podcast.c:305 modules/demux/playlist/podcast.c:328
 msgid "Podcast Info"
-msgstr "Podcast情報"
+msgstr "ポッドキャストの情報"
 
 #: modules/demux/playlist/podcast.c:232
 msgid "Podcast Link"
-msgstr "Podcast リンク"
+msgstr "ポッドキャストリンク"
 
 #: modules/demux/playlist/podcast.c:233
 msgid "Podcast Copyright"
-msgstr "Podcast Copyright"
+msgstr "ポッドキャストの著作権"
 
 #: modules/demux/playlist/podcast.c:234
 msgid "Podcast Category"
-msgstr "Podcast カテゴリ"
+msgstr "ポッドキャストカテゴリ"
 
 #: modules/demux/playlist/podcast.c:235 modules/demux/playlist/podcast.c:312
 msgid "Podcast Keywords"
-msgstr "Podcast キーワード"
+msgstr "ポッドキャストキーワード"
 
 #: modules/demux/playlist/podcast.c:236 modules/demux/playlist/podcast.c:313
 msgid "Podcast Subtitle"
-msgstr "Podcast サブタイトル"
+msgstr "ポッドキャストサブタイトル"
 
 #: modules/demux/playlist/podcast.c:242 modules/demux/playlist/podcast.c:314
 msgid "Podcast Summary"
-msgstr "Podcastの要約"
+msgstr "ポッドキャストのサマリ"
 
 #: modules/demux/playlist/podcast.c:308
 msgid "Podcast Publication Date"
-msgstr "Podcast 公開日"
+msgstr "ポッドキャストの公開日"
 
 #: modules/demux/playlist/podcast.c:309
 msgid "Podcast Author"
-msgstr "Podcast 作者"
+msgstr "ポッドキャストの作者"
 
 #: modules/demux/playlist/podcast.c:310
 msgid "Podcast Subcategory"
-msgstr "Podcast サブカテゴリ"
+msgstr "ポッドキャストのサブカテゴリ"
 
 #: modules/demux/playlist/podcast.c:311
 msgid "Podcast Duration"
-msgstr "Podcast 長さ"
+msgstr "ポッドキャストの長さ"
 
 #: modules/demux/playlist/podcast.c:315
 msgid "Podcast Type"
-msgstr "Podcast タイプ"
+msgstr "ポッドキャストタイプ"
 
 #: modules/demux/playlist/podcast.c:329
 msgid "Podcast Size"
-msgstr "Podcastサイズ"
+msgstr "ポッドキャストのサイズ"
 
 #: modules/demux/playlist/podcast.c:330
 #, c-format
@@ -17255,31 +17254,31 @@ msgstr "再生するメディアを選択するダイアログを表示"
 #: modules/gui/macosx/VLCMainWindow.m:226
 #: modules/gui/qt/components/playlist/selector.cpp:593
 msgid "Subscribe"
-msgstr "視聴登録"
+msgstr "サブスクライブ"
 
 #: modules/gui/macosx/VLCMainWindow.m:221
 #: modules/gui/macosx/VLCMainWindow.m:232
 #: modules/gui/qt/components/playlist/selector.cpp:610
 msgid "Unsubscribe"
-msgstr "視聴登録解除"
+msgstr "サブスクライブ解除"
 
 #: modules/gui/macosx/VLCMainWindow.m:224
 #: modules/gui/qt/components/playlist/selector.cpp:279
 msgid "Subscribe to a podcast"
-msgstr "Podcastに登録"
+msgstr "ポッドキャストをサブスクライブ"
 
 #: modules/gui/macosx/VLCMainWindow.m:225
 #: modules/gui/qt/components/playlist/selector.cpp:594
 msgid "Enter URL of the podcast to subscribe to:"
-msgstr "視聴登録するPodcastのURLを入力:"
+msgstr "サブスクライブするPodcastのURLを入力:"
 
 #: modules/gui/macosx/VLCMainWindow.m:230
 msgid "Unsubscribe from a podcast"
-msgstr "Podcastの登録を解除"
+msgstr "ポッドキャストのサブスクライブを解除"
 
 #: modules/gui/macosx/VLCMainWindow.m:231
 msgid "Select the podcast you would like to unsubscribe from:"
-msgstr "登録を解除したいPodcastを選択:"
+msgstr "サブスクライブを解除したいポッドキャストを選択:"
 
 #: modules/gui/macosx/VLCMainWindow.m:257
 msgid "Check for album art and metadata?"
@@ -19721,11 +19720,11 @@ msgstr "インターネット"
 
 #: modules/gui/qt/components/playlist/selector.cpp:456
 msgid "Remove this podcast subscription"
-msgstr "このPodcastの視聴申込を削除"
+msgstr "このポッドキャストのサブスクリプションを削除"
 
 #: modules/gui/qt/components/playlist/selector.cpp:607
 msgid "Do you really want to unsubscribe from %1?"
-msgstr "本当に%1からの視聴申込を解除しますか?"
+msgstr "本当に%1からのサブスクライブを解除しますか?"
 
 #: modules/gui/qt/components/playlist/sorting.h:69
 msgid "Cover"
@@ -19866,27 +19865,26 @@ msgstr ""
 "Deleteキーで削除。"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1405
-#, fuzzy
 msgid "Global Hotkey change"
-msgstr "ホットキー変更"
+msgstr "グローバルホットキー変更"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1406
 msgid "Hotkey change"
 msgstr "ホットキー変更"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1410
-#, fuzzy
 msgid "Press the new key or combination for <b>%1</b>"
-msgstr "新しいキーまたは、組み合わせを入力:"
+msgstr ""
+"\"<b>%1</b>\"に割り当てる新しいキーまたは、組み合わせを入力してください"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1419
 msgid "Assign"
 msgstr "割り当て"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1455
-#, fuzzy
 msgid "Warning: this key or combination is already assigned to \"<b>%1</b>\""
-msgstr "警告: そのキーまたは、組み合わせは既に割り当てられています"
+msgstr ""
+"警告: このキーの組み合わせは既に他の \"<b>%1</b>\" に割り当てられています"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1467
 msgid "Warning: <b>%1</b> is already an application menu shortcut"
@@ -19894,13 +19892,12 @@ msgstr ""
 "警告: <b>%1</b> はすでにアプリケーションメニューのショートカットにあります"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1490
-#, fuzzy
 msgid "Key or combination: <b>%1</b>"
-msgstr "キーまたは、組み合わせ"
+msgstr "キーまたは、組み合わせ: <b>%1</b>"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1498
 msgid "Key: <b>%1</b>"
-msgstr ""
+msgstr "キー: <b>%1</b>"
 
 #: modules/gui/qt/components/simple_preferences.cpp:256
 #: modules/gui/qt/components/simple_preferences.cpp:636
@@ -20035,11 +20032,11 @@ msgstr "ファイル/フォルダー"
 #: modules/gui/qt/components/sout/sout_widgets.cpp:48
 #: modules/gui/qt/ui/sout.h:199
 msgid "Source"
-msgstr "入力元"
+msgstr "ソース"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:51
 msgid "Source:"
-msgstr "入力元:"
+msgstr "ソース:"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:60
 msgid "Type:"
@@ -20067,24 +20064,19 @@ msgstr ""
 "コンテナー (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:184
-#, fuzzy
 msgid "This module outputs the stream using the RIST protocol (TR06)."
 msgstr ""
-"このモジュールはトランスコーディングされたストリームをmmsプロトコルを使用して"
-"ネットワークに出力します。"
+"このモジュールはRISTプロトコル (TR06) を使用してストリームを出力します。"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:186
-#, fuzzy
 msgid "Destination Address"
-msgstr "出力先プレフィックス"
+msgstr "宛先アドレス"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:191
-#, fuzzy
 msgid "Destination Port"
-msgstr "出力用URL"
+msgstr "宛先ポート"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:201
-#, fuzzy
 msgid "Stream Name"
 msgstr "ストリーム名"
 
@@ -23738,16 +23730,16 @@ msgstr "ディスク"
 #: modules/services_discovery/podcast.c:62
 #: modules/services_discovery/podcast.c:146
 msgid "Podcasts"
-msgstr "Podcast"
+msgstr "ポッドキャスト"
 
 #: modules/services_discovery/podcast.c:56
 #: modules/gui/qt/ui/podcast_configuration.h:99
 msgid "Podcast URLs list"
-msgstr "Podcast URLリスト"
+msgstr "ポッドキャストURLリスト"
 
 #: modules/services_discovery/podcast.c:57
 msgid "Enter the list of podcasts to retrieve, separated by '|' (pipe)."
-msgstr "取得するPodcastのリストを'|'(パイプ)で区切って指定します。"
+msgstr "取得するポッドキャストのリストを'|'(パイプ)で区切って指定します。"
 
 #: modules/services_discovery/pulse.c:41 modules/services_discovery/pulse.c:44
 #: modules/services_discovery/pulse.c:84 modules/services_discovery/udev.c:67
@@ -24344,7 +24336,7 @@ msgstr "オフセット"
 
 #: modules/spu/mosaic.c:176
 msgid "Mosaic video sub source"
-msgstr "モザイクビデオサブフィルター"
+msgstr "モザイクビデオサブソース"
 
 #: modules/spu/mosaic.c:177
 msgid "Mosaic"
@@ -29608,378 +29600,3 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
 msgstr "メディアマネージャーリスト"
-
-#~ msgid "RIST maximum packet size (bytes)"
-#~ msgstr "RIST最大パケットサイズ (バイト)"
-
-#~ msgid "RIST latency (ms)"
-#~ msgstr "RIST遅延 (ms)"
-
-#~ msgid "RIST nack retry interval (ms)"
-#~ msgstr "RISTナックリトライインターバル (ms)"
-
-#~ msgid "RIST reorder buffer (ms)"
-#~ msgstr "RISTレコーダーバッファ (ms)"
-
-#~ msgid "RIST maximum retry count"
-#~ msgstr "RIST最大リトライカウント"
-
-#~ msgid "Disable NACK output packets"
-#~ msgstr "NACK出力パケットを無効化"
-
-#~ msgid "Use this to disable packet recovery"
-#~ msgstr "パケットのリカバリを無効化"
-
-#~ msgid "Do not check for a valid rtcp message from the encoder"
-#~ msgstr "エンコーダーからのRTCPメッセージの正当性チェックをしない"
-
-#~ msgid ""
-#~ "Send nack messages even when we have not confirmed that the encoder is on "
-#~ "our local network."
-#~ msgstr ""
-#~ "エンコーダーがローカルネットワークにあるかどうかに関わらずNACKメッセージが"
-#~ "送信されます。"
-
-#~ msgid "16 bytes"
-#~ msgstr "16バイト"
-
-#~ msgid "24 bytes"
-#~ msgstr "24バイト"
-
-#~ msgid "32 bytes"
-#~ msgstr "32バイト"
-
-#~ msgid "RIST data output caching size (ms)"
-#~ msgstr "RISTデータ出力キャッシングサイズ (ms)"
-
-#~ msgid ""
-#~ "Having this cache will guarantee that the packets going out are delivered "
-#~ "at a spacing determined by the chain timestamps thus ensuring a near "
-#~ "jitter free output. Be aware that this setting will also add to the "
-#~ "overall latency of the stream."
-#~ msgstr ""
-#~ "このキャッシュを使用するとタイムスタンプのチェーンによって、ほぼジッターフ"
-#~ "リー出力としてパケットが送出されることが保証されます。ただしストリームの全"
-#~ "体に遅延が付加されるためご注意ください。"
-
-#~ msgid "RIST retry-buffer queue size (ms)"
-#~ msgstr "RISTリトライバッファキューサイズ (ms)"
-
-#~ msgid ""
-#~ "This must match the buffer size (latency) configured on the server side. "
-#~ "If you are not sure, leave the default of 0 which will set it the maximum "
-#~ "value and will use about 100MB of RAM"
-#~ msgstr ""
-#~ "サーバー側で設定されるバッファーサイズ (遅延) と一致させる必要があります。"
-#~ "不明な場合、デフォルトの0のままとしてください。最大値が使用され、100MBのメ"
-#~ "モリが消費されます。"
-
-#~ msgid "SSRC used in RTP output (default is random, i.e. 0)"
-#~ msgstr "RTP出力でSSRCを使用 (デフォルトはランダム, 0)"
-
-#~ msgid ""
-#~ "Use this setting to specify a known SSRC for the RTP header. This is only "
-#~ "useful if your receiver acts on it. When using VLC as receiver, it is not."
-#~ msgstr ""
-#~ "RTPヘッダーの知られたSSRCを指定するために使用されます。受信者がその値を利"
-#~ "用する場合のみ有効です。VLCを受信側とする場合は無効です。"
-
-#~ msgid ""
-#~ "This Stream name will be sent to the receiver using the rist RTCP channel"
-#~ msgstr "このストリーム名はRIST RTCPチャンネルの受信者に送信されます"
-
-#~ msgid "4:2:0"
-#~ msgstr "4:2:0"
-
-#~ msgid "4:2:2"
-#~ msgstr "4:2:2"
-
-#~ msgid "4:4:4"
-#~ msgstr "4:4:4"
-
-#~ msgid "Rate control method"
-#~ msgstr "レート制御方法"
-
-#~ msgid "Method used to encode the video sequence"
-#~ msgstr "ビデオシーケンスのエンコードに使用される方法"
-
-#~ msgid "Constant noise threshold mode"
-#~ msgstr "固定ノイズ閾値モード"
-
-#~ msgid "Constant bitrate mode (CBR)"
-#~ msgstr "固定ビットレートモード(CBR)"
-
-#~ msgid "Low Delay mode"
-#~ msgstr "低遅延モード"
-
-#~ msgid "Lossless mode"
-#~ msgstr "ロスレスモード"
-
-#~ msgid "Constant lambda mode"
-#~ msgstr "固定ラムダモード"
-
-#~ msgid "Constant error mode"
-#~ msgstr "固定エラーモード"
-
-#~ msgid "Constant quality mode"
-#~ msgstr "固定品質モード"
-
-#~ msgid "GOP structure"
-#~ msgstr "GOP構造"
-
-#~ msgid "GOP structure used to encode the video sequence"
-#~ msgstr "ビデオシーケンスのエンコードに使用されるGOP構造"
-
-#~ msgid ""
-#~ "No fixed gop structure. A picture can be intra or inter and refer to "
-#~ "previous or future pictures."
-#~ msgstr ""
-#~ "固定化したGOP構造なし。画像間、または画像内で前、または先の画像を参照する"
-#~ "ことが可能"
-
-#~ msgid "I-frame only sequence"
-#~ msgstr "Iフレームのみのシーケンス"
-
-#~ msgid "Inter pictures refere to previous pictures only"
-#~ msgstr "画像間は前の画像のみを参照可能"
-
-#~ msgid "Inter pictures can refer to previous or future pictures"
-#~ msgstr "画像間は前、または先の画像を参照可能"
-
-#~ msgid "Constant quality factor"
-#~ msgstr "品質固定化係数"
-
-#~ msgid "Quality factor to use in constant quality mode"
-#~ msgstr "固定品質モードで使用される品質係数"
-
-#~ msgid "Noise Threshold"
-#~ msgstr "ノイズ閾値"
-
-#~ msgid "Noise threshold to use in constant noise threshold mode"
-#~ msgstr "固定ノイズ閾値モードで使用されるノイズの閾値を指定します。"
-
-#~ msgid "CBR bitrate (kbps)"
-#~ msgstr "CBR ビットレート(kbps)"
-
-#~ msgid "Target bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "エンコードが固定ビットレートモードの時のターゲットビットレートをkbpsで指定"
-#~ "します。"
-
-#~ msgid "Maximum bitrate (kbps)"
-#~ msgstr "最大ビットレート(kbps)"
-
-#~ msgid "Maximum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "エンコードが固定ビットレートモードの時の最大ビットレートをkbpsで指定しま"
-#~ "す。"
-
-#~ msgid "Minimum bitrate (kbps)"
-#~ msgstr "最小ビットレート(kbps)"
-
-#~ msgid "Minimum bitrate in kbps when encoding in constant bitrate mode"
-#~ msgstr ""
-#~ "エンコードが固定ビットレートモードの時の最小ビットレートをkbpsで指定しま"
-#~ "す。"
-
-#~ msgid "GOP length"
-#~ msgstr "GOP長"
-
-#~ msgid ""
-#~ "Number of pictures between successive sequence headers i.e. length of the "
-#~ "group of pictures"
-#~ msgstr "連続的なシーケンスヘッダー間の画像数。つまり、画像のグループ数"
-
-#~ msgid "Prefilter"
-#~ msgstr "プレフィルター"
-
-#~ msgid "Enable adaptive prefiltering"
-#~ msgstr "アダプティブプレフィルタリングを有効にします。"
-
-#~ msgid "No pre-filtering"
-#~ msgstr "プレフィルタリングなし"
-
-#~ msgid "Centre Weighted Median"
-#~ msgstr "中心を重点化したメディア"
-
-#~ msgid "Gaussian Low Pass Filter"
-#~ msgstr "ガウスローパスフィルター"
-
-#~ msgid "Add Noise"
-#~ msgstr "ノイズ追加"
-
-#~ msgid "Gaussian Adaptive Low Pass Filter"
-#~ msgstr "ガウス適応ローパスフィルター"
-
-#~ msgid "Low Pass Filter"
-#~ msgstr "ローパスフィルター"
-
-#~ msgid "Amount of prefiltering"
-#~ msgstr "プレフィルタリングの量"
-
-#~ msgid "Higher value implies more prefiltering"
-#~ msgstr "高い値はよりプレフィルタリングを行うことを意味します。"
-
-#~ msgid "Picture coding mode"
-#~ msgstr "画像コーディングモード"
-
-#~ msgid ""
-#~ "Field coding is where interlaced fields are coded separately as opposed "
-#~ "to a pseudo-progressive frame"
-#~ msgstr ""
-#~ "疑似進行フレームに対抗して別にコード化されるインターレス化フィールドの"
-#~ "フィールドコーディングを指定します。"
-
-#~ msgid "auto - let encoder decide based upon input (Best)"
-#~ msgstr "自動:入力を基準としてエンコーダーが決定(最適)"
-
-#~ msgid "force coding frame as single picture"
-#~ msgstr "単一画像としてコーディングフレームを強制"
-
-#~ msgid "force coding frame as separate interlaced fields"
-#~ msgstr "別のインターレース化フィールドとしてコーディングフレームを強制"
-
-#~ msgid "Size of motion compensation blocks"
-#~ msgstr "モーション補正ブロックサイズ"
-
-#~ msgid "automatic - let encoder decide based upon input (Best)"
-#~ msgstr "自動:入力を基準としてエンコーダーが決定(最適)"
-
-#~ msgid "small - use small motion compensation blocks"
-#~ msgstr "小:小さなモーション補正ブロックを使用"
-
-#~ msgid "medium - use medium motion compensation blocks"
-#~ msgstr "中:中間のモーション補正ブロックを使用"
-
-#~ msgid "large - use large motion compensation blocks"
-#~ msgstr "大:大きなモーション補正ブロックを使用"
-
-#~ msgid "Overlap of motion compensation blocks"
-#~ msgstr "モーション補正ブロックの重なり"
-
-#~ msgid "none - Motion compensation blocks do not overlap"
-#~ msgstr "なし:モーション補正ブロックを重ねません"
-
-#~ msgid "partial - Motion compensation blocks only partially overlap"
-#~ msgstr "部分的:モーション補正ブロックを部分的に重ねます"
-
-#~ msgid "full - Motion compensation blocks fully overlap"
-#~ msgstr "フル:モーション補正ブロック全体を重ねます"
-
-#~ msgid "Motion Vector precision"
-#~ msgstr "モーションベクトル精度"
-
-#~ msgid "Motion Vector precision in pels"
-#~ msgstr "モーションベクトルの精度をピクセルで指定します。"
-
-#~ msgid "Three component motion estimation"
-#~ msgstr "3コンポーネントモーション予測"
-
-#~ msgid "Use chroma as part of the motion estimation process"
-#~ msgstr "クロマをモーション予測処理の一部として使用します。"
-
-#~ msgid "Intra picture DWT filter"
-#~ msgstr "画像内DWTフィルター"
-
-#~ msgid "Inter picture DWT filter"
-#~ msgstr "画像間DWTフィルター"
-
-#~ msgid "Number of DWT iterations"
-#~ msgstr "DWT相互作用の数"
-
-#~ msgid "Also known as DWT levels"
-#~ msgstr "DWTレベルとしても知られています。"
-
-#~ msgid "Enable multiple quantizers"
-#~ msgstr "複数の量子化を有効化"
-
-#~ msgid "Enable multiple quantizers per subband (one per codeblock)"
-#~ msgstr ""
-#~ "サブバンドごとに複数の量子化を有効化します。(コードブロックごとに一つ)"
-
-#~ msgid "Disable arithmetic coding"
-#~ msgstr "算術コーディングの無効化"
-
-#~ msgid "Use variable length codes instead, useful for very high bitrates"
-#~ msgstr ""
-#~ "便利な非常に高いビットレートを使用するのではなく、可変長コードを使用しま"
-#~ "す。"
-
-#~ msgid "perceptual weighting method"
-#~ msgstr "知覚的重み付け方式"
-
-#~ msgid "perceptual distance"
-#~ msgstr "知覚的距離"
-
-#~ msgid "perceptual distance to calculate perceptual weight"
-#~ msgstr "知覚的重みを計算するための知覚的距離"
-
-#~ msgid "Horizontal slices per frame"
-#~ msgstr "フレームごとの水平スライス"
-
-#~ msgid "Number of horizontal slices per frame in low delay mode"
-#~ msgstr "低遅延モードでのフレームごとの水平スライス数"
-
-#~ msgid "Vertical slices per frame"
-#~ msgstr "フレームごとの垂直スライス"
-
-#~ msgid "Number of vertical slices per frame in low delay mode"
-#~ msgstr "低遅延モードでのフレームごとの垂直スライス数"
-
-#~ msgid "Size of code blocks in each subband"
-#~ msgstr "個々のサブバンドのコードブロックサイズ"
-
-#~ msgid "small - use small code blocks"
-#~ msgstr "小 - 小さなコードブロックの使用"
-
-#~ msgid "medium - use medium sized code blocks"
-#~ msgstr "中 - 中間サイズのコードブロックの使用"
-
-#~ msgid "large - use large code blocks"
-#~ msgstr "大 - 大きなコードブロックの使用"
-
-#~ msgid "full - One code block per subband"
-#~ msgstr "フル - サブバンドごとに1つのコードブロック"
-
-#~ msgid "Enable hierarchical Motion Estimation"
-#~ msgstr "階層的モーション予測の有効化"
-
-#~ msgid "Number of levels of downsampling"
-#~ msgstr "ダウンサンプリングのレベル数"
-
-#~ msgid ""
-#~ "Number of levels of downsampling in hierarchical motion estimation mode"
-#~ msgstr "階層的モーション予測モードのダウンサンプリングのレベル数"
-
-#~ msgid "Enable Global Motion Estimation"
-#~ msgstr "グローバルモーション予測の有効化"
-
-#~ msgid "Enable Phase Correlation Estimation"
-#~ msgstr "フェーズ相関予測の有効化"
-
-#~ msgid "Enable Scene Change Detection"
-#~ msgstr "シーン変更検出を有効化"
-
-#~ msgid "Force Profile"
-#~ msgstr "プロファイルを強制"
-
-#~ msgid "VC2 Low Delay Profile"
-#~ msgstr "VC2低遅延プロファイル"
-
-#~ msgid "VC2 Simple Profile"
-#~ msgstr "VC2シンプルプロファイル"
-
-#~ msgid "VC2 Main Profile"
-#~ msgstr "VC2メインプロファイル"
-
-#~ msgid "Main Profile"
-#~ msgstr "メインプロファイル"
-
-#~ msgid "Dirac video decoder using libschroedinger"
-#~ msgstr "libschroedinger使用のDiracビデオデコーダー"
-
-#~ msgid "Dirac video encoder using libschroedinger"
-#~ msgstr "libschroedinger使用のDiracビデオエンコーダー"
-
-#~ msgid "Key: "
-#~ msgstr "キー: "
