@@ -3,7 +3,6 @@
 OPENAPV_VERSION := 0.3.0.0
 OPENAPV_URL := $(GITHUB)/AcademySoftwareFoundation/openapv/archive/refs/tags/v$(OPENAPV_VERSION).tar.gz
 
-PKGS += openapv
 ifeq ($(call need_pkg,"oapv >= 0.2"),)
 PKGS_FOUND += openapv
 endif
