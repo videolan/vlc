@@ -300,6 +300,12 @@ unset EXTRA_CFLAGS
 unset EXTRA_LDFLAGS
 unset XCODE_FLAGS
 
+TOOLCHAIN_FLAGS="-isysroot ${SDKROOT} -mmacosx-version-min=${MINIMAL_OSX_VERSION}"
+export CC="${CC} ${TOOLCHAIN_FLAGS}"
+export CXX="${CXX} ${TOOLCHAIN_FLAGS} -stdlib=libc++ -std=c++11"
+export OBJC="${OBJC} ${TOOLCHAIN_FLAGS}"
+export OBJCXX="${OBJCXX} ${TOOLCHAIN_FLAGS} -stdlib=libc++ -std=c++11"
+
 # Enable debug symbols by default
 export CFLAGS="-g -arch $ACTUAL_ARCH"
 export CXXFLAGS="-g -arch $ACTUAL_ARCH"
