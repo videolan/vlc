@@ -74,6 +74,7 @@ PlaylistManager::PlaylistManager( demux_t *p_demux_,
     b_preparsing = false;
     nextPlaylistupdate = 0;
     demux.pcr_syncpoint = TimestampSynchronizationPoint::RandomAccess;
+    demux.rebuffering = false;
     vlc_mutex_init(&demux.lock);
     vlc_cond_init(&demux.cond);
     vlc_mutex_init(&cached.lock);
@@ -440,6 +441,15 @@ vlc_tick_t PlaylistManager::getMinAheadTime() const
     return minbuffer;
 }
 
+bool PlaylistManager::isBufferingSufficient(Times from, vlc_tick_t minimum) const
+{
+    return std::all_of(streams.cbegin(), streams.cend(),
+        [from, minimum](const AbstractStream *st) {
+            return !st->isSelected() ||
+                   st->isBufferingSufficient(from, minimum);
+        });
+}
+
 bool PlaylistManager::reactivateStream(AbstractStream *stream)
 {
     return stream->reactivate(getResumePosition());
@@ -473,12 +483,26 @@ int PlaylistManager::doDemux(vlc_tick_t increment)
         return (b_dead || b_all_disabled) ? VLC_DEMUXER_EOF : VLC_DEMUXER_SUCCESS;
     }
 
-    Times barrier = demux.times;
-    barrier.offsetBy(increment);
+    const Times floor = demux.times;
+    const bool rebuffering = demux.rebuffering;
 
+    if(rebuffering)
+    {
+        const vlc_tick_t minimum = bufferingLogic->getMinBuffering(playlist);
+        if(!isBufferingSufficient(floor, minimum))
+        {
+            vlc_cond_timedwait(&demux.cond, &demux.lock, vlc_tick_now() + VLC_TICK_FROM_MS(50));
+            vlc_mutex_unlock(&demux.lock);
+            return VLC_DEMUXER_BUFFERING;
+        }
+        demux.rebuffering = false;
+    }
     vlc_mutex_unlock(&demux.lock);
 
-    AbstractStream::Status status = dequeue(demux.times, &barrier);
+    Times barrier = floor;
+    barrier.offsetBy(increment);
+
+    AbstractStream::Status status = dequeue(floor, &barrier);
 
     vlc_mutex_lock(&demux.lock);
     if(demux.firsttimes.continuous == VLC_TICK_INVALID && barrier.continuous != VLC_TICK_INVALID)
@@ -508,6 +532,7 @@ int PlaylistManager::doDemux(vlc_tick_t increment)
 
                 demux.times = Times();
                 demux.firsttimes = Times();
+                demux.rebuffering = false;
                 es_out_Control(p_demux->out, ES_OUT_RESET_PCR);
 
                 setBufferingRunState(true);
@@ -516,6 +541,7 @@ int PlaylistManager::doDemux(vlc_tick_t increment)
         break;
     case AbstractStream::Status::Buffering:
         vlc_mutex_lock(&demux.lock);
+        demux.rebuffering = true;
         vlc_cond_timedwait(&demux.cond, &demux.lock, vlc_tick_now() + VLC_TICK_FROM_MS(50));
         vlc_mutex_unlock(&demux.lock);
         return VLC_DEMUXER_BUFFERING;
@@ -523,6 +549,7 @@ int PlaylistManager::doDemux(vlc_tick_t increment)
         vlc_mutex_lock(&demux.lock);
         demux.times = Times();
         demux.firsttimes = Times();
+        demux.rebuffering = false;
         demux.pcr_syncpoint = TimestampSynchronizationPoint::Discontinuity;
         es_out_Control(p_demux->out, ES_OUT_RESET_PCR);
         vlc_mutex_unlock(&demux.lock);
@@ -574,6 +601,7 @@ int PlaylistManager::doControl(int i_query, va_list args)
             {
                 vlc_tick_t now = vlc_tick_now();
                 demux.times = Times();
+                demux.rebuffering = false;
                 cached.lastupdate = 0;
                 if(b_pause)
                 {
@@ -656,6 +684,7 @@ int PlaylistManager::doControl(int i_query, va_list args)
             demux.pcr_syncpoint = TimestampSynchronizationPoint::RandomAccess;
             demux.times = Times();
             demux.firsttimes = Times();
+            demux.rebuffering = false;
             cached.lastupdate = 0;
             cached.i_normaltime = VLC_TICK_INVALID;
             cached.i_time = VLC_TICK_INVALID;
@@ -679,6 +708,7 @@ int PlaylistManager::doControl(int i_query, va_list args)
             demux.pcr_syncpoint = TimestampSynchronizationPoint::RandomAccess;
             demux.times = Times();
             demux.firsttimes = Times();
+            demux.rebuffering = false;
             cached.lastupdate = 0;
             cached.i_normaltime = VLC_TICK_INVALID;
             cached.i_time = VLC_TICK_INVALID;

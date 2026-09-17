@@ -91,6 +91,7 @@ namespace adaptive
 
             Times getTimes(bool = false) const;
             vlc_tick_t getMinAheadTime() const;
+            bool isBufferingSufficient(Times, vlc_tick_t) const;
 
             virtual bool reactivateStream(AbstractStream *);
             bool setupPeriod();
@@ -125,6 +126,7 @@ namespace adaptive
             {
                 TimestampSynchronizationPoint pcr_syncpoint;
                 Times times, firsttimes;
+                bool rebuffering;
                 mutable vlc_mutex_t lock;
                 vlc_cond_t  cond;
             } demux;

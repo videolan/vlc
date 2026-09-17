@@ -89,6 +89,7 @@ namespace adaptive
                                   vlc_tick_t, bool = false);
         BufferingStatus getBufferAndStatus(const Times &, vlc_tick_t, vlc_tick_t, vlc_tick_t *);
         vlc_tick_t getDemuxedAmount(Times) const;
+        bool isBufferingSufficient(Times, vlc_tick_t) const;
         Status dequeue(Times, Times *);
 
         class StreamPosition

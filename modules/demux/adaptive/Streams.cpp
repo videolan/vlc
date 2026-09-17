@@ -355,6 +355,16 @@ vlc_tick_t AbstractStream::getDemuxedAmount(Times from) const
     return i_demuxed;
 }
 
+bool AbstractStream::isBufferingSufficient(Times from, vlc_tick_t minimum) const
+{
+    vlc_mutex_locker locker(&lock);
+
+    if(!valid || disabled || fakeEsOut()->commandsQueue()->isEOF())
+        return true;
+
+    return getDemuxedAmount(from) >= minimum;
+}
+
 AbstractStream::BufferingStatus
 AbstractStream::getBufferAndStatus(const Times &deadline,
                                    vlc_tick_t i_min_buffering,
