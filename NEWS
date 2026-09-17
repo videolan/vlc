@@ -50,10 +50,10 @@ Stream Output:
  * Disable HEVC for original Chromecast devices
 
 Security:
+ * Switch to a new RSA-4096 key for update verification
  * Fix multiple OOB, integer overflow, double-free and use-after-free issues
-   across demuxers, packetizers and codecs
- * Fix MKV OOM vulnerability when parsing oversized child elements
- * Harden EBML/Matroska parsing of unknown and infinite-size elements
+ * See https://www.videolan.org/security/ (will be updated a few days after
+   the release)
 
 Misc:
  * Add Flatpak build support
