@@ -236,14 +236,6 @@ vlc_module_begin ()
     add_renderer_opts(SOUT_CFG_PREFIX)
 
     add_submodule()
-        /* Same module, usable in a non-terminal position of the chain. The
-         * elementary streams all end up in the internal chain built by Open(),
-         * so p_next never sees any of them: whatever follows in the enclosing
-         * chain only gets to run its activate function. */
-        add_shortcut("chromecast")
-        set_capability("sout filter", 0)
-        set_callback(Open)
-    add_submodule()
         /* sout proxy that start the cc input when all streams are loaded */
         add_shortcut("chromecast-proxy")
         set_capability("sout filter", 0)
