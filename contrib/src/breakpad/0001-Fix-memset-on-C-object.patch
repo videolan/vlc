@@ -1,0 +1,27 @@
+From f55635d7fec914def230d84e607f58aade5aa15b Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 17 Sep 2026 11:48:59 +0200
+Subject: [PATCH] Fix memset() on C++ object
+
+When then read data into the object of the same size...
+Let's assume this code worked.
+---
+ src/client/windows/crash_generation/crash_generation_server.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/client/windows/crash_generation/crash_generation_server.cc b/src/client/windows/crash_generation/crash_generation_server.cc
+index 790e8cc0..16b859d2 100644
+--- a/src/client/windows/crash_generation/crash_generation_server.cc
++++ b/src/client/windows/crash_generation/crash_generation_server.cc
+@@ -361,7 +361,7 @@ void CrashGenerationServer::HandleConnectedState() {
+   assert(server_state_ == IPC_SERVER_STATE_CONNECTED);
+ 
+   DWORD bytes_count = 0;
+-  memset(&msg_, 0, sizeof(msg_));
++  memset((void*)&msg_, 0, sizeof(msg_));
+   bool success = ReadFile(pipe_,
+                           &msg_,
+                           sizeof(msg_),
+-- 
+2.52.0.windows.1
+
