@@ -758,6 +758,13 @@ prebuilt: vlc-contrib-$(HOST)-latest.tar.zst
 	$(UNPACK)
 	mv $(HOST) $(PREFIX)
 	cd $(PREFIX) && $(abspath $(SRC))/change_prefix.sh
+	# Regenerate the machine file with local tool paths, without rebuilding dependencies.
+	install -d "$(PREFIX)/share/meson/$(CROSS_OR_NATIVE)"
+	PREFIX="$(PREFIX)" \
+	$(SRC)/gen-meson-machinefile.py \
+		--type external-$(CROSS_OR_NATIVE) \
+		$(foreach tool,$(filter-out $(PKGS_FOUND),$(PKGS.tools)),--binary $(PKGS.tools.$(tool).config-tool):$(PKGS.tools.$(tool).path)) \
+		"$(PREFIX)/share/meson/$(CROSS_OR_NATIVE)/contrib.ini"
 
 package: install
 	rm -Rf tmp/

@@ -305,6 +305,10 @@ found at the following location:
 
     vlc/contrib/x86_64-pc-linux-gnu/share/meson/native/contrib.ini
 
+When using prebuilt contribs, `make prebuilt` regenerates this file for the
+local tool paths. Run `make tools` before configuring VLC if the required
+build tools are not available on the system.
+
 Then you can setup meson with this file using the following command:
 
     meson setup build-meson \
