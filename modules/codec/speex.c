@@ -786,7 +786,7 @@ static int DecodeRtpSpeexPacket( decoder_t *p_dec, block_t *p_speex_bit_block )
             return VLCDEC_SUCCESS;
         }
 
-        p_sys->p_header = malloc(sizeof(SpeexHeader));
+        p_sys->p_header = calloc(1, sizeof(SpeexHeader));
         if ( !p_sys->p_header )
         {
             msg_Err( p_dec, "Could not allocate a Speex header.");
