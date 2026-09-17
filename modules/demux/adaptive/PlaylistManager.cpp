@@ -518,7 +518,7 @@ int PlaylistManager::doDemux(vlc_tick_t increment)
         vlc_mutex_lock(&demux.lock);
         vlc_cond_timedwait(&demux.cond, &demux.lock, vlc_tick_now() + VLC_TICK_FROM_MS(50));
         vlc_mutex_unlock(&demux.lock);
-        break;
+        return VLC_DEMUXER_BUFFERING;
     case AbstractStream::Status::Discontinuity:
         vlc_mutex_lock(&demux.lock);
         demux.times = Times();
