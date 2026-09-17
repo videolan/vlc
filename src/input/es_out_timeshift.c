@@ -798,6 +798,15 @@ static int PrivControlLocked(struct vlc_input_es_out *p_tsout,
 
         return ControlLockedSetPauseState(p_sys, in, b_source_paused, b_paused, i_date);
     }
+    case ES_OUT_PRIV_SET_REBUFFER_STATE:
+    {
+        const bool b_rebuffering = (bool)va_arg( args, int );
+        const vlc_tick_t i_date = va_arg( args, vlc_tick_t );
+
+        return es_out_in_PrivControl(p_sys->p_out, in,
+                                     ES_OUT_PRIV_SET_REBUFFER_STATE,
+                                     b_rebuffering, i_date);
+    }
     case ES_OUT_PRIV_SET_RATE:
     {
         const float src_rate = va_arg( args, double );

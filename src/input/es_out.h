@@ -79,6 +79,9 @@ enum es_out_query_private_e
     /* Set pause state */
     ES_OUT_PRIV_SET_PAUSE_STATE,                    /* arg1=bool b_source_paused, bool b_paused arg2=vlc_tick_t res=can fail */
 
+    /* Set transient demux rebuffering state */
+    ES_OUT_PRIV_SET_REBUFFER_STATE,                 /* arg1=bool b_rebuffering arg2=vlc_tick_t res=cannot fail */
+
     /* Set rate */
     ES_OUT_PRIV_SET_RATE,                           /* arg1=double source_rate arg2=double rate res=can fail */
 
@@ -260,6 +263,13 @@ es_out_SetPauseState(struct vlc_input_es_out *out,
                      vlc_tick_t i_date)
 {
     return es_out_PrivControl(out, ES_OUT_PRIV_SET_PAUSE_STATE, b_source_paused, b_paused, i_date);
+}
+
+static inline void
+es_out_SetRebufferState(struct vlc_input_es_out *out, bool b_rebuffering)
+{
+    int i_ret = es_out_PrivControl(out, ES_OUT_PRIV_SET_REBUFFER_STATE, b_rebuffering, vlc_tick_now());
+    assert( !i_ret );
 }
 
 static inline int
