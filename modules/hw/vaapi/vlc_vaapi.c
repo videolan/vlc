@@ -614,7 +614,6 @@ vlc_vaapi_PicGetDisplay(picture_t *pic)
     return pic_ctx->va_dpy;
 }
 
-#if VA_CHECK_VERSION(1, 1, 0)
 int
 vlc_vaapi_ExportSurfaceHandle(vlc_object_t *o,
                               VADisplay dpy,
@@ -627,4 +626,3 @@ vlc_vaapi_ExportSurfaceHandle(vlc_object_t *o,
     return VLC_SUCCESS;
 error: return VLC_EGENERIC;
 }
-#endif

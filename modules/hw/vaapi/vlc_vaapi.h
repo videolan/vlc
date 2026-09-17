@@ -211,7 +211,6 @@ vlc_vaapi_IsChromaOpaque(int i_vlc_chroma)
 
 void vlc_chroma_to_vaapi(int i_vlc_chroma, unsigned *va_rt_format, int *va_fourcc);
 
-#if VA_CHECK_VERSION(1, 1, 0)
 int
 vlc_vaapi_ExportSurfaceHandle(vlc_object_t *o,
                               VADisplay dpy,
@@ -219,7 +218,6 @@ vlc_vaapi_ExportSurfaceHandle(vlc_object_t *o,
                               uint32_t mem_type,
                               uint32_t flags,
                               void *descriptor);
-#endif
 
 /* This macro is designed to wrap any VA call, and in case of failure,
    display the VA error string then goto the 'error' label (which you must
