@@ -52,8 +52,7 @@ Stream Output:
 Security:
  * Switch to a new RSA-4096 key for update verification
  * Fix multiple OOB, integer overflow, double-free and use-after-free issues
- * See https://www.videolan.org/security/ (will be updated a few days after
-   the release)
+ * See https://www.videolan.org/security/
 
 Misc:
  * Add Flatpak build support
