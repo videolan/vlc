@@ -7,8 +7,7 @@ summary: Read, capture, broadcast your multimedia streams
 description: |
   VLC is a free and open source cross-platform multimedia player and
   framework that plays most multimedia files as well as DVDs, Audio CDs,
-  VCDs, and various streaming protocols.
-  NOTE. This snap contains an untested daily build of VLC
+  VCDs, Webcams, Devices and various streaming protocols.
 confinement: strict
 compression: lzo
 plugs:
