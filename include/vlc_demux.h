@@ -40,9 +40,13 @@
  */
 
 /* pf_demux return values */
-#define VLC_DEMUXER_EOF       0
-#define VLC_DEMUXER_EGENERIC -1
-#define VLC_DEMUXER_SUCCESS   1
+#define VLC_DEMUXER_EOF        0
+#define VLC_DEMUXER_EGENERIC  -1
+#define VLC_DEMUXER_SUCCESS    1
+/* Demuxer has temporary control of some buffering and
+ * recovering from an underrun. A paced input should
+ * pause the clock accordingly. Not an error */
+#define VLC_DEMUXER_BUFFERING  2
 
 /* DEMUX_TEST_AND_CLEAR flags */
 #define INPUT_UPDATE_TITLE      0x0010
