@@ -710,10 +710,10 @@ static char *EsGetTitle( es_out_id_t *es )
     else if (es->psz_language && *es->psz_language)
     {
         if (asprintf(&title, "%s %zu - [%s]", _("Track"),
-                     es->i_pos, es->psz_language ) != -1 )
+                     es->i_pos + 1, es->psz_language ) != -1 )
             return title;
     }
-    else if (asprintf(&title, "%s %zu", _("Track"), es->i_pos) != -1)
+    else if (asprintf(&title, "%s %zu", _("Track"), es->i_pos + 1) != -1)
         return title;
 
     return NULL;
