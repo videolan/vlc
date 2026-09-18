@@ -125,6 +125,7 @@ vlc_modules += {
     'name' : 'glfilter_mock',
     'sources' : files('filter_mock.c'),
     'dependencies' : [gl_plugin_dep, m_lib],
+    'install' : false,
     'enabled' : gl_vout_dep.found(),
 }
 

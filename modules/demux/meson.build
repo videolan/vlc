@@ -359,7 +359,8 @@ vlc_modules += {
 # mock demux
 vlc_modules += {
     'name' : 'demux_mock',
-    'sources' : files('mock.c')
+    'sources' : files('mock.c'),
+    'install' : false,
 }
 
 # mpgv demux
