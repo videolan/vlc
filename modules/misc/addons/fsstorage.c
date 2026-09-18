@@ -856,7 +856,10 @@ static int Remove( addons_storage_t *p_storage, addon_entry_t *p_entry )
 
                 char *psz_translated_filename = strdup( p_file->psz_filename );
                 if ( !psz_translated_filename )
+                {
+                    vlc_mutex_unlock( &p_entry->lock );
                     return VLC_ENOMEM;
+                }
                 char *tmp = psz_translated_filename;
                 while (*tmp++) if ( *tmp == '/' ) *tmp = DIR_SEP_CHAR;
 
@@ -866,6 +869,7 @@ static int Remove( addons_storage_t *p_storage, addon_entry_t *p_entry )
                 {
                     free( psz_dir );
                     free( psz_translated_filename );
+                    vlc_mutex_unlock( &p_entry->lock );
                     return VLC_EGENERIC;
                 }
                 free( psz_dir );
