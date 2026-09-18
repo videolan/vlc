@@ -230,6 +230,8 @@ typedef struct bluray_spu_updater_sys_t bluray_spu_updater_sys_t;
 
 typedef struct bluray_overlay_t
 {
+    /* this lock is held while vout accesses overlay. => overlay can't
+     * be modified. */
     vlc_mutex_t         lock;
     bool                b_on_vout;
     OverlayStatus       status;
@@ -1560,46 +1562,27 @@ static es_out_t *esOutNew(vlc_object_t *p_obj, es_out_t *p_dst_out, void *priv)
  * subpicture_updater_t functions:
  *****************************************************************************/
 
-static bluray_overlay_t *updater_lock_overlay(bluray_spu_updater_sys_t *p_upd_sys)
-{
-    /* this lock is held while vout accesses overlay. => overlay can't be closed. */
-    vlc_mutex_lock(&p_upd_sys->lock);
-
-    bluray_overlay_t *ov = p_upd_sys->p_overlay;
-    if (ov) {
-        /* this lock is held while vout accesses overlay. => overlay can't be modified. */
-        vlc_mutex_lock(&ov->lock);
-        return ov;
-    }
-
-    /* overlay has been closed */
-    vlc_mutex_unlock(&p_upd_sys->lock);
-    return NULL;
-}
-
-static void updater_unlock_overlay(bluray_spu_updater_sys_t *p_upd_sys)
-{
-    assert (p_upd_sys->p_overlay);
-
-    vlc_mutex_unlock(&p_upd_sys->p_overlay->lock);
-    vlc_mutex_unlock(&p_upd_sys->lock);
-}
-
 static void subpictureUpdaterUpdate(subpicture_t *p_subpic,
                                     const struct vlc_spu_updater_configuration *cfg)
 {
     VLC_UNUSED(cfg);
 
     bluray_spu_updater_sys_t *p_upd_sys = p_subpic->updater.sys;
-    bluray_overlay_t         *p_overlay = updater_lock_overlay(p_upd_sys);
 
-    if (!p_overlay) {
+    vlc_mutex_lock(&p_upd_sys->lock);
+    bluray_overlay_t *p_overlay = p_upd_sys->p_overlay;
+
+    if (p_overlay == NULL) {
+        vlc_mutex_unlock(&p_upd_sys->lock);
         return;
     }
 
+    vlc_mutex_lock(&p_overlay->lock);
+
     if (p_overlay->status != Outdated)
     {
-        updater_unlock_overlay(p_upd_sys);
+        vlc_mutex_unlock(&p_overlay->lock);
+        vlc_mutex_unlock(&p_upd_sys->lock);
         return;
     }
 
@@ -1627,21 +1610,28 @@ static void subpictureUpdaterUpdate(subpicture_t *p_subpic,
     }
     p_overlay->status = Displayed;
 
-    updater_unlock_overlay(p_upd_sys);
+    vlc_mutex_unlock(&p_overlay->lock);
+    vlc_mutex_unlock(&p_upd_sys->lock);
 }
 
 static void subpictureUpdaterDestroy(subpicture_t *p_subpic)
 {
     bluray_spu_updater_sys_t *p_upd_sys = p_subpic->updater.sys;
-    bluray_overlay_t         *p_overlay = updater_lock_overlay(p_upd_sys);
 
-    if (p_overlay) {
-        /* vout is closed (seek, new clip, ?). Overlay must be redrawn. */
-        p_overlay->status = ToDisplay;
-        p_overlay->b_on_vout = false;
-        updater_unlock_overlay(p_upd_sys);
-    }
+    vlc_mutex_lock(&p_upd_sys->lock);
+    bluray_overlay_t *p_overlay = p_upd_sys->p_overlay;
 
+    if (p_overlay == NULL)
+        goto end;
+
+    vlc_mutex_lock(&p_overlay->lock);
+    /* vout is closed (seek, new clip, ?). Overlay must be redrawn. */
+    p_overlay->status = ToDisplay;
+    p_overlay->b_on_vout = false;
+    vlc_mutex_unlock(&p_overlay->lock);
+
+end:
+    vlc_mutex_unlock(&p_upd_sys->lock);
     unref_subpicture_updater(p_upd_sys);
 }
 
