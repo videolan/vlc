@@ -72,7 +72,7 @@ libmad_plugin_la_SOURCES = codec/mad.c
 libmad_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(MAD_CFLAGS)
 libmad_plugin_la_LIBADD = $(AM_LIBADD) $(MAD_LIBS)
 if HAVE_MAD
-audio_filter_PLUGINS += libmad_plugin.la
+codec_PLUGINS += libmad_plugin.la
 endif
 
 libmpg123_plugin_la_SOURCES = codec/mpg123.c
