@@ -75,6 +75,15 @@ GotoTimeDialog::GotoTimeDialog( qt_intf_t *_p_intf)
 
     BUTTONACT( resetButton, &GotoTimeDialog::reset );
 
+    const auto updateAvailability = [this, gotoButton]() {
+        gotoButton->setEnabled( THEMIM->isStarted() && THEMIM->isSeekable() );
+    };
+    updateAvailability();
+    connect( THEMIM, &PlayerController::playingStateChanged,
+             this, updateAvailability );
+    connect( THEMIM, &PlayerController::seekableChanged,
+             this, updateAvailability );
+
     QVLCTools::restoreWidgetPosition( p_intf, "gototimedialog", this );
 }
 
@@ -104,11 +113,11 @@ void GotoTimeDialog::reject()
 
 void GotoTimeDialog::accept()
 {
-    if ( THEMIM->hasInput() )
-    {
-        int i_time = QTime( 0, 0, 0 ).msecsTo( timeEdit->time() );
-        THEMIM->setTime( VLC_TICK_FROM_MS(i_time) );
-    }
+    if ( !THEMIM->isStarted() || !THEMIM->isSeekable() )
+        return;
+
+    int i_time = QTime( 0, 0, 0 ).msecsTo( timeEdit->time() );
+    THEMIM->setTime( VLC_TICK_FROM_MS(i_time) );
 
     QVLCDialog::accept();
 }
