@@ -1,14 +1,16 @@
 # stats module
 vlc_modules += {
     'name' : 'stats',
-    'sources' : files('stats.c')
+    'sources' : files('stats.c'),
+    'plugin_dir' : 'misc',
 }
 
 # audioscrobbler module
 vlc_modules += {
     'name' : 'audioscrobbler',
     'sources' : files('audioscrobbler.c'),
-    'dependencies' : [threads_dep, socket_libs]
+    'dependencies' : [threads_dep, socket_libs],
+    'plugin_dir' : 'misc',
 }
 
 # export module
@@ -19,7 +21,8 @@ vlc_modules += {
         'playlist/html.c',
         'playlist/m3u.c',
         'playlist/xspf.c',
-    )
+    ),
+    'plugin_dir' : 'misc',
 }
 
 # audio fingerprinter module
@@ -31,6 +34,7 @@ vlc_modules += {
     ),
     'dependencies' : [m_lib],
     'link_with' : vlc_json_lib,
+    'plugin_dir' : 'misc',
 }
 
 # libxml2 module
@@ -39,7 +43,8 @@ if libxml2_dep.found()
     vlc_modules += {
         'name' : 'xml',
         'sources' : files('xml/libxml.c'),
-        'dependencies' : [libxml2_dep]
+        'dependencies' : [libxml2_dep],
+        'plugin_dir' : 'misc',
     }
 endif
 
@@ -67,7 +72,8 @@ if medialibrary_dep.found()
             'medialibrary/fs/util.h',
             'medialibrary/fs/util.cpp',
         ),
-        'dependencies' : [medialibrary_dep]
+        'dependencies' : [medialibrary_dep],
+        'plugin_dir' : 'misc',
     }
 endif
 
@@ -76,7 +82,8 @@ if host_system == 'darwin'
     vlc_modules += {
         'name' : 'securetransport',
         'sources' : files('securetransport.c'),
-        'dependencies' : [security_dep, corefoundation_dep]
+        'dependencies' : [security_dep, corefoundation_dep],
+        'plugin_dir' : 'misc',
     }
 endif
 
@@ -94,7 +101,8 @@ if gnutls_dep.found()
     vlc_modules += {
         'name' : 'gnutls',
         'sources' : files('gnutls.c'),
-        'dependencies' : [gnutls_dep, gnutls_darwin_deps]
+        'dependencies' : [gnutls_dep, gnutls_darwin_deps],
+        'plugin_dir' : 'misc',
     }
 endif
 
@@ -103,7 +111,8 @@ if have_osx
     vlc_modules += {
         'name' : 'iokit_inhibit',
         'sources' : files('inhibit/iokit-inhibit.c'),
-        'dependencies' : [corefoundation_dep, iokit_dep]
+        'dependencies' : [corefoundation_dep, iokit_dep],
+        'plugin_dir' : 'misc',
     }
 endif
 
@@ -112,7 +121,8 @@ if have_ios or have_tvos
         'name' : 'uikit_inhibit',
         'sources' : files('inhibit/uikit-inhibit.m'),
         'dependencies' : [uikit_dep, foundation_dep],
-        'objc_args' : ['-fobjc-arc']
+        'objc_args' : ['-fobjc-arc'],
+        'plugin_dir' : 'misc',
     }
 endif
 
@@ -120,12 +130,14 @@ if get_option('addon_manager')
     # Add-on manager module
     vlc_modules += {
         'name' : 'addonsvorepository',
-        'sources' : files('addons/vorepository.c')
+        'sources' : files('addons/vorepository.c'),
+        'plugin_dir' : 'misc',
     }
     # Add-on filesystem storage module
     vlc_modules += {
         'name' : 'addonsfsstorage',
-        'sources' : files('addons/fsstorage.c')
+        'sources' : files('addons/fsstorage.c'),
+        'plugin_dir' : 'misc',
     }
 endif
 
@@ -154,6 +166,7 @@ if have_wayland
             wl_inhibit_proto,
         ],
         'dependencies' : [wayland_deps],
+        'plugin_dir' : 'misc',
     }
 endif
 
@@ -162,7 +175,8 @@ if xcb_dep.found()
     vlc_modules += {
         'name' : 'xdg_screensaver',
         'sources' : files('inhibit/xdg.c'),
-        'dependencies' : [xcb_dep]
+        'dependencies' : [xcb_dep],
+        'plugin_dir' : 'misc',
     }
 endif
 
@@ -171,7 +185,8 @@ if dbus_dep.found()
     vlc_modules += {
         'name' : 'dbus_screensaver',
         'sources' : files('inhibit/dbus.c'),
-        'dependencies' : [dbus_dep]
+        'dependencies' : [dbus_dep],
+        'plugin_dir' : 'misc',
     }
 endif
 

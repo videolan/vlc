@@ -11,4 +11,5 @@ vlc_modules += {
         'json/tojson.c',
     ),
     'link_with' : [vlc_json_lib],
+    'plugin_dir' : 'misc',
 }

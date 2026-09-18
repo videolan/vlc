@@ -1,7 +1,8 @@
 # Folder
 vlc_modules += {
     'name' : 'folder',
-    'sources' : files('folder.c')
+    'sources' : files('folder.c'),
+    'plugin_dir' : 'meta_engine',
 }
 
 # Taglib
@@ -10,6 +11,7 @@ if taglib_dep.found()
     vlc_modules += {
         'name' : 'taglib',
         'sources' : files('taglib.cpp'),
-        'dependencies' : [taglib_dep, z_dep]
+        'dependencies' : [taglib_dep, z_dep],
+        'plugin_dir' : 'meta_engine',
     }
 endif

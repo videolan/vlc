@@ -4,7 +4,8 @@
 vlc_modules += {
     'name' : 'edgedetection',
     'sources' : files('edgedetection.c'),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'plugin_dir' : 'video_filter',
 }
 
 # Adjust (saturation/hue) filter
@@ -15,25 +16,29 @@ vlc_modules += {
         'adjust_sat_hue.c',
         'adjust_sat_hue.h'
     ),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'plugin_dir' : 'video_filter',
 }
 
 # Alpha-mask filter
 vlc_modules += {
     'name' : 'alphamask',
-    'sources' : files('alphamask.c')
+    'sources' : files('alphamask.c'),
+    'plugin_dir' : 'video_filter',
 }
 
 # Anaglyph filter
 vlc_modules += {
     'name' : 'anaglyph',
-    'sources' : files('anaglyph.c')
+    'sources' : files('anaglyph.c'),
+    'plugin_dir' : 'video_filter',
 }
 
 # Anti-flicker filter
 vlc_modules += {
     'name' : 'antiflicker',
-    'sources' : files('antiflicker.c')
+    'sources' : files('antiflicker.c'),
+    'plugin_dir' : 'video_filter',
 }
 
 opengl_filter_dep = disabler()
@@ -52,6 +57,7 @@ vlc_modules += {
     'sources' : files('opengl.c'),
     'dependencies' : [gl_common_dep, opengl_filter_dep],
     'c_args' : opengl_filter_cargs,
+    'plugin_dir' : 'video_filter',
     'enabled' : opengl_filter_dep.found()
 }
 
@@ -60,6 +66,7 @@ vlc_modules += {
     'name' : 'gladjust',
     'sources' : files('gladjust.c'),
     'dependencies' : [gl_plugin_dep],
+    'plugin_dir' : 'video_filter',
     'enabled' : opengl_filter_dep.found(),
 }
 
@@ -67,6 +74,7 @@ vlc_modules += {
     'name' : 'opengl_win_offscreen',
     'sources' : files('opengl_win_offscreen.c'),
     'dependencies' : [ gl_common_dep, opengl_dep ],
+    'plugin_dir' : 'video_output',
     'enabled' : opengl_dep.found() and host_system == 'windows'
 }
 
@@ -76,6 +84,7 @@ vlc_modules += {
     'sources' : files('../video_output/opengl/pl_scale.c'),
     'dependencies' : [gl_plugin_dep, libplacebo_dep],
     'link_with' : [libplacebo_utils],
+    'plugin_dir' : 'video_filter',
     'enabled' : libplacebo_dep.found() and gl_plugin_dep.found(),
 }
 
@@ -87,6 +96,7 @@ vlc_modules += {
         '../video_output/opengl/egl_display.c',
     ),
     'dependencies' : [gl_common_dep, gl_vout_dep, egl_dep],
+    'plugin_dir' : 'video_output',
     'enabled' : egl_dep.found() and gl_vout_dep.found() and host_system != 'emscripten',
 }
 
@@ -97,6 +107,7 @@ vlc_modules += {
     'dependencies' : [android_lib, egl_dep, opengles2_dep],
     'c_args' : ['-DUSE_OPENGL_ES2'],
     'link_with' : [libandroid_env, libandroid_utils, libvlc_opengles],
+    'plugin_dir' : 'video_filter',
     'enabled' : host_system == 'android' and egl_dep.found(),
 }
 
@@ -109,6 +120,7 @@ if host_system == 'windows'
             ),
         'link_with': [ d3d11_common_lib ],
         'dependencies': [ contrib_dep, cc.find_library('d3d11')],
+        'plugin_dir' : 'video_filter',
         'enabled' : get_option('amf_frc').allowed() \
                     and cc.find_library('d3d11').found() \
                     and cc.check_header('AMF/core/PropertyStorage.h', args: [contrib_inc_args]) \
@@ -123,6 +135,7 @@ if host_system == 'windows'
             ),
         'link_with': [ d3d11_common_lib ],
         'dependencies': [ contrib_dep, cc.find_library('d3d11') ],
+        'plugin_dir' : 'video_filter',
         'enabled' : get_option('amf_vqenhancer').allowed() \
                     and cc.find_library('d3d11').found() \
                     and cc.check_header('AMF/core/PropertyStorage.h', args: [contrib_inc_args]) \
@@ -134,136 +147,160 @@ endif
 vlc_modules += {
     'name' : 'ball',
     'sources' : files('ball.c'),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'plugin_dir' : 'video_filter',
 }
 
 vlc_modules += {
     'name' : 'blendbench',
-    'sources' : files('blendbench.c')
+    'sources' : files('blendbench.c'),
+    'plugin_dir' : 'video_filter',
 }
 
 vlc_modules += {
     'name' : 'bluescreen',
-    'sources' : files('bluescreen.c')
+    'sources' : files('bluescreen.c'),
+    'plugin_dir' : 'video_filter',
 }
 
 vlc_modules += {
     'name' : 'canvas',
-    'sources' : files('canvas.c')
+    'sources' : files('canvas.c'),
+    'plugin_dir' : 'video_filter',
 }
 
 vlc_modules += {
     'name' : 'colorthres',
     'sources' : files('colorthres.c'),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'plugin_dir' : 'video_filter',
 }
 
 # Crop filter
 vlc_modules += {
     'name' : 'croppadd',
-    'sources' : files('croppadd.c')
+    'sources' : files('croppadd.c'),
+    'plugin_dir' : 'video_filter',
 }
 
 vlc_modules += {
     'name' : 'erase',
-    'sources' : files('erase.c')
+    'sources' : files('erase.c'),
+    'plugin_dir' : 'video_filter',
 }
 
 vlc_modules += {
     'name' : 'extract',
     'sources' : files('extract.c'),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'plugin_dir' : 'video_filter',
 }
 
 vlc_modules += {
     'name' : 'fps',
-    'sources' : files('fps.c')
+    'sources' : files('fps.c'),
+    'plugin_dir' : 'video_filter',
 }
 
 vlc_modules += {
     'name' : 'freeze',
-    'sources' : files('freeze.c')
+    'sources' : files('freeze.c'),
+    'plugin_dir' : 'video_filter',
 }
 
 # Gaussian blur filter
 vlc_modules += {
     'name' : 'gaussianblur',
     'sources' : files('gaussianblur.c'),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'plugin_dir' : 'video_filter',
 }
 
 vlc_modules += {
     'name' : 'gradfun',
     'sources' : files('gradfun.c', 'gradfun.h'),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'plugin_dir' : 'video_filter',
 }
 
 vlc_modules += {
     'name' : 'gradient',
     'sources' : files('gradient.c'),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'plugin_dir' : 'video_filter',
 }
 
 vlc_modules += {
     'name' : 'grain',
     'sources' : files('grain.c'),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'plugin_dir' : 'video_filter',
 }
 
 vlc_modules += {
     'name' : 'hqdn3d',
     'sources' : files('hqdn3d.c', 'hqdn3d.h'),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'plugin_dir' : 'video_filter',
 }
 
 vlc_modules += {
     'name' : 'invert',
-    'sources' : files('invert.c')
+    'sources' : files('invert.c'),
+    'plugin_dir' : 'video_filter',
 }
 
 vlc_modules += {
     'name' : 'magnify',
-    'sources' : files('magnify.c')
+    'sources' : files('magnify.c'),
+    'plugin_dir' : 'video_filter',
 }
 
 vlc_modules += {
     'name' : 'formatcrop',
-    'sources' : files('formatcrop.c')
+    'sources' : files('formatcrop.c'),
+    'plugin_dir' : 'video_filter',
 }
 
 vlc_modules += {
     'name' : 'mirror',
-    'sources' : files('mirror.c')
+    'sources' : files('mirror.c'),
+    'plugin_dir' : 'video_filter',
 }
 
 # Motion blur filter
 vlc_modules += {
     'name' : 'motionblur',
-    'sources' : files('motionblur.c')
+    'sources' : files('motionblur.c'),
+    'plugin_dir' : 'video_filter',
 }
 
 # Motion detection filter
 vlc_modules += {
     'name' : 'motiondetect',
-    'sources' : files('motiondetect.c')
+    'sources' : files('motiondetect.c'),
+    'plugin_dir' : 'video_filter',
 }
 
 # Old movie filter
 vlc_modules += {
     'name' : 'oldmovie',
     'sources' : files('oldmovie.c'),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'plugin_dir' : 'video_filter',
 }
 
 vlc_modules += {
     'name' : 'posterize',
-    'sources' : files('posterize.c')
+    'sources' : files('posterize.c'),
+    'plugin_dir' : 'video_filter',
 }
 
 vlc_modules += {
     'name' : 'psychedelic',
     'sources' : files('psychedelic.c'),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'plugin_dir' : 'video_filter',
 }
 
 # Puzzle filter
@@ -281,13 +318,15 @@ vlc_modules += {
         'puzzle/puzzle_pce.c',
         'puzzle/puzzle_pce.h',
     ),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'plugin_dir' : 'video_filter',
 }
 
 vlc_modules += {
     'name' : 'ripple',
     'sources' : files('ripple.c'),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'plugin_dir' : 'video_filter',
 }
 
 # Rotate filter
@@ -295,47 +334,55 @@ vlc_modules += {
     'name' : 'rotate',
     'sources' : files('rotate.c'),
     'dependencies' : [m_lib],
-    'link_with' : [vlc_motion_lib]
+    'link_with' : [vlc_motion_lib],
+    'plugin_dir' : 'video_filter',
 }
 
 vlc_modules += {
     'name' : 'scale',
-    'sources' : files('scale.c')
+    'sources' : files('scale.c'),
+    'plugin_dir' : 'video_filter',
 }
 
 vlc_modules += {
     'name' : 'scene',
     'sources' : files('scene.c'),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'plugin_dir' : 'video_filter',
 }
 
 # Sepia filter
 vlc_modules += {
     'name' : 'sepia',
-    'sources' : files('sepia.c')
+    'sources' : files('sepia.c'),
+    'plugin_dir' : 'video_filter',
 }
 
 # Sharpen filter
 vlc_modules += {
     'name' : 'sharpen',
-    'sources' : files('sharpen.c')
+    'sources' : files('sharpen.c'),
+    'plugin_dir' : 'video_filter',
 }
 
 vlc_modules += {
     'name' : 'transform',
-    'sources' : files('transform.c')
+    'sources' : files('transform.c'),
+    'plugin_dir' : 'video_filter',
 }
 
 # VHS-effect filter
 vlc_modules += {
     'name' : 'vhs',
-    'sources' : files('vhs.c')
+    'sources' : files('vhs.c'),
+    'plugin_dir' : 'video_filter',
 }
 
 vlc_modules += {
     'name' : 'wave',
     'sources' : files('wave.c'),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'plugin_dir' : 'video_filter',
 }
 
 # macOS/iOS accelerated video filters (CoreImage)
@@ -351,6 +398,7 @@ vlc_modules += {
     ],
     'objc_args' : ['-DGL_SILENCE_DEPRECATION', '-DCI_SILENCE_GL_DEPRECATION'],
     'include_directories' : [include_directories('../codec')],
+    'plugin_dir' : 'video_filter',
     'enabled' : host_system == 'darwin',
 }
 
@@ -372,7 +420,8 @@ vlc_modules += {
     'name' : 'deinterlace',
     'sources' : deinterlace_sources,
     'include_directories' : include_directories('../../extras/include/x86'),
-    'link_with' : [deinterlacecommon_lib]
+    'link_with' : [deinterlacecommon_lib],
+    'plugin_dir' : 'video_filter',
 }
 
 # gl blend
@@ -380,6 +429,7 @@ vlc_modules += {
     'name' : 'glblend',
     'sources' : files('deinterlace/glblend.c'),
     'dependencies' : [gl_common_dep, gl_vout_dep],
+    'plugin_dir' : 'video_filter',
     'enabled' : gl_vout_dep.found(),
 }
 
@@ -395,18 +445,21 @@ if postproc_dep.found()
     'sources' : files('postproc.c'),
     'dependencies' : [m_lib, postproc_dep],
     'c_args' : postproc_c_args,
+    'plugin_dir' : 'video_filter',
     }
 endif
 
 vlc_modules += {
     'name' : 'blend',
-    'sources' : files('blend.cpp')
+    'sources' : files('blend.cpp'),
+    'plugin_dir' : 'video_filter',
 }
 
 vlc_modules += {
     'name' : 'dither',
     'sources' : files('dither.c'),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'plugin_dir' : 'video_filter',
 }
 
 opencv_dep = dependency('opencv4',
@@ -419,6 +472,7 @@ vlc_modules += {
     'sources' : files('opencv_wrapper.cpp'),
     'dependencies' : [m_lib, opencv_dep],
     'link_args' : gc_sections_linkargs,
+    'plugin_dir' : 'video_filter',
     'enabled' : opencv_dep.found()
 }
 
@@ -427,6 +481,7 @@ vlc_modules += {
     'sources' : files('opencv_example.cpp'),
     'dependencies' : [m_lib, opencv_dep],
     'link_args' : gc_sections_linkargs,
+    'plugin_dir' : 'video_filter',
     'enabled' : opencv_dep.found()
 }
 
@@ -443,6 +498,7 @@ if opencv_dep.found() and sam3_dep.found()
             sam3_dep,
         ],
         'cpp_args' : [ '-fexceptions' ],
-        'link_args' : gc_sections_linkargs
+        'link_args' : gc_sections_linkargs,
+        'plugin_dir' : 'video_filter',
     }
 endif

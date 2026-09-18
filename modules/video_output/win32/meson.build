@@ -34,7 +34,8 @@ if get_option('directx').allowed()
         'link_with' : d3d11_link_with,
         'c_args' : d3d11_cargs,
         'cpp_args' : d3d11_cxxargs,
-        'dependencies' : d3d11_deps
+        'dependencies' : d3d11_deps,
+        'plugin_dir' : 'video_output',
     }
 endif
 
@@ -48,7 +49,8 @@ if have_win_desktop
             'dependencies' : [
                 cc.find_library('user32'),
                 cc.find_library('dxva2'),
-            ]
+            ],
+            'plugin_dir' : 'video_output',
         }
     endif
 
@@ -59,7 +61,8 @@ if have_win_desktop
         'link_with' : [ chroma_copy_lib ],
         'dependencies' : [
             cc.find_library('user32')
-        ]
+        ],
+        'plugin_dir' : 'video_output',
     }
 
     opengl32_lib = cc.find_library('opengl32', required: false)
@@ -74,7 +77,8 @@ if have_win_desktop
             'c_args' : [ contrib_inc_args, '-DHAVE_WIN32_SENSORS' ],
             'dependencies' : [ gl_common_dep, opengl32_lib,
                 cc.find_library('user32')
-            ]
+            ],
+            'plugin_dir' : 'video_output',
         }
 
         # WGL
@@ -82,25 +86,29 @@ if have_win_desktop
             'name' : 'wgl',
             'sources' : files('wgl.c'),
             'c_args' : [ contrib_inc_args ],
-            'dependencies' : [ opengl32_lib ]
+            'dependencies' : [ opengl32_lib ],
+            'plugin_dir' : 'video_output',
         }
     endif
 
     # Desktop inhibit
     vlc_modules += {
         'name' : 'winhibit',
-        'sources' : files('inhibit.c')
+        'sources' : files('inhibit.c'),
+        'plugin_dir' : 'video_output',
     }
 
     # Window
     vlc_modules += {
         'name' : 'win32_window',
-        'sources' : files('window.c')
+        'sources' : files('window.c'),
+        'plugin_dir' : 'video_output',
     }
 
     # Windows drawable
     vlc_modules += {
         'name' : 'drawable',
-        'sources' : files('drawable.c')
+        'sources' : files('drawable.c'),
+        'plugin_dir' : 'video_output',
     }
 endif

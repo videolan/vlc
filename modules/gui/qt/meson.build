@@ -1191,6 +1191,7 @@ if qt6_dep.found()
             'c_args': qt_wayland_cargs,
             'include_directories': [qt_include_dir],
             'dependencies': [wayland_deps[0], m_lib],
+            'plugin_dir' : 'gui',
         }
     endif
 
@@ -1218,6 +1219,7 @@ if qt6_dep.found()
             'style/gtkthemeprovider/scoped_gobject.h'
         ),
         'dependencies' : [gtk_dep, qt6_dep],
+        'plugin_dir' : 'gui',
         'enabled' : gtk_dep.found()
     }
 
@@ -1239,7 +1241,8 @@ if qt6_dep.found()
                     'maininterface/windoweffects_module.hpp',
                     'maininterface/kwindowsystem_module.cpp',
                 ),
-                'dependencies' : [kf6WindowSystem_dep, qt6_dep]
+                'dependencies' : [kf6WindowSystem_dep, qt6_dep],
+                'plugin_dir' : 'gui',
             }
         endif
     endif
@@ -1256,6 +1259,7 @@ if qt6_dep.found()
             'util/csdmenu_x11.h'
         ),
         'dependencies' : [xcb_dep, xcb_render_dep, xcb_xfixes_dep],
+        'plugin_dir' : 'gui',
         'enabled': xcb_dep.found() and xcb_render_dep.found() and xcb_xfixes_dep.found(),
     }
 
@@ -1278,6 +1282,7 @@ if qt6_dep.found()
         'cpp_args' : [qt_extra_flags, qt_cppargs],
         'link_args' : qt_link_args,
         'link_with' : qmllibs,
+        'plugin_dir' : 'gui',
     }
 
     vlc_tests += {

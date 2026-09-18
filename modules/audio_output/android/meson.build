@@ -8,12 +8,14 @@ android_audio_common = files(
 vlc_modules += {
     'name' : 'android_audiodev',
     'sources' : [android_audio_common, android_env_c, files('device.c')],
+    'plugin_dir' : 'audio_output',
     'enabled' : host_system == 'android',
 }
 
 vlc_modules += {
     'name' : 'audiotrack',
     'sources' : [android_audio_common, android_env_c, files('audiotrack.c')],
+    'plugin_dir' : 'audio_output',
     'enabled' : host_system == 'android',
 }
 
@@ -22,6 +24,7 @@ vlc_modules += {
     'name' : 'opensles',
     'sources' : files('opensles.c'),
     'dependencies' : [opensles_lib],
+    'plugin_dir' : 'audio_output',
     'enabled' : host_system == 'android' and opensles_lib.found(),
 }
 
@@ -30,5 +33,6 @@ vlc_modules += {
     'name' : 'aaudio',
     'sources' : [android_audio_common, android_env_c, files('aaudio.c')],
     'dependencies' : [aaudio_lib],
+    'plugin_dir' : 'audio_output',
     'enabled' : host_system == 'android' and aaudio_lib.found(),
 }

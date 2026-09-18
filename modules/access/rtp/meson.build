@@ -37,49 +37,59 @@ vlc_modules += {
         ),
     'dependencies': rtp_deps,
     'link_with': [rtp_lib],
+    'plugin_dir' : 'access',
 }
 
 vlc_modules += {
     'name': 'rtp_ac3',
-    'sources': files('ac3.c')
+    'sources': files('ac3.c'),
+    'plugin_dir' : 'access/rtp',
 }
 
 vlc_modules += {
     'name': 'rtp_mpeg12',
-    'sources': files('mpeg12.c')
+    'sources': files('mpeg12.c'),
+    'plugin_dir' : 'access/rtp',
 }
 
 vlc_modules += {
     'name': 'rtp_mpeg4',
-    'sources': files('mpeg4.c')
+    'sources': files('mpeg4.c'),
+    'plugin_dir' : 'access/rtp',
 }
 
 vlc_modules += {
     'name': 'rtp_pcm',
-    'sources': files('pcm.c')
+    'sources': files('pcm.c'),
+    'plugin_dir' : 'access/rtp',
 }
 
 vlc_modules += {
     'name': 'rtp_raw',
-    'sources': files('raw.c')
+    'sources': files('raw.c'),
+    'plugin_dir' : 'access/rtp',
 }
 
 vlc_modules += {
     'name': 'rtp_h264',
     'sources': files('h264.c', 'h26x.h'),
+    'plugin_dir' : 'access/rtp',
 }
 
 vlc_modules += {
     'name': 'rtp_h265',
     'sources': files('h265.c', 'h26x.h'),
+    'plugin_dir' : 'access/rtp',
 }
 
 vlc_modules += {
     'name': 'rtp_opus',
-    'sources': files('opus.c')
+    'sources': files('opus.c'),
+    'plugin_dir' : 'access/rtp',
 }
 
 vlc_modules += {
     'name': 'rtp_xiph',
-    'sources': files('xiph.c')
+    'sources': files('xiph.c'),
+    'plugin_dir' : 'access/rtp',
 }

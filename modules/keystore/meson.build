@@ -1,7 +1,8 @@
 # Memory keystore
 vlc_modules += {
     'name' : 'memory_keystore',
-    'sources' : files('memory.c', 'list_util.c')
+    'sources' : files('memory.c', 'list_util.c'),
+    'plugin_dir' : 'keystore',
 }
 
 # File keystore
@@ -22,6 +23,7 @@ vlc_modules += {
     'sources' : files('file.c', 'list_util.c') + file_keystore_extra_sources,
     'dependencies' : file_keystore_extra_deps,
     'link_with' : file_keystore_extra_link,
+    'plugin_dir' : 'keystore',
 }
 
 # libsecret keystore
@@ -30,7 +32,8 @@ if libsecret_dep.found()
     vlc_modules += {
         'name' : 'secret',
         'sources' : files('secret.c'),
-        'dependencies' : [libsecret_dep]
+        'dependencies' : [libsecret_dep],
+        'plugin_dir' : 'keystore',
     }
 endif
 
@@ -39,7 +42,8 @@ if dbus_dep.found()
     vlc_modules += {
         'name' : 'kwallet',
         'sources' : files('kwallet.c'),
-        'dependencies' : [dbus_dep, m_lib]
+        'dependencies' : [dbus_dep, m_lib],
+        'plugin_dir' : 'keystore',
     }
 endif
 
@@ -49,6 +53,7 @@ if host_system == 'darwin'
         'name' : 'keychain',
         'sources' : files('keychain.m', 'list_util.c'),
         'objc_args' : ['-fobjc-arc'],
-        'dependencies' : [foundation_dep, security_dep]
+        'dependencies' : [foundation_dep, security_dep],
+        'plugin_dir' : 'keystore',
     }
 endif

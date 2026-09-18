@@ -62,6 +62,7 @@ vlc_modules += {
   'name' : 'lua',
   'sources' : lua_sources,
   'dependencies' : [lua_dep, socket_libs],
+  'plugin_dir' : 'lua',
   'enabled' : lua_dep.found() and get_option('lua').allowed(),
 }
 

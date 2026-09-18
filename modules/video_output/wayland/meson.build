@@ -66,6 +66,7 @@ vlc_modules += {
     ],
     'include_directories': [wayland_inc],
     'dependencies': [wayland_client_dep],
+    'plugin_dir' : 'video_output',
 }
 
 xkbcommon_dep = dependency('xkbcommon', required: false)
@@ -96,6 +97,7 @@ vlc_modules += {
     'c_args': shell_common_cargs + ['-DXDG_SHELL'],
     'include_directories': [wayland_inc],
     'dependencies': shell_common_deps,
+    'plugin_dir' : 'video_output',
 }
 
 vlc_modules += {
@@ -106,6 +108,7 @@ vlc_modules += {
     'c_args': shell_common_cargs,
     'include_directories': [wayland_inc],
     'dependencies': shell_common_deps,
+    'plugin_dir' : 'video_output',
 }
 
 if egl_dep.found()
@@ -114,6 +117,7 @@ if egl_dep.found()
         'sources': files('../opengl/egl.c'),
         'c_args': ['-DUSE_PLATFORM_WAYLAND=1'],
         'dependencies': [egl_dep, wayland_egl_dep],
+        'plugin_dir' : 'video_output',
     }
 
     if gbm_dep.found() and drm_dep.found()
@@ -150,5 +154,6 @@ vlc_modules += {
     'sources': files('vulkan.c', '../vulkan/platform.h'),
     'c_args': ['-DVK_USE_PLATFORM_WAYLAND_KHR'],
     'dependencies': [wayland_client_dep, vulkan_dep],
+    'plugin_dir' : 'video_output',
     'enabled': vulkan_dep.found(),
 }

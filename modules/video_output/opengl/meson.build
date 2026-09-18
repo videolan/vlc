@@ -49,6 +49,7 @@ vlc_modules += {
         ],
     'link_with' : [libvlc_opengl],
     'dependencies' : [gl_common_dep, m_lib],
+    'plugin_dir' : 'video_output',
     'enabled' : opengl_dep.found() and not (have_ios or have_tvos or host_system == 'android')
 }
 
@@ -106,6 +107,7 @@ vlc_modules += {
     'link_with' : [libvlc_opengles],
     'dependencies' : [gl_common_dep, m_lib],
     'c_args' : ['-DUSE_OPENGL_ES2'],
+    'plugin_dir' : 'video_output',
     'enabled' : opengles2_dep.found(),
 }
 
@@ -114,6 +116,7 @@ vlc_modules += {
     'name' : 'glfilter_draw',
     'sources' : files('filter_draw.c'),
     'dependencies' : [gl_plugin_dep, m_lib],
+    'plugin_dir' : 'video_output',
     'enabled' : gl_vout_dep.found(),
 }
 
@@ -140,6 +143,7 @@ vlc_modules += {
     'dependencies' : glsampler_builtin_deps,
     'link_with' : glsampler_builtin_link,
     'c_args' : glsampler_builtin_cargs,
+    'plugin_dir' : 'video_output',
     'enabled' : gl_vout_dep.found(),
 }
 
@@ -148,6 +152,7 @@ vlc_modules += {
     'name' : 'glinterop_sw',
     'sources' : files('interop_sw.c'),
     'dependencies' : [gl_common_dep, gl_vout_dep, m_lib],
+    'plugin_dir' : 'video_output',
     'enabled' : gl_vout_dep.found(),
 }
 
@@ -159,6 +164,7 @@ vlc_modules += {
     'c_args' : [ contrib_inc_args ],
     'dependencies' : [ opengl32_lib, dxva2_dep ],
     'link_with' : [ d3d9_common_lib ],
+    'plugin_dir' : 'video_output',
     'enabled' : have_win_desktop and opengl32_lib.found() and dxva2_dep.found() and not missing_win_glew,
 }
 
@@ -170,6 +176,7 @@ vlc_modules += {
         '../../hw/vaapi/vlc_vaapi.c',
     ),
     'dependencies' : [gl_common_dep, libva_dep, egl_dep],
+    'plugin_dir' : 'video_output',
     'enabled' : opengl_dep.found() and egl_dep.found() and libva_dep.found(),
 }
 
@@ -178,6 +185,7 @@ vlc_modules += {
     'name' : 'egl_display_generic',
     'sources' : files('egl_display_generic.c'),
     'dependencies' : [egl_dep],
+    'plugin_dir' : 'video_output',
     'enabled' : egl_dep.found(),
 }
 
@@ -195,5 +203,6 @@ vlc_modules += {
     'sources' : files('egl_display_gbm.c'),
     'dependencies' : egl_display_gbm_deps,
     'c_args' : egl_display_gbm_cargs,
+    'plugin_dir' : 'video_output',
     'enabled' : egl_dep.found() and gbm_dep.found(),
 }

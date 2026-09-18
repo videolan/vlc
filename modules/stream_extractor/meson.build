@@ -3,5 +3,6 @@ vlc_modules += {
     'name' : 'archive',
     'sources' : files('archive.c'),
     'dependencies' : [libarchive_dep],
+    'plugin_dir' : 'stream_extractor',
     'enabled': libarchive_dep.found(),
 }

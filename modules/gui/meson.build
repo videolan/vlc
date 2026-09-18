@@ -6,7 +6,8 @@ if ncursesw_dep.found()
     vlc_modules += {
         'name' : 'ncurses',
         'sources' : files('ncurses.c'),
-        'dependencies' : [m_lib, threads_dep, ncursesw_dep]
+        'dependencies' : [m_lib, threads_dep, ncursesw_dep],
+        'plugin_dir' : 'gui',
     }
 endif
 
@@ -21,7 +22,8 @@ if get_option('minimal_macosx').require(have_osx).allowed()
             'minimal_macosx/macosx.c'
         ),
         'dependencies' : [cocoa_dep],
-        'objc_args' : ['-fobjc-arc', '-fobjc-exceptions']
+        'objc_args' : ['-fobjc-arc', '-fobjc-exceptions'],
+        'plugin_dir' : 'gui',
     }
 endif
 

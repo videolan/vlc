@@ -179,6 +179,7 @@ vlc_modules += {
     'c_args' : skins2_flags,
     'cpp_args' : [skins2_flags, '-O2', '-fno-rtti'],
     'objcpp_args' : [skins2_flags, '-O2', '-fno-rtti'],
+    'plugin_dir' : 'gui',
     'enabled': skins2_feasible,
 }
 
@@ -189,6 +190,7 @@ if host_system == 'darwin' and skins2_feasible
         'dependencies' : [
             dependency('appleframeworks', modules: ['Cocoa']),
         ],
+        'plugin_dir' : 'gui',
     }
 endif
 

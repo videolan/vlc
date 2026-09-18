@@ -15,7 +15,8 @@ vlc_modules += {
     'name' : 'flacsys',
     'sources' : files('flac.c'),
     'include_directories' : include_directories('../packetizer'),
-    'link_with' : [xiph_meta_lib]
+    'link_with' : [xiph_meta_lib],
+    'plugin_dir' : 'demux',
 }
 
 # OGG demux
@@ -33,6 +34,7 @@ if ogg_dep.found()
         'link_with' : [xiph_meta_lib],
         'dependencies' : ogg_deps,
         'c_args' : ogg_c_args,
+        'plugin_dir' : 'demux',
     }
 endif
 
@@ -48,61 +50,71 @@ endif
 # Demux dump
 vlc_modules += {
     'name' : 'demuxdump',
-    'sources' : files('demuxdump.c')
+    'sources' : files('demuxdump.c'),
+    'plugin_dir' : 'demux',
 }
 
 # Raw DV demux
 vlc_modules += {
     'name' : 'rawdv',
-    'sources' : files('rawdv.c')
+    'sources' : files('rawdv.c'),
+    'plugin_dir' : 'demux',
 }
 
 # Raw Vid demux
 vlc_modules += {
     'name' : 'rawvid',
-    'sources' : files('rawvid.c')
+    'sources' : files('rawvid.c'),
+    'plugin_dir' : 'demux',
 }
 
 # au demux
 vlc_modules += {
     'name' : 'au',
-    'sources' : files('au.c')
+    'sources' : files('au.c'),
+    'plugin_dir' : 'demux',
 }
 
 # Raw AUD demux
 vlc_modules += {
     'name' : 'rawaud',
-    'sources' : files('rawaud.c')
+    'sources' : files('rawaud.c'),
+    'plugin_dir' : 'demux',
 }
 
 # WAV demux module
 vlc_modules += {
     'name' : 'wav',
     'sources' : files('wav.c'),
+    'plugin_dir' : 'demux',
 }
 
 # NSV demux
 vlc_modules += {
     'name' : 'nsv',
-    'sources' : files('nsv.c')
+    'sources' : files('nsv.c'),
+    'plugin_dir' : 'demux',
 }
 
 # HX raw video/audio IP camera demuxer
 vlc_modules += {
     'name' : 'hx',
     'sources' : files('hx.c'),
+    'plugin_dir' : 'demux',
 }
 
 # G64 RTP dumps demuxer
 vlc_modules += {
     'name' : 'g64rtp',
     'sources' : files('g64rtp.c'),
+    'plugin_dir' : 'demux',
 }
 
 # MPEG PS demux
 vlc_modules += {
     'name' : 'ps',
-    'sources' : files('mpeg/ps.c')
+    'sources' : files('mpeg/ps.c'),
+    'plugin_dir' : 'demux',
 }
 
 # libmodplug
@@ -112,124 +124,144 @@ if libmodplug_dep.found()
     vlc_modules += {
         'name' : 'mod',
         'sources' : files('mod.c'),
-        'dependencies' : [libmodplug_dep]
+        'dependencies' : [libmodplug_dep],
+        'plugin_dir' : 'demux',
     }
 endif
 
 # PVA demux
 vlc_modules += {
     'name' : 'pva',
-    'sources' : files('pva.c')
+    'sources' : files('pva.c'),
+    'plugin_dir' : 'demux',
 }
 
 # AIFF demux
 vlc_modules += {
     'name' : 'aiff',
-    'sources' : files('aiff.c')
+    'sources' : files('aiff.c'),
+    'plugin_dir' : 'demux',
 }
 
 # MJPEG demux
 vlc_modules += {
     'name' : 'mjpeg',
-    'sources' : files('mjpeg.c')
+    'sources' : files('mjpeg.c'),
+    'plugin_dir' : 'demux',
 }
 
 # Subtitle demux
 vlc_modules += {
     'name' : 'subtitle',
     'sources' : files('subtitle.c'),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'plugin_dir' : 'demux',
 }
 
 # ty demux
 vlc_modules += {
     'name' : 'ty',
-    'sources' : files('ty.c')
+    'sources' : files('ty.c'),
+    'plugin_dir' : 'demux',
 }
 
 # vobsub demux
 vlc_modules += {
     'name' : 'vobsub',
-    'sources' : files('vobsub.c')
+    'sources' : files('vobsub.c'),
+    'plugin_dir' : 'demux',
 }
 
 # voc demux
 vlc_modules += {
     'name' : 'voc',
-    'sources' : files('voc.c')
+    'sources' : files('voc.c'),
+    'plugin_dir' : 'demux',
 }
 
 # xa demux
 vlc_modules += {
     'name' : 'xa',
-    'sources' : files('xa.c')
+    'sources' : files('xa.c'),
+    'plugin_dir' : 'demux',
 }
 
 # nuv demux
 vlc_modules += {
     'name' : 'nuv',
-    'sources' : files('nuv.c')
+    'sources' : files('nuv.c'),
+    'plugin_dir' : 'demux',
 }
 
 # tta demux
 vlc_modules += {
     'name' : 'tta',
-    'sources' : files('tta.c')
+    'sources' : files('tta.c'),
+    'plugin_dir' : 'demux',
 }
 
 # VC1 demux
 vlc_modules += {
     'name' : 'vc1',
-    'sources' : files('vc1.c')
+    'sources' : files('vc1.c'),
+    'plugin_dir' : 'demux',
 }
 
 # CDG demux
 vlc_modules += {
     'name' : 'demux_cdg',
-    'sources' : files('cdg.c')
+    'sources' : files('cdg.c'),
+    'plugin_dir' : 'demux',
 }
 
 # SMF demux
 vlc_modules += {
     'name' : 'smf',
-    'sources' : files('smf.c')
+    'sources' : files('smf.c'),
+    'plugin_dir' : 'demux',
 }
 
 # DMX Audio Music demux
 vlc_modules += {
     'name' : 'dmxmus',
-    'sources' : files('dmxmus.c')
+    'sources' : files('dmxmus.c'),
+    'plugin_dir' : 'demux',
 }
 
 # Image demux
 vlc_modules += {
     'name' : 'image',
-    'sources' : files('image.c')
+    'sources' : files('image.c'),
+    'plugin_dir' : 'demux',
 }
 
 # STL demux
 vlc_modules += {
     'name' : 'demux_stl',
-    'sources' : files('stl.c')
+    'sources' : files('stl.c'),
+    'plugin_dir' : 'demux',
 }
 
 # ASF demux
 vlc_modules += {
     'name' : 'asf',
-    'sources' : files('asf/asf.c', 'asf/libasf.c', 'asf/asfpacket.c')
+    'sources' : files('asf/asf.c', 'asf/libasf.c', 'asf/asfpacket.c'),
+    'plugin_dir' : 'demux',
 }
 
 # AVI demux
 vlc_modules += {
     'name' : 'avi',
-    'sources' : files('avi/avi.c', 'avi/libavi.c')
+    'sources' : files('avi/avi.c', 'avi/libavi.c'),
+    'plugin_dir' : 'demux',
 }
 
 # CAF demux
 vlc_modules += {
     'name' : 'caf',
     'sources' : files('caf.c'),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'plugin_dir' : 'demux',
 }
 
 # FFmpeg AVFormat demuxer
@@ -249,6 +281,7 @@ if avformat_dep.found()
         'dependencies' : [avformat_dep, avutil_dep, avcodec_dep],
         'link_with' : [libavcodec_common],
         'link_args' : symbolic_linkargs,
+        'plugin_dir' : 'demux',
         'enabled' : not get_option('merge-ffmpeg'),
     }
 endif
@@ -256,19 +289,22 @@ endif
 # Directory demuxer
 vlc_modules += {
     'name' : 'directory_demux',
-    'sources' : files('directory.c')
+    'sources' : files('directory.c'),
+    'plugin_dir' : 'demux',
 }
 
 # ES demux
 vlc_modules += {
     'name' : 'es',
-    'sources' : files('mpeg/es.c', '../packetizer/dts_header.c')
+    'sources' : files('mpeg/es.c', '../packetizer/dts_header.c'),
+    'plugin_dir' : 'demux',
 }
 
 # h.26x demux
 vlc_modules += {
     'name' : 'h26x',
-    'sources' : files('mpeg/h26x.c', '../packetizer/h264_nal.c')
+    'sources' : files('mpeg/h26x.c', '../packetizer/h264_nal.c'),
+    'plugin_dir' : 'demux',
 }
 
 # MKV demux
@@ -298,7 +334,8 @@ if libebml_dep.found() and libmatroska_dep.found()
             'mp4/libmp4.c',
             '../packetizer/dts_header.c',
         ),
-        'dependencies' : [libebml_dep, libmatroska_dep, z_dep]
+        'dependencies' : [libebml_dep, libmatroska_dep, z_dep],
+        'plugin_dir' : 'demux',
     }
 endif
 
@@ -315,7 +352,8 @@ vlc_modules += {
         'asf/asfpacket.c',
         'mp4/attachments.c',
     ),
-    'dependencies' : [m_lib, z_dep]
+    'dependencies' : [m_lib, z_dep],
+    'plugin_dir' : 'demux',
 }
 
 # mock demux
@@ -327,7 +365,8 @@ vlc_modules += {
 # mpgv demux
 vlc_modules += {
     'name' : 'mpgv',
-    'sources' : files('mpeg/mpgv.c')
+    'sources' : files('mpeg/mpgv.c'),
+    'plugin_dir' : 'demux',
 }
 
 # Playlist demux
@@ -349,7 +388,8 @@ vlc_modules += {
         'playlist/wpl.c',
         'playlist/wms.c',
         'playlist/xspf.c',
-        'playlist/playlist.c')
+        'playlist/playlist.c'),
+    'plugin_dir' : 'demux',
 }
 
 # TS demux
@@ -398,6 +438,7 @@ if libdvbpsi_dep.found()
         ),
         'dependencies' : [libdvbpsi_dep, aribb24_dep, libdvbcsa_dep],
         'c_args' : [libdvbpsi_c_args, arrib24_define],
+        'plugin_dir' : 'demux',
     }
 endif
 
@@ -407,6 +448,7 @@ vlc_modules += {
     'name' : 'gme',
     'sources' : files('gme.c'),
     'dependencies' : [gme_dep],
+    'plugin_dir' : 'demux',
     'enabled': gme_dep.found(),
 }
 
@@ -418,6 +460,7 @@ vlc_modules += {
     'name' : 'sid',
     'sources' : files('sid.cpp'),
     'dependencies' : [sid_dep, resid_dep],
+    'plugin_dir' : 'demux',
     'enabled': sid_dep.found() and resid_dep.found()
 }
 endif
@@ -638,10 +681,12 @@ vlc_modules += {
     'include_directories' : include_directories('adaptive', './'),
     'dependencies' : [socket_libs, m_lib, z_dep, gcrypt_dep],
     'link_with' : vlc_http_lib,
+    'plugin_dir' : 'demux',
 }
 
 # noseek demux
 vlc_modules += {
     'name' : 'noseek',
-    'sources' : files('filter/noseek.c')
+    'sources' : files('filter/noseek.c'),
+    'plugin_dir' : 'demux',
 }

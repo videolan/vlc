@@ -10,13 +10,15 @@ vlc_modules += {
     'sources' : files('audiobargraph_a.c'),
     'dependencies' : [m_lib],
     'shortname' : 'abg_a',
+    'plugin_dir' : 'audio_filter',
 }
 
 # Chorus flanger module
 vlc_modules += {
     'name' : 'chorus_flanger',
     'sources' : files('chorus_flanger.c'),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'plugin_dir' : 'audio_filter',
 }
 
 # Shared dynamics core
@@ -33,6 +35,7 @@ vlc_modules += {
     'sources' : files('compressor.c'),
     'dependencies' : [m_lib],
     'link_with' : [libdynamics],
+    'plugin_dir' : 'audio_filter',
 }
 
 # Expander module
@@ -41,6 +44,7 @@ vlc_modules += {
     'sources' : files('expander.c'),
     'dependencies' : [m_lib],
     'link_with' : [libdynamics],
+    'plugin_dir' : 'audio_filter',
 }
 
 # Limiter module
@@ -49,46 +53,53 @@ vlc_modules += {
     'sources' : files('limiter.c'),
     'dependencies' : [m_lib],
     'link_with' : [libdynamics],
+    'plugin_dir' : 'audio_filter',
 }
 
 # Equalizer filter module
 vlc_modules += {
     'name' : 'equalizer',
     'sources' : files('equalizer.c'),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'plugin_dir' : 'audio_filter',
 }
 
 # Gate filter module
 vlc_modules += {
     'name' : 'gate',
     'sources' : files('gate.c'),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'plugin_dir' : 'audio_filter',
 }
 
 # Karaoke filter module
 vlc_modules += {
     'name' : 'karaoke',
-    'sources' : files('karaoke.c')
+    'sources' : files('karaoke.c'),
+    'plugin_dir' : 'audio_filter',
 }
 
 # Volume normalization module
 vlc_modules += {
     'name' : 'normvol',
     'sources' : files('normvol.c'),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'plugin_dir' : 'audio_filter',
 }
 
 # Gain module
 vlc_modules += {
     'name' : 'gain',
-    'sources' : files('gain.c')
+    'sources' : files('gain.c'),
+    'plugin_dir' : 'audio_filter',
 }
 
 # Parametrical Equalizer module
 vlc_modules += {
     'name' : 'param_eq',
     'sources' : files('param_eq.c'),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'plugin_dir' : 'audio_filter',
 }
 
 # Scaletempo module
@@ -99,6 +110,7 @@ vlc_modules += {
     'name' : 'scaletempo',
     'sources' : scaletempo_sources,
     'dependencies' : scaletempo_deps,
+    'plugin_dir' : 'audio_filter',
 }
 
 # Scaletempo pitch module
@@ -108,12 +120,14 @@ vlc_modules += {
     'dependencies' : scaletempo_deps,
     'c_args' : ['-DPITCH_SHIFTER'],
     'shortname' : 'scalet_p',
+    'plugin_dir' : 'audio_filter',
 }
 
 # Stereo widen module
 vlc_modules += {
     'name' : 'stereo_widen',
-    'sources' : files('stereo_widen.c')
+    'sources' : files('stereo_widen.c'),
+    'plugin_dir' : 'audio_filter',
 }
 
 # Spatializer module
@@ -125,21 +139,24 @@ vlc_modules += {
         'spatializer/comb.cpp',
         'spatializer/denormals.c',
         'spatializer/revmodel.cpp'),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'plugin_dir' : 'audio_filter',
 }
 
 # Central channel filter
 vlc_modules += {
     'name' : 'center',
     'sources' : files('center.c'),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'plugin_dir' : 'audio_filter',
 }
 
 # Stereo panning filter
 vlc_modules += {
     'name' : 'stereopan',
     'sources' : files('stereo_pan.c'),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'plugin_dir' : 'audio_filter',
 }
 
 
@@ -148,39 +165,45 @@ vlc_modules += {
 # Dolby surround module
 vlc_modules += {
     'name' : 'dolby_surround_decoder',
-    'sources' : files('channel_mixer/dolby.c')
+    'sources' : files('channel_mixer/dolby.c'),
+    'plugin_dir' : 'audio_filter',
 }
 
 # Headphone mixer module
 vlc_modules += {
     'name' : 'headphone_channel_mixer',
     'sources' : files('channel_mixer/headphone.c'),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'plugin_dir' : 'audio_filter',
 }
 
 # Mono mixer module
 vlc_modules += {
     'name' : 'mono',
     'sources' : files('channel_mixer/mono.c'),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'plugin_dir' : 'audio_filter',
 }
 
 # Channel remap mixer module
 vlc_modules += {
     'name' : 'remap',
-    'sources' : files('channel_mixer/remap.c')
+    'sources' : files('channel_mixer/remap.c'),
+    'plugin_dir' : 'audio_filter',
 }
 
 # Trivial channel mixer module
 vlc_modules += {
     'name' : 'trivial_channel_mixer',
-    'sources' : files('channel_mixer/trivial.c')
+    'sources' : files('channel_mixer/trivial.c'),
+    'plugin_dir' : 'audio_filter',
 }
 
 # Simple channel mixer module
 vlc_modules += {
     'name' : 'simple_channel_mixer',
-    'sources' : files('channel_mixer/simple.c')
+    'sources' : files('channel_mixer/simple.c'),
+    'plugin_dir' : 'audio_filter',
 }
 
 # TODO: NEON optimized channel mixer plugin
@@ -205,6 +228,7 @@ vlc_modules += {
     'sources' : files('channel_mixer/spatialaudio.cpp'),
     'dependencies' : [spatial_dep],
     'cpp_args' : spatial_extra_cppflags,
+    'plugin_dir' : 'audio_filter',
     'enabled' : spatial_dep.found(),
 }
 
@@ -215,7 +239,8 @@ vlc_modules += {
 vlc_modules += {
     'name' : 'audio_format',
     'sources' : files('converter/format.c'),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'plugin_dir' : 'audio_filter',
 }
 
 # SPDIF converter module
@@ -225,7 +250,8 @@ vlc_modules += {
         'converter/tospdif.c',
         '../packetizer/dts_header.c'
     ),
-    'include_directories' : include_dir
+    'include_directories' : include_dir,
+    'plugin_dir' : 'audio_filter',
 }
 
 
@@ -234,7 +260,8 @@ vlc_modules += {
 # Ugly resampler module
 vlc_modules += {
     'name' : 'ugly_resampler',
-    'sources' : files('resampler/ugly.c')
+    'sources' : files('resampler/ugly.c'),
+    'plugin_dir' : 'audio_filter',
 }
 
 # libsamplerate resampler
@@ -243,7 +270,8 @@ if samplerate_dep.found()
     vlc_modules += {
         'name' : 'samplerate',
         'sources' : files('resampler/src.c'),
-        'dependencies' : [m_lib, samplerate_dep]
+        'dependencies' : [m_lib, samplerate_dep],
+        'plugin_dir' : 'audio_filter',
     }
 endif
 
@@ -253,7 +281,8 @@ if soxr_dep.found()
     vlc_modules += {
         'name' : 'soxr',
         'sources' : files('resampler/soxr.c'),
-        'dependencies' : [m_lib, soxr_dep]
+        'dependencies' : [m_lib, soxr_dep],
+        'plugin_dir' : 'audio_filter',
     }
 endif
 
@@ -263,7 +292,8 @@ if ebur128_dep.found()
     vlc_modules += {
 	'name' : 'ebur128',
 	'sources' : files('libebur128.c'),
-	'dependencies' : [ebur128_dep]
+	'dependencies' : [ebur128_dep],
+    'plugin_dir' : 'audio_filter',
     }
 endif
 
@@ -273,7 +303,8 @@ if speexdsp_dep.found()
     vlc_modules += {
         'name' : 'speex_resampler',
         'sources' : files('resampler/speex.c'),
-        'dependencies' : [speexdsp_dep]
+        'dependencies' : [speexdsp_dep],
+        'plugin_dir' : 'audio_filter',
     }
 endif
 
@@ -283,6 +314,7 @@ if rnnoise_dep.found()
     vlc_modules += {
 	'name' : 'rnnoise',
 	'sources' : files('rnnoise.c'),
-	'dependencies' : [m_lib, rnnoise_dep]
+	'dependencies' : [m_lib, rnnoise_dep],
+    'plugin_dir' : 'audio_filter',
     }
 endif

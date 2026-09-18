@@ -5,13 +5,15 @@
 # Dummy codec
 vlc_modules += {
     'name' : 'ddummy',
-    'sources' : files('ddummy.c')
+    'sources' : files('ddummy.c'),
+    'plugin_dir' : 'codec',
 }
 
 # Dummy codec
 vlc_modules += {
     'name' : 'edummy',
-    'sources' : files('edummy.c')
+    'sources' : files('edummy.c'),
+    'plugin_dir' : 'codec',
 }
 
 ## Audio codecs
@@ -19,25 +21,29 @@ vlc_modules += {
 # SPDIF codec
 vlc_modules += {
     'name' : 'spdif',
-    'sources' : files('spdif.c')
+    'sources' : files('spdif.c'),
+    'plugin_dir' : 'codec',
 }
 
 # adpcm codec
 vlc_modules += {
     'name' : 'adpcm',
-    'sources' : files('adpcm.c')
+    'sources' : files('adpcm.c'),
+    'plugin_dir' : 'codec',
 }
 
 # AES3 codec
 vlc_modules += {
     'name' : 'aes3',
-    'sources' : files('aes3.c')
+    'sources' : files('aes3.c'),
+    'plugin_dir' : 'codec',
 }
 
 # Raw PCM demux module
 vlc_modules += {
     'name' : 'araw',
     'sources' : files('araw.c'),
+    'plugin_dir' : 'codec',
 }
 
 # faad decoder plugin
@@ -46,13 +52,15 @@ vlc_modules += {
     'name' : 'faad',
     'sources' : files('faad.c'),
     'dependencies' : [faad_lib, m_lib],
+    'plugin_dir' : 'codec',
     'enabled' : faad_lib.found(),
 }
 
 # g711 codec
 vlc_modules += {
     'name' : 'g711',
-    'sources' : files('g711.c')
+    'sources' : files('g711.c'),
+    'plugin_dir' : 'codec',
 }
 
 # libfluidsynth (MIDI synthetizer) plugin
@@ -80,6 +88,7 @@ vlc_modules += {
     'sources' : files('fluidsynth.c'),
     'dependencies' : [fluidsynth_dep, m_lib],
     'c_args' : fluidsynth_module_flags,
+    'plugin_dir' : 'codec',
     'enabled' : fluidsynth_dep.found(),
 }
 
@@ -92,13 +101,15 @@ vlc_modules += {
         frameworks['AudioUnit'],
         frameworks['AudioToolbox'],
     ],
+    'plugin_dir' : 'codec',
     'enabled' : have_osx,
 }
 
 # LPCM codec
 vlc_modules += {
     'name' : 'lpcm',
-    'sources' : files('lpcm.c')
+    'sources' : files('lpcm.c'),
+    'plugin_dir' : 'codec',
 }
 
 # libmad codec
@@ -118,6 +129,7 @@ vlc_modules += {
     'name' : 'mad',
     'sources' : files('mad.c'),
     'dependencies' : [mad_dep],
+    'plugin_dir' : 'codec',
     'enabled' : mad_dep.found(),
 }
 
@@ -127,13 +139,15 @@ vlc_modules += {
     'name' : 'mpg123',
     'sources' : files('mpg123.c'),
     'dependencies' : [mpg123_dep],
+    'plugin_dir' : 'codec',
     'enabled' : mpg123_dep.found(),
 }
 
 # Ulead DV Audio codec
 vlc_modules += {
     'name' : 'uleaddvaudio',
-    'sources' : files('uleaddvaudio.c')
+    'sources' : files('uleaddvaudio.c'),
+    'plugin_dir' : 'codec',
 }
 
 
@@ -142,19 +156,22 @@ vlc_modules += {
 # CDG codec
 vlc_modules += {
     'name' : 'cdg',
-    'sources' : files('cdg.c')
+    'sources' : files('cdg.c'),
+    'plugin_dir' : 'codec',
 }
 
 # Raw video codec
 vlc_modules += {
     'name' : 'rawvideo',
-    'sources' : files('rawvideo.c')
+    'sources' : files('rawvideo.c'),
+    'plugin_dir' : 'codec',
 }
 
 # RTP video codec
 vlc_modules += {
     'name' : 'rtpvideo',
-    'sources' : files('rtpvideo.c')
+    'sources' : files('rtpvideo.c'),
+    'plugin_dir' : 'codec',
 }
 
 openapv_dep = dependency('oapv',
@@ -164,13 +181,15 @@ vlc_modules += {
     'name' : 'openapv',
     'sources' : files('openapv.c'),
     'dependencies' : [openapv_dep],
+    'plugin_dir' : 'codec',
     'enabled' : openapv_dep.found(),
 }
 
 # RTP Raw video codec
 vlc_modules += {
     'name' : 'rtp_rawvid',
-    'sources' : files('rtp-rawvid.c')
+    'sources' : files('rtp-rawvid.c'),
+    'plugin_dir' : 'codec',
 }
 
 ## Image codecs
@@ -181,6 +200,7 @@ vlc_modules += {
     'name' : 'png',
     'sources' : files('png.c'),
     'dependencies' : [png_dep, m_lib],
+    'plugin_dir' : 'codec',
     'enabled' : png_dep.found(),
 }
 
@@ -190,6 +210,7 @@ vlc_modules += {
     'name' : 'jpeg',
     'sources' : files('jpeg.c'),
     'dependencies' : [jpeg_dep],
+    'plugin_dir' : 'codec',
     'enabled' : jpeg_dep.found(),
 }
 
@@ -199,6 +220,7 @@ vlc_modules += {
     'name' : 'bpg',
     'sources' : files('bpg.c'),
     'dependencies' : [bpg_lib],
+    'plugin_dir' : 'codec',
     'enabled' : bpg_lib.found(),
 }
 
@@ -208,6 +230,7 @@ vlc_modules += {
     'name' : 'svgdec',
     'sources' : files('svg.c'),
     'dependencies' : [rsvg_dep, cairo_dep],
+    'plugin_dir' : 'codec',
     'enabled' : rsvg_dep.found() and cairo_dep.found(),
 }
 
@@ -218,6 +241,7 @@ vlc_modules += {
     'name' : 'xwd',
     'sources' : files('xwd.c'),
     'dependencies' : [xproto_dep],
+    'plugin_dir' : 'codec',
     'enabled' : xproto_dep.found(),
 }
 
@@ -248,25 +272,29 @@ vlc_modules += {
     'name' : 'libass',
     'sources' : files('libass.c'),
     'dependencies' : libass_deps,
+    'plugin_dir' : 'codec',
     'enabled' : libass_dep.found(),
 }
 
 # Closed captioning decoder
 vlc_modules += {
     'name' : 'cc',
-    'sources' : files('cc.c', 'cea708.c')
+    'sources' : files('cc.c', 'cea708.c'),
+    'plugin_dir' : 'codec',
 }
 
 # cvdsub decoder
 vlc_modules += {
     'name' : 'cvdsub',
-    'sources' : files('cvdsub.c')
+    'sources' : files('cvdsub.c'),
+    'plugin_dir' : 'codec',
 }
 
 # dvbsub decoder
 vlc_modules += {
     'name' : 'dvbsub',
-    'sources' : files('dvbsub.c')
+    'sources' : files('dvbsub.c'),
+    'plugin_dir' : 'codec',
 }
 
 # aribsub
@@ -276,6 +304,7 @@ vlc_modules += {
     'sources' : files('arib/aribsub.c'),
     'dependencies' : [aribb24_dep],
     'c_args' : ['-DHAVE_ARIBB24'],
+    'plugin_dir' : 'codec',
     'enabled' : aribb24_dep.found()
 }
 
@@ -284,43 +313,50 @@ vlc_modules += {
     'name' : 'aribcaption',
     'sources' : files('arib/libaribcaption.c'),
     'dependencies' : [libaribcaption_dep],
+    'plugin_dir' : 'codec',
     'enabled' : libaribcaption_dep.found()
 }
 
 # scte18 decoder
 vlc_modules += {
     'name' : 'scte18',
-    'sources' : files('scte18.c', 'atsc_a65.c')
+    'sources' : files('scte18.c', 'atsc_a65.c'),
+    'plugin_dir' : 'codec',
 }
 
 # scte27 decoder
 vlc_modules += {
     'name' : 'scte27',
-    'sources' : files('scte27.c')
+    'sources' : files('scte27.c'),
+    'plugin_dir' : 'codec',
 }
 
 # SPU decoder
 vlc_modules += {
     'name' : 'spudec',
-    'sources' : files('spudec/spudec.c', 'spudec/parse.c')
+    'sources' : files('spudec/spudec.c', 'spudec/parse.c'),
+    'plugin_dir' : 'codec',
 }
 
 # STL codec
 vlc_modules += {
     'name' : 'stl',
-    'sources' : files('stl.c')
+    'sources' : files('stl.c'),
+    'plugin_dir' : 'codec',
 }
 
 # subsdec
 vlc_modules += {
     'name' : 'subsdec',
-    'sources' : files('subsdec.c')
+    'sources' : files('subsdec.c'),
+    'plugin_dir' : 'codec',
 }
 
 # subsusf
 vlc_modules += {
     'name' : 'subsusf',
-    'sources' : files('subsusf.c')
+    'sources' : files('subsusf.c'),
+    'plugin_dir' : 'codec',
 }
 
 # TTML
@@ -333,19 +369,22 @@ endif
 vlc_modules += {
     'name' : 'ttml',
     'sources' : ttml_sources,
-    'include_directories' : include_directories('.')
+    'include_directories' : include_directories('.'),
+    'plugin_dir' : 'codec',
 }
 
 # svcdsub
 vlc_modules += {
     'name' : 'svcdsub',
-    'sources' : files('svcdsub.c')
+    'sources' : files('svcdsub.c'),
+    'plugin_dir' : 'codec',
 }
 
 # t140
 vlc_modules += {
     'name' : 't140',
-    'sources' : files('t140.c')
+    'sources' : files('t140.c'),
+    'plugin_dir' : 'codec',
 }
 
 # zvbi
@@ -354,6 +393,7 @@ vlc_modules += {
     'name' : 'zvbi',
     'sources' : files('zvbi.c'),
     'dependencies' : [zvbi_dep, socket_libs],
+    'plugin_dir' : 'codec',
     'enabled' : use_zvbi,
 }
 
@@ -361,19 +401,22 @@ vlc_modules += {
 vlc_modules += {
     'name' : 'telx',
     'sources' : files('telx.c'),
+    'plugin_dir' : 'codec',
     'enabled' : not use_zvbi and get_option('telx').enabled(),
 }
 
 # textst
 vlc_modules += {
     'name' : 'textst',
-    'sources' : files('textst.c')
+    'sources' : files('textst.c'),
+    'plugin_dir' : 'codec',
 }
 
 # substx3g
 vlc_modules += {
     'name' : 'substx3g',
-    'sources' : files('substx3g.c')
+    'sources' : files('substx3g.c'),
+    'plugin_dir' : 'codec',
 }
 
 # WebVTT plugin
@@ -429,6 +472,7 @@ vlc_modules += {
     'name' : 'webvtt',
     'sources' : webvtt_sources,
     'include_directories' : include_directories('webvtt'),
+    'plugin_dir' : 'codec',
     'enabled': get_option('css_engine').require(flex.found() and bison.found()).allowed()
 }
 
@@ -442,6 +486,7 @@ vlc_modules += {
     'name' : 'flac',
     'sources' : files('flac.c'),
     'dependencies' : [flac_dep],
+    'plugin_dir' : 'codec',
     'enabled' : flac_dep.found(),
 }
 
@@ -462,6 +507,7 @@ vlc_modules += {
     'sources' : files('kate.c'),
     'dependencies' : kate_deps,
     'c_args' : kate_c_args,
+    'plugin_dir' : 'codec',
     'enabled' : kate_dep.found(),
 }
 
@@ -471,6 +517,7 @@ vlc_modules += {
     'name' : 'opus',
     'sources' : files('opus.c', 'opus_header.c'),
     'dependencies' : [opus_dep, ogg_dep],
+    'plugin_dir' : 'codec',
     'enabled' : opus_dep.found() and ogg_dep.found(),
 }
 
@@ -481,6 +528,7 @@ vlc_modules += {
     'name' : 'theora',
     'sources' : files('theora.c'),
     'dependencies' : [theoraenc_dep, theoradec_dep, ogg_dep],
+    'plugin_dir' : 'codec',
     'enabled' : theoraenc_dep.found() and theoradec_dep.found() and ogg_dep.found(),
 }
 
@@ -491,6 +539,7 @@ vlc_modules += {
     'name' : 'daala',
     'sources' : files('daala.c'),
     'dependencies' : [daaladec_dep, daalaenc_dep],
+    'plugin_dir' : 'codec',
     'enabled' : daaladec_dep.found() and daalaenc_dep.found(),
 }
 
@@ -500,6 +549,7 @@ vlc_modules += {
     'name' : 'speex',
     'sources' : files('speex.c'),
     'dependencies' : [speex_dep, ogg_dep],
+    'plugin_dir' : 'codec',
     'enabled' : speex_dep.found() and ogg_dep.found(),
 }
 
@@ -510,6 +560,7 @@ vlc_modules += {
     'name' : 'vorbis',
     'sources' : files('vorbis.c'),
     'dependencies' : [vorbis_dep, vorbisenc_dep, ogg_dep],
+    'plugin_dir' : 'codec',
     'enabled' : vorbis_dep.found() and vorbisenc_dep.found() and ogg_dep.found()
 }
 
@@ -518,6 +569,7 @@ vlc_modules += {
     'name' : 'oggspots',
     'sources' : files('oggspots.c'),
     'dependencies' : [ogg_dep],
+    'plugin_dir' : 'codec',
     'enabled' : ogg_dep.found(),
 }
 
@@ -551,6 +603,7 @@ if host_system == 'darwin'
             frameworks['CoreVideo'],
         ],
         'link_with' : [hxxxhelper_lib, libvlc_vtutils],
+        'plugin_dir' : 'codec',
     }
 
     vlc_modules += {
@@ -565,6 +618,7 @@ if host_system == 'darwin'
             frameworks['CoreVideo'],
         ],
         'link_with' : [hxxxhelper_lib, libvlc_vtutils],
+        'plugin_dir' : 'codec',
     }
 
 endif
@@ -624,6 +678,7 @@ vlc_modules += {
     'c_args' : avcodec_cargs,
     'link_with' : [libavcodec_common],
     'link_args' : symbolic_linkargs,
+    'plugin_dir' : 'codec',
     'enabled' : avcodec_dep.found(),
 }
 
@@ -640,6 +695,7 @@ vlc_modules += {
             'avcodec/va_surface.c',
         ),
     'dependencies' : [avcodec_dep, libva_dep, avutil_dep],
+    'plugin_dir' : 'codec',
     'enabled' : get_option('libva').require(
         avcodec_dep.found() and avutil_dep.found(),
         error_message: 'VAAPI requires avcodec').allowed() and
@@ -657,7 +713,8 @@ if host_system == 'windows'
             ),
         'link_with' : [ hxxxhelper_lib, d3d11_common_lib ],
         'cpp_args' : libcom_cppflags,
-        'dependencies' : mft_deps
+        'dependencies' : mft_deps,
+        'plugin_dir' : 'codec',
     }
 
     if (get_option('d3d11va').
@@ -680,6 +737,7 @@ if host_system == 'windows'
                 vlc_include_dirs,
                 include_directories('avcodec')
             ],
+            'plugin_dir' : 'codec',
         }
     endif
 
@@ -703,6 +761,7 @@ if host_system == 'windows'
                 include_directories('avcodec')
             ],
             'dependencies' : [avcodec_compile_dep, cc.find_library('dxva2')],
+            'plugin_dir' : 'codec',
         }
     endif
 
@@ -716,6 +775,7 @@ if host_system == 'windows'
             cc.find_library('uuid'),
             cc.find_library('msdmo'),
         ],
+        'plugin_dir' : 'codec',
         'enabled' : have_win_desktop,
     }
 endif
@@ -733,6 +793,7 @@ vlc_modules += {
         ),
     'dependencies' : [dl_lib],
     'link_with' : [chroma_copy_lib],
+    'plugin_dir' : 'codec',
     'enabled' : get_option('omxil'),
 }
 
@@ -755,6 +816,7 @@ vlc_modules += {
         cc.find_library('EGL', required: host_system == 'android'),
         cc.find_library('GLESv2', required: host_system == 'android'),
     ],
+    'plugin_dir' : 'codec',
     'enabled' : host_system == 'android' and mediandk_lib.found(),
 }
 
@@ -766,6 +828,7 @@ vlc_modules += {
     'name' : 'x265',
     'sources' : files('x265.c'),
     'dependencies' : [x265_dep],
+    'plugin_dir' : 'codec',
     'enabled' : x265_dep.found(),
 }
 
@@ -777,6 +840,7 @@ vlc_modules += {
     'dependencies' : [x262_dep],
     'c_args' : ['-DPLUGIN_X262'],
     'link_args' : symbolic_linkargs,
+    'plugin_dir' : 'codec',
     'enabled' : x262_dep.found(),
 }
 
@@ -788,6 +852,7 @@ vlc_modules += {
     'dependencies' : [x26410b_dep],
     'c_args' : ['-DPLUGIN_X264_10B'],
     'link_args' : symbolic_linkargs,
+    'plugin_dir' : 'codec',
     'enabled' : x26410b_dep.found(),
 }
 
@@ -799,6 +864,7 @@ vlc_modules += {
     'dependencies' : [x264_dep],
     'c_args' : ['-DPLUGIN_X264'],
     'link_args' : symbolic_linkargs,
+    'plugin_dir' : 'codec',
     'enabled' : x264_dep.found(),
 }
 
@@ -811,6 +877,7 @@ vlc_modules += {
     'name' : 'fdkaac',
     'sources' : files('fdkaac.c'),
     'dependencies' : [fdkaac_dep],
+    'plugin_dir' : 'codec',
     'enabled' : fdkaac_dep.found(),
 }
 
@@ -820,6 +887,7 @@ vlc_modules += {
     'name' : 'shine',
     'sources' : files('shine.c'),
     'dependencies' : [shine_dep],
+    'plugin_dir' : 'codec',
     'enabled' : shine_dep.found(),
 }
 
@@ -846,6 +914,7 @@ vlc_modules += {
     'sources' : files('vpx.c'),
     'c_args' : vpx_c_args,
     'dependencies' : [vpx_dep],
+    'plugin_dir' : 'codec',
     'enabled' : vpx_dep.found(),
 }
 
@@ -866,6 +935,7 @@ vlc_modules += {
     'link_with' : vpx_alpha_with,
     'dependencies' : [vpx_alpha_deps],
     'cpp_args' : vpx_alpha_cxx_args,
+    'plugin_dir' : 'codec',
 }
 
 # libaom AV1 codec
@@ -874,6 +944,7 @@ vlc_modules += {
     'name' : 'aom',
     'sources' : files('aom.c', '../packetizer/av1_obu.c'),
     'dependencies' : [aom_dep],
+    'plugin_dir' : 'codec',
     'enabled' : aom_dep.found(),
 }
 
@@ -882,6 +953,7 @@ vlc_modules += {
     'name' : 'rav1e',
     'sources' : files('rav1e.c'),
     'dependencies' : [rav1e_dep],
+    'plugin_dir' : 'codec',
     'enabled' : rav1e_dep.found(),
 }
 
@@ -891,6 +963,7 @@ vlc_modules += {
     'name' : 'twolame',
     'sources' : files('twolame.c'),
     'dependencies' : [twolame_dep],
+    'plugin_dir' : 'codec',
     'enabled' : twolame_dep.found(),
 }
 
@@ -903,6 +976,7 @@ vlc_modules += {
             '../packetizer/av1_obu.c'
         ),
     'dependencies' : [dav1d_dep],
+    'plugin_dir' : 'codec',
     'enabled' : dav1d_dep.found(),
 }
 
@@ -922,6 +996,7 @@ vlc_modules += {
     'name' : 'qsv',
     'sources' : files('qsv.c'),
     'dependencies' : [qsv_dep],
+    'plugin_dir' : 'codec',
     'enabled' : qsv_dep.found(),
 }
 

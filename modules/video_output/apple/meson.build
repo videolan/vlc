@@ -23,6 +23,7 @@ vlc_modules += {
         frameworks['CoreVideo'],
         darwingl_dep,
     ],
+    'plugin_dir' : 'video_output',
 }
 
 if have_osx
@@ -51,6 +52,7 @@ vlc_modules += {
         frameworks['CoreImage'],
         frameworks['VideoToolbox'],
     ],
+    'plugin_dir' : 'video_output',
 }
 
 if have_ios or have_tvos
@@ -64,6 +66,7 @@ if have_ios or have_tvos
             frameworks['QuartzCore'],
             frameworks['OpenGLES']
         ],
+        'plugin_dir' : 'video_output',
     }
 
     vlc_modules += {
@@ -75,5 +78,6 @@ if have_ios or have_tvos
             frameworks['UIKit'],
             frameworks['CoreGraphics'],
         ],
+        'plugin_dir' : 'video_output',
     }
 endif

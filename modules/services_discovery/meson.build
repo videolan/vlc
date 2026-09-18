@@ -2,20 +2,23 @@
 vlc_modules += {
     'name' : 'podcast',
     'sources' : files('podcast.c'),
-    'dependencies' : [threads_dep]
+    'dependencies' : [threads_dep],
+    'plugin_dir' : 'services_discovery',
 }
 
 # Radio
 vlc_modules += {
     'name' : 'radio',
     'sources' : files('radio.c'),
+    'plugin_dir' : 'services_discovery',
 }
 
 # SAP
 vlc_modules += {
     'name' : 'sap',
     'sources' : files('sap.c', '../access/rtp/sdp.c'),
-    'dependencies' : [socket_libs, z_dep]
+    'dependencies' : [socket_libs, z_dep],
+    'plugin_dir' : 'services_discovery',
 }
 
 # Zeroconf services discovery
@@ -24,7 +27,8 @@ if avahi_dep.found()
     vlc_modules += {
         'name' : 'avahi',
         'sources' : files('avahi.c'),
-        'dependencies' : [avahi_dep]
+        'dependencies' : [avahi_dep],
+        'plugin_dir' : 'services_discovery',
     }
 endif
 
@@ -34,7 +38,8 @@ if mtp_dep.found()
     vlc_modules += {
         'name' : 'mtp',
         'sources' : files('mtp.c'),
-        'dependencies' : [mtp_dep]
+        'dependencies' : [mtp_dep],
+        'plugin_dir' : 'services_discovery',
     }
 endif
 
@@ -82,6 +87,7 @@ if upnp_dep.found()
         'name' : 'upnp',
         'sources' : upnp_sources,
         'dependencies' : [contrib_dep, upnp_dep, upnp_darwin_deps],
+        'plugin_dir' : 'services_discovery',
     }
 endif
 
@@ -91,6 +97,7 @@ vlc_modules += {
     'sources' : files('pipewire.c'),
     'link_with' : [libvlc_pipewire],
     'dependencies' : [pipewire_dep],
+    'plugin_dir' : 'services_discovery',
     'enabled' : pipewire_dep.found(),
 }
 
@@ -101,6 +108,7 @@ if pulse_dep.found()
         'sources' : files('pulse.c'),
         'link_with' : [libvlc_pulse],
         'dependencies' : [pulse_dep],
+        'plugin_dir' : 'services_discovery',
     }
 endif
 
@@ -110,7 +118,8 @@ if libudev_dep.found()
     vlc_modules += {
         'name' : 'udev',
         'sources' : files('udev.c'),
-        'dependencies' : [libudev_dep]
+        'dependencies' : [libudev_dep],
+        'plugin_dir' : 'services_discovery',
     }
 endif
 
@@ -119,7 +128,8 @@ if xcb_dep.found()
     vlc_modules += {
         'name' : 'xcb_apps',
         'sources' : files('xcb_apps.c'),
-        'dependencies' : [xcb_dep]
+        'dependencies' : [xcb_dep],
+        'plugin_dir' : 'services_discovery',
     }
 endif
 
@@ -127,12 +137,14 @@ endif
 if host_system == 'windows' and have_win_desktop
     vlc_modules += {
         'name' : 'windrive',
-        'sources' : files('windrive.c')
+        'sources' : files('windrive.c'),
+        'plugin_dir' : 'services_discovery',
     }
 
     vlc_modules += {
         'name' : 'winvolumes',
-        'sources' : files('winvolumes.c')
+        'sources' : files('winvolumes.c'),
+        'plugin_dir' : 'services_discovery',
     }
 endif
 
@@ -140,7 +152,8 @@ endif
 if host_system == 'os/2'
     vlc_modules += {
         'name' : 'os2drive',
-        'sources' : files('os2drive.c')
+        'sources' : files('os2drive.c'),
+        'plugin_dir' : 'services_discovery',
     }
 endif
 
@@ -150,7 +163,8 @@ if microdns_dep.found()
     vlc_modules += {
         'name' : 'microdns',
         'sources' : files('microdns.c'),
-        'dependencies' : [microdns_dep, socket_libs]
+        'dependencies' : [microdns_dep, socket_libs],
+        'plugin_dir' : 'services_discovery',
     }
 endif
 
@@ -160,6 +174,7 @@ if host_system == 'darwin'
         'name' : 'bonjour',
         'sources' : files('bonjour.m'),
         'objc_args' : ['-fobjc-arc'],
-        'dependencies' : [foundation_dep]
+        'dependencies' : [foundation_dep],
+        'plugin_dir' : 'services_discovery',
     }
 endif

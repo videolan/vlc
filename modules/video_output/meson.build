@@ -37,6 +37,7 @@ if host_system == 'darwin'
         'dependencies' : [
             frameworks['Cocoa'],
         ],
+        'plugin_dir' : 'video_output',
     }
 endif
 
@@ -54,13 +55,15 @@ endif
 # Dummy video output
 vlc_modules += {
     'name' : 'vdummy',
-    'sources' : files('vdummy.c')
+    'sources' : files('vdummy.c'),
+    'plugin_dir' : 'video_output',
 }
 
 # Dummy window provider
 vlc_modules += {
     'name' : 'wdummy',
-    'sources' : files('wdummy.c')
+    'sources' : files('wdummy.c'),
+    'plugin_dir' : 'video_output',
 }
 
 android_lib = []
@@ -99,6 +102,7 @@ if host_system == 'android'
         'include_directories' : [vlc_include_dirs],
         'link_with' : [libandroid_utils, libandroid_env],
         'dependencies' : [android_lib, egl_lib, glesv2_lib, m_lib],
+        'plugin_dir' : 'video_output',
     }
 
     # EGL display module for Android
@@ -108,6 +112,7 @@ if host_system == 'android'
         'c_args' : ['-DUSE_PLATFORM_ANDROID=1'],
         'link_with' : [libandroid_utils, libandroid_env],
         'dependencies' : [android_lib, egl_lib, glesv2_lib],
+        'plugin_dir' : 'video_output',
     }
 
     # OpenGL ES 2 interop for Android Surface (SurfaceTexture / ANativeWindow)
@@ -117,6 +122,7 @@ if host_system == 'android'
         'c_args' : ['-DUSE_OPENGL_ES2'],
         'link_with' : [libandroid_utils, libandroid_env],
         'dependencies' : [android_lib, egl_lib, glesv2_lib],
+        'plugin_dir' : 'video_output',
     }
 
     # OpenGL ES 2 interop for Android Image (AImageReader)
@@ -126,44 +132,51 @@ if host_system == 'android'
         'c_args' : ['-DUSE_OPENGL_ES2'],
         'link_with' : [libandroid_utils],
         'dependencies' : [android_lib, egl_lib, glesv2_lib],
+        'plugin_dir' : 'video_output',
     }
 endif
 
 # Video splitter
 vlc_modules += {
     'name' : 'video_splitter',
-    'sources' : files('splitter.c')
+    'sources' : files('splitter.c'),
+    'plugin_dir' : 'video_output',
 }
 
 # YUV video output
 vlc_modules += {
     'name' : 'yuv',
-    'sources' : files('yuv.c')
+    'sources' : files('yuv.c'),
+    'plugin_dir' : 'video_output',
 }
 
 # Flaschen video output
 vlc_modules += {
     'name' : 'flaschen',
     'sources' : files('flaschen.c'),
-    'dependencies' : [socket_libs]
+    'dependencies' : [socket_libs],
+    'plugin_dir' : 'video_output',
 }
 
 # vmem
 vlc_modules += {
     'name' : 'vmem',
-    'sources' : files('vmem.c')
+    'sources' : files('vmem.c'),
+    'plugin_dir' : 'video_output',
 }
 
 # wextern
 vlc_modules += {
     'name' : 'wextern',
-    'sources' : files('wextern.c')
+    'sources' : files('wextern.c'),
+    'plugin_dir' : 'video_output',
 }
 
 # vgl
 vlc_modules += {
     'name' : 'vgl',
-    'sources' : files('vgl.c')
+    'sources' : files('vgl.c'),
+    'plugin_dir' : 'video_output',
 }
 
 vlc_modules += {
@@ -179,6 +192,7 @@ vlc_modules += {
                     '../stream_out/sdi/V210.hpp'),
     'dependencies' : [dl_lib, decklink_dep],
     'cpp_args' : decklink_cpp_args,
+    'plugin_dir' : 'video_output',
     'enabled' : decklink_dep.found(),
 }
 
@@ -187,7 +201,8 @@ if drm_dep.found()
     vlc_modules += {
         'name' : 'kms',
         'sources' : files('kms.c'),
-        'dependencies' : [drm_dep]
+        'dependencies' : [drm_dep],
+        'plugin_dir' : 'video_output',
     }
 endif
 
@@ -202,6 +217,7 @@ if caca_dep.found()
         'name' : 'caca',
         'sources' : files('caca.c'),
         'dependencies' : [caca_deps],
+        'plugin_dir' : 'video_output',
     }
 endif
 
@@ -222,7 +238,8 @@ if xcb_dep.found()
         vlc_modules += {
             'name' : 'xcb_window',
             'sources' : files('xcb/window.c'),
-            'dependencies' : [xcb_dep, xcb_randr_dep, xproto_dep]
+            'dependencies' : [xcb_dep, xcb_randr_dep, xproto_dep],
+            'plugin_dir' : 'video_output',
         }
     endif
 
@@ -234,7 +251,8 @@ if xcb_dep.found()
               'xcb/render.c'
             ),
             'dependencies' : [xcb_dep, xcb_render_dep, xcb_shm_dep, m_lib],
-            'link_with' : [vlc_xcb_events_lib]
+            'link_with' : [vlc_xcb_events_lib],
+            'plugin_dir' : 'video_output',
         }
     endif
 
@@ -246,7 +264,8 @@ if xcb_dep.found()
               'xcb/x11.c'
             ),
             'dependencies' : [xcb_dep, xcb_shm_dep],
-            'link_with' : [vlc_xcb_events_lib]
+            'link_with' : [vlc_xcb_events_lib],
+            'plugin_dir' : 'video_output',
         }
     endif
 endif
@@ -256,7 +275,8 @@ if x11_dep.found() and egl_dep.found()
         'name' : 'egl_x11',
         'sources' : files('opengl/egl.c'),
         'c_args' : ['-DUSE_PLATFORM_X11=1'],
-        'dependencies' : [egl_dep, x11_dep]
+        'dependencies' : [egl_dep, x11_dep],
+        'plugin_dir' : 'video_output',
     }
 endif
 
@@ -264,7 +284,8 @@ if x11_dep.found() and opengl_dep.found()
     vlc_modules += {
         'name' : 'glx',
         'sources' : files('glx.c'),
-        'dependencies' : [x11_dep, opengl_dep]
+        'dependencies' : [x11_dep, opengl_dep],
+        'plugin_dir' : 'video_output',
     }
 endif
 
@@ -275,11 +296,13 @@ if host_system == 'os/2'
     vlc_modules += {
         'name' : 'drawable_os2',
         'sources' : files('drawable_os2.c'),
+        'plugin_dir' : 'video_output',
     }
 
     vlc_modules += {
         'name' : 'window_os2',
         'sources' : files('window_os2.c'),
+        'plugin_dir' : 'video_output',
     }
 
     if get_option('kva').allowed()
@@ -291,6 +314,7 @@ if host_system == 'os/2'
             'name' : 'kva',
             'sources' : files('kva.c'),
             'dependencies' : [kva_lib],
+            'plugin_dir' : 'video_output',
             'enabled' : kva_lib.found(),
         }
     endif

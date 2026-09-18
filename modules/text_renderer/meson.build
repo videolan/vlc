@@ -4,7 +4,8 @@
 # Dummy text renderer
 vlc_modules += {
     'name' : 'tdummy',
-    'sources' : files('tdummy.c')
+    'sources' : files('tdummy.c'),
+    'plugin_dir' : 'text_renderer',
 }
 
 # Freetype text renderer
@@ -61,6 +62,7 @@ vlc_modules += {
     'dependencies' : freetype_deps,
     'c_args' : freetype_cargs,
     'cpp_args' : freetype_cppargs,
+    'plugin_dir' : 'text_renderer',
     'enabled' : freetype_dep.found(),
 }
 
@@ -69,6 +71,7 @@ vlc_modules += {
     'name' : 'svg',
     'sources' : files('svg.c'),
     'dependencies' : [rsvg_dep, cairo_dep],
+    'plugin_dir' : 'text_renderer',
     'enabled' : rsvg_dep.found() and cairo_dep.found(),
 }
 
@@ -77,6 +80,7 @@ vlc_modules += {
     'name' : 'nsspeechsynthesizer',
     'sources' : files('nsspeechsynthesizer.m'),
     'dependencies' : [cocoa_dep],
+    'plugin_dir' : 'text_renderer',
     'enabled' : have_osx,
 }
 
@@ -96,5 +100,6 @@ vlc_modules += {
     'name' : 'sapi',
     'sources' : files('sapi.cpp'),
     'cpp_args' : libcom_cppflags,
+    'plugin_dir' : 'text_renderer',
     'enabled' : have_sapi,
 }

@@ -12,4 +12,5 @@ vlc_modules += {
     ),
     'link_with' : [hxxxhelper_lib],
     'shortname' : 's_o_hls',
+    'plugin_dir' : 'stream_out',
 }

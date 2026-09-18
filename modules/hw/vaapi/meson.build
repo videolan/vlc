@@ -22,6 +22,7 @@ vlc_modules += {
     'sources' : vaapi_common_sources,
     'c_args' : ['-DHAVE_VA_X11'],
     'dependencies' : [libva_dep, libva_x11_dep, x11_dep],
+    'plugin_dir' : 'vaapi',
     'enabled' : libva_dep.found() and libva_x11_dep.found() and x11_dep.found(),
 }
 
@@ -31,6 +32,7 @@ vlc_modules += {
     'sources' : vaapi_common_sources,
     'c_args' : ['-DHAVE_VA_DRM'],
     'dependencies' : [libva_dep, libva_drm_dep],
+    'plugin_dir' : 'vaapi',
     'enabled' : libva_dep.found() and libva_drm_dep.found(),
 }
 
@@ -40,6 +42,7 @@ vlc_modules += {
     'sources' : vaapi_common_sources,
     'c_args' : ['-DHAVE_VA_WL'],
     'dependencies' : [libva_dep, libva_wayland_dep] + wayland_deps,
+    'plugin_dir' : 'vaapi',
     'enabled' : libva_dep.found() and libva_wayland_dep.found() and have_wayland,
 }
 
@@ -53,5 +56,6 @@ vlc_modules += {
     ),
     'dependencies' : [libva_dep],
     'link_with' : [chroma_copy_lib],
+    'plugin_dir' : 'vaapi',
     'enabled' : libva_dep.found(),
 }

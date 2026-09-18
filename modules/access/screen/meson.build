@@ -4,7 +4,8 @@ if get_option('screen').allowed()
       vlc_modules += {
           'name' : 'xcb_screen',
           'sources' : files('xcb.c'),
-          'dependencies' : [xcb_dep, xcb_shm_dep, xcb_composite_dep]
+          'dependencies' : [xcb_dep, xcb_shm_dep, xcb_composite_dep],
+          'plugin_dir' : 'access',
       }
   endif
 
@@ -42,6 +43,7 @@ if get_option('screen').allowed()
         'dependencies' : screen_deps,
         'cpp_args' : screen_cppargs,
         'link_with' : screen_link_with,
+        'plugin_dir' : 'access',
     }
   endif
 endif

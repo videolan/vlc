@@ -7,6 +7,7 @@ vlc_modules += {
       'visual/window_presets.h'),
     'dependencies' : [opengl_dep, m_lib],
     'c_args' : [ contrib_inc_args ] + (host_system == 'darwin' ? ['-DGL_SILENCE_DEPRECATION'] : []),
+    'plugin_dir' : 'visualization',
     'enabled' : opengl_dep.found(),
 }
 
@@ -16,6 +17,7 @@ vlc_modules += {
     'name' : 'goom',
     'sources' : files('goom.c'),
     'dependencies' : [goom2_dep, m_lib],
+    'plugin_dir' : 'visualization',
     'enabled' : goom2_dep.found(),
 }
 
@@ -39,6 +41,7 @@ vlc_modules += {
     'sources' : files('projectm.cpp'),
     'dependencies' : [projectm_dep],
     'cpp_args' : projectm_cpp_args,
+    'plugin_dir' : 'visualization',
     'enabled' : projectm_dep.found()
 }
 
@@ -51,6 +54,7 @@ vlc_modules += {
         'visual/window.c', 'visual/window.h',
         'visual/effects.c', 'visual/window_presets.h'),
     'dependencies' : [m_lib],
+    'plugin_dir' : 'visualization',
 }
 
 # Vsxu plugin
@@ -59,5 +63,6 @@ vlc_modules += {
     'name' : 'vsxu',
     'sources' : files('vsxu.cpp', 'cyclic_buffer.h'),
     'dependencies' : [m_lib, vsxu_dep],
+    'plugin_dir' : 'visualization',
     'enabled' : vsxu_dep.found()
 }

@@ -5,6 +5,7 @@ vlc_modules += {
     'name' : 'access_output_dummy',
     'sources' : files('dummy.c'),
     'shortname' : 'a_o_dumm',
+    'plugin_dir' : 'access_output',
 }
 
 # File
@@ -12,6 +13,7 @@ vlc_modules += {
     'name' : 'access_output_file',
     'sources' : files('file.c'),
     'shortname' : 'a_o_file',
+    'plugin_dir' : 'access_output',
 }
 
 # HTTP
@@ -19,6 +21,7 @@ vlc_modules += {
     'name' : 'access_output_http',
     'sources' : files('http.c'),
     'shortname' : 'a_o_http',
+    'plugin_dir' : 'access_output',
 }
 
 # liveHTTP
@@ -29,6 +32,7 @@ vlc_modules += {
     'dependencies' : [ gcrypt_dep, gpg_error_dep ],
     'enabled' : gcrypt_dep.found() and gpg_error_dep.found(),
     'shortname' : 'a_o_live',
+    'plugin_dir' : 'access_output',
 }
 
 # Shout (Icecast and old Shoutcast)
@@ -39,6 +43,7 @@ if shout_dep.found()
         'sources' : files('shout.c'),
         'dependencies' : [shout_dep, socket_libs],
         'shortname' : 'a_o_shou',
+        'plugin_dir' : 'access_output',
     }
 endif
 
@@ -49,6 +54,7 @@ vlc_modules += {
     'include_directories' : include_directories('../access/http'),
     'link_with' : [vlc_http_lib],
     'shortname' : 'a_http_p',
+    'plugin_dir' : 'access_output',
 }
 
 # SRT
@@ -59,6 +65,7 @@ if srt_dep.found()
 	'include_directories' : include_directories('../access/'),
 	'dependencies' : [srt_dep],
     'shortname' : 'a_o_srt',
+    'plugin_dir' : 'access_output',
     }
 endif
 
@@ -70,5 +77,6 @@ if librist_dep.found()
 	'include_directories' : include_directories('../access/'),
     'dependencies' : [librist_dep],
     'shortname' : 'a_o_rist',
+    'plugin_dir' : 'access_output',
     }
 endif

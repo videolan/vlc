@@ -10,7 +10,8 @@ chroma_copy_lib = static_library(
 
 vlc_modules += {
     'name' : 'chain',
-    'sources' : files('chain.c')
+    'sources' : files('chain.c'),
+    'plugin_dir' : 'video_chroma',
 }
 
 swscale_dep = dependency('libswscale', version: '>= 0.5.0', required: get_option('swscale'))
@@ -22,12 +23,14 @@ vlc_modules += {
     ),
     'dependencies' : [swscale_dep, m_lib],
     'link_args' : symbolic_linkargs,
+    'plugin_dir' : 'video_chroma',
     'enabled' : swscale_dep.found(),
 }
 
 vlc_modules += {
     'name' : 'grey_yuv',
-    'sources' : files('grey_yuv.c')
+    'sources' : files('grey_yuv.c'),
+    'plugin_dir' : 'video_chroma',
 }
 
 vlc_modules += {
@@ -37,40 +40,47 @@ vlc_modules += {
         'i420_rgb8.c',
         'i420_rgb16.c',
     ),
+    'plugin_dir' : 'video_chroma',
 }
 
 vlc_modules += {
     'name' : 'i420_nv12',
     'sources' : files('i420_nv12.c'),
     'link_with' : [chroma_copy_lib],
+    'plugin_dir' : 'video_chroma',
 }
 
 vlc_modules += {
     'name' : 'i422_i420',
     'sources' : files('i422_i420.c'),
-    'shortname' : 'i422_i20'
+    'shortname' : 'i422_i20',
+    'plugin_dir' : 'video_chroma',
 }
 
 vlc_modules += {
     'name' : 'rv32',
-    'sources' : files('rv32.c')
+    'sources' : files('rv32.c'),
+    'plugin_dir' : 'video_chroma',
 }
 
 vlc_modules += {
     'name' : 'yuy2_i420',
     'sources' : files('yuy2_i420.c'),
-    'shortname' : 'yuy2_i20'
+    'shortname' : 'yuy2_i20',
+    'plugin_dir' : 'video_chroma',
 }
 
 vlc_modules += {
     'name' : 'yuy2_i422',
     'sources' : files('yuy2_i422.c'),
-    'shortname' : 'yuy2_i22'
+    'shortname' : 'yuy2_i22',
+    'plugin_dir' : 'video_chroma',
 }
 
 vlc_modules += {
     'name' : 'yuvp',
-    'sources' : files('yuvp.c')
+    'sources' : files('yuvp.c'),
+    'plugin_dir' : 'video_chroma',
 }
 
 vlc_modules += {
@@ -81,12 +91,14 @@ vlc_modules += {
     ),
     'c_args' : ['-DPLUGIN_SSE2'],
     'enabled' : have_sse2,
-    'shortname' : 'i420_r_2'
+    'shortname' : 'i420_r_2',
+    'plugin_dir' : 'video_chroma',
 }
 
 vlc_modules += {
     'name' : 'orient',
     'sources' : files('orient.c'),
+    'plugin_dir' : 'video_chroma',
 }
 
 d3d11_common_lib = []
@@ -137,6 +149,7 @@ vlc_modules += {
         frameworks['CoreMedia'],
         frameworks['CoreVideo'],
     ],
+    'plugin_dir' : 'video_chroma',
     'enabled' : host_system == 'darwin',
 }
 

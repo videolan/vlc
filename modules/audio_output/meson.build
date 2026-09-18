@@ -5,19 +5,22 @@ subdir('android')
 # Dummy audio output
 vlc_modules += {
     'name' : 'adummy',
-    'sources' : files('adummy.c')
+    'sources' : files('adummy.c'),
+    'plugin_dir' : 'audio_output',
 }
 
 # File audio output
 vlc_modules += {
     'name' : 'afile',
-    'sources' : files('file.c')
+    'sources' : files('file.c'),
+    'plugin_dir' : 'audio_output',
 }
 
 # Memory audio output
 vlc_modules += {
     'name' : 'amem',
-    'sources' : files('amem.c')
+    'sources' : files('amem.c'),
+    'plugin_dir' : 'audio_output',
 }
 
 # PipeWire output
@@ -26,6 +29,7 @@ vlc_modules += {
     'sources' : files('pipewire.c'),
     'dependencies' : [m_lib, pipewire_dep],
     'link_with' : [libvlc_pipewire],
+    'plugin_dir' : 'audio_output',
     'enabled' : pipewire_dep.found(),
 }
 
@@ -36,6 +40,7 @@ if pulse_dep.found()
         'sources' : files('pulse.c'),
         'dependencies' : [m_lib, pulse_dep],
         'link_with' : [libvlc_pulse],
+        'plugin_dir' : 'audio_output',
     }
 endif
 
@@ -44,7 +49,8 @@ if alsa_dep.found()
     vlc_modules += {
         'name' : 'alsa',
         'sources' : files('alsa.c'),
-        'dependencies' : [m_lib, alsa_dep]
+        'dependencies' : [m_lib, alsa_dep],
+        'plugin_dir' : 'audio_output',
     }
 endif
 
@@ -53,7 +59,8 @@ if jack_dep.found()
     vlc_modules += {
         'name' : 'jack',
         'sources' : files('jack.c'),
-        'dependencies' : [jack_dep]
+        'dependencies' : [jack_dep],
+        'plugin_dir' : 'audio_output',
     }
 endif
 
@@ -64,6 +71,7 @@ vlc_modules += {
     'name' : 'sndio',
     'sources' : files('sndio.c'),
     'dependencies' : [sndio_dep],
+    'plugin_dir' : 'audio_output',
     'enabled' : sndio_dep.found(),
 }
 
@@ -79,6 +87,7 @@ if have_osx
             frameworks['AudioToolbox'],
             frameworks['CoreAudio'],
         ],
+        'plugin_dir' : 'audio_output',
     }
 endif
 
@@ -94,6 +103,7 @@ if have_ios or have_tvos
             frameworks['AudioToolbox'],
             frameworks['CoreAudio'],
         ],
+        'plugin_dir' : 'audio_output',
     }
 endif
 
@@ -116,7 +126,8 @@ if have_osx or have_ios or have_tvos
             frameworks['Foundation'],
             frameworks['AVFoundation'],
         ],
-        'objc_args' : ['-fobjc-arc']
+        'objc_args' : ['-fobjc-arc'],
+        'plugin_dir' : 'audio_output',
     }
 endif
 
@@ -124,12 +135,14 @@ if host_system == 'windows'
 vlc_modules += {
     'name' : 'mmdevice',
     'sources' : files('mmdevice.c'),
+    'plugin_dir' : 'audio_output',
     'enabled' : have_win_desktop,
 }
 
 vlc_modules += {
     'name' : 'winstore',
     'sources' : files('winstore.c'),
+    'plugin_dir' : 'audio_output',
     'enabled' : have_win_store,
 }
 
@@ -137,6 +150,7 @@ vlc_modules += {
     'name' : 'wasapi',
     'sources' : files('wasapi.c'),
     'dependencies' : [ksuser_lib],
+    'plugin_dir' : 'audio_output',
     'enabled' : get_option('wasapi')
       .require(host_system == 'windows', error_message: 'WASAPI requires Windows')
       .allowed() and ksuser_lib.found()
@@ -146,6 +160,7 @@ vlc_modules += {
     'name' : 'waveout',
     'sources' : files('waveout.c'),
     'dependencies' : [cc.find_library('winmm')],
+    'plugin_dir' : 'audio_output',
     'enabled' : have_win_desktop,
 }
 endif
@@ -159,6 +174,7 @@ if host_system == 'os/2'
             'name' : 'kai',
             'sources' : files('kai.c'),
             'dependencies' : [kai_lib],
+            'plugin_dir' : 'audio_output',
             'enabled' : kai_lib.found(),
         }
     endif

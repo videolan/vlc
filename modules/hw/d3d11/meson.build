@@ -16,5 +16,6 @@ if get_option('directx').allowed()
         'link_with' : [ d3d11_common_lib, chroma_copy_lib, deinterlacecommon_lib ],
         'cpp_args' : libcom_cppflags,
         'include_directories' : [vlc_include_dirs],
+        'plugin_dir' : 'd3d11',
     }
 endif

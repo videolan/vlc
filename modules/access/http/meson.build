@@ -93,7 +93,8 @@ endif
 vlc_modules += {
     'name' : 'https',
     'sources' : files('access.c'),
-    'link_with' : [vlc_http_lib]
+    'link_with' : [vlc_http_lib],
+    'plugin_dir' : 'access',
 }
 
 #
@@ -102,5 +103,6 @@ vlc_modules += {
 vlc_modules += {
     'name' : 'webdav',
     'sources' : files('../webdav.c'),
-    'link_with' : [vlc_http_lib]
+    'link_with' : [vlc_http_lib],
+    'plugin_dir' : 'access',
 }

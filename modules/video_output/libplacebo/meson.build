@@ -18,6 +18,7 @@ vlc_modules += {
     'sources' : files('instance.c', 'display.c'),
     'link_with' : [libplacebo_utils],
     'dependencies' : [libplacebo_dep],
+    'plugin_dir' : 'video_output',
 }
 
 ## Vulkan
@@ -27,6 +28,7 @@ if vulkan_dep.found()
         'sources' : files('../vulkan/platform.c', 'instance_vulkan.c'),
         'link_with' : [libplacebo_utils],
         'dependencies' : [libplacebo_dep],
+        'plugin_dir' : 'video_output',
     }
 endif
 
@@ -37,6 +39,7 @@ if opengl_dep.found()
         'sources' : files('instance_opengl.c'),
         'link_with' : [libplacebo_utils],
         'dependencies' : [libplacebo_dep],
+        'plugin_dir' : 'video_output',
     }
 endif
 
@@ -47,5 +50,6 @@ if opengles2_dep.found()
         'link_with' : [libplacebo_utils],
         'c_args' : '-DUSE_OPENGL_ES2',
         'dependencies' : [libplacebo_dep],
+        'plugin_dir' : 'video_output',
     }
 endif

@@ -5,6 +5,7 @@ vlc_modules += {
     'name' : 'stream_out_dummy',
     'sources' : files('dummy.c'),
     'shortname' : 's_o_dumm',
+    'plugin_dir' : 'stream_out',
 }
 
 # cycle
@@ -12,6 +13,7 @@ vlc_modules += {
     'name' : 'stream_out_cycle',
     'sources' : files('cycle.c'),
     'shortname' : 's_o_cycl',
+    'plugin_dir' : 'stream_out',
 }
 
 # delay
@@ -19,6 +21,7 @@ vlc_modules += {
     'name' : 'stream_out_delay',
     'sources' : files('delay.c'),
     'shortname' : 's_o_dela',
+    'plugin_dir' : 'stream_out',
 }
 
 # stats
@@ -26,6 +29,7 @@ vlc_modules += {
     'name' : 'stream_out_stats',
     'sources' : files('stats.c'),
     'shortname' : 's_o_stat',
+    'plugin_dir' : 'stream_out',
 }
 
 # standard
@@ -37,6 +41,7 @@ vlc_modules += {
     ),
     'dependencies' : [socket_libs],
     'shortname' : 's_o_stan',
+    'plugin_dir' : 'stream_out',
 }
 
 # duplicate
@@ -44,6 +49,7 @@ vlc_modules += {
     'name' : 'stream_out_duplicate',
     'sources' : files('duplicate.c'),
     'shortname' : 's_o_dupl',
+    'plugin_dir' : 'stream_out',
 }
 
 # es
@@ -51,6 +57,7 @@ vlc_modules += {
     'name' : 'stream_out_es',
     'sources' : files('es.c'),
     'shortname' : 's_o_es',
+    'plugin_dir' : 'stream_out',
 }
 
 # display
@@ -58,6 +65,7 @@ vlc_modules += {
     'name' : 'stream_out_display',
     'sources' : files('display.c'),
     'shortname' : 's_o_disp',
+    'plugin_dir' : 'stream_out',
 }
 
 # gather
@@ -65,6 +73,7 @@ vlc_modules += {
     'name' : 'stream_out_gather',
     'sources' : files('gather.c'),
     'shortname' : 's_o_gath',
+    'plugin_dir' : 'stream_out',
 }
 
 # bridge
@@ -72,6 +81,7 @@ vlc_modules += {
     'name' : 'stream_out_bridge',
     'sources' : files('bridge.c'),
     'shortname' : 's_o_brid',
+    'plugin_dir' : 'stream_out',
 }
 
 # mosaic_bridge
@@ -79,6 +89,7 @@ vlc_modules += {
     'name' : 'stream_out_mosaic_bridge',
     'sources' : files('mosaic_bridge.c'),
     'shortname' : 's_o_mosa',
+    'plugin_dir' : 'stream_out',
 }
 
 # autodel
@@ -86,6 +97,7 @@ vlc_modules += {
     'name' : 'stream_out_autodel',
     'sources' : files('autodel.c'),
     'shortname' : 's_o_auto',
+    'plugin_dir' : 'stream_out',
 }
 
 # record
@@ -93,6 +105,7 @@ vlc_modules += {
     'name' : 'stream_out_record',
     'sources' : files('record.c'),
     'shortname' : 's_o_reco',
+    'plugin_dir' : 'stream_out',
 }
 
 # smem
@@ -100,6 +113,7 @@ vlc_modules += {
     'name' : 'stream_out_smem',
     'sources' : files('smem.c'),
     'shortname' : 's_o_smem',
+    'plugin_dir' : 'stream_out',
 }
 
 # setid
@@ -107,6 +121,7 @@ vlc_modules += {
     'name' : 'stream_out_setid',
     'sources' : files('setid.c'),
     'shortname' : 's_o_seti',
+    'plugin_dir' : 'stream_out',
 }
 
 # transcode
@@ -126,6 +141,7 @@ vlc_modules += {
     ),
     'dependencies' : [m_lib],
     'shortname' : 's_o_tran',
+    'plugin_dir' : 'stream_out',
 }
 
 # trace
@@ -133,6 +149,7 @@ vlc_modules += {
     'name' : 'stream_out_trace',
     'sources' : files('trace.c'),
     'shortname' : 's_o_trac',
+    'plugin_dir' : 'stream_out',
 }
 
 # UDP
@@ -141,6 +158,7 @@ vlc_modules += {
     'sources' : files('sdp_helper.c', 'udp.c'),
     'dependencies' : [socket_libs],
     'shortname' : 's_o_udp',
+    'plugin_dir' : 'stream_out',
 }
 
 # RTP
@@ -160,6 +178,7 @@ vlc_modules += {
     ),
     'dependencies' : rtp_sout_deps,
     'shortname' : 's_o_rtp',
+    'plugin_dir' : 'stream_out',
 }
 
 # Chromaprint module
@@ -170,6 +189,7 @@ vlc_modules += {
     'dependencies' : [libchromaprint_dep],
     'enabled' : libchromaprint_dep.found(),
     'shortname' : 's_o_chro',
+    'plugin_dir' : 'stream_out',
 }
 
 
@@ -201,6 +221,7 @@ vlc_modules += {
     'cpp_args' : decklink_cpp_args,
     'enabled' : decklink_dep.found(),
     'shortname' : 's_o_sdi',
+    'plugin_dir' : 'stream_out',
 }
 
 # Chromecast module

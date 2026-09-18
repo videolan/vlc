@@ -48,6 +48,7 @@ vlc_modules += {
         'chromecast.h',
         'chromecast_common.h') + chromecast_proto,
     'dependencies' : [protobuf_dep],
+    'plugin_dir' : 'demux',
     'enabled': get_option('stream_outputs') and protoc.found() and protobuf_dep.found(),
 }
 
@@ -65,5 +66,6 @@ vlc_modules += {
         chromecast_proto,
     'dependencies' : [socket_libs, protobuf_dep],
     'link_with' : vlc_json_lib,
+    'plugin_dir' : 'stream_out',
     'enabled': get_option('stream_outputs') and protobuf_dep.found() and protoc.found(),
 }

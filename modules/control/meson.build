@@ -2,19 +2,22 @@
 vlc_modules += {
     'name' : 'dummy',
     'sources' : files('dummy.c'),
+    'plugin_dir' : 'control',
 }
 
 # Gestures
 vlc_modules += {
     'name' : 'gestures',
-    'sources' : files('gestures.c')
+    'sources' : files('gestures.c'),
+    'plugin_dir' : 'control',
 }
 
 # Hotkeys
 vlc_modules += {
     'name' : 'hotkeys',
     'sources' : files('hotkeys.c'),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'plugin_dir' : 'control',
 }
 
 # XXX: netsync disabled, move current code to new playlist/player and add a
@@ -22,7 +25,8 @@ vlc_modules += {
 # vlc_modules += {
 #     'name' : 'netsync',
 #     'sources' : files('netsync.c'),
-#     'dependencies' : [socket_libs]
+#     'dependencies' : [socket_libs],
+#     'plugin_dir' : 'control',
 # }
 
 # Remote control
@@ -34,7 +38,8 @@ vlc_modules += {
         'cli/cli.c',
         'cli/cli.h'
     ),
-    'dependencies' : [socket_libs, m_lib]
+    'dependencies' : [socket_libs, m_lib],
+    'plugin_dir' : 'control',
 }
 
 # XCB hotkeys
@@ -42,7 +47,8 @@ if xcb_dep.found() and xcb_keysyms_dep.found()
     vlc_modules += {
         'name' : 'xcb_hotkeys',
         'sources' : files('globalhotkeys/xcb.c'),
-        'dependencies' : [xcb_dep, xcb_keysyms_dep]
+        'dependencies' : [xcb_dep, xcb_keysyms_dep],
+        'plugin_dir' : 'control',
     }
 endif
 
@@ -75,7 +81,8 @@ if dbus_dep.found()
             'dbus/dbus_tracklist.c',
             'dbus/dbus.c',
         ),
-        'dependencies' : [dbus_dep, m_lib]
+        'dependencies' : [dbus_dep, m_lib],
+        'plugin_dir' : 'control',
     }
 endif
 
@@ -84,19 +91,22 @@ if host_system == 'windows' and have_win_desktop
     # NT service control
     vlc_modules += {
         'name' : 'ntservice',
-        'sources' : files('ntservice.c')
+        'sources' : files('ntservice.c'),
+        'plugin_dir' : 'control',
     }
 
     # Windows hotkeys control
     vlc_modules += {
         'name' : 'win_hotkeys',
-        'sources' : files('globalhotkeys/win32.c')
+        'sources' : files('globalhotkeys/win32.c'),
+        'plugin_dir' : 'control',
     }
 
     # Windows message control
     vlc_modules += {
         'name' : 'win_msg',
-        'sources' : files('win_msg.c')
+        'sources' : files('win_msg.c'),
+        'plugin_dir' : 'control',
     }
 
 endif
