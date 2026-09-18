@@ -452,6 +452,7 @@ foreach module : vlc_modules
         'enabled',
         'shortname',
         'plugin_dir',
+        'install',
     ]
     foreach key : module.keys()
         if key not in valid_dict_keys
@@ -506,7 +507,7 @@ foreach module : vlc_modules
         nasm_args: [module.get('nasm_args', []), []],
         extra_files: module.get('extra_files', []),
         build_by_default: true,
-        install: true,
+        install: module.get('install', true),
         install_dir: plugin_dir,
         kwargs: kwargs,
         shortname: shortname,
