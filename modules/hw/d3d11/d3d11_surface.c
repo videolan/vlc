@@ -252,8 +252,10 @@ static void D3D11_YUY2(filter_t *p_filter, picture_t *src, picture_t *dst)
     if (sys->d3d_proc.procEnumerator)
     {
         HRESULT hr;
-        if (FAILED( D3D11_Assert_ProcessorInput(p_filter, &sys->d3d_proc, p_sys) ))
+        if (FAILED( D3D11_Assert_ProcessorInput(p_filter, &sys->d3d_proc, p_sys) )) {
+            vlc_mutex_unlock(&sys->staging_lock);
             return;
+        }
 
         D3D11_VIDEO_PROCESSOR_STREAM stream = {
             .Enable = TRUE,
@@ -366,8 +368,10 @@ static void D3D11_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
     if (sys->d3d_proc.procEnumerator)
     {
         HRESULT hr;
-        if (FAILED( D3D11_Assert_ProcessorInput(p_filter, &sys->d3d_proc, p_sys) ))
+        if (FAILED( D3D11_Assert_ProcessorInput(p_filter, &sys->d3d_proc, p_sys) )) {
+            vlc_mutex_unlock(&sys->staging_lock);
             return;
+        }
 
         D3D11_VIDEO_PROCESSOR_STREAM stream = {
             .Enable = TRUE,
