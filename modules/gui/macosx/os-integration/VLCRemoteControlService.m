@@ -182,21 +182,19 @@ static inline NSArray * RemoteCommandCenterCommandsToHandle()
         __weak typeof(self) weakSelf = self;
         [VLCLibraryImageCache thumbnailForInputItem:inputItem
                                      withCompletion:^(NSImage * const coverArtImage) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                VLCRemoteControlService * const strongSelf = weakSelf;
-                if (!strongSelf || inputItem != strongSelf->_playerController.currentMedia) {
-                    return;
-                }
+            VLCRemoteControlService * const strongSelf = weakSelf;
+            if (!strongSelf || inputItem != strongSelf->_playerController.currentMedia) {
+                return;
+            }
 
-                MPMediaItemArtwork * const mpartwork = [[MPMediaItemArtwork alloc] initWithBoundsSize:coverArtImage.size
-                                                                                       requestHandler:^NSImage* _Nonnull(CGSize __unused size) {
-                    return coverArtImage;
-                }];
-                MPNowPlayingInfoCenter * const nowPlayingInfoCenter = MPNowPlayingInfoCenter.defaultCenter;
-                NSMutableDictionary * const updatedTrackInfo = [nowPlayingInfoCenter.nowPlayingInfo mutableCopy];
-                updatedTrackInfo[MPMediaItemPropertyArtwork] = mpartwork;
-                nowPlayingInfoCenter.nowPlayingInfo = updatedTrackInfo;
-            });
+            MPMediaItemArtwork * const mpartwork = [[MPMediaItemArtwork alloc] initWithBoundsSize:coverArtImage.size
+                                                                                   requestHandler:^NSImage* _Nonnull(CGSize __unused size) {
+                return coverArtImage;
+            }];
+            MPNowPlayingInfoCenter * const nowPlayingInfoCenter = MPNowPlayingInfoCenter.defaultCenter;
+            NSMutableDictionary * const updatedTrackInfo = [nowPlayingInfoCenter.nowPlayingInfo mutableCopy];
+            updatedTrackInfo[MPMediaItemPropertyArtwork] = mpartwork;
+            nowPlayingInfoCenter.nowPlayingInfo = updatedTrackInfo;
         }];
     }
 }

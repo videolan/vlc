@@ -373,13 +373,11 @@
         __weak typeof(self) weakSelf = self;
         [VLCLibraryImageCache thumbnailForInputItem:inputItem
                                      withCompletion:^(NSImage * const thumbnail) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                VLCStatusBarIcon * const strongSelf = weakSelf;
-                if (!strongSelf || inputItem != playerController.currentMedia) {
-                    return;
-                }
-                strongSelf->coverImageView.image = thumbnail ?: NSImage.VLCNoArtImage;
-            });
+            VLCStatusBarIcon * const strongSelf = weakSelf;
+            if (!strongSelf || inputItem != playerController.currentMedia) {
+                return;
+            }
+            strongSelf->coverImageView.image = thumbnail ?: NSImage.VLCNoArtImage;
         }];
     }
 }

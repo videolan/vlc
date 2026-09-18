@@ -378,7 +378,9 @@ static NSString *thumbnailHashForString(NSString *string)
     if (artworkMRL) {
         NSImage * const cachedImage = [_imageCache objectForKey:artworkMRL];
         if (cachedImage) {
-            completionHandler(cachedImage);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionHandler(cachedImage);
+            });
             return;
         }
     }
@@ -402,9 +404,13 @@ static NSString *thumbnailHashForString(NSString *string)
         if (mediaItem.mediaType != VLC_ML_MEDIA_TYPE_AUDIO) {
             [self generateThumbnailForMediaItem:mediaItem.libraryID];
         }
-        completionHandler(_noArtImage);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completionHandler(self->_noArtImage);
+        });
     } else {
-        completionHandler(_noArtImage);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completionHandler(self->_noArtImage);
+        });
     }
 }
 
@@ -434,7 +440,9 @@ static NSString *thumbnailHashForString(NSString *string)
     NSString * const cacheKey = [@"flag://" stringByAppendingString:normalizedCountryCode];
     NSImage * const cachedImage = [_imageCache objectForKey:cacheKey];
     if (cachedImage) {
-        completionHandler(cachedImage);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completionHandler(cachedImage);
+        });
         return;
     }
 
@@ -463,7 +471,9 @@ static NSString *thumbnailHashForString(NSString *string)
 
     NSImage * const cachedImage = [_imageCache objectForKey:cacheKey];
     if (cachedImage) {
-        completionHandler(cachedImage);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completionHandler(cachedImage);
+        });
         return;
     }
     [self generateImageForInputItem:inputItem withCompletion:completionHandler];
