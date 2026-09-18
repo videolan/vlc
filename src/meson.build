@@ -498,18 +498,22 @@ if host_system == 'windows'
     )
 endif
 
+libvlccore_kwargs = {}
+if vlc_lib_versioning
+    libvlccore_kwargs += {'version': '9.0.0'}
+endif
 
 libvlccore = library(
     'vlccore',
     libvlccore_sources, vlc_about, fourcc, rev_target,
     include_directories: vlc_include_dirs,
-    version: '9.0.0',
     c_args: vlccore_cargs,
     link_args: libvlccore_link_args,
     link_with: [vlc_libcompat],
     dependencies: libvlccore_deps,
     install: true,
     install_dir: libdir_path,
+    kwargs: libvlccore_kwargs,
 )
 
 libvlccore_dep = declare_dependency(link_with: libvlccore, sources: vlc_about)
