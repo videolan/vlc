@@ -460,6 +460,10 @@ static int ReadDirectory(stream_t *p_access, input_item_node_t *p_node)
         int language_index = csv_parser_get_field_index(parser, "language");
         int codec_index = csv_parser_get_field_index(parser, "codec");
         int bitrate_index = csv_parser_get_field_index(parser, "bitrate");
+        int votes_index = csv_parser_get_field_index(parser, "votes");
+        int clickcount_index = csv_parser_get_field_index(parser, "clickcount");
+        int state_index = csv_parser_get_field_index(parser, "state");
+        int countrycode_index = csv_parser_get_field_index(parser, "countrycode");
         if (name_index < 0 || url_index < 0)
         {
             msg_Err(p_access, "Missing required fields in station data");
@@ -503,6 +507,10 @@ static int ReadDirectory(stream_t *p_access, input_item_node_t *p_node)
 
             SetMetaExtraFromField(station_item, parser, codec_index, "Codec");
             SetMetaExtraFromField(station_item, parser, bitrate_index, "Bitrate (kb/s)");
+            SetMetaExtraFromField(station_item, parser, votes_index, "votes");
+            SetMetaExtraFromField(station_item, parser, clickcount_index, "clickcount");
+            SetMetaExtraFromField(station_item, parser, state_index, "state");
+            SetMetaExtraFromField(station_item, parser, countrycode_index, "countrycode");
 
             input_item_node_AppendItem(p_node, station_item);
             input_item_Release(station_item);
