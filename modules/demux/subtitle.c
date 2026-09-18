@@ -2519,6 +2519,7 @@ static char *get_language_from_url(const char *urlstr)
 {
     vlc_url_t url;
     const char *filename = NULL;
+    char *decoded_filename = NULL;
     char *ret = NULL;
 
     assert(urlstr != NULL);
@@ -2532,6 +2533,10 @@ static char *get_language_from_url(const char *urlstr)
         filename = strrchr(url.psz_path, '/');
     if (filename != NULL) {
         filename++; // skip forward slash
+        decoded_filename = vlc_uri_decode_duplicate(filename);
+        if (decoded_filename == NULL)
+            goto out;
+        filename = decoded_filename;
 
         const char *ext = strrchr(filename, '.');
 
@@ -2550,6 +2555,8 @@ static char *get_language_from_url(const char *urlstr)
        }
     }
 
+out:
+    free(decoded_filename);
     vlc_UrlClean(&url);
     return ret;
 }
@@ -2697,11 +2704,22 @@ static void test_subtitle_ParseSubRipTiming(void)
     }
 }
 
+static void test_subtitle_GetLanguageFromUrl(void)
+{
+    char *language = get_language_from_url(
+        "file:///tmp/Example_%5BSubtitle%5D.srt");
+
+    assert(language != NULL);
+    assert(!strcmp(language, "[Subtitle]"));
+    free(language);
+}
+
 int main(int argc, char **argv)
 {
     (void)argc; (void)argv;
     test_subtitle_ParseSubRipTimingValue();
     test_subtitle_ParseSubRipTiming();
+    test_subtitle_GetLanguageFromUrl();
 
     return 0;
 }
