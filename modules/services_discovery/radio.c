@@ -332,6 +332,7 @@ static void *Run(void *data)
     }
     int name_index = csv_parser_get_field_index(parser, "name");
     int iso_3166_1_index = csv_parser_get_field_index(parser, "iso_3166_1");
+    int stationcount_index = csv_parser_get_field_index(parser, "stationcount");
 
     if (name_index < 0 || iso_3166_1_index < 0)
     {
@@ -371,6 +372,7 @@ static void *Run(void *data)
         char flag[256];
         snprintf(flag, sizeof(flag), "https://flags.videolan.org/%s/flat/64.png", parser->fields[iso_3166_1_index]);
         input_item_SetMeta(country_node, vlc_meta_ArtworkURL, flag);
+        SetMetaExtraFromField(country_node, parser, stationcount_index, "stationcount");
 
         services_discovery_AddItem(p_sd, country_node);
     }
