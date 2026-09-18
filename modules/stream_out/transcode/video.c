@@ -140,12 +140,16 @@ static int video_update_format_decoder( decoder_t *p_dec, vlc_video_context *vct
         struct encoder_owner *p_enc_owner =
            (struct encoder_owner *)sout_EncoderCreate( VLC_OBJECT(p_owner->p_stream), sizeof(struct encoder_owner) );
         if ( unlikely(p_enc_owner == NULL))
+        {
+            vlc_mutex_unlock(&id->fifo.lock);
             return VLC_EGENERIC;
+        }
 
         id->encoder = transcode_encoder_new( &p_enc_owner->enc, &p_dec->fmt_out );
         if( !id->encoder )
         {
             vlc_object_delete( &p_enc_owner->enc );
+            vlc_mutex_unlock(&id->fifo.lock);
             return VLC_EGENERIC;
         }
 
