@@ -1125,6 +1125,7 @@ error:
     free(url->psz_url);
 
     free(url);
+    vlc_mutex_unlock(&host->lock);
     return NULL;
 }
 
