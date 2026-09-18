@@ -1926,8 +1926,10 @@ static void blurayOverlayProc(void *ptr, const BD_OVERLAY *const overlay)
         return;
     }
 
-    if(overlay->plane >= MAX_OVERLAY)
+    if(overlay->plane >= MAX_OVERLAY) {
+        vlc_mutex_unlock(&p_sys->bdj.lock);
         return;
+    }
 
     switch (overlay->cmd) {
     case BD_OVERLAY_INIT:
