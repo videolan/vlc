@@ -425,7 +425,7 @@ libnoidea_plugin_la_SOURCES = access/ndi.c
 libnoidea_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_noidea)
 libnoidea_plugin_la_LIBADD = $(LIBS_noidea) $(SOCKET_LIBS)
 libnoidea_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(access_RPATH)
-access_LTLIBRARIES += $(LTLIBnoidea)
+access_PLUGINS += $(LTLIBnoidea)
 EXTRA_LTLIBRARIES += libnoidea_plugin.la
 
 libtcp_plugin_la_SOURCES = access/tcp.c
