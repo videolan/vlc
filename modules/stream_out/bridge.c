@@ -216,7 +216,10 @@ static void *AddOut( sout_stream_t *p_stream, const es_format_t *p_fmt, const ch
         bridged_es_id = NULL;
 
     if ( unlikely(bridged_es_id == NULL) )
+    {
+        vlc_mutex_unlock( &lock );
         return NULL;
+    }
 
     if ( i == p_bridge->i_es_num )
     {
