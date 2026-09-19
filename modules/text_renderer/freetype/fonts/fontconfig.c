@@ -82,7 +82,10 @@ int FontConfig_Prepare( vlc_font_select_t *fs )
     i_dialog_id = i_ret > 0 ? i_ret : 0;
 
     if( FcConfigBuildFonts( config ) == FcFalse )
+    {
+        vlc_mutex_unlock( &lock );
         return VLC_ENOMEM;
+    }
 
     if( i_dialog_id != 0 )
         vlc_dialog_cancel( fs->p_obj, i_dialog_id );
