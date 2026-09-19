@@ -108,6 +108,7 @@ struct aout_sys_t
     enum device_acquisition_status device_status;
     atomic_uintptr_t device_name; /**< device identifier to use, 0 if default */
     atomic_bool default_device_changed;
+    atomic_bool session_volume_changed; /**< Flag to check if session volume/mute changed */
     vlc_sem_t init_passed;
     CRITICAL_SECTION lock;
     CONDITION_VARIABLE work;
@@ -296,8 +297,9 @@ vlc_AudioSessionEvents_OnSimpleVolumeChanged(IAudioSessionEvents *this,
 
     msg_Dbg(aout, "simple volume changed: %f, muting %sabled", vol,
             mute ? "en" : "dis");
+    atomic_store(&sys->session_volume_changed, true);
     EnterCriticalSection(&sys->lock);
-    WakeConditionVariable(&sys->work); /* implicit state: vol & mute */
+    WakeConditionVariable(&sys->work);
     LeaveCriticalSection(&sys->lock);
     (void) ctx;
     return S_OK;
@@ -814,6 +816,9 @@ static void MMSessionMainloop(audio_output_t *aout, ISimpleAudioVolume *volume)
     {
         if (volume != NULL)
         {
+            if (atomic_exchange(&sys->session_volume_changed, false))
+                report_volume = report_mute = true;
+
             if (sys->requested_volume >= 0.f)
             {
                 hr = ISimpleAudioVolume_SetMasterVolume(volume, sys->requested_volume, NULL);
@@ -1331,6 +1336,7 @@ static int Open(vlc_object_t *obj)
     sys->requested_volume = -1.f;
     sys->requested_mute = -1;
     atomic_init(&sys->default_device_changed, false);
+    atomic_init(&sys->session_volume_changed, false);
 
     if (!var_CreateGetBool(aout, "volume-save"))
         VolumeSetLocked(aout, var_InheritFloat(aout, "mmdevice-volume"));
