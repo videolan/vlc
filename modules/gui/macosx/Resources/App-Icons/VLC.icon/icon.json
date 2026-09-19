@@ -319,8 +319,8 @@
               "appearance" : "tinted",
               "value" : {
                 "linear-gradient" : [
-                  "gray:0.00000,1.00000",
-                  "gray:0.58612,1.00000"
+                  "gray:0.58612,0.79000",
+                  "gray:0.00000,1.00000"
                 ],
                 "orientation" : {
                   "start" : {

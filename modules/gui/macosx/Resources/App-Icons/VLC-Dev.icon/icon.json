@@ -344,8 +344,8 @@
             {
               "value" : {
                 "linear-gradient" : [
-                  "gray:1.00000,0.00000",
-                  "gray:1.00000,1.00000"
+                  "gray:1.00000,0.72000",
+                  "gray:1.00000,0.00000"
                 ],
                 "orientation" : {
                   "start" : {
@@ -363,8 +363,8 @@
               "appearance" : "dark",
               "value" : {
                 "linear-gradient" : [
-                  "display-p3:0.00000,0.52840,1.00000,0.00000",
-                  "display-p3:0.00000,0.52840,1.00000,1.00000"
+                  "display-p3:0.00000,0.52840,1.00000,0.60000",
+                  "display-p3:0.00000,0.52840,1.00000,0.00000"
                 ],
                 "orientation" : {
                   "start" : {
@@ -382,8 +382,8 @@
               "appearance" : "tinted",
               "value" : {
                 "linear-gradient" : [
-                  "gray:1.00000,0.00000",
-                  "gray:1.00000,0.78772"
+                  "gray:1.00000,0.52000",
+                  "gray:1.00000,0.00000"
                 ],
                 "orientation" : {
                   "start" : {
