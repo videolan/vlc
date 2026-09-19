@@ -172,10 +172,11 @@ tc_vaegl_update(const struct vlc_gl_interop *interop, uint32_t textures[],
 
     if (pic == priv->last.pic)
     {
-        for (unsigned i = 0; i < priv->last.va_surface_descriptor.num_layers; ++i)
+        for (unsigned i = 0; i < priv->last.num_planes; ++i)
         {
             priv->gl.BindTexture(interop->tex_target, textures[i]);
-            priv->glEGLImageTargetTexture2DOES(interop->tex_target, priv->last.egl_images[i]);
+            priv->glEGLImageTargetTexture2DOES(interop->tex_target,
+                                               priv->last.egl_images[i]);
         }
         return VLC_SUCCESS;
     }
