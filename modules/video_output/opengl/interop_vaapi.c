@@ -54,6 +54,8 @@ typedef void (*PFNGLEGLIMAGETARGETTEXTURE2DOESPROC)(GLenum target, GLeglImageOES
 
 #define DRM_FORMAT_MOD_INVALID  fourcc_mod_code(NONE, DRM_FORMAT_RESERVED)
 
+/* From max number of plane in libva and DRM */
+#define INTEROP_MAX_PLANES 4
 
 struct priv
 {
@@ -77,7 +79,7 @@ struct priv
     } gl;
 
     unsigned fourcc;
-    EGLint drm_fourccs[3];
+    EGLint drm_fourccs[INTEROP_MAX_PLANES];
 
     struct {
         picture_t *                 pic;
@@ -85,7 +87,7 @@ struct priv
          * (GPU tiling, compression, etc...) */
         VADRMPRIMESurfaceDescriptor va_surface_descriptor;
         unsigned                    num_planes;
-        void *                      egl_images[3];
+        EGLImageKHR                 egl_images[INTEROP_MAX_PLANES];
     } last;
 };
 
@@ -179,7 +181,7 @@ tc_vaegl_update(const struct vlc_gl_interop *interop, uint32_t textures[],
     }
 
     VADRMPRIMESurfaceDescriptor va_surface_descriptor;
-    EGLImageKHR egl_images[3] = { };
+    EGLImageKHR egl_images[INTEROP_MAX_PLANES] = { NULL };
     bool release_image = false;
     unsigned num_planes = 0;
 
@@ -235,7 +237,7 @@ error:
         for (unsigned i = 0; i < va_surface_descriptor.num_objects; ++i)
             close(va_surface_descriptor.objects[i].fd);
 
-        for (unsigned i = 0; i < 3 && egl_images[i] != NULL; ++i)
+        for (unsigned i = 0; i < INTEROP_MAX_PLANES && egl_images[i] != NULL; ++i)
             vaegl_image_destroy(interop, egl_images[i]);
     }
     return VLC_EGENERIC;
