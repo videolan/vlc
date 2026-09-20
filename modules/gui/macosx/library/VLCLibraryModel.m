@@ -1162,6 +1162,21 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
 - (void)dropCaches
 {
+    dispatch_queue_t const cacheQueues[] = {
+        _mediaItemCacheModificationQueue,
+        _albumCacheModificationQueue,
+        _artistCacheModificationQueue,
+        _genreCacheModificationQueue,
+        _groupCacheModificationQueue,
+        _mediaTitlesCacheModificationQueue,
+    };
+    const NSUInteger cacheQueueCount = sizeof(cacheQueues) / sizeof(cacheQueues[0]);
+    dispatch_group_t const cacheDropGroup = dispatch_group_create();
+
+    for (NSUInteger index = 0; index < cacheQueueCount; index++) {
+        dispatch_group_enter(cacheDropGroup);
+    }
+
         self.cachedVideoMedia = nil;
         self.cachedAudioMedia = nil;
         self.cachedRecentMedia = nil;
@@ -1175,7 +1190,16 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         self.cachedListOfGroups = nil;
         self.cachedMediaTitles = nil;
 
+    // Barrier sentinels complete after the setter writes on each queue.
+    for (NSUInteger index = 0; index < cacheQueueCount; index++) {
+        dispatch_barrier_async(cacheQueues[index], ^{
+            dispatch_group_leave(cacheDropGroup);
+        });
+    }
+
+    dispatch_group_notify(cacheDropGroup, dispatch_get_main_queue(), ^{
     [self.changeDelegate notifyChange:VLCLibraryModelAllCachesDropped withObject:self];
+    });
 }
 
 - (void)performActionOnMediaItemInCache:(const int64_t)libraryId 
