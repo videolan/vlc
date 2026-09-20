@@ -125,18 +125,18 @@ NSString * const VLCLibraryModelDiscoveryFailed = @"VLCLibraryModelDiscoveryFail
 @property (readwrite) NSArray<VLCMediaLibraryFolderObserver *> *folderObservers;
 @property (atomic) NSUInteger cacheGeneration;
 
-@property (readwrite, nonatomic) NSArray *cachedAudioMedia;
-@property (readwrite, nonatomic) NSArray *cachedArtists;
-@property (readwrite, nonatomic) NSArray *cachedAlbums;
-@property (readwrite, nonatomic) NSArray *cachedGenres;
-@property (readwrite, nonatomic) NSArray *cachedVideoMedia;
-@property (readwrite, nonatomic) NSArray *cachedListOfShows;
-@property (readwrite, nonatomic) NSArray *cachedListOfMovies;
-@property (readwrite, nonatomic) NSArray *cachedListOfGroups;
-@property (readwrite, nonatomic) NSArray *cachedRecentMedia;
-@property (readwrite, nonatomic) NSArray *cachedRecentAudioMedia;
-@property (readwrite, nonatomic) NSArray *cachedListOfMonitoredFolders;
-@property (readwrite, nonatomic) NSArray *cachedMediaTitles;
+@property (readwrite, nonatomic) NSArray<VLCMediaLibraryMediaItem *> *cachedAudioMedia;
+@property (readwrite, nonatomic) NSArray<VLCMediaLibraryArtist *> *cachedArtists;
+@property (readwrite, nonatomic) NSArray<VLCMediaLibraryAlbum *> *cachedAlbums;
+@property (readwrite, nonatomic) NSArray<VLCMediaLibraryGenre *> *cachedGenres;
+@property (readwrite, nonatomic) NSArray<VLCMediaLibraryMediaItem *> *cachedVideoMedia;
+@property (readwrite, nonatomic) NSArray<VLCMediaLibraryShow *> *cachedListOfShows;
+@property (readwrite, nonatomic) NSArray<VLCMediaLibraryMovie *> *cachedListOfMovies;
+@property (readwrite, nonatomic) NSArray<VLCMediaLibraryGroup *> *cachedListOfGroups;
+@property (readwrite, nonatomic) NSArray<VLCMediaLibraryMediaItem *> *cachedRecentMedia;
+@property (readwrite, nonatomic) NSArray<VLCMediaLibraryMediaItem *> *cachedRecentAudioMedia;
+@property (readwrite, nonatomic) NSArray<VLCMediaLibraryEntryPoint *> *cachedListOfMonitoredFolders;
+@property (readwrite, nonatomic) NSArray<NSString *> *cachedMediaTitles;
 
 - (instancetype)initWithoutMediaLibrary;
 - (void)resetCachedListOfRecentMedia;
