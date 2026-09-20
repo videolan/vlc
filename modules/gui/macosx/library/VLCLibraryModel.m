@@ -1162,7 +1162,6 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
 - (void)dropCaches
 {
-    dispatch_barrier_async(_mediaItemCacheModificationQueue, ^{
         self.cachedVideoMedia = nil;
         self.cachedAudioMedia = nil;
         self.cachedRecentMedia = nil;
@@ -1170,27 +1169,11 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         self.cachedListOfShows = nil;
         self.cachedListOfMovies = nil;
         self.cachedListOfMonitoredFolders = nil;
-    });
-
-    dispatch_barrier_async(_albumCacheModificationQueue, ^{
         self.cachedAlbums = nil;
-    });
-
-    dispatch_barrier_async(_artistCacheModificationQueue, ^{
         self.cachedArtists = nil;
-    });
-
-    dispatch_barrier_async(_genreCacheModificationQueue, ^{
         self.cachedGenres = nil;
-    });
-
-    dispatch_barrier_async(_groupCacheModificationQueue, ^{
         self.cachedListOfGroups = nil;
-    });
-
-    dispatch_barrier_async(_mediaTitlesCacheModificationQueue, ^{
         self.cachedMediaTitles = nil;
-    });
 
     [self.changeDelegate notifyChange:VLCLibraryModelAllCachesDropped withObject:self];
 }
