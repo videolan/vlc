@@ -147,6 +147,8 @@ NSString * const VLCLibraryModelDiscoveryFailed = @"VLCLibraryModelDiscoveryFail
 - (void)handleGenreUpdateEvent:(const vlc_ml_event_t * const)p_event;
 - (void)handleGroupUpdateEvent:(const vlc_ml_event_t * const)p_event;
 - (void)handlePlaylistUpdateEvent:(const vlc_ml_event_t * const)p_event;
+- (void)performAfterCacheWritesOnQueue:(dispatch_queue_t)queue
+                                 block:(dispatch_block_t)block;
 
 @end
 
@@ -482,6 +484,15 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     return result;
 }
 
+- (void)performAfterCacheWritesOnQueue:(dispatch_queue_t)queue
+                                 block:(dispatch_block_t)block
+{
+    // The sentinel runs after all cache writes already queued on this queue.
+    dispatch_barrier_async(queue, ^{
+        dispatch_async(dispatch_get_main_queue(), block);
+    });
+}
+
 - (void)resetCachedListOfAudioMedia
 {
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
@@ -494,8 +505,10 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         vlc_ml_media_list_release(p_media_list);
         dispatch_async(dispatch_get_main_queue(), ^{
             self.cachedAudioMedia = mediaArray;
-            [self.changeDelegate notifyChange:VLCLibraryModelAudioMediaListReset withObject:self];
-            [self resetCachedListOfMediaTitles];
+            [self performAfterCacheWritesOnQueue:self->_mediaItemCacheModificationQueue block:^{
+                [self.changeDelegate notifyChange:VLCLibraryModelAudioMediaListReset withObject:self];
+                [self resetCachedListOfMediaTitles];
+            }];
         });
     });
 }
@@ -544,7 +557,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         dispatch_async(dispatch_get_main_queue(), ^{
             self.cachedArtists = mutableArtistArray.copy;
             self->_artistDict = mutableArtistDict.copy;
-            [self.changeDelegate notifyChange:VLCLibraryModelArtistListReset withObject:self];
+            [self performAfterCacheWritesOnQueue:self->_artistCacheModificationQueue block:^{
+                [self.changeDelegate notifyChange:VLCLibraryModelArtistListReset withObject:self];
+            }];
         });
     });
 }
@@ -590,7 +605,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         dispatch_async(dispatch_get_main_queue(), ^{
             self.cachedAlbums = mutableAlbumArray.copy;
             self->_albumDict = mutableAlbumDict.copy;
-            [self.changeDelegate notifyChange:VLCLibraryModelAlbumListReset withObject:self];
+            [self performAfterCacheWritesOnQueue:self->_albumCacheModificationQueue block:^{
+                [self.changeDelegate notifyChange:VLCLibraryModelAlbumListReset withObject:self];
+            }];
         });
     });
 }
@@ -636,7 +653,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         dispatch_async(dispatch_get_main_queue(), ^{
             self.cachedGenres = mutableGenreArray.copy;
             self->_genreDict = mutableGenreDict.copy;
-            [self.changeDelegate notifyChange:VLCLibraryModelGenreListReset withObject:self];
+            [self performAfterCacheWritesOnQueue:self->_genreCacheModificationQueue block:^{
+                [self.changeDelegate notifyChange:VLCLibraryModelGenreListReset withObject:self];
+            }];
         });
     });
 }
@@ -681,8 +700,10 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         vlc_ml_media_list_release(p_media_list);
         dispatch_async(dispatch_get_main_queue(), ^{
             self.cachedVideoMedia = [mutableArray copy];
-            [self.changeDelegate notifyChange:VLCLibraryModelVideoMediaListReset withObject:self];
-            [self resetCachedListOfMediaTitles];
+            [self performAfterCacheWritesOnQueue:self->_mediaItemCacheModificationQueue block:^{
+                [self.changeDelegate notifyChange:VLCLibraryModelVideoMediaListReset withObject:self];
+                [self resetCachedListOfMediaTitles];
+            }];
         });
     });
 }
@@ -721,7 +742,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         NSArray<NSString *> * const sortedTitles = [titleSet.allObjects sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
 
         dispatch_barrier_async(self->_mediaTitlesCacheModificationQueue, ^{
-            self.cachedMediaTitles = sortedTitles;
+            self->_cachedMediaTitles = [sortedTitles copy];
         });
     });
 }
@@ -776,7 +797,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
                       withCountLimit:_recentMediaLimit
                       withCompletion:^(NSArray * const mediaArray) {
         self.cachedRecentMedia = mediaArray;
-        [self.changeDelegate notifyChange:VLCLibraryModelRecentsMediaListReset withObject:self];
+        [self performAfterCacheWritesOnQueue:self->_mediaItemCacheModificationQueue block:^{
+            [self.changeDelegate notifyChange:VLCLibraryModelRecentsMediaListReset withObject:self];
+        }];
     }];
 }
 
@@ -810,7 +833,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
                       withCountLimit:_recentAudioMediaLimit
                       withCompletion:^(NSArray * const mediaArray) {
         self.cachedRecentAudioMedia = mediaArray;
-        [self.changeDelegate notifyChange:VLCLibraryModelRecentAudioMediaListReset withObject:self];
+        [self performAfterCacheWritesOnQueue:self->_mediaItemCacheModificationQueue block:^{
+            [self.changeDelegate notifyChange:VLCLibraryModelRecentAudioMediaListReset withObject:self];
+        }];
     }];
 }
 
@@ -854,7 +879,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         vlc_ml_show_list_release(p_show_list);
         dispatch_async(dispatch_get_main_queue(), ^{
             self.cachedListOfShows = mutableArray.copy;
-            [self.changeDelegate notifyChange:VLCLibraryModelListOfShowsReset withObject:self];
+            [self performAfterCacheWritesOnQueue:self->_mediaItemCacheModificationQueue block:^{
+                [self.changeDelegate notifyChange:VLCLibraryModelListOfShowsReset withObject:self];
+            }];
         });
     });
 }
@@ -881,8 +908,10 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         vlc_ml_media_list_release(p_movie_list);
         dispatch_async(dispatch_get_main_queue(), ^{
             self.cachedListOfMovies = mutableArray.copy;
-            [self.changeDelegate notifyChange:VLCLibraryModelListOfMoviesReset withObject:self];
-            [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelListOfMoviesReset object:self];
+            [self performAfterCacheWritesOnQueue:self->_mediaItemCacheModificationQueue block:^{
+                [self.changeDelegate notifyChange:VLCLibraryModelListOfMoviesReset withObject:self];
+                [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelListOfMoviesReset object:self];
+            }];
         });
     });
 }
@@ -971,7 +1000,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         vlc_ml_group_list_release(p_group_list);
         dispatch_async(dispatch_get_main_queue(), ^{
             self.cachedListOfGroups = mutableArray.copy;
-            [self.changeDelegate notifyChange:VLCLibraryModelListOfGroupsReset withObject:self];
+            [self performAfterCacheWritesOnQueue:self->_groupCacheModificationQueue block:^{
+                [self.changeDelegate notifyChange:VLCLibraryModelListOfGroupsReset withObject:self];
+            }];
         });
     });
 }
@@ -1064,7 +1095,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
             self.cachedListOfMonitoredFolders = mutableArray.copy;
             self.folderObservers = mutableObservers.copy;
-            [self.changeDelegate notifyChange:VLCLibraryModelListOfMonitoredFoldersUpdated withObject:self];
+            [self performAfterCacheWritesOnQueue:self->_mediaItemCacheModificationQueue block:^{
+                [self.changeDelegate notifyChange:VLCLibraryModelListOfMonitoredFoldersUpdated withObject:self];
+            }];
         });
     });
 }
@@ -1177,18 +1210,18 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         dispatch_group_enter(cacheDropGroup);
     }
 
-        self.cachedVideoMedia = nil;
-        self.cachedAudioMedia = nil;
-        self.cachedRecentMedia = nil;
-        self.cachedRecentAudioMedia = nil;
-        self.cachedListOfShows = nil;
-        self.cachedListOfMovies = nil;
-        self.cachedListOfMonitoredFolders = nil;
-        self.cachedAlbums = nil;
-        self.cachedArtists = nil;
-        self.cachedGenres = nil;
-        self.cachedListOfGroups = nil;
-        self.cachedMediaTitles = nil;
+    self.cachedVideoMedia = nil;
+    self.cachedAudioMedia = nil;
+    self.cachedRecentMedia = nil;
+    self.cachedRecentAudioMedia = nil;
+    self.cachedListOfShows = nil;
+    self.cachedListOfMovies = nil;
+    self.cachedListOfMonitoredFolders = nil;
+    self.cachedAlbums = nil;
+    self.cachedArtists = nil;
+    self.cachedGenres = nil;
+    self.cachedListOfGroups = nil;
+    self.cachedMediaTitles = nil;
 
     // Barrier sentinels complete after the setter writes on each queue.
     for (NSUInteger index = 0; index < cacheQueueCount; index++) {
@@ -1198,7 +1231,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     }
 
     dispatch_group_notify(cacheDropGroup, dispatch_get_main_queue(), ^{
-    [self.changeDelegate notifyChange:VLCLibraryModelAllCachesDropped withObject:self];
+        [self.changeDelegate notifyChange:VLCLibraryModelAllCachesDropped withObject:self];
     });
 }
 
@@ -1310,7 +1343,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
         if (recentMediaArray != nil && recentMediaIndex != NSNotFound) {
             [recentMediaArray replaceObjectAtIndex:recentMediaIndex withObject:mediaItem];
-            dispatch_async(dispatch_get_main_queue(), ^{
+            [self performAfterCacheWritesOnQueue:self->_mediaItemCacheModificationQueue block:^{
                 switch (mediaItem.mediaType) {
                     case VLC_ML_MEDIA_TYPE_VIDEO:
                         [self.changeDelegate notifyChange:VLCLibraryModelRecentsMediaItemUpdated 
@@ -1324,7 +1357,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
                         NSLog(@"Unknown type of media type encountered, don't know what to do in deletion");
                         break;
                 }
-            });
+            }];
         }
 
         if (showsArray != nil && showIndex != NSNotFound) {
@@ -1332,12 +1365,12 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             VLCMediaLibraryShow * const staleShow = showsArray[showIndex];
             VLCMediaLibraryShow * const updatedShow = [VLCMediaLibraryShow showWithLibraryId:staleShow.libraryID];
             [showsArray replaceObjectAtIndex:showIndex withObject:updatedShow];
-            dispatch_async(dispatch_get_main_queue(), ^{
+            [self performAfterCacheWritesOnQueue:self->_mediaItemCacheModificationQueue block:^{
                 [self.changeDelegate notifyChange:VLCLibraryModelShowUpdated withObject:updatedShow];
-            });
+            }];
         }
 
-        dispatch_async(dispatch_get_main_queue(), ^{
+        [self performAfterCacheWritesOnQueue:self->_mediaItemCacheModificationQueue block:^{
             switch (mediaItem.mediaType) {
                 case VLC_ML_MEDIA_TYPE_VIDEO:
                     [self.changeDelegate notifyChange:VLCLibraryModelVideoMediaItemUpdated 
@@ -1351,7 +1384,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
                     NSLog(@"Unknown type of media type encountered, don't know what to do in update");
                     break;
             }
-        });
+        }];
     }];
 }
 
@@ -1382,7 +1415,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
         if (recentMediaArray != nil && recentMediaIndex != NSNotFound) {
             [recentMediaArray removeObjectAtIndex:recentMediaIndex];
-            dispatch_async(dispatch_get_main_queue(), ^{
+            [self performAfterCacheWritesOnQueue:self->_mediaItemCacheModificationQueue block:^{
                 switch (mediaItem.mediaType) {
                     case VLC_ML_MEDIA_TYPE_VIDEO:
                         [self.changeDelegate notifyChange:VLCLibraryModelRecentsMediaItemDeleted
@@ -1396,7 +1429,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
                         NSLog(@"Unknown type of media type encountered, don't know what to do in deletion");
                         break;
                 }
-            });
+            }];
         }
 
         if (showsArray != nil && showIndex != NSNotFound) {
@@ -1406,20 +1439,20 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
                 [VLCMediaLibraryShow showWithLibraryId:staleShow.libraryID];
 
             if (updatedShow == nil || updatedShow.episodeCount == 0) {
-                dispatch_async(dispatch_get_main_queue(), ^{
+                [self performAfterCacheWritesOnQueue:self->_mediaItemCacheModificationQueue block:^{
                     [self.changeDelegate notifyChange:VLCLibraryModelShowDeleted
                                            withObject:@(staleShow.libraryID)];
-                });
+                }];
             } else {
                 [showsArray replaceObjectAtIndex:showIndex withObject:updatedShow];
-                dispatch_async(dispatch_get_main_queue(), ^{
+                [self performAfterCacheWritesOnQueue:self->_mediaItemCacheModificationQueue block:^{
                     [self.changeDelegate notifyChange:VLCLibraryModelShowUpdated
                                            withObject:updatedShow];
-                });
+                }];
             }
         }
 
-        dispatch_async(dispatch_get_main_queue(), ^{
+        [self performAfterCacheWritesOnQueue:self->_mediaItemCacheModificationQueue block:^{
             switch (mediaItem.mediaType) {
                 case VLC_ML_MEDIA_TYPE_VIDEO:
                     [self.changeDelegate notifyChange:VLCLibraryModelVideoMediaItemDeleted
@@ -1433,7 +1466,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
                     NSLog(@"Unknown type of media type encountered, don't know what to do in deletion");
                     break;
             }
-        });
+        }];
     }];
 }
 
@@ -1482,9 +1515,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         void (*cacheSetterFunction)(id, SEL, NSArray *) = (void *)cacheSetterImp;
         cacheSetterFunction(self, setterSelector, mutableAudioGroupCache.copy);
 
-        dispatch_async(dispatch_get_main_queue(), ^{
+        [self performAfterCacheWritesOnQueue:queue block:^{
             [self.changeDelegate notifyChange:notificationName withObject:audioGroupItem];
-        });
+        }];
     });
 }
 
@@ -1523,9 +1556,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         void (*cacheSetterFunction)(id, SEL, NSArray *) = (void *)cacheSetterImp;
         cacheSetterFunction(self, setterSelector, mutableAudioGroupCache.copy);
 
-        dispatch_async(dispatch_get_main_queue(), ^{
+        [self performAfterCacheWritesOnQueue:queue block:^{
             [self.changeDelegate notifyChange:notificationName withObject:audioGroupItem];
-        });
+        }];
     });
 }
 
@@ -1655,10 +1688,10 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         [mutableGroups removeObjectAtIndex:groupIdx];
         self.cachedListOfGroups = mutableGroups.copy;
 
-        dispatch_async(dispatch_get_main_queue(), ^{
+        [self performAfterCacheWritesOnQueue:self->_groupCacheModificationQueue block:^{
             [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelGroupDeleted
                                                             object:groupToDelete];
-        });
+        }];
     });
 }
 
@@ -1696,10 +1729,10 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         [mutableGroups replaceObjectAtIndex:groupIdx withObject:group];
         self.cachedListOfGroups = mutableGroups.copy;
 
-        dispatch_async(dispatch_get_main_queue(), ^{
+        [self performAfterCacheWritesOnQueue:self->_groupCacheModificationQueue block:^{
             [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelGroupUpdated
                                                             object:group];
-        });
+        }];
     });
 }
 
