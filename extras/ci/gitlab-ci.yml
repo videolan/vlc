@@ -245,6 +245,7 @@ nightly-win64-llvm-meson:
         name: $VLC_WIN_LLVM_MSVCRT_IMAGE
     variables:
         <<: *variables-win64
+        VLCARCH: win64-meson
         LIBVLC_EXTRA_BUILD_FLAGS: -D / -m -t
 
 nightly-win64-arm-llvm:
