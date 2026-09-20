@@ -1786,6 +1786,8 @@ static es_out_pgrm_t *EsOutProgramAdd(es_out_sys_t *p_sys, input_source_t *sourc
      * than the visual quality if the user chose this option. */
     if (input_priv(p_input)->b_low_delay)
         vlc_clock_main_SetDejitter(p_pgrm->clocks.main, 0);
+    if( EsOutIsPaused(p_sys) )
+        vlc_clock_main_ChangePause(p_pgrm->clocks.main, p_sys->i_pause_date, true);
     vlc_clock_main_Unlock(p_pgrm->clocks.main);
 
     /* Append it */
