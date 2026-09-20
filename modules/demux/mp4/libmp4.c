@@ -2228,8 +2228,10 @@ static int MP4_ReadBox_ASF( stream_t *p_stream, MP4_Box_t *p_box )
     if (i_read != 8)
         MP4_READBOX_EXIT( 0 );
 
-    MP4_GET1BYTE( p_asf->i_stream_number );
-    /* remaining is unknown */
+    MP4_GET4BYTESLE( p_asf->i_stream_number );
+    MP4_GET4BYTESLE( p_asf->i_packet_size );
+    if( p_asf->i_packet_size == 0 )
+        MP4_READBOX_EXIT( 0 );
 
     MP4_READBOX_EXIT( 1 );
 }

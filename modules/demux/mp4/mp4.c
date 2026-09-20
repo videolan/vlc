@@ -976,9 +976,11 @@ static void MP4_Block_Send( demux_t *p_demux, mp4_track_t *p_track, block_t *p_b
             do
             {
                 startpos = vlc_stream_Tell(p_sys->asfpacketsys.s);
+                const uint32_t i_packet_size =
+                    p_track->BOXDATA(p_asf)->i_packet_size;
                 DemuxASFPacket( &p_sys->asfpacketsys,
-                                p_block->i_buffer - startpos,
-                                p_block->i_buffer - startpos,
+                                __MIN(p_block->i_buffer - startpos, i_packet_size),
+                                i_packet_size,
                                 0, p_block->i_buffer );
             } while( vlc_stream_Tell(p_sys->asfpacketsys.s) != p_block->i_buffer &&
                      vlc_stream_Tell(p_sys->asfpacketsys.s) != startpos );

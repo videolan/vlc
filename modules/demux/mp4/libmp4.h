@@ -1349,7 +1349,8 @@ typedef struct
 
 typedef struct
 {
-    uint8_t i_stream_number;
+    uint32_t i_stream_number;
+    uint32_t i_packet_size;
 } MP4_Box_data_ASF_t;
 
 typedef union
