@@ -449,7 +449,7 @@ int DemuxASFPacket( asf_packet_sys_t *p_packetsys,
     pkt.property = p_peek[i_skip]; i_skip++;
     pkt.multiple = !!(i_packet_flags&0x01);
 
-    pkt.length = i_data_packet_min;
+    pkt.length = p_packetsys->b_can_hold_multiple_packets ? i_data_packet_max : i_data_packet_min;
     pkt.padding_length = 0;
 
     if (GetValue2b(&pkt.length, p_peek, &i_skip, i_data_packet_min - i_skip, i_packet_flags >> 5) < 0)
@@ -479,17 +479,22 @@ int DemuxASFPacket( asf_packet_sys_t *p_packetsys,
     pkt.send_time = VLC_TICK_FROM_MS(GetDWLE( p_peek + i_skip )); i_skip += 4;
     /* uint16_t i_packet_duration = GetWLE( p_peek + i_skip ); */ i_skip += 2;
 
+    uint32_t i_read_length = pkt.length;
     if( i_data_end &&
         (pkt.length > i_data_end ||
          i_read_pos > i_data_end - pkt.length) )
     {
-        vlc_warning( p_packetsys->logger, "pkt size %"PRIu32" at %"PRIu64" does not fit data chunk size %"PRIu32,
-                  pkt.length, i_read_pos, i_data_packet_max );
-        return 0;
+        if( !p_packetsys->b_can_hold_multiple_packets )
+        {
+            vlc_warning( p_packetsys->logger, "pkt size %"PRIu32" at %"PRIu64" does not fit data chunk size %"PRIu32,
+                         pkt.length, i_read_pos, i_data_packet_max );
+            return 0;
+        }
+        i_read_length = i_data_end - i_read_pos;
     }
 
-    i_return = vlc_stream_Peek( p_packetsys->s, &p_peek, pkt.length );
-    if( i_return <= 0 || pkt.length == 0 || (size_t)i_return < pkt.length )
+    i_return = vlc_stream_Peek( p_packetsys->s, &p_peek, i_read_length );
+    if( i_return <= 0 || pkt.length == 0 || (size_t)i_return < i_read_length )
     {
         vlc_warning( p_packetsys->logger, "unexpected end of file" );
         return 0;
@@ -512,9 +517,10 @@ int DemuxASFPacket( asf_packet_sys_t *p_packetsys,
 
     pkt.i_skip = i_skip;
     pkt.p_peek = p_peek;
-    pkt.left = pkt.length;
+    pkt.left = i_read_length;
 
-    for( int i_payload = 0; i_payload < i_payload_count ; i_payload++ )
+    for( int i_payload = 0; i_payload < i_payload_count &&
+         (!p_packetsys->b_can_hold_multiple_packets || pkt.left > 0); i_payload++ )
         if (DemuxPayload(p_packetsys, &pkt, i_payload) < 0)
         {
             vlc_warning( p_packetsys->logger, "payload err %d / %d", i_payload + 1, i_payload_count );
@@ -535,7 +541,7 @@ int DemuxASFPacket( asf_packet_sys_t *p_packetsys,
         }
         else if( pkt.left < pkt.padding_length )
         {
-            toskip = 0;
+            toskip = p_packetsys->b_can_hold_multiple_packets ? pkt.left : 0;
 #ifdef ASF_DEBUG
             vlc_warning( p_packetsys->logger, "Read %"PRIu32" too much bytes from the packet",
                                pkt.padding_length - pkt.left );
