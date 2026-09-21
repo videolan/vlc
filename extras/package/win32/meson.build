@@ -23,6 +23,7 @@ else
     endif
 endif
 
-if get_option('nsis').allowed()
+if get_option('nsis').disable_auto_if(
+    host_system != 'windows' or have_win_store).allowed()
     subdir('NSIS')
 endif

@@ -827,7 +827,7 @@ option('v4l2',
 
 option('nsis',
        type: 'feature',
-       value: 'disabled',
+       value: 'auto',
        description: 'Generate NSIS files to create Windows installer')
 
 # TODO: Missing rpi-omxil

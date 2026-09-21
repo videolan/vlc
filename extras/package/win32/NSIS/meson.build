@@ -1,5 +1,8 @@
 #  nsis packaging
 
+nsis_required = get_option('nsis').allowed() and not get_option('nsis').auto()
+makensis = find_program('makensis', required: nsis_required)
+
 nsi_conf = cdata
 nsi_conf.set('BUILD_LUA_TRUE', lua_dep.found() and get_option('lua').allowed() ? '' : '#')
 nsi_conf.set('BUILD_SKINS_TRUE', skins2_feasible ? '' : '#')
@@ -53,3 +56,30 @@ install_data('nsProcess.nsh',    install_dir : 'NSIS')
 install_data('vlc_branding.bmp', install_dir : 'NSIS')
 install_subdir('languages',      install_dir : '.')
 install_subdir('helpers',        install_dir : '.')
+
+if have_win_store
+  nsi_script_dir = 'vlc-' + winstaller_suffix + '-uwp'
+elif cc.compiles(ucrt_version_test, name: 'compiles with Universal C Runtime')
+  nsi_script_dir = 'vlc-' + winstaller_suffix + '-ucrt'
+else
+  nsi_script_dir = 'vlc-' + winstaller_suffix
+endif
+
+if makensis.found()
+    spad_nsis = custom_target('spad-nsis',
+        command: [makensis, nsi_script_dir / 'spad.nsi'],
+        input: spad_nsi,
+        output: 'spad-setup.exe', # real name but located in installed folder
+        build_by_default: false,
+        console: true)
+
+    vlc_nsis = custom_target('vlc-nsis',
+        command: [makensis, nsi_script_dir / 'vlc.win32.nsi'],
+        input: vlc_nsi,
+        output: 'vlc-' + vlc_version + '-' + winstaller_suffix + '.exe', # real name but root build folder
+        build_by_default: false,
+        console: true,
+        depends: nsProcess)
+
+    alias_target('nsis', spad_nsis, vlc_nsis)
+endif
