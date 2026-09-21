@@ -51,6 +51,7 @@ static vlc_mutex_t lock = VLC_STATIC_MUTEX;
 
 int FontConfig_Prepare( vlc_font_select_t *fs )
 {
+    int ret = VLC_SUCCESS;
     vlc_tick_t ts;
 
     vlc_mutex_lock( &lock );
@@ -66,12 +67,15 @@ int FontConfig_Prepare( vlc_font_select_t *fs )
 #ifndef _WIN32
     config = FcInitLoadConfigAndFonts();
     if( unlikely(config == NULL) )
-        refs = 0;
+        ret = VLC_ENOMEM;
 
 #else
-    unsigned int i_dialog_id = 0;
-    dialog_progress_bar_t *p_dialog = NULL;
     config = FcInitLoadConfig();
+    if( unlikely(config == NULL) )
+    {
+        ret = VLC_ENOMEM;
+        goto end;
+    }
 
     int i_ret =
         vlc_dialog_display_progress( fs->p_obj, true, 0.0, NULL,
@@ -79,12 +83,12 @@ int FontConfig_Prepare( vlc_font_select_t *fs )
                                      _("Please wait while your font cache is rebuilt.\n"
                                      "This should take less than a few minutes.") );
 
-    i_dialog_id = i_ret > 0 ? i_ret : 0;
+    unsigned int i_dialog_id = i_ret > 0 ? i_ret : 0;
 
     if( FcConfigBuildFonts( config ) == FcFalse )
     {
-        vlc_mutex_unlock( &lock );
-        return VLC_ENOMEM;
+        FcConfigDestroy(config);
+        ret = VLC_ENOMEM;
     }
 
     if( i_dialog_id != 0 )
@@ -92,10 +96,13 @@ int FontConfig_Prepare( vlc_font_select_t *fs )
 
 #endif
 
+    if (ret != VLC_SUCCESS)
+        refs--;
+
     vlc_mutex_unlock( &lock );
     msg_Dbg( fs->p_obj, "Took %" PRId64 " microseconds", vlc_tick_now() - ts );
 
-    return (config != NULL) ? VLC_SUCCESS : VLC_EGENERIC;
+    return ret;
 }
 
 void FontConfig_Unprepare( vlc_font_select_t *fs )
