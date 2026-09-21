@@ -227,6 +227,30 @@
     XCTAssertEqual(strcmp(queryParams.psz_pattern, "jazz"), 0);
 }
 
+- (void)testQueryParamsPreservesFilterAndSortTogether
+{
+    self.model.filterString = @"jazz";
+    [self.model sortByCriteria:VLC_ML_SORTING_DURATION andDescending:YES];
+
+    const vlc_ml_query_params_t queryParams = [self.model queryParams];
+
+    XCTAssertNotEqual(queryParams.psz_pattern, (const char *)NULL);
+    XCTAssertEqual(strcmp(queryParams.psz_pattern, "jazz"), 0);
+    XCTAssertEqual(queryParams.i_sort, VLC_ML_SORTING_DURATION);
+    XCTAssertTrue(queryParams.b_desc);
+}
+
+- (void)testQueryParamsPreservesUTF8FilterPattern
+{
+    NSString * const filter = @"Beyoncé";
+    self.model.filterString = filter;
+
+    const vlc_ml_query_params_t queryParams = [self.model queryParams];
+
+    XCTAssertNotEqual(queryParams.psz_pattern, (const char *)NULL);
+    XCTAssertEqual(strcmp(queryParams.psz_pattern, filter.UTF8String), 0);
+}
+
 - (void)testQueryParamsUsesSortState
 {
     [self.model sortByCriteria:VLC_ML_SORTING_ALPHA andDescending:YES];
