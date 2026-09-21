@@ -26,6 +26,11 @@
 #import "library/VLCLibraryModelChangeDelegate.h"
 #import "tests/VLCLibraryDataTypesIntegrationTestSupport.h"
 
+static int64_t sSortingAudioAlphaID;
+static int64_t sSortingAudioZuluID;
+static int64_t sSortingVideoAlphaID;
+static int64_t sSortingVideoZuluID;
+
 @interface VLCLibraryModel ()
 - (void)applicationWillTerminate:(NSNotification *)notification;
 @end
@@ -41,10 +46,50 @@
     [super setUp];
     XCTAssertTrue(VLCLibraryDataTypesIntegrationStart());
     XCTAssertTrue(VLCLibraryDataTypesIntegrationPrepareFactoryFixtures());
+
+    /* External records provide deterministic titles without requiring another
+     * filesystem discovery pass. */
+    vlc_medialibrary_t * const mediaLibrary =
+        VLCLibraryDataTypesIntegrationMediaLibrary();
+    sSortingAudioAlphaID = VLCLibraryDataTypesIntegrationCreateExternalMedia(
+        "file:///tmp/vlc-sort-audio-alpha.mp3");
+    sSortingAudioZuluID = VLCLibraryDataTypesIntegrationCreateExternalMedia(
+        "file:///tmp/vlc-sort-audio-zulu.mp3");
+    sSortingVideoAlphaID = VLCLibraryDataTypesIntegrationCreateExternalMedia(
+        "file:///tmp/vlc-sort-video-alpha.mp4");
+    sSortingVideoZuluID = VLCLibraryDataTypesIntegrationCreateExternalMedia(
+        "file:///tmp/vlc-sort-video-zulu.mp4");
+
+    XCTAssertNotEqual(sSortingAudioAlphaID, (int64_t)0);
+    XCTAssertNotEqual(sSortingAudioZuluID, (int64_t)0);
+    XCTAssertNotEqual(sSortingVideoAlphaID, (int64_t)0);
+    XCTAssertNotEqual(sSortingVideoZuluID, (int64_t)0);
+    XCTAssertEqual(vlc_ml_media_set_type(mediaLibrary, sSortingAudioAlphaID,
+                                         VLC_ML_MEDIA_TYPE_AUDIO), VLC_SUCCESS);
+    XCTAssertEqual(vlc_ml_media_set_type(mediaLibrary, sSortingAudioZuluID,
+                                         VLC_ML_MEDIA_TYPE_AUDIO), VLC_SUCCESS);
+    XCTAssertEqual(vlc_ml_media_set_type(mediaLibrary, sSortingVideoAlphaID,
+                                         VLC_ML_MEDIA_TYPE_VIDEO), VLC_SUCCESS);
+    XCTAssertEqual(vlc_ml_media_set_type(mediaLibrary, sSortingVideoZuluID,
+                                         VLC_ML_MEDIA_TYPE_VIDEO), VLC_SUCCESS);
 }
 
 + (void)tearDown
 {
+    vlc_medialibrary_t * const mediaLibrary =
+        VLCLibraryDataTypesIntegrationMediaLibrary();
+    if (mediaLibrary != NULL && sSortingAudioAlphaID != 0) {
+        vlc_ml_remove_stream(mediaLibrary, sSortingAudioAlphaID);
+    }
+    if (mediaLibrary != NULL && sSortingAudioZuluID != 0) {
+        vlc_ml_remove_stream(mediaLibrary, sSortingAudioZuluID);
+    }
+    if (mediaLibrary != NULL && sSortingVideoAlphaID != 0) {
+        vlc_ml_remove_stream(mediaLibrary, sSortingVideoAlphaID);
+    }
+    if (mediaLibrary != NULL && sSortingVideoZuluID != 0) {
+        vlc_ml_remove_stream(mediaLibrary, sSortingVideoZuluID);
+    }
     VLCLibraryDataTypesIntegrationStop();
     [super tearDown];
 }
@@ -158,6 +203,51 @@
     return loader();
 }
 
+- (NSArray<VLCMediaLibraryPlaylist *> *)playlistsForSortingWithPrefix:(NSString *)prefix
+{
+    const int64_t alphaID = VLCLibraryDataTypesIntegrationCreatePlaylist();
+    const int64_t zuluID = VLCLibraryDataTypesIntegrationCreatePlaylist();
+    XCTAssertNotEqual(alphaID, (int64_t)0);
+    XCTAssertNotEqual(zuluID, (int64_t)0);
+
+    VLCMediaLibraryPlaylist * const alpha =
+        [VLCMediaLibraryPlaylist playlistForLibraryID:alphaID];
+    VLCMediaLibraryPlaylist * const zulu =
+        [VLCMediaLibraryPlaylist playlistForLibraryID:zuluID];
+    XCTAssertTrue([alpha renameTo:[prefix stringByAppendingString:@" Alpha"]]);
+    XCTAssertTrue([zulu renameTo:[prefix stringByAppendingString:@" Zulu"]]);
+
+    self.model.filterString = prefix;
+    return [self.model listOfPlaylistsOfType:VLC_ML_PLAYLIST_TYPE_ALL];
+}
+
+- (NSArray<VLCMediaLibraryPlaylist *> *)playlistsForDurationSortingWithPrefix:(NSString *)prefix
+{
+    const int64_t emptyID = VLCLibraryDataTypesIntegrationCreatePlaylist();
+    const int64_t filledID = VLCLibraryDataTypesIntegrationCreatePlaylist();
+    XCTAssertNotEqual(emptyID, (int64_t)0);
+    XCTAssertNotEqual(filledID, (int64_t)0);
+
+    VLCMediaLibraryPlaylist * const empty =
+        [VLCMediaLibraryPlaylist playlistForLibraryID:emptyID];
+    VLCMediaLibraryPlaylist * const filled =
+        [VLCMediaLibraryPlaylist playlistForLibraryID:filledID];
+    XCTAssertTrue([empty renameTo:[prefix stringByAppendingString:@" Empty"]]);
+    XCTAssertTrue([filled renameTo:[prefix stringByAppendingString:@" Filled"]]);
+
+    VLCMediaLibraryMediaItem * const fixture =
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:
+            VLCLibraryDataTypesIntegrationFactoryAudioMediaID()];
+    XCTAssertNotNil(fixture);
+    if (fixture == nil) {
+        return @[ ];
+    }
+    XCTAssertTrue([filled appendMediaItems:@[fixture]]);
+
+    self.model.filterString = prefix;
+    return [self.model listOfPlaylistsOfType:VLC_ML_PLAYLIST_TYPE_ALL];
+}
+
 - (void)testAudioMediaQueryReturnsMatchingFixtureMedia
 {
     NSArray<VLCMediaLibraryMediaItem *> * const media =
@@ -189,6 +279,148 @@
         [self videoMediaAfterFilter:@"No Matching Fixture Media"];
 
     XCTAssertEqual(media.count, (NSUInteger)0);
+}
+
+- (void)testPlaylistQuerySortsMatchingItemsInAscendingOrder
+{
+    [self.model sortByCriteria:VLC_ML_SORTING_ALPHA andDescending:NO];
+
+    NSArray<VLCMediaLibraryPlaylist *> * const playlists =
+        [self playlistsForSortingWithPrefix:@"Sorting Ascending"];
+
+    XCTAssertEqual(playlists.count, (NSUInteger)2);
+    XCTAssertEqualObjects(playlists[0].displayString, @"Sorting Ascending Alpha");
+    XCTAssertEqualObjects(playlists[1].displayString, @"Sorting Ascending Zulu");
+}
+
+- (void)testPlaylistQuerySortsMatchingItemsInDescendingOrder
+{
+    [self.model sortByCriteria:VLC_ML_SORTING_ALPHA andDescending:YES];
+
+    NSArray<VLCMediaLibraryPlaylist *> * const playlists =
+        [self playlistsForSortingWithPrefix:@"Sorting Descending"];
+
+    XCTAssertEqual(playlists.count, (NSUInteger)2);
+    XCTAssertEqualObjects(playlists[0].displayString, @"Sorting Descending Zulu");
+    XCTAssertEqualObjects(playlists[1].displayString, @"Sorting Descending Alpha");
+}
+
+- (void)testAudioMediaQuerySortsMatchingItemsInAscendingOrder
+{
+    [self.model sortByCriteria:VLC_ML_SORTING_ALPHA andDescending:NO];
+
+    NSArray<VLCMediaLibraryMediaItem *> * const media =
+        [self audioMediaAfterFilter:@"sort"];
+
+    XCTAssertEqual(media.count, (NSUInteger)2);
+    XCTAssertEqualObjects(media[0].displayString, @"vlc-sort-audio-alpha.mp3");
+    XCTAssertEqualObjects(media[1].displayString, @"vlc-sort-audio-zulu.mp3");
+}
+
+- (void)testAudioMediaQuerySortsMatchingItemsInDescendingOrder
+{
+    [self.model sortByCriteria:VLC_ML_SORTING_ALPHA andDescending:YES];
+
+    NSArray<VLCMediaLibraryMediaItem *> * const media =
+        [self audioMediaAfterFilter:@"sort"];
+
+    XCTAssertEqual(media.count, (NSUInteger)2);
+    XCTAssertEqualObjects(media[0].displayString, @"vlc-sort-audio-zulu.mp3");
+    XCTAssertEqualObjects(media[1].displayString, @"vlc-sort-audio-alpha.mp3");
+}
+
+- (void)testVideoMediaQuerySortsMatchingItemsInAscendingOrder
+{
+    [self.model sortByCriteria:VLC_ML_SORTING_ALPHA andDescending:NO];
+
+    NSArray<VLCMediaLibraryMediaItem *> * const media =
+        [self videoMediaAfterFilter:@"sort"];
+
+    XCTAssertEqual(media.count, (NSUInteger)2);
+    XCTAssertEqualObjects(media[0].displayString, @"vlc-sort-video-alpha.mp4");
+    XCTAssertEqualObjects(media[1].displayString, @"vlc-sort-video-zulu.mp4");
+}
+
+- (void)testVideoMediaQuerySortsMatchingItemsInDescendingOrder
+{
+    [self.model sortByCriteria:VLC_ML_SORTING_ALPHA andDescending:YES];
+
+    NSArray<VLCMediaLibraryMediaItem *> * const media =
+        [self videoMediaAfterFilter:@"sort"];
+
+    XCTAssertEqual(media.count, (NSUInteger)2);
+    XCTAssertEqualObjects(media[0].displayString, @"vlc-sort-video-zulu.mp4");
+    XCTAssertEqualObjects(media[1].displayString, @"vlc-sort-video-alpha.mp4");
+}
+
+- (void)testPlaylistQuerySortsMatchingItemsByDurationAscending
+{
+    [self.model sortByCriteria:VLC_ML_SORTING_DURATION andDescending:NO];
+
+    NSArray<VLCMediaLibraryPlaylist *> * const playlists =
+        [self playlistsForDurationSortingWithPrefix:@"Sorting Duration Ascending"];
+
+    XCTAssertEqual(playlists.count, (NSUInteger)2);
+    XCTAssertEqualObjects(playlists[0].displayString, @"Sorting Duration Ascending Empty");
+    XCTAssertEqualObjects(playlists[1].displayString, @"Sorting Duration Ascending Filled");
+}
+
+- (void)testPlaylistQuerySortsMatchingItemsByDurationDescending
+{
+    [self.model sortByCriteria:VLC_ML_SORTING_DURATION andDescending:YES];
+
+    NSArray<VLCMediaLibraryPlaylist *> * const playlists =
+        [self playlistsForDurationSortingWithPrefix:@"Sorting Duration Descending"];
+
+    XCTAssertEqual(playlists.count, (NSUInteger)2);
+    XCTAssertEqualObjects(playlists[0].displayString, @"Sorting Duration Descending Filled");
+    XCTAssertEqualObjects(playlists[1].displayString, @"Sorting Duration Descending Empty");
+}
+
+- (void)testFavoriteAudioQuerySortsMatchingItemsInAscendingOrder
+{
+    VLCMediaLibraryMediaItem * const alpha =
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:sSortingAudioAlphaID];
+    VLCMediaLibraryMediaItem * const zulu =
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:sSortingAudioZuluID];
+    XCTAssertEqual([alpha setFavorite:YES], VLC_SUCCESS);
+    XCTAssertEqual([zulu setFavorite:YES], VLC_SUCCESS);
+    [self.model sortByCriteria:VLC_ML_SORTING_ALPHA andDescending:NO];
+
+    NSArray<VLCMediaLibraryMediaItem *> * const favorites =
+        [self itemsAfterFilter:@"sort"
+                         loader:^NSArray *{
+        return self.model.listOfFavoriteAudioMedia;
+    }];
+
+    XCTAssertEqual(favorites.count, (NSUInteger)2);
+    XCTAssertEqualObjects(favorites[0].displayString, @"vlc-sort-audio-alpha.mp3");
+    XCTAssertEqualObjects(favorites[1].displayString, @"vlc-sort-audio-zulu.mp3");
+    XCTAssertEqual([alpha setFavorite:NO], VLC_SUCCESS);
+    XCTAssertEqual([zulu setFavorite:NO], VLC_SUCCESS);
+}
+
+- (void)testFavoriteAudioQuerySortsMatchingItemsInDescendingOrder
+{
+    VLCMediaLibraryMediaItem * const alpha =
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:sSortingAudioAlphaID];
+    VLCMediaLibraryMediaItem * const zulu =
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:sSortingAudioZuluID];
+    XCTAssertEqual([alpha setFavorite:YES], VLC_SUCCESS);
+    XCTAssertEqual([zulu setFavorite:YES], VLC_SUCCESS);
+    [self.model sortByCriteria:VLC_ML_SORTING_ALPHA andDescending:YES];
+
+    NSArray<VLCMediaLibraryMediaItem *> * const favorites =
+        [self itemsAfterFilter:@"sort"
+                         loader:^NSArray *{
+        return self.model.listOfFavoriteAudioMedia;
+    }];
+
+    XCTAssertEqual(favorites.count, (NSUInteger)2);
+    XCTAssertEqualObjects(favorites[0].displayString, @"vlc-sort-audio-zulu.mp3");
+    XCTAssertEqualObjects(favorites[1].displayString, @"vlc-sort-audio-alpha.mp3");
+    XCTAssertEqual([alpha setFavorite:NO], VLC_SUCCESS);
+    XCTAssertEqual([zulu setFavorite:NO], VLC_SUCCESS);
 }
 
 - (void)testRecentVideoQueryReturnsMatchingFixtureMedia
