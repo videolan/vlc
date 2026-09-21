@@ -28,6 +28,7 @@
 #   include "config.h"
 #endif
 
+#include <stdarg.h>
 #include <string.h>
 #include <limits.h>
 #include <assert.h>
@@ -39,6 +40,7 @@
 #include <vlc_input.h>
 #include <vlc_dialog.h>
 #include <vlc_stream.h>
+#include <vlc_messages.h>
 
 #include <ass/ass.h>
 
@@ -117,6 +119,11 @@ static void OldEngineClunkyRollInfoPatch( decoder_t *p_dec, ASS_Track * );
 
 //#define DEBUG_REGION
 
+static void vlc_ass_msg_handler(int level, const char *fmt, va_list va, void *data) {
+    decoder_t *p_dec = data;
+    msg_GenericVa( p_dec, VLC_MSG_DBG, fmt, va );
+}
+
 /*****************************************************************************
  * Create: Open libass decoder.
  *****************************************************************************/
@@ -152,6 +159,8 @@ static int Create( vlc_object_t *p_this )
         DecSysRelease( p_sys );
         return VLC_EGENERIC;
     }
+
+    ass_set_message_cb(p_library, vlc_ass_msg_handler, p_dec);
 
     /* load attachments */
     input_attachment_t  **pp_attachments;
