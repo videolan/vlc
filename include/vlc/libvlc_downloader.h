@@ -386,7 +386,9 @@ libvlc_downloader_task_get_media(libvlc_downloader_task *task);
  * - It is safe to call this API from within the on_state_update callback, when it
  *   reports a terminal state (finished, cancelled, error) \see libvlc_downloader_status_t.
  *
- * - The task handle should not be used after calling this function.
+ * - It is safe to call this API at any time, including after
+ *   libvlc_downloader_destroy() has been called on the downloader that
+ *   created it. The task handle should not be used after calling this function.
  *
  * - If called on an active task, it doesn't cancel the task,
  *   use \ref libvlc_downloader_cancel() for that.

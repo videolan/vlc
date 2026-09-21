@@ -136,9 +136,6 @@ DownloaderTaskDestroy(struct libvlc_downloader_task *task)
     if (task->parser_task)
         libvlc_parser_task_release(task->parser_task);
 
-    if (task->s)
-        vlc_stream_Delete(task->s);
-
     free(task);
 }
 
@@ -298,6 +295,9 @@ cleanup_locked:
     task->thread->terminated = true;
     vlc_mutex_unlock(&downloader->lock);
     free(buf);
+    if (task->s != NULL)
+        vlc_stream_Delete(task->s);
+
     libvlc_downloader_task_release(task);
     return NULL;
 }
