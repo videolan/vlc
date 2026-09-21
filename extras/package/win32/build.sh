@@ -579,10 +579,6 @@ if [ -n "$BUILD_MESON" ]; then
     # we don't want to install in <destdir>/usr/local, just <destdir>
     MCONFIGFLAGS="$MCONFIGFLAGS --prefix=/"
 
-    if [ "$INSTALLER" = "n" ] || [ "$INSTALLER" = "r" ] || [ "$INSTALLER" = "u" ]; then
-        MCONFIGFLAGS="$MCONFIGFLAGS -Dnsis=enabled"
-    fi
-
     # generate the crossfile.meson
     test -e $SHORTARCH-meson/crossfile.meson && unlink $SHORTARCH-meson/crossfile.meson
     exec 3>$SHORTARCH-meson/crossfile.meson || return $?
@@ -643,8 +639,10 @@ if [ -n "$BUILD_MESON" ]; then
         VLC_GIT_TAG="$(git describe --tags --long --match '?.*.*' --always)"
 
         meson install -C ${BUILD_PATH}/$SHORTARCH-meson ${MINSTALLFLAGS}
-        makensis $MDESTDIR/spad.nsi
-        makensis $MDESTDIR/vlc.win32.nsi
+        if [ -z "$WINSTORE" ]; then
+            # generate .exe installer
+            ninja -C ${BUILD_PATH}/$SHORTARCH-meson package-win32-exe
+        fi
 
         rm -rf ${BUILD_PATH}/$SHORTARCH-meson/vlc-$SHORTARCH-$VLC_GIT_TAG-debug.7z
         cd ${BUILD_PATH}/$SHORTARCH-meson && \
@@ -652,12 +650,16 @@ if [ -n "$BUILD_MESON" ]; then
     elif [ "$INSTALLER" = "r" ]; then
         meson dist -C ${BUILD_PATH}/$SHORTARCH-meson -j$JOBS --no-tests
         meson install -C ${BUILD_PATH}/$SHORTARCH-meson ${MINSTALLFLAGS}
-        makensis $MDESTDIR/spad.nsi
-        makensis $MDESTDIR/vlc.win32.nsi
+        if [ -z "$WINSTORE" ]; then
+            # generate .exe installer
+            ninja -C ${BUILD_PATH}/$SHORTARCH-meson package-win32-exe
+        fi
     elif [ "$INSTALLER" = "u" ]; then
         meson install -C ${BUILD_PATH}/$SHORTARCH-meson ${MINSTALLFLAGS}
-        makensis $MDESTDIR/spad.nsi
-        makensis $MDESTDIR/vlc.win32.nsi
+        if [ -z "$WINSTORE" ]; then
+            # generate .exe installer
+            ninja -C ${BUILD_PATH}/$SHORTARCH-meson package-win32-exe
+        fi
     fi
 else
     info "Bootstrapping"

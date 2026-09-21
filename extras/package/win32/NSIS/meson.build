@@ -27,6 +27,8 @@ if have_win64
     endif
 endif
 
+# TODO use nsis-pluginapi if possible to be compatible with the system makensis
+
 nsProcess = shared_library('nsProcess',
                            'nsProcess/nsProcess.c', 'nsProcess/pluginapi.c',
                            c_args: nsProcess_cargs,
@@ -81,5 +83,5 @@ if makensis.found()
         console: true,
         depends: nsProcess)
 
-    alias_target('nsis', spad_nsis, vlc_nsis)
+    alias_target('package-win32-exe', spad_nsis, vlc_nsis)
 endif
