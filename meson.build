@@ -1019,9 +1019,7 @@ if host_system == 'windows'
     libdir_path = prefix_path
     pkglibdir_path = libdir_path / vlc_pkg_suffix
     plugins_path = prefix_path / 'plugins'
-    libvlc_header_path = prefix_path / 'sdk/include' / vlc_pkg_suffix
-    plugins_header_path = prefix_path / 'sdk/include' / vlc_pkg_suffix / 'plugins'
-    vlccore_lib_path = prefix_path / 'sdk/lib'
+    vlc_sdk_path = prefix_path / 'sdk'
     bindir_path = prefix_path
     libexecdir_path = prefix_path
     pkglibexecdir_path = prefix_path
@@ -1030,14 +1028,15 @@ else
     libdir_path = prefix_path / get_option('libdir')
     pkglibdir_path = libdir_path / vlc_pkg_suffix
     plugins_path = pkglibdir_path / 'plugins'
-    libvlc_header_path = prefix_path / 'include' / vlc_pkg_suffix
-    plugins_header_path = prefix_path / 'include' / vlc_pkg_suffix / 'plugins'
-    vlccore_lib_path = prefix_path / 'lib'
+    vlc_sdk_path = prefix_path
     bindir_path = prefix_path / 'bin'
     libexecdir_path = prefix_path / get_option('libexecdir')
     pkglibexecdir_path = libexecdir_path / vlc_pkg_suffix
     localedir_path = prefix_path / get_option('localedir')
 endif
+libvlc_header_path = vlc_sdk_path / 'include' / vlc_pkg_suffix
+plugins_header_path = vlc_sdk_path / 'include' / vlc_pkg_suffix / 'plugins'
+vlccore_lib_path = vlc_sdk_path / 'lib'
 
 cdata.set_quoted('LIBDIR', libdir_path)
 cdata.set_quoted('PKGLIBDIR', pkglibdir_path)
