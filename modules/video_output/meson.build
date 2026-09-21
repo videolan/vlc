@@ -237,7 +237,7 @@ if xcb_dep.found()
         include_directories: [vlc_include_dirs],
         dependencies: [xcb_dep, libvlccore_dep],
         install: true,
-        install_dir: libdir_path,
+        install_dir: pkglibdir_path,
         )
 
     if xcb_randr_dep.found() and xproto_dep.found()
