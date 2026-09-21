@@ -163,7 +163,7 @@
     [self waitForExpectations:@[ notificationExpectation ] timeout:0.1];
 }
 
-- (void)testSortChangeDropsCachedLists
+- (void)testChangingSortCriteriaDropsCachedLists
 {
     self.model.cachedVideoMedia = @[ [VLCMediaLibraryMediaItem new] ];
 
@@ -176,13 +176,34 @@
     XCTAssertNil(self.model.cachedVideoMedia);
 }
 
-- (void)testUnchangedSortDoesNotPostCacheDropNotification
+- (void)testChangingSortDirectionDropsCachedLists
 {
+    XCTestExpectation * const initialNotificationExpectation =
+        [self expectationForNotification:VLCLibraryModelAllCachesDropped object:self.model handler:nil];
+
+    [self.model sortByCriteria:VLC_ML_SORTING_ALPHA andDescending:NO];
+    [self waitForExpectations:@[ initialNotificationExpectation ] timeout:1.];
+
+    XCTestExpectation * const notificationExpectation =
+        [self expectationForNotification:VLCLibraryModelAllCachesDropped object:self.model handler:nil];
+
+    [self.model sortByCriteria:VLC_ML_SORTING_ALPHA andDescending:YES];
+    [self waitForExpectations:@[ notificationExpectation ] timeout:1.];
+}
+
+- (void)testRepeatingSortDoesNotPostCacheDropNotification
+{
+    XCTestExpectation * const initialNotificationExpectation =
+        [self expectationForNotification:VLCLibraryModelAllCachesDropped object:self.model handler:nil];
+
+    [self.model sortByCriteria:VLC_ML_SORTING_ALPHA andDescending:YES];
+    [self waitForExpectations:@[ initialNotificationExpectation ] timeout:1.];
+
     XCTestExpectation * const notificationExpectation =
         [self expectationForNotification:VLCLibraryModelAllCachesDropped object:self.model handler:nil];
     notificationExpectation.inverted = YES;
 
-    [self.model sortByCriteria:VLC_ML_SORTING_DEFAULT andDescending:NO];
+    [self.model sortByCriteria:VLC_ML_SORTING_ALPHA andDescending:YES];
 
     [self waitForExpectations:@[ notificationExpectation ] timeout:0.1];
 }
@@ -192,6 +213,8 @@
     const vlc_ml_query_params_t queryParams = [self.model queryParams];
 
     XCTAssertEqual(queryParams.psz_pattern, (const char *)NULL);
+    XCTAssertEqual(queryParams.i_sort, VLC_ML_SORTING_DEFAULT);
+    XCTAssertFalse(queryParams.b_desc);
 }
 
 - (void)testQueryParamsUsesFilterPattern
@@ -212,6 +235,16 @@
 
     XCTAssertEqual(queryParams.i_sort, VLC_ML_SORTING_ALPHA);
     XCTAssertTrue(queryParams.b_desc);
+}
+
+- (void)testQueryParamsUsesAscendingSortState
+{
+    [self.model sortByCriteria:VLC_ML_SORTING_ALPHA andDescending:NO];
+
+    const vlc_ml_query_params_t queryParams = [self.model queryParams];
+
+    XCTAssertEqual(queryParams.i_sort, VLC_ML_SORTING_ALPHA);
+    XCTAssertFalse(queryParams.b_desc);
 }
 
 @end
