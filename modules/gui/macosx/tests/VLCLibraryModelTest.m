@@ -33,7 +33,12 @@
 @property (readwrite, nonatomic) NSArray<VLCMediaLibraryAlbum *> *cachedAlbums;
 @property (readwrite, nonatomic) NSArray<VLCMediaLibraryArtist *> *cachedArtists;
 @property (readwrite, nonatomic) NSArray<VLCMediaLibraryGenre *> *cachedGenres;
+@property (readwrite, nonatomic) NSArray<VLCMediaLibraryShow *> *cachedListOfShows;
+@property (readwrite, nonatomic) NSArray<VLCMediaLibraryMovie *> *cachedListOfMovies;
 @property (readwrite, nonatomic) NSArray<VLCMediaLibraryGroup *> *cachedListOfGroups;
+@property (readwrite, nonatomic) NSArray<VLCMediaLibraryMediaItem *> *cachedRecentMedia;
+@property (readwrite, nonatomic) NSArray<VLCMediaLibraryMediaItem *> *cachedRecentAudioMedia;
+@property (readwrite, nonatomic) NSArray<VLCMediaLibraryEntryPoint *> *cachedListOfMonitoredFolders;
 @property (readwrite, nonatomic) NSArray<NSString *> *cachedMediaTitles;
 @end
 
@@ -70,14 +75,26 @@
     XCTAssertEqual([VLCLibraryModel modelIndexFromModelItemNotification:notification], (NSUInteger)17);
 }
 
-- (void)testFilterChangeDropsAllCachedLists
+- (void)testChangingFilterStoresNewValue
+{
+    self.model.filterString = @"rock";
+
+    XCTAssertEqualObjects(self.model.filterString, @"rock");
+}
+
+- (void)testChangingFilterDropsAllCaches
 {
     self.model.cachedAudioMedia = @[ [VLCMediaLibraryMediaItem new] ];
     self.model.cachedVideoMedia = @[ [VLCMediaLibraryMediaItem new] ];
     self.model.cachedAlbums = @[ [VLCMediaLibraryAlbum new] ];
     self.model.cachedArtists = @[ [VLCMediaLibraryArtist new] ];
     self.model.cachedGenres = @[ [VLCMediaLibraryGenre new] ];
+    self.model.cachedListOfShows = @[ [VLCMediaLibraryShow new] ];
+    self.model.cachedListOfMovies = @[ [VLCMediaLibraryMovie new] ];
     self.model.cachedListOfGroups = @[ [VLCMediaLibraryGroup new] ];
+    self.model.cachedRecentMedia = @[ [VLCMediaLibraryMediaItem new] ];
+    self.model.cachedRecentAudioMedia = @[ [VLCMediaLibraryMediaItem new] ];
+    self.model.cachedListOfMonitoredFolders = @[ [VLCMediaLibraryEntryPoint new] ];
     self.model.cachedMediaTitles = @[ @"title" ];
 
     XCTestExpectation * const notificationExpectation =
@@ -92,8 +109,30 @@
     XCTAssertNil(self.model.cachedAlbums);
     XCTAssertNil(self.model.cachedArtists);
     XCTAssertNil(self.model.cachedGenres);
+    XCTAssertNil(self.model.cachedListOfShows);
+    XCTAssertNil(self.model.cachedListOfMovies);
     XCTAssertNil(self.model.cachedListOfGroups);
+    XCTAssertNil(self.model.cachedRecentMedia);
+    XCTAssertNil(self.model.cachedRecentAudioMedia);
+    XCTAssertNil(self.model.cachedListOfMonitoredFolders);
     XCTAssertNil(self.model.cachedMediaTitles);
+}
+
+- (void)testClearingFilterPostsCacheDropNotification
+{
+    XCTestExpectation * const initialNotificationExpectation =
+        [self expectationForNotification:VLCLibraryModelAllCachesDropped object:self.model handler:nil];
+
+    self.model.filterString = @"rock";
+    [self waitForExpectations:@[ initialNotificationExpectation ] timeout:1.];
+
+    XCTestExpectation * const notificationExpectation =
+        [self expectationForNotification:VLCLibraryModelAllCachesDropped object:self.model handler:nil];
+
+    self.model.filterString = @"";
+    [self waitForExpectations:@[ notificationExpectation ] timeout:1.];
+
+    XCTAssertEqualObjects(self.model.filterString, @"");
 }
 
 - (void)testUnchangedFilterDoesNotPostCacheDropNotification
@@ -103,6 +142,23 @@
     notificationExpectation.inverted = YES;
 
     self.model.filterString = @"";
+
+    [self waitForExpectations:@[ notificationExpectation ] timeout:0.1];
+}
+
+- (void)testRepeatingNonEmptyFilterDoesNotPostCacheDropNotification
+{
+    XCTestExpectation * const initialNotificationExpectation =
+        [self expectationForNotification:VLCLibraryModelAllCachesDropped object:self.model handler:nil];
+
+    self.model.filterString = @"rock";
+    [self waitForExpectations:@[ initialNotificationExpectation ] timeout:1.];
+
+    XCTestExpectation * const notificationExpectation =
+        [self expectationForNotification:VLCLibraryModelAllCachesDropped object:self.model handler:nil];
+    notificationExpectation.inverted = YES;
+
+    self.model.filterString = @"rock";
 
     [self waitForExpectations:@[ notificationExpectation ] timeout:0.1];
 }
@@ -131,17 +187,31 @@
     [self waitForExpectations:@[ notificationExpectation ] timeout:0.1];
 }
 
-- (void)testQueryParamsUsesFilterAndSortState
+- (void)testQueryParamsOmitsEmptyFilterPattern
+{
+    const vlc_ml_query_params_t queryParams = [self.model queryParams];
+
+    XCTAssertEqual(queryParams.psz_pattern, (const char *)NULL);
+}
+
+- (void)testQueryParamsUsesFilterPattern
 {
     self.model.filterString = @"jazz";
+
+    const vlc_ml_query_params_t queryParams = [self.model queryParams];
+
+    XCTAssertNotEqual(queryParams.psz_pattern, (const char *)NULL);
+    XCTAssertEqual(strcmp(queryParams.psz_pattern, "jazz"), 0);
+}
+
+- (void)testQueryParamsUsesSortState
+{
     [self.model sortByCriteria:VLC_ML_SORTING_ALPHA andDescending:YES];
 
     const vlc_ml_query_params_t queryParams = [self.model queryParams];
 
     XCTAssertEqual(queryParams.i_sort, VLC_ML_SORTING_ALPHA);
     XCTAssertTrue(queryParams.b_desc);
-    XCTAssertNotEqual(queryParams.psz_pattern, (const char *)NULL);
-    XCTAssertEqual(strcmp(queryParams.psz_pattern, "jazz"), 0);
 }
 
 @end
