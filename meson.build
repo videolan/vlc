@@ -1019,8 +1019,8 @@ if host_system == 'windows'
     libdir_path = prefix_path
     pkglibdir_path = libdir_path / vlc_pkg_suffix
     plugins_path = prefix_path / 'plugins'
-    libvlc_header_path = prefix_path / 'sdk/include/vlc'
-    plugins_header_path = prefix_path / 'sdk/include/vlc/plugins'
+    libvlc_header_path = prefix_path / 'sdk/include' / vlc_pkg_suffix
+    plugins_header_path = prefix_path / 'sdk/include' / vlc_pkg_suffix / 'plugins'
     vlccore_lib_path = prefix_path / 'sdk/lib'
     bindir_path = prefix_path
     libexecdir_path = prefix_path
