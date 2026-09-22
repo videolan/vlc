@@ -129,18 +129,22 @@ case $ARCH in
     x86_64)
         SHORTARCH="win64"
         MESON_CPU_FAMILY="x86_64"
+        WINDOWS_ARCH="x64"
         ;;
     i686)
         SHORTARCH="win32"
         MESON_CPU_FAMILY="x86"
+        WINDOWS_ARCH="x86"
         ;;
     aarch64)
         SHORTARCH="winarm64"
         MESON_CPU_FAMILY="aarch64"
+        WINDOWS_ARCH="arm64"
         ;;
     armv7)
         SHORTARCH="winarm"
         MESON_CPU_FAMILY="arm"
+        WINDOWS_ARCH="arm"
         ;;
     *)
         usage
@@ -203,14 +207,21 @@ make -j$JOBS
 
 # avoid installing wine on WSL
 # wine is needed to build Qt with shaders or running vlc-cache-gen
-if test -z "$(command -v wine)"
-then
-    if test -n "$(command -v wsl.exe)"
-    then
+if test -z "$(command -v wine)"; then
+    if test -n "$(command -v wsl.exe)"; then
         echo "Using wsl.exe to replace wine"
         echo "#!/bin/sh" > build/bin/wine
         echo "\"\$@\"" >> build/bin/wine
         chmod +x build/bin/wine
+        WIN32_PATH_CMD=wslpath
+    else
+        WIN32_PATH_CMD=cygpath
+    fi
+else
+    if test -n "$(command -v wsl.exe)"; then
+        WIN32_PATH_CMD=wslpath
+    else
+        WIN32_PATH_CMD=winepath
     fi
 fi
 HOST="$(cc -dumpmachine)"
@@ -651,6 +662,33 @@ if [ -n "$BUILD_MESON" ]; then
         if [ -z "$WINSTORE" ]; then
             # generate .exe installer
             ninja -C ${BUILD_PATH}/$SHORTARCH-meson package-win32-exe
+            # generate .msi installer
+            ${VLC_ROOT_PATH}/extras/package/win32/msi/msi-heat.py \
+                --dir ${MDESTDIR}/plugins -cg CompPluginsGroup -gg -scom -sreg -sfrag -dr APPLICATIONFOLDER \
+                -out ${BUILD_PATH}/$SHORTARCH-meson/extras/package/win32/msi/Plugins.fragment.wxs
+            if [ "$I18N" = "yes" ]; then
+                ${VLC_ROOT_PATH}/extras/package/win32/msi/msi-heat.py \
+                    --dir ${MDESTDIR}/locale -cg CompLocaleGroup -gg -scom -sreg -sfrag -dr APPLICATIONFOLDER \
+                    -out ${BUILD_PATH}/$SHORTARCH-meson/extras/package/win32/msi/Locale.fragment.wxs
+            fi
+            ${VLC_ROOT_PATH}/extras/package/win32/msi/msi-heat.py \
+                --dir ${MDESTDIR}/lua -cg CompLuaGroup -gg -scom -sreg -sfrag -dr APPLICATIONFOLDER \
+                -out ${BUILD_PATH}/$SHORTARCH-meson/extras/package/win32/msi/Lua.fragment.wxs
+            if [ -z "$DISABLEGUI" ]; then
+                ${VLC_ROOT_PATH}/extras/package/win32/msi/msi-heat.py \
+                    --dir ${MDESTDIR}/skins -cg CompSkinsGroup -gg -scom -sreg -sfrag -dr APPLICATIONFOLDER \
+                    -out ${BUILD_PATH}/$SHORTARCH-meson/extras/package/win32/msi/Skins.fragment.wxs
+            fi
+
+            W_MSIDIR=$($WIN32_PATH_CMD -w "${VLC_ROOT_PATH}/extras/package/win32/msi")
+            W_MSIBUILDDIR=$($WIN32_PATH_CMD -w "${BUILD_PATH}/$SHORTARCH-meson/extras/package/win32/msi")
+            cd ${BUILD_PATH}/$SHORTARCH-meson/extras/package/win32/msi && \
+                wine "${WIXPATH}/candle.exe" -arch $WINDOWS_ARCH \
+                -ext WiXUtilExtension $W_MSIDIR/product.wxs $W_MSIDIR/extensions.wxs $W_MSIBUILDDIR/*.fragment.wxs
+
+            MSIOUTFILE=vlc-$SHORTARCH-$VLC_GIT_TAG.msi
+            cd $MDESTDIR && wine "${WIXPATH}/light.exe" -sval -spdb -ext WixUIExtension -ext WixUtilExtension -cultures:en-us \
+                -b $W_MSIDIR $W_MSIBUILDDIR/product.wixobj $W_MSIBUILDDIR/extensions.wixobj $W_MSIBUILDDIR/*.fragment.wixobj -o ../$MSIOUTFILE
         fi
 
         rm -rf ${BUILD_PATH}/$SHORTARCH-meson/vlc-$SHORTARCH-$VLC_GIT_TAG-debug.7z

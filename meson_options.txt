@@ -828,7 +828,12 @@ option('v4l2',
 option('nsis',
        type: 'feature',
        value: 'auto',
-       description: 'Generate NSIS files to create Windows installer')
+       description: 'Generate NSIS files to create Windows EXE installer')
+
+option('wix',
+       type: 'feature',
+       value: 'auto',
+       description: 'Generate WIX files to create Windows MSI installer')
 
 # TODO: Missing rpi-omxil
 # TODO: Missing gst-decode
