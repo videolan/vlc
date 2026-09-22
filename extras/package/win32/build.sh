@@ -70,7 +70,7 @@ do
              INSTALLER=$OPTARG
          ;;
          W)
-             WIXPATH=--with-wix="$OPTARG"
+             WIXPATH="$OPTARG"
          ;;
          s)
              INTERACTIVE="yes"
@@ -562,6 +562,9 @@ if [ "$INSTALLER" = "n" ]; then
     MCOMPILEFLAGS="$MCOMPILEFLAGS --verbose"
 fi
 
+if [ -z "$WIXPATH" ]; then
+    WIXPATH="$( pwd -P )/contrib/$CONTRIB_PREFIX/bin"
+fi
 
 if [ -n "$BUILD_MESON" ]; then
     # disable alarm() calls in tests. The timeout is handled by meson
@@ -702,7 +705,7 @@ else
     fi
 
     info "Configuring VLC"
-    ${SCRIPT_PATH}/configure.sh --host=$TRIPLET --with-contrib=../contrib/$CONTRIB_PREFIX "$WIXPATH" $CONFIGFLAGS LTCFLAGS=-O0
+    ${SCRIPT_PATH}/configure.sh --host=$TRIPLET --with-contrib=../contrib/$CONTRIB_PREFIX --with-wix="$WIXPATH" $CONFIGFLAGS LTCFLAGS=-O0
 
     info "Compiling"
     make -j$JOBS ${COMPILEFLAGS}
