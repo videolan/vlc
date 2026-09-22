@@ -63,7 +63,7 @@ def outputDir(top, parent: str, dir: str):
         for file in cwd.iterdir():
             if not file.is_dir():
                 # args.out.write('          file   <{}>\r\n'.format(file))
-                if not file.name.endswith('.pdb'):
+                if not file.name.endswith('.pdb') and not file.name.endswith('.dll.a'):
                     outname = os.path.join(top.name, str(file.relative_to(top)))
                     fileId = generate_id('cmp', outname)
                     args.out.write('                    <Component Id="{}" Guid="*">\r\n'.format(fileId))
