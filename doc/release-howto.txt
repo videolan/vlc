@@ -32,7 +32,7 @@ Release HOWTO
                 ${sum}sum --binary $file > $file.$sum
             done
             gpg --rfc4880 --no-textmode --armor --detach-sign \
-                -u VideoLAN\ Release --digest-algo SHA512 \
+                -u "VideoLAN Release Signing Key 2026" --digest-algo SHA512 \
                 --output "$file.asc" -- "$file"
         done
 
@@ -69,7 +69,7 @@ Release HOWTO
   - Sign with the same release key as the advertised installer, then verify:
         file=status-win-x64
         gpg --rfc4880 --no-textmode --armor --detach-sign \
-            -u VideoLAN\ Release --digest-algo SHA512 \
+            -u "VideoLAN Release Signing Key 2026" --digest-algo SHA512 \
             --output "$file.asc" -- "$file"
 
  * Mirrors
