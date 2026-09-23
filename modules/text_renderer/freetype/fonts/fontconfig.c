@@ -50,6 +50,15 @@ static FcConfig *config;
 static uintptr_t refs;
 static vlc_mutex_t lock = VLC_STATIC_MUTEX;
 
+static void FontConfig_DefaultSubstitute( FcPattern *p_pattern )
+{
+#if FC_VERSION >= 21700
+    FcConfigSetDefaultSubstitute( config, p_pattern );
+#else
+    FcDefaultSubstitute( p_pattern );
+#endif
+}
+
 int FontConfig_Prepare( vlc_font_select_t *fs )
 {
     int ret = VLC_SUCCESS;
@@ -206,7 +215,7 @@ int FontConfig_SelectAmongFamilies( vlc_font_select_t *fs, const fontfamilies_t 
     FcPatternAddBool( pat, FC_OUTLINE, FcTrue );
 
     /* */
-    FcDefaultSubstitute( pat );
+    FontConfig_DefaultSubstitute( pat );
     if( !FcConfigSubstitute( config, pat, FcMatchPattern ) )
     {
         FcPatternDestroy( pat );
@@ -293,7 +302,7 @@ int FontConfig_GetFallbacksAmongFamilies( vlc_font_select_t *fs, const fontfamil
     vlc_family_t *p_current = NULL;
     if( FcConfigSubstitute( config, p_pattern, FcMatchPattern ) == FcTrue )
     {
-        FcDefaultSubstitute( p_pattern );
+        FontConfig_DefaultSubstitute( p_pattern );
         FcResult result;
         FcFontSet* p_font_set = FcFontSort( config, p_pattern, FcTrue, NULL, &result );
         if( p_font_set )
