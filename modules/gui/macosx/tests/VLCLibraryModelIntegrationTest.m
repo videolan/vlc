@@ -46,6 +46,7 @@ static int64_t sSortingVideoZuluID;
     [super setUp];
     XCTAssertTrue(VLCLibraryDataTypesIntegrationStart());
     XCTAssertTrue(VLCLibraryDataTypesIntegrationPrepareFactoryFixtures());
+    XCTAssertTrue(VLCLibraryDataTypesIntegrationPrepareMovieFixture());
 
     /* External records provide deterministic titles without requiring another
      * filesystem discovery pass. */
@@ -179,6 +180,33 @@ static int64_t sSortingVideoZuluID;
     }];
 }
 
+- (NSArray<VLCMediaLibraryShow *> *)showsAfterQuery
+{
+    return [self cachedItemsAfterFilter:@"Factory"
+                       notificationName:VLCLibraryModelListOfShowsReset
+                                 loader:^NSArray *{
+        return self.model.listOfShows;
+    }];
+}
+
+- (NSArray<VLCMediaLibraryMovie *> *)moviesAfterQuery
+{
+    return [self cachedItemsAfterFilter:@"Factory"
+                       notificationName:VLCLibraryModelListOfMoviesReset
+                                 loader:^NSArray *{
+        return self.model.listOfMovies;
+    }];
+}
+
+- (NSArray<VLCMediaLibraryEntryPoint *> *)monitoredFoldersAfterQuery
+{
+    return [self cachedItemsAfterFilter:@"Factory"
+                       notificationName:VLCLibraryModelListOfMonitoredFoldersUpdated
+                                 loader:^NSArray *{
+        return self.model.listOfMonitoredFolders;
+    }];
+}
+
 - (void)markMediaIDAsRecentlyPlayed:(int64_t)mediaID
 {
     vlc_medialibrary_t * const mediaLibrary =
@@ -255,6 +283,7 @@ static int64_t sSortingVideoZuluID;
 
     XCTAssertEqual(media.count, (NSUInteger)1);
     XCTAssertEqualObjects(media.firstObject.displayString, @"Factory Track");
+    XCTAssertEqual(self.model.numberOfAudioMedia, media.count);
 }
 
 - (void)testAudioMediaQueryRejectsNonMatchingFilter
@@ -271,6 +300,7 @@ static int64_t sSortingVideoZuluID;
         [self videoMediaAfterFilter:@"Factory Show"];
 
     XCTAssertEqual(media.count, (NSUInteger)1);
+    XCTAssertEqual(self.model.numberOfVideoMedia, media.count);
 }
 
 - (void)testVideoMediaQueryRejectsNonMatchingFilter
@@ -279,6 +309,38 @@ static int64_t sSortingVideoZuluID;
         [self videoMediaAfterFilter:@"No Matching Fixture Media"];
 
     XCTAssertEqual(media.count, (NSUInteger)0);
+}
+
+- (void)testShowQueryReturnsFactoryShowAndMatchingCount
+{
+    NSArray<VLCMediaLibraryShow *> * const shows = [self showsAfterQuery];
+
+    XCTAssertEqual(shows.count, (NSUInteger)1);
+    XCTAssertEqual(shows.firstObject.libraryID,
+                   VLCLibraryDataTypesIntegrationShowID());
+    XCTAssertEqualObjects(shows.firstObject.name, @"Factory Show");
+    XCTAssertEqual(self.model.numberOfShows, shows.count);
+}
+
+- (void)testMovieQueryReturnsFactoryMovieAndMatchingCount
+{
+    NSArray<VLCMediaLibraryMovie *> * const movies = [self moviesAfterQuery];
+
+    XCTAssertEqual(movies.count, (NSUInteger)1);
+    XCTAssertEqual(movies.firstObject.libraryID,
+                   VLCLibraryDataTypesIntegrationFactoryMovieMediaID());
+    XCTAssertEqual(self.model.numberOfMovies, movies.count);
+}
+
+- (void)testMonitoredFolderQueryReturnsFixtureFolder
+{
+    NSArray<VLCMediaLibraryEntryPoint *> * const folders =
+        [self monitoredFoldersAfterQuery];
+
+    XCTAssertGreaterThan(folders.count, (NSUInteger)0);
+    for (VLCMediaLibraryEntryPoint * const folder in folders) {
+        XCTAssertGreaterThan(folder.MRL.length, (NSUInteger)0);
+    }
 }
 
 - (void)testPlaylistQuerySortsMatchingItemsInAscendingOrder
@@ -506,6 +568,9 @@ static int64_t sSortingVideoZuluID;
 
     XCTAssertEqual(artists.count, (NSUInteger)1);
     XCTAssertEqualObjects(artists.firstObject.name, @"Factory Artist");
+    XCTAssertEqual(self.model.numberOfArtists, artists.count);
+    XCTAssertEqualObjects(self.model.artistDict[@(artists.firstObject.libraryID)],
+                          @"Factory Artist");
 }
 
 - (void)testArtistQueryRejectsNonMatchingFilter
@@ -523,6 +588,9 @@ static int64_t sSortingVideoZuluID;
 
     XCTAssertEqual(albums.count, (NSUInteger)1);
     XCTAssertEqualObjects(albums.firstObject.title, @"Factory Album");
+    XCTAssertEqual(self.model.numberOfAlbums, albums.count);
+    XCTAssertEqualObjects(self.model.albumDict[@(albums.firstObject.libraryID)],
+                          @"Factory Album");
 }
 
 - (void)testAlbumQueryRejectsNonMatchingFilter
@@ -540,6 +608,8 @@ static int64_t sSortingVideoZuluID;
 
     XCTAssertEqual(genres.count, (NSUInteger)1);
     XCTAssertEqualObjects(genres.firstObject.name, @"Rock");
+    XCTAssertEqual(self.model.numberOfGenres, genres.count);
+    XCTAssertEqualObjects(self.model.genreDict[@(genres.firstObject.libraryID)], @"Rock");
 }
 
 - (void)testGenreQueryRejectsNonMatchingFilter
@@ -557,6 +627,7 @@ static int64_t sSortingVideoZuluID;
 
     XCTAssertEqual(groups.count, (NSUInteger)1);
     XCTAssertEqualObjects(groups.firstObject.displayString, @"Factory Show S01E01");
+    XCTAssertEqual(self.model.numberOfGroups, groups.count);
 }
 
 - (void)testGroupQueryRejectsNonMatchingFilter
@@ -769,6 +840,115 @@ static int64_t sSortingVideoZuluID;
                    item.libraryID);
 
     XCTAssertEqual([item setFavorite:NO], VLC_SUCCESS);
+}
+
+- (void)testAudioLibraryParentQueryReturnsAudioMedia
+{
+    NSArray<VLCMediaLibraryMediaItem *> * const media =
+        [self audioMediaAfterFilter:@"Factory Track"];
+    NSArray<id<VLCMediaLibraryItemProtocol>> * const parentItems =
+        [self.model listOfLibraryItemsOfParentType:VLCMediaLibraryParentGroupTypeAudioLibrary];
+
+    XCTAssertEqual(parentItems.count, media.count);
+    XCTAssertEqual(((VLCMediaLibraryMediaItem *)parentItems.firstObject).libraryID,
+                   VLCLibraryDataTypesIntegrationFactoryAudioMediaID());
+}
+
+- (void)testVideoLibraryParentQueryReturnsVideoMedia
+{
+    NSArray<VLCMediaLibraryMediaItem *> * const media =
+        [self videoMediaAfterFilter:@"Factory Show"];
+    NSArray<id<VLCMediaLibraryItemProtocol>> * const parentItems =
+        [self.model listOfLibraryItemsOfParentType:VLCMediaLibraryParentGroupTypeVideoLibrary];
+
+    XCTAssertEqual(parentItems.count, media.count);
+    XCTAssertEqual(((VLCMediaLibraryMediaItem *)parentItems.firstObject).libraryID,
+                   VLCLibraryDataTypesIntegrationFactoryVideoMediaID());
+}
+
+- (void)testArtistParentQueryReturnsArtists
+{
+    NSArray<VLCMediaLibraryArtist *> * const artists =
+        [self artistsAfterFilter:@"Factory Artist"];
+    NSArray<id<VLCMediaLibraryItemProtocol>> * const parentItems =
+        [self.model listOfLibraryItemsOfParentType:VLCMediaLibraryParentGroupTypeArtist];
+
+    XCTAssertEqual(parentItems.count, artists.count);
+    XCTAssertEqual(((VLCMediaLibraryArtist *)parentItems.firstObject).libraryID,
+                   artists.firstObject.libraryID);
+}
+
+- (void)testAlbumParentQueryReturnsAlbums
+{
+    NSArray<VLCMediaLibraryAlbum *> * const albums =
+        [self albumsAfterFilter:@"Factory Album"];
+    NSArray<id<VLCMediaLibraryItemProtocol>> * const parentItems =
+        [self.model listOfLibraryItemsOfParentType:VLCMediaLibraryParentGroupTypeAlbum];
+
+    XCTAssertEqual(parentItems.count, albums.count);
+    XCTAssertEqual(((VLCMediaLibraryAlbum *)parentItems.firstObject).libraryID,
+                   albums.firstObject.libraryID);
+}
+
+- (void)testGenreParentQueryReturnsGenres
+{
+    NSArray<VLCMediaLibraryGenre *> * const genres = [self genresAfterFilter:@"Rock"];
+    NSArray<id<VLCMediaLibraryItemProtocol>> * const parentItems =
+        [self.model listOfLibraryItemsOfParentType:VLCMediaLibraryParentGroupTypeGenre];
+
+    XCTAssertEqual(parentItems.count, genres.count);
+    XCTAssertEqual(((VLCMediaLibraryGenre *)parentItems.firstObject).libraryID,
+                   genres.firstObject.libraryID);
+}
+
+- (void)testRecentVideosParentQueryReturnsRecentMedia
+{
+    [self markMediaIDAsRecentlyPlayed:
+        VLCLibraryDataTypesIntegrationFactoryVideoMediaID()];
+    NSArray<VLCMediaLibraryMediaItem *> * const recent =
+        [self cachedItemsAfterFilter:@"Factory Show"
+                    notificationName:VLCLibraryModelRecentsMediaListReset
+                              loader:^NSArray *{
+        return self.model.listOfRecentMedia;
+    }];
+    NSArray<id<VLCMediaLibraryItemProtocol>> * const parentItems =
+        [self.model listOfLibraryItemsOfParentType:VLCMediaLibraryParentGroupTypeRecentVideos];
+
+    XCTAssertEqual(parentItems.count, recent.count);
+    XCTAssertEqual(((VLCMediaLibraryMediaItem *)parentItems.firstObject).libraryID,
+                   VLCLibraryDataTypesIntegrationFactoryVideoMediaID());
+    [self clearRecentMediaHistory];
+}
+
+- (void)testUnknownParentQueryReturnsNil
+{
+    XCTAssertNil([self.model listOfLibraryItemsOfParentType:
+        VLCMediaLibraryParentGroupTypeUnknown]);
+}
+
+- (void)testAudioLibraryMediaItemsQueryReturnsFixtureMedia
+{
+    NSArray<VLCMediaLibraryMediaItem *> * const audio =
+        [self audioMediaAfterFilter:@"Factory Track"];
+    NSArray<VLCMediaLibraryMediaItem *> * const mediaItems =
+        [self.model listOfMediaItemsForParentType:VLCMediaLibraryParentGroupTypeAudioLibrary];
+
+    XCTAssertEqual(mediaItems.count, audio.count);
+    XCTAssertEqual(mediaItems.firstObject.libraryID,
+                   VLCLibraryDataTypesIntegrationFactoryAudioMediaID());
+}
+
+- (void)testArtistMediaItemsQueryReturnsFixtureMedia
+{
+    NSArray<VLCMediaLibraryArtist *> * const artists =
+        [self artistsAfterFilter:@"Factory Artist"];
+    NSArray<VLCMediaLibraryMediaItem *> * const mediaItems =
+        [self.model listOfMediaItemsForParentType:VLCMediaLibraryParentGroupTypeArtist];
+
+    XCTAssertEqual(artists.count, (NSUInteger)1);
+    XCTAssertEqual(mediaItems.count, (NSUInteger)1);
+    XCTAssertEqual(mediaItems.firstObject.libraryID,
+                   VLCLibraryDataTypesIntegrationFactoryAudioMediaID());
 }
 
 @end
