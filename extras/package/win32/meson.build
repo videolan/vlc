@@ -8,6 +8,21 @@ install_data('../../../THANKS',    rename : 'THANKS.txt',  install_dir : '.')
 
 install_data('../../../share/icons/vlc.ico',  install_dir : '.')
 
+have_win64 = host_machine.cpu_family() == 'x86_64' or host_machine.cpu_family() == 'aarch64' or host_machine.cpu() == 'arm64'
+if have_win64
+    if host_machine.cpu_family() == 'aarch64'
+        winstaller_suffix = 'winarm64'
+    else
+        winstaller_suffix = 'win64'
+    endif
+else
+    if host_machine.cpu_family() == 'arm'
+        winstaller_suffix = 'winarm'
+    else
+        winstaller_suffix = 'win32'
+    endif
+endif
+
 if get_option('nsis').allowed()
     subdir('NSIS')
 endif

@@ -1,7 +1,5 @@
 #  nsis packaging
 
-have_win64 = host_machine.cpu_family() == 'x86_64' or host_machine.cpu_family() == 'aarch64' or host_machine.cpu() == 'arm64'
-
 nsi_conf = cdata
 nsi_conf.set('BUILD_LUA_TRUE', lua_dep.found() and get_option('lua').allowed() ? '' : '#')
 nsi_conf.set('BUILD_SKINS_TRUE', skins2_feasible ? '' : '#')
