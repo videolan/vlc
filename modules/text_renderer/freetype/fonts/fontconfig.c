@@ -161,7 +161,7 @@ static void FontConfig_FillFaces( vlc_family_t *p_family )
         FcPatternAddString( pat, FC_FAMILY, (const FcChar8 *) p_family->psz_name );
         FcPatternAddBool( pat, FC_OUTLINE, FcTrue );
 
-        FcFontSet *fs = FcFontList( 0, pat, os );
+        FcFontSet *fs = FcFontList( config, pat, os );
         FcObjectSetDestroy( os );
         if( fs )
         {
