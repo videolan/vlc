@@ -410,7 +410,6 @@ if host_system == 'windows'
             vlc_src_root / 'share',
             vlc_src_root / 'extras/package/win32',
         ],
-        implicit_include_directories: true,
     )
 endif
 

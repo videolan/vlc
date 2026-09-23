@@ -36,7 +36,6 @@ if build_vlc and (host_system != 'darwin' or have_osx) and not have_win_store an
                 vlc_src_root / 'share/icons',
                 vlc_src_root / 'extras/package/win32',
             ],
-            implicit_include_directories: true,
             depend_files: files('../extras/package/win32/vlc.exe.manifest'),
         )
     endif
