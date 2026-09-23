@@ -129,22 +129,18 @@ case $ARCH in
     x86_64)
         SHORTARCH="win64"
         MESON_CPU_FAMILY="x86_64"
-        WINDOWS_ARCH="x64"
         ;;
     i686)
         SHORTARCH="win32"
         MESON_CPU_FAMILY="x86"
-        WINDOWS_ARCH="x86"
         ;;
     aarch64)
         SHORTARCH="winarm64"
         MESON_CPU_FAMILY="aarch64"
-        WINDOWS_ARCH="arm64"
         ;;
     armv7)
         SHORTARCH="winarm"
         MESON_CPU_FAMILY="arm"
-        WINDOWS_ARCH="arm"
         ;;
     *)
         usage
@@ -596,9 +592,6 @@ if [ -n "$BUILD_MESON" ]; then
 
     BUILD_PATH="$( pwd -P )"
 
-    # we don't want to install in <destdir>/usr/local, just <destdir>
-    MCONFIGFLAGS="$MCONFIGFLAGS --prefix=/"
-
     # generate the crossfile.meson
     test -e $SHORTARCH-meson/crossfile.meson && unlink $SHORTARCH-meson/crossfile.meson
     exec 3>$SHORTARCH-meson/crossfile.meson || return $?
@@ -628,12 +621,29 @@ if [ -n "$BUILD_MESON" ]; then
     if [ -x "$(command -v ${CONTRIB_PREFIX}-luac)" ]; then
         printf 'luac = '"'"'%s'"'"'\n' "$(command -v ${CONTRIB_PREFIX}-luac)" >&3
     fi
+    if [ -n "$WIN32_PATH_CMD" ]; then
+        printf 'cygpath = '"'"'%s'"'"'\n' "$(command -v ${WIN32_PATH_CMD})" >&3
+    fi
+    if [ -e "${WIXPATH}/candle.exe" ]; then
+        printf 'candle.exe = '"'"'%s'"'"'\n' "${WIXPATH}/candle.exe" >&3
+    fi
+    if [ -e "${WIXPATH}/light.exe" ]; then
+        printf 'light.exe = '"'"'%s'"'"'\n' "${WIXPATH}/light.exe" >&3
+    fi
 
     printf '\n[host_machine]\n' >&3
     printf 'system = '"'"'windows'"'"'\n' >&3
     printf 'cpu_family = '"'"'%s'"'"'\n' "${MESON_CPU_FAMILY}" >&3
     printf 'endian = '"'"'little'"'"'\n' >&3
     printf 'cpu = '"'"'%s'"'"'\n' "${ARCH}" >&3
+
+    if [ -n "$INSTALL_PATH" ]; then
+        MDESTDIR="$INSTALL_PATH"
+    else
+        MDESTDIR="${BUILD_PATH}/$SHORTARCH-meson/vlc-$SHORTARCH"
+    fi
+    # we don't want to install in <destdir>/usr/local, just <destdir>
+    MCONFIGFLAGS="$MCONFIGFLAGS --prefix=$MDESTDIR"
 
 
     info "Configuring VLC"
@@ -648,12 +658,7 @@ if [ -n "$BUILD_MESON" ]; then
     info "Compiling"
     meson compile -j $JOBS -C ${BUILD_PATH}/$SHORTARCH-meson ${MCOMPILEFLAGS}
 
-    if [ -n "$INSTALL_PATH" ]; then
-        MDESTDIR="$INSTALL_PATH"
-    else
-        MDESTDIR="${BUILD_PATH}/$SHORTARCH-meson/vlc-$SHORTARCH"
-    fi
-    MINSTALLFLAGS="--destdir=$MDESTDIR --strip --no-rebuild $MINSTALLFLAGS"
+    MINSTALLFLAGS="--strip --no-rebuild $MINSTALLFLAGS"
 
     if [ "$INSTALLER" = "n" ]; then
         VLC_GIT_TAG="$(git describe --tags --long --match '?.*.*' --always)"
@@ -663,32 +668,7 @@ if [ -n "$BUILD_MESON" ]; then
             # generate .exe installer
             ninja -C ${BUILD_PATH}/$SHORTARCH-meson package-win32-exe
             # generate .msi installer
-            ${VLC_ROOT_PATH}/extras/package/win32/msi/msi-heat.py \
-                --dir ${MDESTDIR}/plugins -cg CompPluginsGroup -gg -scom -sreg -sfrag -dr APPLICATIONFOLDER \
-                -out ${BUILD_PATH}/$SHORTARCH-meson/extras/package/win32/msi/Plugins.fragment.wxs
-            if [ "$I18N" = "yes" ]; then
-                ${VLC_ROOT_PATH}/extras/package/win32/msi/msi-heat.py \
-                    --dir ${MDESTDIR}/locale -cg CompLocaleGroup -gg -scom -sreg -sfrag -dr APPLICATIONFOLDER \
-                    -out ${BUILD_PATH}/$SHORTARCH-meson/extras/package/win32/msi/Locale.fragment.wxs
-            fi
-            ${VLC_ROOT_PATH}/extras/package/win32/msi/msi-heat.py \
-                --dir ${MDESTDIR}/lua -cg CompLuaGroup -gg -scom -sreg -sfrag -dr APPLICATIONFOLDER \
-                -out ${BUILD_PATH}/$SHORTARCH-meson/extras/package/win32/msi/Lua.fragment.wxs
-            if [ -z "$DISABLEGUI" ]; then
-                ${VLC_ROOT_PATH}/extras/package/win32/msi/msi-heat.py \
-                    --dir ${MDESTDIR}/skins -cg CompSkinsGroup -gg -scom -sreg -sfrag -dr APPLICATIONFOLDER \
-                    -out ${BUILD_PATH}/$SHORTARCH-meson/extras/package/win32/msi/Skins.fragment.wxs
-            fi
-
-            W_MSIDIR=$($WIN32_PATH_CMD -w "${VLC_ROOT_PATH}/extras/package/win32/msi")
-            W_MSIBUILDDIR=$($WIN32_PATH_CMD -w "${BUILD_PATH}/$SHORTARCH-meson/extras/package/win32/msi")
-            cd ${BUILD_PATH}/$SHORTARCH-meson/extras/package/win32/msi && \
-                wine "${WIXPATH}/candle.exe" -arch $WINDOWS_ARCH \
-                -ext WiXUtilExtension $W_MSIDIR/product.wxs $W_MSIDIR/extensions.wxs $W_MSIBUILDDIR/*.fragment.wxs
-
-            MSIOUTFILE=vlc-$SHORTARCH-$VLC_GIT_TAG.msi
-            cd $MDESTDIR && wine "${WIXPATH}/light.exe" -sval -spdb -ext WixUIExtension -ext WixUtilExtension -cultures:en-us \
-                -b $W_MSIDIR $W_MSIBUILDDIR/product.wixobj $W_MSIBUILDDIR/extensions.wixobj $W_MSIBUILDDIR/*.fragment.wixobj -o ../$MSIOUTFILE
+            ninja -C ${BUILD_PATH}/$SHORTARCH-meson package-msi
         fi
 
         rm -rf ${BUILD_PATH}/$SHORTARCH-meson/vlc-$SHORTARCH-$VLC_GIT_TAG-debug.7z
@@ -700,12 +680,16 @@ if [ -n "$BUILD_MESON" ]; then
         if [ -z "$WINSTORE" ]; then
             # generate .exe installer
             ninja -C ${BUILD_PATH}/$SHORTARCH-meson package-win32-exe
+            # generate .msi installer
+            ninja -C ${BUILD_PATH}/$SHORTARCH-meson package-msi
         fi
     elif [ "$INSTALLER" = "u" ]; then
         meson install -C ${BUILD_PATH}/$SHORTARCH-meson ${MINSTALLFLAGS}
         if [ -z "$WINSTORE" ]; then
             # generate .exe installer
             ninja -C ${BUILD_PATH}/$SHORTARCH-meson package-win32-exe
+            # generate .msi installer
+            ninja -C ${BUILD_PATH}/$SHORTARCH-meson package-msi
         fi
     fi
 else
