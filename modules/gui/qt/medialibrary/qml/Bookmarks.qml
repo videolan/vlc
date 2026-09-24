@@ -95,6 +95,7 @@ Item {
 
             height: control.barHeight
             width: height
+            backgroundColor: bookmarkButton.colorContext.fg.primary
 
             x: control.width * model.position - width/2
             y: VLCStyle.dp(1, VLCStyle.scale)

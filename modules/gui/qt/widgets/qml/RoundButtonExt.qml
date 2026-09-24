@@ -25,6 +25,8 @@ import VLC.Style
 T.RoundButton {
     id: control
 
+    property color backgroundColor: theme.bg.secondary // ###
+
     implicitWidth: text.length !== 1 ? Math.max(implicitBackgroundWidth + leftInset + rightInset,
                                                 implicitContentWidth + leftPadding + rightPadding)
                                      : implicitHeight // special case for single letter/icon to make it perfectly round. This should be safe due to `Text.HorizontalFit`
@@ -66,7 +68,7 @@ T.RoundButton {
         radius: control.radius
         enabled: control.enabled
         visible: !control.flat || control.down || control.checked || control.highlighted
-        color: theme.fg.primary
+        color: control.backgroundColor
         border.color: theme.border
     }
 }
