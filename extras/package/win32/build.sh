@@ -351,6 +351,8 @@ if [ -n "$DISABLEGUI" ]; then
     CONTRIBFLAGS="$CONTRIBFLAGS --disable-qt --disable-qtsvg --disable-qtdeclarative --disable-qtgraphicaleffects --disable-qtquickcontrols2"
 fi
 
+CONTRIBFLAGS="$CONTRIBFLAGS --enable-sections"
+
 if [ "$COMPILING_WITH_CLANG" -gt 0 ]; then
     # avoid using gcc-ar with the clang toolchain, if both are installed
     VLC_AR="$TRIPLET-ar"
