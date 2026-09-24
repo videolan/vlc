@@ -36,6 +36,7 @@
 #include <vlc_strings.h>
 
 #include <sys/types.h>
+#include <math.h>
 #include <unistd.h>
 
 #include <glib.h>
