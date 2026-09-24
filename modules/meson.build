@@ -170,6 +170,7 @@ if pipewire_dep.found()
         include_directories: [include_directories('audio_output'), vlc_include_dirs],
         dependencies: [libvlccore_dep, pipewire_dep],
         link_with: [vlc_libcompat],
+        link_args: gc_sections_linkargs,
         install: true,
         install_dir: libdir_path,
     )
@@ -184,6 +185,7 @@ if pulse_dep.found()
         include_directories: [include_directories('audio_output'), vlc_include_dirs],
         dependencies: [libvlccore_dep, pulse_dep],
         link_with: [vlc_libcompat],
+        link_args: gc_sections_linkargs,
         install: true,
         install_dir: libdir_path,
     )
@@ -387,6 +389,7 @@ if get_option('qt').allowed() and qt6_dep.found()
         files('gui/qt/vlc-qt-check.cpp'),
         dependencies: [qt6_dep, qt_extra_deps],
         include_directories: [vlc_include_dirs],
+        link_args: gc_sections_linkargs,
         build_by_default: enable_qt_check,
         install: enable_qt_check,
         install_dir: pkglibexecdir_path,
@@ -495,7 +498,7 @@ foreach module : vlc_modules
         module['name'] + '_plugin',
         module['sources'] + win_extra_sources,
         link_with: [module.get('link_with', []), vlc_libcompat],
-        link_args: module.get('link_args', []),
+        link_args: [module.get('link_args', []), symbolic_linkargs, gc_sections_linkargs],
         link_depends: module.get('link_depends', []),
         include_directories: [module.get('include_directories', []), vlc_include_dirs],
         dependencies: [module.get('dependencies', []), libvlccore_dep],

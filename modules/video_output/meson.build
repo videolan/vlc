@@ -258,6 +258,7 @@ if xcb_dep.found()
     vlc_xcb_events_lib = library('vlc_xcb_events',
         files('xcb/events.c'),
         include_directories: [vlc_include_dirs],
+        link_args: gc_sections_linkargs,
         dependencies: [xcb_dep, libvlccore_dep],
         install: true,
         install_dir: pkglibdir_path,

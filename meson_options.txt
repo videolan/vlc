@@ -95,6 +95,12 @@ option('avx',
     value : 'auto',
     description : 'AVX (1-2) optimizations')
 
+option('split_sections',
+    type : 'feature',
+    value : 'auto',
+    description : 'Split compiled sections and remove unused ones')
+
+
 # TODO: Missing neon option
 # TODO: Missing sve option
 # TODO: Missing altivec option

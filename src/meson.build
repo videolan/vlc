@@ -509,6 +509,7 @@ libvlccore = library(
     c_args: vlccore_cargs,
     link_args: libvlccore_link_args,
     link_with: [vlc_libcompat],
+    link_args: gc_sections_linkargs,
     dependencies: libvlccore_deps,
     install: true,
     install_dir: libdir_path,
