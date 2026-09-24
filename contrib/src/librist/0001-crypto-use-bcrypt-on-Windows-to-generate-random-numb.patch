@@ -1,0 +1,41 @@
+From e21451f5b5053045e129aba2018ec0e05bfb9c33 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 24 Sep 2026 13:34:33 +0200
+Subject: [PATCH] crypto: use bcrypt on Windows to generate random numbers
+
+No need to link the whole gnutls with it.
+---
+ src/crypto/random.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/src/crypto/random.c b/src/crypto/random.c
+index e964fbb..fbd5e34 100644
+--- a/src/crypto/random.c
++++ b/src/crypto/random.c
+@@ -98,6 +98,12 @@ static void _librist_crypto_random_init(void) {
+ #endif
+ }
+ 
++#elif defined(_WIN32)
++#include <windows.h>
++#include <bcrypt.h>
++static void _librist_crypto_random_init(void) {
++	return;
++}
+ #elif HAVE_NETTLE
+ #include <gnutls/crypto.h>
+ static void _librist_crypto_random_init(void) {
+@@ -113,6 +119,10 @@ int _librist_crypto_ramdom_get_bytes(uint8_t buf[], size_t buflen) {
+ 	if (ctr_drbg_seed_ret != 0)
+ 		return ctr_drbg_seed_ret;
+ 	ret = mbedtls_ctr_drbg_random(&ctr_drbg_ctx, buf, buflen);
++#elif defined(_WIN32)
++    NTSTATUS nret;
++    nret = BCryptGenRandom(0, buf, buflen, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
++    ret = BCRYPT_SUCCESS(ret) ? 0 : -1;
+ #elif HAVE_NETTLE
+ 	int i=0;
+ 	do {
+-- 
+2.52.0.windows.1
+

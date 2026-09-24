@@ -47,6 +47,7 @@ $(TARBALLS)/librist-$(LIBRIST_VERSION).tar.gz:
 
 librist: librist-$(LIBRIST_VERSION).tar.gz .sum-librist
 	$(UNPACK)
+	$(APPLY) $(SRC)/librist/0001-crypto-use-bcrypt-on-Windows-to-generate-random-numb.patch
 	$(MOVE)
 
 .librist: librist crossfile.meson
