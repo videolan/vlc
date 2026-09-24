@@ -40,6 +40,10 @@ static int64_t sMediaID;
 static int64_t sFactoryAudioMediaID;
 static int64_t sFactoryVideoMediaID;
 static int64_t sFactoryMovieMediaID;
+static int64_t sSortingAudioAlphaMediaID;
+static int64_t sSortingAudioZuluMediaID;
+static int64_t sSortingVideoAlphaMediaID;
+static int64_t sSortingVideoZuluMediaID;
 static int64_t sAlbumID;
 static int64_t sGenreID;
 static int64_t sShowID;
@@ -138,8 +142,42 @@ static BOOL VLCLibraryDataTypesIntegrationSetMovieMetadata(int64_t mediaID)
     return success;
 }
 
+static BOOL VLCLibraryDataTypesIntegrationSetMediaType(int64_t mediaID,
+                                                       int type)
+{
+    NSString * const databasePath =
+        [sUserDataPath stringByAppendingPathComponent:@"ml/ml.db"];
+    sqlite3 *database = NULL;
+    if (sqlite3_open_v2(databasePath.fileSystemRepresentation,
+                        &database,
+                        SQLITE_OPEN_READWRITE,
+                        NULL) != SQLITE_OK) {
+        if (database != NULL) {
+            sqlite3_close(database);
+        }
+        return NO;
+    }
+
+    sqlite3_busy_timeout(database, 5000);
+    sqlite3_stmt *statement = NULL;
+    BOOL success = sqlite3_prepare_v2(database,
+                                      "UPDATE Media SET type = ?, import_type = 0, "
+                                      "is_present = 1 WHERE id_media = ?",
+                                      -1,
+                                      &statement,
+                                      NULL) == SQLITE_OK;
+    if (success) {
+        sqlite3_bind_int(statement, 1, type);
+        sqlite3_bind_int64(statement, 2, mediaID);
+        success = sqlite3_step(statement) == SQLITE_DONE && sqlite3_changes(database) == 1;
+    }
+    sqlite3_finalize(statement);
+    sqlite3_close(database);
+    return success;
+}
+
 static void VLCLibraryDataTypesIntegrationMediaLibraryEvent(void *data,
-                                                             const vlc_ml_event_t *event)
+                                                            const vlc_ml_event_t *event)
 {
     VLCLibraryDataTypesDiscoveryWait * const wait = data;
     switch (event->i_type) {
@@ -167,14 +205,14 @@ static void VLCLibraryDataTypesIntegrationMediaLibraryEvent(void *data,
 }
 
 static BOOL VLCLibraryDataTypesIntegrationWaitForMediaAdded(NSString *folderURL,
-    NSArray<NSString *> *mediaMRLStrings)
+                                                            NSArray<NSString *> *mediaMRLStrings)
 {
     const NSUInteger mediaMRLCount = mediaMRLStrings.count;
-    if (mediaMRLCount == 0 || mediaMRLCount > 2) {
+    if (mediaMRLCount == 0 || mediaMRLCount > 6) {
         return NO;
     }
-    const char *mediaMRLs[2] = { NULL, NULL };
-    BOOL mediaAdded[2] = { NO, NO };
+    const char *mediaMRLs[6] = { NULL };
+    BOOL mediaAdded[6] = { NO };
     for (NSUInteger index = 0; index < mediaMRLCount; ++index) {
         mediaMRLs[index] = mediaMRLStrings[index].UTF8String;
     }
@@ -246,7 +284,9 @@ BOOL VLCLibraryDataTypesIntegrationStart(void)
                                          stringByAppendingPathComponent:@"VLC.app"]
                                         stringByAppendingPathComponent:@"Contents"]
                                        stringByAppendingPathComponent:@"MacOS"];
-    setenv("VLC_PLUGIN_PATH", modulesPath.fileSystemRepresentation, 1);
+    /* Use the build's plugins.dat without scanning .libs: loading the macOS GUI
+     * plugin here would register a second copy of the classes under test. */
+    setenv("VLC_PLUGIN_PATH", buildModulesPath.fileSystemRepresentation, 1);
     if ([[NSFileManager defaultManager]
             fileExistsAtPath:[appLibexecPath stringByAppendingPathComponent:@"vlc-preparser"]]) {
         /* The packaged helper has the application framework rpaths needed by
@@ -261,6 +301,7 @@ BOOL VLCLibraryDataTypesIntegrationStart(void)
     }
 
     const char * const args[] = {
+        "--no-plugins-scan",
         "--vout=dummy",
         "--aout=dummy",
         "--text-renderer=dummy",
@@ -313,6 +354,10 @@ void VLCLibraryDataTypesIntegrationStop(void)
     sFactoryAudioMediaID = 0;
     sFactoryVideoMediaID = 0;
     sFactoryMovieMediaID = 0;
+    sSortingAudioAlphaMediaID = 0;
+    sSortingAudioZuluMediaID = 0;
+    sSortingVideoAlphaMediaID = 0;
+    sSortingVideoZuluMediaID = 0;
     sAlbumID = 0;
     sGenreID = 0;
     sShowID = 0;
@@ -369,16 +414,20 @@ int64_t VLCLibraryDataTypesIntegrationCreatePlaylist(void)
     return playlistID;
 }
 
-static void VLCLibraryDataTypesIntegrationWriteID3v1Tag(NSMutableData *data)
+static void VLCLibraryDataTypesIntegrationWriteID3v1Tag(NSMutableData *data,
+                                                        const char *title,
+                                                        const char *artist,
+                                                        const char *album,
+                                                        unsigned char genre)
 {
     unsigned char tag[128] = { 0 };
     memcpy(tag, "TAG", 3);
-    memcpy(tag + 3, "Factory Track", 13);
-    memcpy(tag + 33, "Factory Artist", 14);
-    memcpy(tag + 63, "Factory Album", 13);
+    memcpy(tag + 3, title, MIN(strlen(title), (size_t)30));
+    memcpy(tag + 33, artist, MIN(strlen(artist), (size_t)30));
+    memcpy(tag + 63, album, MIN(strlen(album), (size_t)30));
     memcpy(tag + 93, "2026", 4);
     memcpy(tag + 97, "VLC test fixture", 16);
-    tag[127] = 17; // Rock, from the ID3v1 genre table.
+    tag[127] = genre;
     [data appendBytes:tag length:sizeof(tag)];
 }
 
@@ -400,17 +449,36 @@ BOOL VLCLibraryDataTypesIntegrationPrepareFactoryFixtures(void)
         @VLC_MACOSX_TEST_SOURCE_DIR "/test/samples/meta.mp3";
     NSMutableData * const audioData =
         [[NSMutableData alloc] initWithContentsOfFile:sourcePath];
-    if (audioData == nil) {
+    if (audioData.length < 10) {
         return NO;
     }
-    VLCLibraryDataTypesIntegrationWriteID3v1Tag(audioData);
+    const unsigned char * const bytes = audioData.bytes;
+    if (memcmp(bytes, "ID3", 3) != 0) {
+        return NO;
+    }
+    /* The sample's ID3v2 title and artist take precedence over ID3v1.
+     * Remove that tag so the fixture metadata is what gets indexed. */
+    NSUInteger tagLength = 10 + ((NSUInteger)bytes[6] << 21) +
+        ((NSUInteger)bytes[7] << 14) + ((NSUInteger)bytes[8] << 7) + bytes[9];
+    if ((bytes[5] & 0x10) != 0) {
+        tagLength += 10;
+    }
+    if (tagLength >= audioData.length) {
+        return NO;
+    }
+    [audioData replaceBytesInRange:NSMakeRange(0, tagLength) withBytes:NULL length:0];
+    VLCLibraryDataTypesIntegrationWriteID3v1Tag(audioData,
+                                                "Factory Track",
+                                                "Factory Artist",
+                                                "Factory Album",
+                                                17);
 
     NSString * const fixtureDirectory =
         [sUserDataPath stringByAppendingPathComponent:@"factory-fixtures"];
     if (![[NSFileManager defaultManager] createDirectoryAtPath:fixtureDirectory
-                                    withIntermediateDirectories:YES
-                                                     attributes:nil
-                                                          error:nil]) {
+                                   withIntermediateDirectories:YES
+                                                    attributes:nil
+                                                         error:nil]) {
         return NO;
     }
     NSString * const fixturePath =
@@ -420,7 +488,7 @@ BOOL VLCLibraryDataTypesIntegrationPrepareFactoryFixtures(void)
     }
     NSData * const videoData = [[NSData alloc]
         initWithBase64EncodedString:VLCLibraryDataTypesIntegrationVideoFixtureBase64()
-                             options:0];
+                            options:0];
     NSString * const videoPath =
         [fixtureDirectory stringByAppendingPathComponent:@"Factory Show S01E01.mp4"];
     if (videoData == nil || ![videoData writeToFile:videoPath atomically:YES]) {
@@ -428,9 +496,45 @@ BOOL VLCLibraryDataTypesIntegrationPrepareFactoryFixtures(void)
     }
     NSString * const audioMRL = [NSURL fileURLWithPath:fixturePath].absoluteString;
     NSString * const videoMRL = [NSURL fileURLWithPath:videoPath].absoluteString;
+    NSString * const sortingAudioAlphaPath =
+        [fixtureDirectory stringByAppendingPathComponent:@"vlc-sort-audio-alpha.mp3"];
+    NSString * const sortingAudioZuluPath =
+        [fixtureDirectory stringByAppendingPathComponent:@"vlc-sort-audio-zulu.mp3"];
+    NSMutableData * const sortingAudioAlphaData = [audioData mutableCopy];
+    NSMutableData * const sortingAudioZuluData = [audioData mutableCopy];
+    [sortingAudioAlphaData setLength:sortingAudioAlphaData.length - 128];
+    [sortingAudioZuluData setLength:sortingAudioZuluData.length - 128];
+    VLCLibraryDataTypesIntegrationWriteID3v1Tag(sortingAudioAlphaData,
+                                                "vlc-sort-audio-alpha.mp3",
+                                                "Sorting Artist",
+                                                "Sorting Album",
+                                                0);
+    VLCLibraryDataTypesIntegrationWriteID3v1Tag(sortingAudioZuluData,
+                                                "vlc-sort-audio-zulu.mp3",
+                                                "Sorting Artist",
+                                                "Sorting Album",
+                                                0);
+    NSString * const sortingVideoAlphaPath =
+        [fixtureDirectory stringByAppendingPathComponent:@"vlc-sort-video-alpha.mp4"];
+    NSString * const sortingVideoZuluPath =
+        [fixtureDirectory stringByAppendingPathComponent:@"vlc-sort-video-zulu.mp4"];
+    if (![sortingAudioAlphaData writeToFile:sortingAudioAlphaPath atomically:YES] ||
+        ![sortingAudioZuluData writeToFile:sortingAudioZuluPath atomically:YES] ||
+        ![videoData writeToFile:sortingVideoAlphaPath atomically:YES] ||
+        ![videoData writeToFile:sortingVideoZuluPath atomically:YES]) {
+        return NO;
+    }
+    NSArray<NSString *> * const mediaMRLs = @[
+        audioMRL,
+        videoMRL,
+        [NSURL fileURLWithPath:sortingAudioAlphaPath].absoluteString,
+        [NSURL fileURLWithPath:sortingAudioZuluPath].absoluteString,
+        [NSURL fileURLWithPath:sortingVideoAlphaPath].absoluteString,
+        [NSURL fileURLWithPath:sortingVideoZuluPath].absoluteString,
+    ];
     if (!VLCLibraryDataTypesIntegrationWaitForMediaAdded(
             [NSURL fileURLWithPath:fixtureDirectory].absoluteString,
-            @[audioMRL, videoMRL])) {
+            mediaMRLs)) {
         return NO;
     }
 
@@ -478,6 +582,14 @@ BOOL VLCLibraryDataTypesIntegrationPrepareFactoryFixtures(void)
         vlc_ml_get_media_by_mrl(sMediaLibrary, audioMRL.UTF8String);
     vlc_ml_media_t * const video =
         vlc_ml_get_media_by_mrl(sMediaLibrary, videoMRL.UTF8String);
+    vlc_ml_media_t * const sortingAudioAlpha =
+        vlc_ml_get_media_by_mrl(sMediaLibrary, mediaMRLs[2].UTF8String);
+    vlc_ml_media_t * const sortingAudioZulu =
+        vlc_ml_get_media_by_mrl(sMediaLibrary, mediaMRLs[3].UTF8String);
+    vlc_ml_media_t * const sortingVideoAlpha =
+        vlc_ml_get_media_by_mrl(sMediaLibrary, mediaMRLs[4].UTF8String);
+    vlc_ml_media_t * const sortingVideoZulu =
+        vlc_ml_get_media_by_mrl(sMediaLibrary, mediaMRLs[5].UTF8String);
     if (audio != NULL) {
         sFactoryAudioMediaID = audio->i_id;
         vlc_ml_media_release(audio);
@@ -485,6 +597,22 @@ BOOL VLCLibraryDataTypesIntegrationPrepareFactoryFixtures(void)
     if (video != NULL) {
         sFactoryVideoMediaID = video->i_id;
         vlc_ml_media_release(video);
+    }
+    if (sortingAudioAlpha != NULL) {
+        sSortingAudioAlphaMediaID = sortingAudioAlpha->i_id;
+        vlc_ml_media_release(sortingAudioAlpha);
+    }
+    if (sortingAudioZulu != NULL) {
+        sSortingAudioZuluMediaID = sortingAudioZulu->i_id;
+        vlc_ml_media_release(sortingAudioZulu);
+    }
+    if (sortingVideoAlpha != NULL) {
+        sSortingVideoAlphaMediaID = sortingVideoAlpha->i_id;
+        vlc_ml_media_release(sortingVideoAlpha);
+    }
+    if (sortingVideoZulu != NULL) {
+        sSortingVideoZuluMediaID = sortingVideoZulu->i_id;
+        vlc_ml_media_release(sortingVideoZulu);
     }
     if (albums != NULL) {
         vlc_ml_album_list_release(albums);
@@ -499,7 +627,27 @@ BOOL VLCLibraryDataTypesIntegrationPrepareFactoryFixtures(void)
         vlc_ml_group_list_release(groups);
     }
     if (sFactoryAudioMediaID == 0 || sFactoryVideoMediaID == 0 ||
+        sSortingAudioAlphaMediaID == 0 || sSortingAudioZuluMediaID == 0 ||
+        sSortingVideoAlphaMediaID == 0 || sSortingVideoZuluMediaID == 0 ||
         sAlbumID == 0 || sGenreID == 0 || sShowID == 0 || sGroupID == 0) {
+        return NO;
+    }
+
+    /* The tiny fixture is sufficient for metadata extraction, but the
+     * preparser does not consistently classify it in every test environment.
+     * Seed the persisted category without scheduling another parse task. */
+    if (!VLCLibraryDataTypesIntegrationSetMediaType(sFactoryAudioMediaID,
+                                                    VLC_ML_MEDIA_TYPE_AUDIO) ||
+        !VLCLibraryDataTypesIntegrationSetMediaType(sFactoryVideoMediaID,
+                                                    VLC_ML_MEDIA_TYPE_VIDEO) ||
+        !VLCLibraryDataTypesIntegrationSetMediaType(sSortingAudioAlphaMediaID,
+                                                    VLC_ML_MEDIA_TYPE_AUDIO) ||
+        !VLCLibraryDataTypesIntegrationSetMediaType(sSortingAudioZuluMediaID,
+                                                    VLC_ML_MEDIA_TYPE_AUDIO) ||
+        !VLCLibraryDataTypesIntegrationSetMediaType(sSortingVideoAlphaMediaID,
+                                                    VLC_ML_MEDIA_TYPE_VIDEO) ||
+        !VLCLibraryDataTypesIntegrationSetMediaType(sSortingVideoZuluMediaID,
+                                                    VLC_ML_MEDIA_TYPE_VIDEO)) {
         return NO;
     }
     sFactoryFixturesPrepared = YES;
@@ -524,7 +672,9 @@ BOOL VLCLibraryDataTypesIntegrationPrepareMovieFixture(void)
             const BOOL isMovie = existingMedia->i_subtype == VLC_ML_MEDIA_SUBTYPE_MOVIE;
             vlc_ml_media_release(existingMedia);
             if (isMovie && [[NSFileManager defaultManager] fileExistsAtPath:moviePath]) {
-                return VLCLibraryDataTypesIntegrationSetMovieMetadata(sFactoryMovieMediaID);
+                return VLCLibraryDataTypesIntegrationSetMovieMetadata(sFactoryMovieMediaID) &&
+                       VLCLibraryDataTypesIntegrationSetMediaType(sFactoryMovieMediaID,
+                                                                  VLC_ML_MEDIA_TYPE_VIDEO);
             }
         }
         sFactoryMovieMediaID = 0;
@@ -557,6 +707,12 @@ BOOL VLCLibraryDataTypesIntegrationPrepareMovieFixture(void)
         return NO;
     }
 
+    if (!VLCLibraryDataTypesIntegrationSetMediaType(sFactoryMovieMediaID,
+                                                    VLC_ML_MEDIA_TYPE_VIDEO)) {
+        sFactoryMovieMediaID = 0;
+        return NO;
+    }
+
     vlc_ml_media_t * const movie =
         vlc_ml_get_media(sMediaLibrary, sFactoryMovieMediaID);
     const BOOL isMovie = movie != NULL && movie->i_subtype == VLC_ML_MEDIA_SUBTYPE_MOVIE;
@@ -582,6 +738,26 @@ int64_t VLCLibraryDataTypesIntegrationFactoryVideoMediaID(void)
 int64_t VLCLibraryDataTypesIntegrationFactoryMovieMediaID(void)
 {
     return sFactoryMovieMediaID;
+}
+
+int64_t VLCLibraryDataTypesIntegrationSortingAudioAlphaMediaID(void)
+{
+    return sSortingAudioAlphaMediaID;
+}
+
+int64_t VLCLibraryDataTypesIntegrationSortingAudioZuluMediaID(void)
+{
+    return sSortingAudioZuluMediaID;
+}
+
+int64_t VLCLibraryDataTypesIntegrationSortingVideoAlphaMediaID(void)
+{
+    return sSortingVideoAlphaMediaID;
+}
+
+int64_t VLCLibraryDataTypesIntegrationSortingVideoZuluMediaID(void)
+{
+    return sSortingVideoZuluMediaID;
 }
 
 int64_t VLCLibraryDataTypesIntegrationAlbumID(void)

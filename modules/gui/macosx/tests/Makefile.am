@@ -44,6 +44,7 @@ VLCMacOSXTests_SOURCES = \
 	gui/macosx/library/VLCLibraryCarouselView.m \
 	gui/macosx/library/VLCLibraryCollectionViewDelegate.m \
 	gui/macosx/library/VLCLibraryCollectionViewFlowLayout.m \
+	gui/macosx/extensions/NSArray+VLCAdditions.m \
 	gui/macosx/library/VLCLibraryDataTypes.m \
 	gui/macosx/library/VLCInputItem.m \
 	gui/macosx/library/VLCInputNode.m \
@@ -124,6 +125,7 @@ mostlyclean-local-macosx-xctest:
 	rm -rf $(macosx_gui_xctest_bundles)
 
 check-macosx: VLCMacOSXTests.xctest
+	$(MAKE) -C $(top_builddir)/bin ../modules/plugins.dat
 	$(XCTEST_LOG_COMPILER) $<
 
 else
