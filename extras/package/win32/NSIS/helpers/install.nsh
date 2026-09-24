@@ -31,7 +31,7 @@
 
 !macro InstallFolder FOLDER
   SetOutPath "$INSTDIR\${FOLDER}"
-  File /r /x "${FOLDER}\*.pdb" "${FOLDER}\*.*"
+  File /r /x "${FOLDER}\*.pdb" /x "${FOLDER}\*.dll.a" "${FOLDER}\*.*"
   SetOutPath "$INSTDIR"
   Push "${FOLDER}"
   Call InstallFolderInternal
@@ -39,7 +39,7 @@
 
 !macro InstallFolderOptional FOLDER
   SetOutPath "$INSTDIR\${FOLDER}"
-  File /nonfatal /r /x "${FOLDER}\*.pdb" "${FOLDER}\*.*"
+  File /nonfatal /r /x "${FOLDER}\*.pdb" /x "${FOLDER}\*.dll.a" "${FOLDER}\*.*"
   SetOutPath "$INSTDIR"
   Push "${FOLDER}"
   Call InstallFolderInternal
@@ -72,5 +72,3 @@ Function InstallFolderInternal
   !undef Index
 FunctionEnd
 ;;; End of Macros
-
-
