@@ -14,7 +14,12 @@ GMP_CONF += --disable-assembly
 endif
 endif
 # gmp requires C99 and is _not_ forward-compatible with C23.
+ifdef HAVE_WIN32
+# disable sections splitting as it fails to link with "foo"
+GMP_CONF += CFLAGS="$(CFLAGS_NO_SECTIONS) -std=gnu99"
+else
 GMP_CONF += CFLAGS="$(CFLAGS) -std=gnu99"
+endif
 
 ifdef HAVE_WIN32
 ifeq ($(ARCH),arm)
