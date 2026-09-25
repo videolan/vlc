@@ -1027,7 +1027,7 @@ static int ASF_ReadObject_extended_stream_properties( stream_t *s,
         else
         {
             /* This p_sp will be inserted by ReadRoot later */
-            p_esp->p_sp = (asf_object_stream_properties_t*)p_sp;
+            p_esp->p_sp = &p_sp->stream_properties;
             ASF_ParentObject( p_obj, p_sp );
         }
     }
@@ -1858,19 +1858,19 @@ asf_object_root_t *ASF_ReadObjectRoot( stream_t *s, int b_seekable )
         {
             case( ASF_OBJECT_HEADER ):
                 if ( p_root->p_index || p_root->p_data || p_root->p_hdr ) break;
-                p_root->p_hdr = (asf_object_header_t*)p_obj;
+                p_root->p_hdr = &p_obj->header;
                 break;
             case( ASF_OBJECT_DATA ):
                 if ( p_root->p_index || p_root->p_data ) break;
-                p_root->p_data = (asf_object_data_t*)p_obj;
+                p_root->p_data = &p_obj->data;
             break;
             case( ASF_OBJECT_INDEX ):
                 if ( p_root->p_index ) break;
-                p_root->p_index = (asf_object_index_t*)p_obj;
+                p_root->p_index = &p_obj->index;
                 break;
             case( ASF_OBJECT_TIMECODE_INDEX ):
                 if ( p_root->p_timecode_index ) break;
-                p_root->p_timecode_index = (asf_object_timecode_index_t*)p_obj;
+                p_root->p_timecode_index = &p_obj->timecode_index;
                 break;
             default:
                 msg_Warn( s, "unknown top-level object found: " GUID_FMT,
@@ -1922,7 +1922,7 @@ asf_object_root_t *ASF_ReadObjectRoot( stream_t *s, int b_seekable )
             }
 
             ASF_ObjectDumpDebug( VLC_OBJECT(s),
-                                 (asf_object_common_t*)p_root, 0 );
+                                 &p_obj_root->common, 0 );
             return p_root;
         }
         msg_Warn( s, "cannot find file properties object" );
