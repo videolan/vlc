@@ -160,11 +160,8 @@ EbmlElement *EbmlParser::Get( bool allow_overshoot )
             }
             if( !ret->IsFiniteSize() )
             {
-                msg_Err( p_demux, "Infinite EBML element %s at %" PRIu64 " inside finite parent",
+                msg_Dbg( p_demux, "Infinite EBML element %s at %" PRIu64 " inside finite parent",
                          EBML_NAME(ret), ret->GetElementPosition() );
-                delete ret;
-                m_el[mi_level] = NULL;
-                return NULL;
             }
         }
         return ret;
