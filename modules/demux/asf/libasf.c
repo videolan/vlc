@@ -1818,11 +1818,14 @@ static void ASF_ObjectDumpDebug( vlc_object_t *p_obj,
  *****************************************************************************/
 asf_object_root_t *ASF_ReadObjectRoot( stream_t *s, int b_seekable )
 {
-    asf_object_root_t *p_root = malloc( sizeof( asf_object_root_t ) );
+    static_assert(offsetof(asf_object_root_t, p_next) == offsetof(asf_object_common_t, p_next),
+                           "bogus asf_object_root_t offset");
+    asf_object_t *p_obj_root = malloc( sizeof( *p_obj_root ) );
+    asf_object_root_t *p_root = &p_obj_root->root;
     asf_object_t *p_obj;
     uint64_t i_boundary = 0;
 
-    if( !p_root )
+    if( !p_obj_root )
         return NULL;
 
     p_root->i_type = ASF_OBJECT_ROOT;
