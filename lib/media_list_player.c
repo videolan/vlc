@@ -314,13 +314,41 @@ set_current_playing_item(libvlc_media_list_player_t * p_mlp, libvlc_media_list_p
     return libvlc_media_list_item_at_path(p_mlp->p_mlist, path);
 }
 
+/**************************************************************************
+ *       find_next_media_locked (private)
+ *
+ * Find the media that should play after p_mlp->current_playing_item_path,
+ * according to the current playback mode.
+ *
+ * Playlist lock must be held.
+ **************************************************************************/
+static libvlc_media_t *
+find_next_media_locked(libvlc_media_list_player_t * p_mlp)
+{
+    libvlc_media_list_path_t path;
+    if (p_mlp->e_playback_mode != libvlc_playback_mode_repeat)
+    {
+        bool b_loop = (p_mlp->e_playback_mode == libvlc_playback_mode_loop);
+        path = get_next_path(p_mlp, b_loop);
+    }
+    else
+        path = libvlc_media_list_path_copy(p_mlp->current_playing_item_path);
+
+    libvlc_media_t *md = NULL;
+    if (path != NULL)
+    {
+        md = libvlc_media_list_item_at_path(p_mlp->p_mlist, path);
+        free(path);
+    }
+    return md;
+}
+
 static void
 internal_player_media_changed(vlc_player_t *player, input_item_t *new_media,
                               void *opaque)
 {
     (void) player;
     libvlc_media_list_player_t *p_mlp = opaque;
-    libvlc_media_t *md = NULL;
 
     libvlc_media_list_lock(p_mlp->p_mlist);
 
@@ -335,20 +363,7 @@ internal_player_media_changed(vlc_player_t *player, input_item_t *new_media,
     }
 
     /* Find and set the next media */
-    if (p_mlp->e_playback_mode != libvlc_playback_mode_repeat)
-    {
-        bool b_loop = (p_mlp->e_playback_mode == libvlc_playback_mode_loop);
-        path = get_next_path(p_mlp, b_loop);
-    }
-    else
-        path = libvlc_media_list_path_copy(p_mlp->current_playing_item_path);
-
-
-    if (path != NULL)
-    {
-        md = libvlc_media_list_item_at_path(p_mlp->p_mlist, path);
-        free(path);
-    }
+    libvlc_media_t *md = find_next_media_locked(p_mlp);
 
     libvlc_media_list_unlock(p_mlp->p_mlist);
 
