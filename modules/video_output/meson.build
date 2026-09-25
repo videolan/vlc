@@ -228,6 +228,29 @@ if caca_dep.found()
 endif
 
 #
+# Vulkan video outputs
+#
+if vulkan_dep.found()
+    vlc_modules += {
+        'name' : 'vk_win32',
+        'sources' : files('vulkan/platform.c', 'vulkan/platform_win32.c'),
+        'c_args' : ['-DVK_USE_PLATFORM_WIN32_KHR', '-DPLATFORM_NAME=Win32'],
+        'dependencies' : [vulkan_dep],
+        'plugin_dir' : 'video_output',
+        'enabled': host_system == 'windows' and not have_win_store,
+    }
+
+    vlc_modules += {
+        'name' : 'vk_android',
+        'sources' : files('vulkan/platform.c', 'vulkan/platform_android.c'),
+        'c_args' : ['-DVK_USE_PLATFORM_ANDROID_KHR', '-DPLATFORM_NAME=Android'],
+        'dependencies' : [vulkan_dep],
+        'plugin_dir' : 'video_output',
+        'enabled': host_system == 'android'
+    }
+endif
+
+#
 # x11 video outputs
 #
 
