@@ -132,7 +132,6 @@ private slots:
         m_model = std::make_unique<MLTestModel>();
         m_model->classBegin();
         m_model->setMl(m_medialib.get());
-        m_model->componentComplete();
     }
 
     void cleanup() {
@@ -165,6 +164,7 @@ private slots:
         }, Qt::SingleShotConnection);
 
         m_model->appendRange(1, 1000);
+        m_model->componentComplete();
         QTRY_COMPARE_WITH_TIMEOUT(m_model->getCount(), 1000u, 100);
     }
 
@@ -174,6 +174,7 @@ private slots:
         const int low = 1;
         const int high = 300;
         m_model->appendRange(low, high);
+        m_model->componentComplete();
 
         // let loading complete, getIndexFromID won't work for 'loading' model
         QVERIFY(QTest::qWaitFor([this] () { return !m_model->loading(); }));
