@@ -2848,7 +2848,7 @@ static int InputSourceInit( input_source_t *in, input_thread_t *p_input,
                             const char *psz_forced_demux, bool b_in_can_fail )
 {
     input_thread_private_t *priv = input_priv(p_input);
-    const char *psz_access, *psz_demux, *psz_path, *psz_anchor = NULL;
+    const char *psz_access, *psz_demux, *psz_path, *psz_anchor;
     const bool master = priv->master == in;
 
     assert( psz_mrl );
@@ -3456,6 +3456,7 @@ static void input_SplitMRL( const char **access, const char **demux,
                             const char **path, const char **anchor, char *buf )
 {
     char *p;
+    *anchor = "";
 
     /* Separate <path> from <access>[/<demux>]:// */
     p = strchr( buf, ':');
@@ -3472,8 +3473,6 @@ static void input_SplitMRL( const char **access, const char **demux,
             *(p++) = '\0';
             *anchor = p;
         }
-        else
-            *anchor = "";
     }
     else
     {
