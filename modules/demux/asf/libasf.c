@@ -216,7 +216,7 @@ static int  ASF_ReadObject_Header( stream_t *s, asf_object_t *p_obj )
     {
         p_subobj = malloc( sizeof( asf_object_t ) );
 
-        if( !p_subobj || ASF_ReadObject( s, p_subobj, (asf_object_t*)p_hdr ) )
+        if( !p_subobj || ASF_ReadObject( s, p_subobj, p_obj ) )
         {
             free( p_subobj );
             break;
@@ -539,7 +539,7 @@ static int ASF_ReadObject_header_extension( stream_t *s, asf_object_t *p_obj )
         asf_object_t *p_child = malloc( sizeof( asf_object_t ) );
 
         if( p_child == NULL
-         || ASF_ReadObject( s, p_child, (asf_object_t*)p_he ) )
+         || ASF_ReadObject( s, p_child, p_obj ) )
         {
             free( p_child );
             break;
@@ -1849,7 +1849,7 @@ asf_object_root_t *ASF_ReadObjectRoot( stream_t *s, int b_seekable )
     {
         p_obj = malloc( sizeof( asf_object_t ) );
 
-        if( !p_obj || ASF_ReadObject( s, p_obj, (asf_object_t*)p_root ) )
+        if( !p_obj || ASF_ReadObject( s, p_obj, p_obj_root ) )
         {
             free( p_obj );
             break;
