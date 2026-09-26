@@ -375,6 +375,10 @@ static void PictureRender (vout_display_t *vd, picture_t *pic,
             sys->change_projection = false;
         }
         vout_display_opengl_Prepare(sys->vgl, pic, subpicture);
+        // Submit the rendering so that it is ready when
+        // vout_display_opengl_Display() is called, and so that the command
+        // buffer does not fill up if it is never called.
+        glFlush();
         vlc_gl_ReleaseCurrent(sys->gl);
 
         VLCVideoLayerView *view = (__bridge VLCVideoLayerView *)sys->gl->sys;
