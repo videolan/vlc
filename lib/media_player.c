@@ -104,7 +104,6 @@ on_stopping_current_media(vlc_player_t *player, input_item_t *item,
 {
     assert(item != NULL);
     (void) player;
-    (void) stopping_reason;
 
     libvlc_media_player_t *mp = data;
 

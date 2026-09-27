@@ -1161,9 +1161,6 @@ input_thread_Events(input_thread_t *input_thread,
             input_item_node_Delete(event->subitems);
             break;
         case INPUT_EVENT_DEAD:
-            if (input->started) /* Can happen with early input_thread fails */
-                vlc_player_input_HandleState(input, VLC_PLAYER_STATE_STOPPING,
-                                             VLC_TICK_INVALID);
             vlc_player_destructor_AddJoinableInput(player, input);
             break;
         case INPUT_EVENT_VBI_PAGE:
