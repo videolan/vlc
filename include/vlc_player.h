@@ -325,7 +325,7 @@ enum vlc_player_abloop
  */
 enum vlc_player_media_stopping_reason
 {
-    /** The media is stopping because of an error (default) */
+    /** The media is stopping because of an error */
     VLC_PLAYER_MEDIA_STOPPING_ERROR,
     /** The media reached the end of stream */
     VLC_PLAYER_MEDIA_STOPPING_EOS,

@@ -209,7 +209,7 @@ typedef enum libvlc_list_action_t {
  * Enumeration of media stopping reasons
  */
 typedef enum libvlc_stopping_reason_t {
-    /** media is stopping due to an error (default) */
+    /** media is stopping due to an error */
     libvlc_stopping_reason_error,
     /** media has reached the end of stream */
     libvlc_stopping_reason_eos,

@@ -251,7 +251,6 @@ vlc_player_mainloop_Thread(void *data)
         vlc_list_foreach(input, &player->mainloop.stop_inputs, node)
         {
             input_Stop(input->thread);
-            input->stopping_reason = VLC_PLAYER_MEDIA_STOPPING_USER;
             vlc_player_input_HandleState(input, VLC_PLAYER_STATE_STOPPING,
                                          VLC_TICK_INVALID);
             vlc_player_destructor_AddStoppingInput(player, input);

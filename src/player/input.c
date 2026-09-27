@@ -279,6 +279,19 @@ vlc_player_input_HandleState(struct vlc_player_input *input,
             send_event = !player->started && last_state != VLC_PLAYER_STATE_STOPPED;
             break;
         case VLC_PLAYER_STATE_STOPPING:
+        {
+            enum vlc_player_media_stopping_reason reason;
+            /* The order matters. input->error is only set while the
+               input->started flag is set, so an error or EOS that follows a
+               user stop request is ignored and the stop is reported as USER,
+               whereas an error that occurred before a user stop request takes
+               precedence and is reported as ERROR. */
+            if (input->error != VLC_PLAYER_ERROR_NONE)
+                reason = VLC_PLAYER_MEDIA_STOPPING_ERROR;
+            else if (!input->started)
+                reason = VLC_PLAYER_MEDIA_STOPPING_USER;
+            else
+                reason = VLC_PLAYER_MEDIA_STOPPING_EOS;
             input->started = false;
 
             /* Note: no need to hold the media here, as it is already protected
@@ -286,7 +299,7 @@ vlc_player_input_HandleState(struct vlc_player_input *input,
                to use it beyond the callback scope. */
             input_item_t *media = input_GetItem(input->thread);
             vlc_player_SendEvent(player, on_stopping_current_media,
-                                 media, input->stopping_reason);
+                                 media, reason);
 
             vlc_player_UpdateTimerEvent(player, NULL,
                                         VLC_PLAYER_TIMER_EVENT_DISCONTINUITY,
@@ -303,6 +316,7 @@ vlc_player_input_HandleState(struct vlc_player_input *input,
                 player->started = false;
             send_event = !player->started;
             break;
+        }
         case VLC_PLAYER_STATE_PLAYING:
             input->pause_date = VLC_TICK_INVALID;
             vlc_player_SignalAtoBLoop(player);
@@ -361,7 +375,6 @@ vlc_player_input_HandleStateEvent(struct vlc_player_input *input,
             break;
         case END_S:
             input->playing = false;
-            input->stopping_reason = VLC_PLAYER_MEDIA_STOPPING_EOS;
             vlc_player_input_HandleState(input, VLC_PLAYER_STATE_STOPPING,
                                          VLC_TICK_INVALID);
             vlc_player_destructor_AddStoppingInput(input->player, input);
@@ -370,7 +383,7 @@ vlc_player_input_HandleStateEvent(struct vlc_player_input *input,
             /* Don't send errors if the input is stopped by the user */
             if (input->started)
             {
-                /* Contrary to the input_thead_t, an error is not a state */
+                /* Contrary to the input_thread_t, an error is not a state */
                 input->error = VLC_PLAYER_ERROR_GENERIC;
                 vlc_player_SendEvent(input->player, on_error_changed, input->error);
             }
@@ -379,7 +392,6 @@ vlc_player_input_HandleStateEvent(struct vlc_player_input *input,
              * the input thread and we won't reach END_S. */
             if (!input->playing)
             {
-                input->stopping_reason = VLC_PLAYER_MEDIA_STOPPING_ERROR;
                 vlc_player_input_HandleState(input, VLC_PLAYER_STATE_STOPPING,
                                              VLC_TICK_INVALID);
                 vlc_player_destructor_AddStoppingInput(input->player, input);
@@ -1150,11 +1162,8 @@ input_thread_Events(input_thread_t *input_thread,
             break;
         case INPUT_EVENT_DEAD:
             if (input->started) /* Can happen with early input_thread fails */
-            {
-                input->stopping_reason = VLC_PLAYER_MEDIA_STOPPING_ERROR;
                 vlc_player_input_HandleState(input, VLC_PLAYER_STATE_STOPPING,
                                              VLC_TICK_INVALID);
-            }
             vlc_player_destructor_AddJoinableInput(player, input);
             break;
         case INPUT_EVENT_VBI_PAGE:
@@ -1249,7 +1258,6 @@ vlc_player_input_New(vlc_player_t *player, input_item_t *item)
 
     input->state = VLC_PLAYER_STATE_STOPPED;
     input->error = VLC_PLAYER_ERROR_NONE;
-    input->stopping_reason = VLC_PLAYER_MEDIA_STOPPING_ERROR;
     input->rate = 1.f;
     input->capabilities = 0;
     input->length = input->time = VLC_TICK_INVALID;
