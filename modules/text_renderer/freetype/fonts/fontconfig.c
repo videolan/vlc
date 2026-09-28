@@ -9,6 +9,7 @@
  *          Jean-Baptiste Kempf <jb@videolan.org>
  *          Felix Paul Kühne <fkuehne@videolan.org>
  *          Salah-Eddin Shaban <salshaaban@gmail.com>
+ *          Alexandre Janniaux <ajanni@videolabs.io>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -214,9 +215,9 @@ int FontConfig_SelectAmongFamilies( vlc_font_select_t *fs, const fontfamilies_t 
 
     /* Find the best font for the pattern, destroy the pattern */
     p_matchpat = FcFontMatch( config, pat, &result );
+    FcPatternDestroy( pat );
     if( !p_matchpat )
         return VLC_EGENERIC;
-    FcPatternDestroy( pat );
     if( result == FcResultNoMatch )
     {
         *pp_result = NULL;
