@@ -639,7 +639,7 @@ if [ -n "$BUILD_MESON" ]; then
     else
         MDESTDIR="${BUILD_PATH}/$SHORTARCH-meson/vlc-$SHORTARCH"
     fi
-    MINSTALLFLAGS="--destdir=$MDESTDIR --strip $MINSTALLFLAGS"
+    MINSTALLFLAGS="--destdir=$MDESTDIR --strip --no-rebuild $MINSTALLFLAGS"
 
     if [ "$INSTALLER" = "n" ]; then
         VLC_GIT_TAG="$(git describe --tags --long --match '?.*.*' --always)"
