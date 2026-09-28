@@ -637,7 +637,7 @@ if [ -n "$BUILD_MESON" ]; then
     else
         MDESTDIR="${BUILD_PATH}/$SHORTARCH-meson/vlc-$SHORTARCH"
     fi
-    MINSTALLFLAGS="--destdir=$MDESTDIR $MINSTALLFLAGS"
+    MINSTALLFLAGS="--destdir=$MDESTDIR --strip $MINSTALLFLAGS"
 
     if [ "$INSTALLER" = "n" ]; then
         meson install -C ${BUILD_PATH}/$SHORTARCH-meson ${MINSTALLFLAGS}
