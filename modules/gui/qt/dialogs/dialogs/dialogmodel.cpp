@@ -132,9 +132,15 @@ void DialogErrorModel::pushError(const DialogError & error)
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
     assert(qGuiApp);
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 13, 0)
+    const qint64 badgeNumber = qGuiApp->badgeNumber() + 1;
+#else
     const int badgeNumber = qGuiApp->property("badgeNumber").toInt() + 1;
-    qGuiApp->setBadgeNumber(badgeNumber);
     qGuiApp->setProperty("badgeNumber", badgeNumber);
+#endif
+
+    qGuiApp->setBadgeNumber(badgeNumber);
 #endif
 
     emit countChanged();
@@ -166,7 +172,9 @@ void DialogErrorModel::resetRepeatedMessageCount()
     // Errors are dismissed, or error dialog is opened.
     assert(qGuiApp);
     qGuiApp->setBadgeNumber(0);
+#if QT_VERSION < QT_VERSION_CHECK(6, 13, 0)
     qGuiApp->setProperty("badgeNumber", 0);
+#endif
 #endif
 }
 
