@@ -94,6 +94,7 @@ int FontConfig_Prepare( vlc_font_select_t *fs )
     if( i_dialog_id != 0 )
         vlc_dialog_cancel( fs->p_obj, i_dialog_id );
 
+end:
 #endif
 
     if (ret != VLC_SUCCESS)
