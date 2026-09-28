@@ -254,7 +254,7 @@ export EXTRA_LDFLAGS="-Wl,-syslibroot,$SDKROOT -mmacosx-version-min=$MINIMAL_OSX
 # xcodebuild only allows to set a build-in sdk, not a custom one. Therefore use the default included SDK here
 export XCODE_FLAGS="MACOSX_DEPLOYMENT_TARGET=$MINIMAL_OSX_VERSION -sdk macosx WARNING_CFLAGS=-Werror=partial-availability"
 
-CONTRIBFLAGS=
+CONTRIBFLAGS="--enable-sections"
 if [ "$PACKAGETYPE" = "u" ]; then
     # release package should have sparkle, breakpad, growl
     CONTRIBFLAGS="$CONTRIBFLAGS --enable-sparkle --enable-breakpad --enable-growl"
