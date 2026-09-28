@@ -11,6 +11,7 @@ MSIDIR=$(abs_srcdir)/extras/package/win32/msi
 W_MSIDIR=`$(WIN32_PATH_CMD) -w '$(MSIDIR)'`
 MSIBUILDDIR=$(abs_top_builddir)/extras/package/win32/msi
 W_MSIBUILDDIR=`$(WIN32_PATH_CMD) -w '$(MSIBUILDDIR)'`
+W_TOPBUILDDIR=`$(WIN32_PATH_CMD) -w '$(abs_top_builddir)'`
 if HAVE_ARM64
 MSIOUTFILE=vlc-$(VERSION)-winarm64.msi
 else
@@ -34,10 +35,10 @@ if BUILD_SKINS
 endif
 
 candle: heat
-	$(am__cd) $(MSIBUILDDIR) && $(CANDLE) -arch $(WINDOWS_ARCH) -ext WiXUtilExtension $(W_MSIDIR)/product.wxs $(W_MSIDIR)/extensions.wxs $(W_MSIBUILDDIR)/*.fragment.wxs
+	$(am__cd) $(MSIBUILDDIR) && $(CANDLE) -arch $(WINDOWS_ARCH) -I$(W_TOPBUILDDIR) -ext WiXUtilExtension $(W_MSIDIR)/product.wxs $(W_MSIDIR)/extensions.wxs $(W_MSIBUILDDIR)/*.fragment.wxs
 
 $(MSIOUTFILE): candle
-	$(AM_V_GEN)cd vlc-@VERSION@ && $(LIGHT) -sval -spdb -ext WixUIExtension -ext WixUtilExtension -cultures:en-us -b $(W_MSIDIR) $(W_MSIBUILDDIR)/product.wixobj $(W_MSIBUILDDIR)/extensions.wixobj $(W_MSIBUILDDIR)/*.fragment.wixobj -o ../$@
+	$(AM_V_GEN)$(LIGHT) -sval -spdb -ext WixUIExtension -ext WixUtilExtension -cultures:en-us $(W_MSIBUILDDIR)/product.wixobj $(W_MSIBUILDDIR)/extensions.wixobj $(W_MSIBUILDDIR)/*.fragment.wixobj -o $@
 	chmod 644 $@
 
 package-msi: $(MSIOUTFILE)

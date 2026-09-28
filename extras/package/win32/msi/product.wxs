@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 
 -->
-<?include $(sys.CURRENTDIR)/config.wxi?>
+<?include extras/package/win32/msi/config.wxi?>
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
     <Product
@@ -48,7 +48,7 @@
             <RegistrySearch Id="NSISLOCATION" Type="raw" Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\VLC media player" Name="UninstallString" />
         </Property>
 
-        <Icon Id="vlc.ico" SourceFile="$(var.SourceDir)/vlc.ico"/>
+        <Icon Id="vlc.ico" SourceFile="$(var.VlcInstallPrefix)vlc.ico"/>
 
         <!-- The about link that appears in Add & Remove Programs. -->
         <Property Id="ARPURLINFOABOUT" Value="$(var.AboutURL)" />
@@ -67,8 +67,8 @@
         </Property>
 
         <WixVariable Id="WixUISupportPerUser" Value="1" />
-        <WixVariable Id="WixUILicenseRtf" Value="LICENSE.rtf" />
-        <WixVariable Id="WixUIBannerBmp" Value="bannrbmp.bmp" />
+        <WixVariable Id="WixUILicenseRtf" Value="$(sys.SOURCEFILEDIR)/LICENSE.rtf" />
+        <WixVariable Id="WixUIBannerBmp" Value="$(sys.SOURCEFILEDIR)/bannrbmp.bmp" />
 
         <Media Id='1' Cabinet='product.cab' EmbedCab='yes' CompressionLevel="high" />
 
@@ -95,7 +95,7 @@
                         </Component>
 
                         <Component Id='CompVLC' Guid='$(var.CompVLCexe)' Win64="$(var.Win64)">
-                            <File Id='vlc.exe' Name='vlc.exe' KeyPath='yes' Vital='yes' DiskId='1' />
+                            <File Id='vlc.exe' Name='vlc.exe' KeyPath='yes' Vital='yes' DiskId='1' Source="$(var.VlcInstallPrefix)vlc.exe"/>
 
                             <Shortcut Id="DesktopShortcut"
                                 Directory="DesktopFolder"
@@ -122,31 +122,31 @@
                         </Component>
 
                         <Component Id='CompTXT' Guid='7fbd228c-87d8-4e91-85b3-aa65e03c9f1e' Win64="$(var.Win64)">
-                            <File Id='AUTHORS.txt' Name='AUTHORS.txt'  DiskId='1' />
-                            <File Id='COPYING.txt' Name='COPYING.txt' DiskId='1' />
-                            <File Id='NEWS.txt' Name='NEWS.txt' DiskId='1' />
-                            <File Id='README.txt' Name='README.txt' DiskId='1' />
-                            <File Id='THANKS.txt' Name='THANKS.txt' DiskId='1' />
+                            <File Id='AUTHORS.txt' Name='AUTHORS.txt'  DiskId='1'  Source="$(var.VlcInstallPrefix)AUTHORS.txt"/>
+                            <File Id='COPYING.txt' Name='COPYING.txt' DiskId='1'  Source="$(var.VlcInstallPrefix)COPYING.txt"/>
+                            <File Id='NEWS.txt' Name='NEWS.txt' DiskId='1'  Source="$(var.VlcInstallPrefix)NEWS.txt"/>
+                            <File Id='README.txt' Name='README.txt' DiskId='1'  Source="$(var.VlcInstallPrefix)README.txt"/>
+                            <File Id='THANKS.txt' Name='THANKS.txt' DiskId='1'  Source="$(var.VlcInstallPrefix)THANKS.txt"/>
                         </Component>
 
                         <Component Id='CompLibvlccore' Guid='efa826fd-0037-4ccd-9573-604fde3b9efa' Win64="$(var.Win64)">
-                            <File Id='libvlccore.dll' Name='libvlccore.dll' KeyPath='yes' Vital='yes' DiskId='1' />
+                            <File Id='libvlccore.dll' Name='libvlccore.dll' KeyPath='yes' Vital='yes' DiskId='1' Source="$(var.VlcInstallPrefix)libvlccore.dll"/>
                         </Component>
 
                         <Component Id='CompLibvlc' Guid='50d7e1e1-4512-4020-9f7b-5dc8484574f3' Win64="$(var.Win64)">
-                            <File Id='libvlc.dll' Name='libvlc.dll' KeyPath='yes' Vital='yes' DiskId='1' />
+                            <File Id='libvlc.dll' Name='libvlc.dll' KeyPath='yes' Vital='yes' DiskId='1' Source="$(var.VlcInstallPrefix)libvlc.dll"/>
                         </Component>
 
                         <Component Id='CompCacheGen' Guid='e1b4a499-e223-4c18-9de0-258f12b8dcfa' Win64="$(var.Win64)">
-                            <File Id='vlc_cache_gen.exe' Name='vlc-cache-gen.exe' KeyPath='yes' DiskId='1' />
+                            <File Id='vlc_cache_gen.exe' Name='vlc-cache-gen.exe' KeyPath='yes' DiskId='1' Source="$(var.VlcInstallPrefix)vlc-cache-gen.exe"/>
                         </Component>
 
                         <Component Id='CompPreparserExe' Guid='83ff6660-bf97-4c6e-a6eb-123df8ec9cb1' Win64="$(var.Win64)">
-                            <File Id='vlc_preparser.exe' Name='vlc-preparser.exe' KeyPath='yes' DiskId='1' />
+                            <File Id='vlc_preparser.exe' Name='vlc-preparser.exe' KeyPath='yes' DiskId='1' Source="$(var.VlcInstallPrefix)vlc-preparser.exe"/>
                         </Component>
 
                         <Component Id='CompIcon' Guid='8707410c-55fe-4c38-924e-438762b8b82e' Win64="$(var.Win64)">
-                            <File Id='vlc.ico' Name='vlc.ico' KeyPath='yes' DiskId='1' />
+                            <File Id='vlc.ico' Name='vlc.ico' KeyPath='yes' DiskId='1'  Source="$(var.VlcInstallPrefix)vlc.ico"/>
                         </Component>
 
                         <Directory Id='PLUGINSDIR' Name='plugins'>

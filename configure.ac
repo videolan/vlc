@@ -5307,6 +5307,9 @@ AM_COND_IF([KDE_SOLID], [
 ])
 
 AM_COND_IF([HAVE_WIN32], [
+  PREFIX_PATH="vlc-${VERSION}/"
+  AC_SUBST([PREFIX_PATH])
+
   AC_CONFIG_FILES([
     extras/package/win32/NSIS/spad.nsi
     extras/package/win32/NSIS/vlc.win32.nsi
