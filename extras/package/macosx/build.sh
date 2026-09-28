@@ -192,6 +192,8 @@ case $LICENSE in
     ;;
 esac
 
+CONTRIBFLAGS="$CONTRIBFLAGS --enable-sections"
+
 if [ "$REBUILD" = "yes" ]; then
     rm -rf contrib-$HOST_TRIPLET
     rm -rf $HOST_TRIPLET
