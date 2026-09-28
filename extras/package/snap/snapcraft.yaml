@@ -82,6 +82,7 @@ parts:
       cd contrib && mkdir linux && cd linux
       ../bootstrap \
           --host=${CRAFT_ARCH_TRIPLET_BUILD_FOR} \
+          --enable-sections \
           --enable-libdsm \
           --enable-dvdcss
       if [ -v VLC_PREBUILT_CONTRIBS_URL ]; then
