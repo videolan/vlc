@@ -345,6 +345,16 @@ CFLAGS := $(CFLAGS) -fembed-bitcode
 CXXFLAGS := $(CXXFLAGS) -fembed-bitcode
 endif
 
+# opt-out flags when --enable-sections is used
+CFLAGS_NO_SECTIONS := $(CFLAGS)
+CXXFLAGS_NO_SECTIONS := $(CXXFLAGS)
+
+ifdef ENABLE_SECTION_SPLIT
+CFLAGS := $(CFLAGS) -fdata-sections -ffunction-sections
+CXXFLAGS := $(CXXFLAGS) -fdata-sections -ffunction-sections
+endif
+
+
 # Add these flags after CMake consumed the CFLAGS/CXXFLAGS
 # CMake handles the optimization level with CMAKE_BUILD_TYPE
 HOSTVARS_CMAKE := \
@@ -359,17 +369,23 @@ HOSTVARS_CMAKE := \
 # incorrectly report they have not, even if they have.
 ifndef WITH_OPTIMIZATION
 CFLAGS := $(CFLAGS) -g -O0
+CFLAGS_NO_SECTIONS := $(CFLAGS_NO_SECTIONS) -g -O0
 CXXFLAGS := $(CXXFLAGS) -g -O0
+CXXFLAGS_NO_SECTIONS := $(CXXFLAGS_NO_SECTIONS) -g -O0
 else
 CFLAGS := $(CFLAGS) -g -O2
+CFLAGS_NO_SECTIONS := $(CFLAGS_NO_SECTIONS) -g -O2
 CXXFLAGS := $(CXXFLAGS) -g -O2
+CXXFLAGS_NO_SECTIONS := $(CXXFLAGS_NO_SECTIONS) -g -O2
 endif
 
 ifdef ENABLE_PDB
 ifdef HAVE_CLANG
 ifneq ($(findstring $(ARCH),i686 x86_64),)
 CFLAGS := $(CFLAGS) -gcodeview
+CFLAGS_NO_SECTIONS := $(CFLAGS_NO_SECTIONS) -gcodeview
 CXXFLAGS := $(CXXFLAGS) -gcodeview
+CXXFLAGS_NO_SECTIONS := $(CXXFLAGS_NO_SECTIONS) -gcodeview
 endif
 endif
 endif
