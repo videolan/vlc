@@ -408,6 +408,25 @@ AS_IF([test -n "${GC_SECTIONS_LDFLAGS}"],
     [AC_MSG_RESULT([none])])
 AC_SUBST([GC_SECTIONS_LDFLAGS])
 
+AC_ARG_ENABLE([split-sections],
+     AS_HELP_STRING([--split-sections],
+                    [Split compiled sections and remove unused ones (default enabled)]))
+AS_IF([test "${enable_split_sections}" != "no" ], [
+  AS_IF([test -z "${GC_SECTIONS_LDFLAGS}"], [
+    AS_IF([test -n "${enable_split_sections}"], [
+      AC_MSG_ERROR([Split sections enabled but not supported by linker!])
+    ],[
+      AC_MSG_WARN([Split sections enabled but not supported by linker.])
+    ])
+  ],[
+    AX_APPEND_FLAG([${GC_SECTIONS_LDFLAGS}], [LDFLAGS])
+    AX_CHECK_COMPILE_FLAG([-fdata-sections -ffunction-sections], [
+        AX_APPEND_FLAG([-fdata-sections -ffunction-sections], [CFLAGS])
+        AX_APPEND_FLAG([-fdata-sections -ffunction-sections], [CXXFLAGS])
+    ])
+  ])
+])
+
 dnl WinRT
 AC_ARG_ENABLE(winstore_app,
      AS_HELP_STRING([--enable-winstore-app],
