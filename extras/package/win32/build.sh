@@ -202,7 +202,7 @@ fi
 make -j$JOBS
 
 # avoid installing wine on WSL
-# wine is needed to build Qt with shaders
+# wine is needed to build Qt with shaders or running vlc-cache-gen
 if test -z "$(command -v wine)"
 then
     if test -n "$(command -v wsl.exe)"
@@ -216,6 +216,8 @@ fi
 HOST="$(cc -dumpmachine)"
 HOST_ARCH="${HOST%%-*}"
 if [ "$HOST_ARCH" = "$ARCH" ]; then
+    VLC_EXE_WRAPPER="wine"
+elif [ "$HOST_ARCH" = "x86_64" ] && [ "$ARCH" = "i686" ]; then
     VLC_EXE_WRAPPER="wine"
 fi
 
