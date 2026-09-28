@@ -386,6 +386,16 @@ CFLAGS := $(CFLAGS) -fembed-bitcode
 CXXFLAGS := $(CXXFLAGS) -fembed-bitcode
 endif
 
+# opt-out flags when --enable-sections is used
+CFLAGS_NO_SECTIONS := $(CFLAGS)
+CXXFLAGS_NO_SECTIONS := $(CXXFLAGS)
+
+ifdef ENABLE_SECTION_SPLIT
+CFLAGS := $(CFLAGS) -fdata-sections -ffunction-sections
+CXXFLAGS := $(CXXFLAGS) -fdata-sections -ffunction-sections
+endif
+
+
 # Add these flags after CMake consumed the CFLAGS/CXXFLAGS
 # CMake handles the optimization level with CMAKE_BUILD_TYPE
 # CMake handles LTO flags with INTERPROCEDURAL_OPTIMIZATION
@@ -411,6 +421,9 @@ ifdef ENABLE_LTO
 AUTOTOOLS_CFLAGS := $(AUTOTOOLS_CFLAGS) -flto
 AUTOTOOLS_CXXFLAGS := $(AUTOTOOLS_CXXFLAGS) -flto
 endif
+
+CFLAGS_NO_SECTIONS := $(CFLAGS_NO_SECTIONS) $(AUTOTOOLS_CFLAGS)
+CXXFLAGS_NO_SECTIONS := $(CXXFLAGS_NO_SECTIONS) $(AUTOTOOLS_CFLAGS)
 
 HOSTVARS := $(HOSTTOOLS) \
 	CPPFLAGS="$(CPPFLAGS)" \

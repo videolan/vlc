@@ -38,6 +38,7 @@ usage()
 	echo "  --enable-lto     use Link Time Optimization"
 	echo "  --enable-pdb     generate debug information in PDB format"
 	echo "  --enable-bitcode generate bitcode information"
+	echo "  --enable-sections enable section splitting with compiler"
 }
 
 BUILD=
@@ -54,6 +55,7 @@ AD_CLAUSES=
 WITH_OPTIMIZATION="1"
 ENABLE_PDB=
 ENABLE_BITCODE=
+ENABLE_SECTION_SPLIT=
 
 while test -n "$1"
 do
@@ -91,6 +93,9 @@ do
 			;;
 		--enable-bitcode)
 			ENABLE_BITCODE=1
+			;;
+		--enable-sections)
+			ENABLE_SECTION_SPLIT=1
 			;;
 		--enable-small)
 			ENABLE_SMALL=1
@@ -264,6 +269,7 @@ test -z "$AD_CLAUSES" || add_make_enabled "AD_CLAUSES"
 test -z "$WITH_OPTIMIZATION" || add_make_enabled "WITH_OPTIMIZATION"
 test -z "$ENABLE_LTO" || add_make_enabled "ENABLE_LTO"
 test -z "$ENABLE_PDB" || add_make_enabled "ENABLE_PDB"
+test -z "$ENABLE_SECTION_SPLIT" || add_make_enabled "ENABLE_SECTION_SPLIT"
 
 LN_S="ln -s"
 
