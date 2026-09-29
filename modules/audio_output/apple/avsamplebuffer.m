@@ -31,6 +31,15 @@
 #if TARGET_OS_IPHONE || TARGET_OS_TV || TARGET_OS_VISION
 #define HAS_AVAUDIOSESSION
 #import "avaudiosession_common.h"
+
+#if (TARGET_OS_IOS   && defined(__IPHONE_27_0)   && __IPHONE_OS_VERSION_MAX_ALLOWED    >= __IPHONE_27_0) || \
+    (TARGET_OS_TV    && defined(__TVOS_27_0)     && __TV_OS_VERSION_MAX_ALLOWED     >= __TVOS_27_0) || \
+    (TARGET_OS_WATCH && defined(__WATCHOS_27_0)  && __WATCH_OS_VERSION_MAX_ALLOWED  >= __WATCHOS_27_0) || \
+    (defined(TARGET_OS_VISION) && TARGET_OS_VISION && defined(__VISIONOS_27_0) && __VISION_OS_VERSION_MAX_ALLOWED >= __VISIONOS_27_0)
+#define IS_AVAS_ACTIVATION_LIFECYCLE_API_AVAILABLE 1
+#else
+#define IS_AVAS_ACTIVATION_LIFECYCLE_API_AVAILABLE 0
+#endif
 #endif
 
 #import "channel_layout.h"
@@ -480,6 +489,22 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
     vlc_mutex_unlock(&_sessionLock);
 }
 
+#if IS_AVAS_ACTIVATION_LIFECYCLE_API_AVAILABLE
+- (void)sessionDidBecomeInactive:(NSNotification *)notification API_AVAILABLE(ios(27.0), tvos(27.0), watchos(27.0), visionos(27.0))
+{
+    AVAudioSessionDeactivationContext *context = notification.userInfo[AVAudioSessionDeactivationContextKey];
+    if (context.source == AVAudioSessionDeactivationSourceSystem)
+        [self beginInterruption];
+}
+
+- (void)resumptionRecommended:(NSNotification *)notification API_AVAILABLE(ios(27.0), tvos(27.0), watchos(27.0), visionos(27.0))
+{
+    AVAudioSessionResumptionContext *context = notification.userInfo[AVAudioSessionResumptionContextKey];
+    if (context.recommendation == AVAudioSessionResumptionRecommendationShouldResume)
+        [self endInterruption];
+}
+#endif
+
 - (void)handleInterruption:(NSNotification *)notification
 {
     NSDictionary *userInfo = notification.userInfo;
@@ -600,10 +625,26 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
                         name:AVSampleBufferAudioRendererWasFlushedAutomaticallyNotification
                       object:nil];
 #ifdef HAS_AVAUDIOSESSION
-    [notifCenter addObserver:self
-                    selector:@selector(handleInterruption:)
-                        name:AVAudioSessionInterruptionNotification
-                      object:instance];
+#if IS_AVAS_ACTIVATION_LIFECYCLE_API_AVAILABLE
+    if (@available(iOS 27.0, tvOS 27.0, watchOS 27.0, visionOS 27.0, *))
+    {
+        [notifCenter addObserver:self
+                        selector:@selector(sessionDidBecomeInactive:)
+                            name:AVAudioSessionDidBecomeInactiveNotification
+                          object:instance];
+        [notifCenter addObserver:self
+                        selector:@selector(resumptionRecommended:)
+                            name:AVAudioSessionResumptionRecommendationNotification
+                          object:instance];
+    }
+    else
+#endif
+    {
+        [notifCenter addObserver:self
+                        selector:@selector(handleInterruption:)
+                            name:AVAudioSessionInterruptionNotification
+                          object:instance];
+    }
 #endif
 #if (TARGET_OS_OSX   && defined(__MAC_12_0)    && MAC_OS_X_VERSION_MAX_ALLOWED    >= __MAC_12_0) || \
     (TARGET_OS_IOS   && defined(__IPHONE_15_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_15_0) || \
