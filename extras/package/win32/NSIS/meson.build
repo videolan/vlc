@@ -18,21 +18,34 @@ if not have_win64
 endif
 nsProcess_link_args = ['-static-libgcc']
 
-if have_win64
-    # nsProcess.dll needs to be a 32-bit DLL
-    # with clang we can select it via -target i686-w64-mingw32
-    if cc.has_argument(['--target=i686-w64-mingw32']) and cc.has_link_argument(['--target=i686-w64-mingw32'])
-        nsProcess_cargs     += '--target=i686-w64-mingw32'
-        nsProcess_link_args += '--target=i686-w64-mingw32'
-    endif
-endif
-
 # TODO use nsis-pluginapi if possible to be compatible with the system makensis
+# it provides the matching pluginapi.h and a library to link with
 
+nsProcess_sources = files('nsProcess/nsProcess.c', 'nsProcess/pluginapi.c')
+nsProcess_src = []
+nsProcess_obj = []
+if host_machine.cpu_family() != 'x86'
+    # nsProcess.dll needs to be a 32-bit DLL
+    # with clang we can link a i686 DLL via -target i686-w64-mingw32
+    if cc.has_link_argument(['--target=i686-w64-mingw32'], required: nsis_required)
+        nsProcess_link_args += '--target=i686-w64-mingw32'
+
+        x86_compiler = generator(find_program('i686-w64-mingw32-gcc'),
+          output: ['@BASENAME@.obj'],
+          arguments: ['@INPUT@', '-c', '-o', '@OUTPUT@', nsProcess_cargs])
+
+        nsProcess_obj += x86_compiler.process(nsProcess_sources)
+    endif
+else
+    # TODO always use this mode when we switch to a native .exe installer
+    # for each architecture
+    nsProcess_src = nsProcess_sources
+endif
 nsProcess = shared_library('nsProcess',
-                           'nsProcess/nsProcess.c', 'nsProcess/pluginapi.c',
+                           nsProcess_src,
                            c_args: nsProcess_cargs,
                            link_args: nsProcess_link_args,
+                           objects: nsProcess_obj,
                            dependencies : [ cc.find_library('ole32', required: true) ],
                            name_prefix: '',
                            install: true,
