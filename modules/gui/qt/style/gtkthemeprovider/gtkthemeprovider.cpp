@@ -306,7 +306,7 @@ static int updatePalette(vlc_qt_theme_provider_t* obj)
         setGtkColor(obj, CS, VQTC_SECTION_BG, VQTC_NAME_PRIMARY, VQTC_STATE_NORMAL, tabButtonNormalBg);
     }
 
-#define BUTTON_STANDARD_SELECTOR VIEW_SELECTOR " GtkButton#button.flat"
+#define BUTTON_STANDARD_SELECTOR VIEW_SELECTOR " GtkButton#button"
     {
         auto CS = VQTC_SET_BUTTON_STANDARD;
         setGtkColorSetBg(obj, CS, VQTC_NAME_PRIMARY, BUTTON_STANDARD_SELECTOR);
