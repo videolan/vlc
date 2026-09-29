@@ -76,6 +76,9 @@ API_AVAILABLE(macos(MIN_MACOS), ios(MIN_IOS), tvos(MIN_TVOS) VISIONOS_API_AVAILA
     unsigned _sampleRate;
     BOOL _stopped;
     BOOL _dateReached;
+    vlc_mutex_t _sessionLock;
+    BOOL _corked;
+    BOOL _uncorkOnPlay;
 }
 @end
 
@@ -94,6 +97,7 @@ API_AVAILABLE(macos(MIN_MACOS), ios(MIN_IOS), tvos(MIN_TVOS) VISIONOS_API_AVAILA
 
     vlc_mutex_init(&_bufferLock);
     vlc_cond_init(&_bufferWait);
+    vlc_mutex_init(&_sessionLock);
 
     _outChain = NULL;
     _outChainLast = &_outChain;
@@ -238,6 +242,11 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
 {
     (void) date;
 
+#ifdef HAS_AVAUDIOSESSION
+    if (!pause)
+        [self endInterruption];
+#endif
+
     if (_ptsSamples >= 0)
         _sync.rate = pause ? 0.0f : 1.0f;
 }
@@ -346,6 +355,14 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
 
 - (void)play:(block_t *)block date:(vlc_tick_t)date
 {
+#ifdef HAS_AVAUDIOSESSION
+    if (_uncorkOnPlay)
+    {
+        _uncorkOnPlay = NO;
+        [self endInterruption];
+    }
+#endif
+
     vlc_mutex_lock(&_bufferLock);
 
     if (_ptsSamples == -1)
@@ -433,6 +450,54 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
     aout_RestartRequest(_aout, false);
 }
 
+#ifdef HAS_AVAUDIOSESSION
+- (void)beginInterruption
+{
+    vlc_mutex_lock(&_sessionLock);
+    if (!_corked)
+    {
+        _corked = YES;
+        aout_PolicyReport(_aout, true);
+    }
+    vlc_mutex_unlock(&_sessionLock);
+}
+
+- (void)endInterruption
+{
+    vlc_mutex_lock(&_sessionLock);
+    if (_corked)
+    {
+        NSError *error = nil;
+        if ([[AVAudioSession sharedInstance] setActive:YES error:&error])
+        {
+            _corked = NO;
+            aout_PolicyReport(_aout, false);
+        }
+        else
+            msg_Err(_aout, "AVAudioSession reactivation failed: %s(%d)",
+                    error.domain.UTF8String, (int)error.code);
+    }
+    vlc_mutex_unlock(&_sessionLock);
+}
+
+- (void)handleInterruption:(NSNotification *)notification
+{
+    NSDictionary *userInfo = notification.userInfo;
+    NSUInteger type = [userInfo[AVAudioSessionInterruptionTypeKey] unsignedIntegerValue];
+
+    if (type == AVAudioSessionInterruptionTypeBegan)
+    {
+        [self beginInterruption];
+        return;
+    }
+
+    assert(type == AVAudioSessionInterruptionTypeEnded);
+    NSUInteger options = [userInfo[AVAudioSessionInterruptionOptionKey] unsignedIntegerValue];
+    if (options & AVAudioSessionInterruptionOptionShouldResume)
+        [self endInterruption];
+}
+#endif
+
 - (BOOL)start:(audio_sample_format_t *)fmt
 {
     if (aout_BitsPerSample(fmt->i_format) == 0)
@@ -518,6 +583,11 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
 
     _stopped = NO;
     _dateReached = NO;
+#ifdef HAS_AVAUDIOSESSION
+    vlc_mutex_lock(&_sessionLock);
+    _uncorkOnPlay = _corked;
+    vlc_mutex_unlock(&_sessionLock);
+#endif
 
     _ptsSamples = -1;
     _firstPts = VLC_TICK_INVALID;
@@ -529,6 +599,12 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
                     selector:@selector(flushedAutomatically:)
                         name:AVSampleBufferAudioRendererWasFlushedAutomaticallyNotification
                       object:nil];
+#ifdef HAS_AVAUDIOSESSION
+    [notifCenter addObserver:self
+                    selector:@selector(handleInterruption:)
+                        name:AVAudioSessionInterruptionNotification
+                      object:instance];
+#endif
 #if (TARGET_OS_OSX   && defined(__MAC_12_0)    && MAC_OS_X_VERSION_MAX_ALLOWED    >= __MAC_12_0) || \
     (TARGET_OS_IOS   && defined(__IPHONE_15_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_15_0) || \
     (TARGET_OS_TV    && defined(__TVOS_15_0)   && __TV_OS_VERSION_MAX_ALLOWED     >= __TVOS_15_0) || \
