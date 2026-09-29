@@ -90,7 +90,6 @@
 		531062162CE259290087F863 /* VLCLibraryHomeViewActionButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 531062152CE259290087F863 /* VLCLibraryHomeViewActionButtonCell.m */; };
 		531062192CE4AEFB0087F863 /* VLCStatusNotifierView.m in Sources */ = {isa = PBXBuildFile; fileRef = 531062182CE4AEFB0087F863 /* VLCStatusNotifierView.m */; };
 		5310AFB12B4FE72700E75F9A /* NSArray+VLCAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 5310AFB02B4FE72700E75F9A /* NSArray+VLCAdditions.m */; };
-		5310AFB52B53EC4F00E75F9A /* iCarousel.m in Sources */ = {isa = PBXBuildFile; fileRef = 5310AFB32B53EC4E00E75F9A /* iCarousel.m */; };
 		531343E72A8E7B94007AEDFA /* VLCLibraryWindowNavigationSidebarViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 531343E62A8E7B94007AEDFA /* VLCLibraryWindowNavigationSidebarViewController.m */; };
 		531343EA2A8E8965007AEDFA /* VLCLibrarySegment.m in Sources */ = {isa = PBXBuildFile; fileRef = 531343E92A8E8965007AEDFA /* VLCLibrarySegment.m */; };
 		5317FE04294E3DD3001702F0 /* VLCLibraryCollectionViewDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5317FE03294E3DD3001702F0 /* VLCLibraryCollectionViewDelegate.m */; };
@@ -361,8 +360,6 @@
 		531062182CE4AEFB0087F863 /* VLCStatusNotifierView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCStatusNotifierView.m; sourceTree = "<group>"; };
 		5310AFAF2B4FE72700E75F9A /* NSArray+VLCAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSArray+VLCAdditions.h"; sourceTree = "<group>"; };
 		5310AFB02B4FE72700E75F9A /* NSArray+VLCAdditions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSArray+VLCAdditions.m"; sourceTree = "<group>"; };
-		5310AFB32B53EC4E00E75F9A /* iCarousel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iCarousel.m; sourceTree = "<group>"; };
-		5310AFB42B53EC4E00E75F9A /* iCarousel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iCarousel.h; sourceTree = "<group>"; };
 		531343E52A8E7B94007AEDFA /* VLCLibraryWindowNavigationSidebarViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryWindowNavigationSidebarViewController.h; sourceTree = "<group>"; };
 		531343E62A8E7B94007AEDFA /* VLCLibraryWindowNavigationSidebarViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryWindowNavigationSidebarViewController.m; sourceTree = "<group>"; };
 		531343E82A8E8965007AEDFA /* VLCLibrarySegment.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibrarySegment.h; sourceTree = "<group>"; };
@@ -1226,7 +1223,6 @@
 			children = (
 				3D46D70B2E1C023F00741E96 /* VLCLibraryRatingIndicator.h */,
 				3D46D70C2E1C023F00741E96 /* VLCLibraryRatingIndicator.m */,
-				5310AFB22B53EC4E00E75F9A /* iCarousel */,
 				536283FE291147C500640C15 /* VLCBasicView.h */,
 				536283FF291147C500640C15 /* VLCBasicView.m */,
 				6B0292E41F43256300A50082 /* VLCBottomBarView.h */,
@@ -1714,15 +1710,6 @@
 				6BBBB8A81D108A17001BD9BA /* VLCRendererMenuController.m */,
 			);
 			path = renderers;
-			sourceTree = "<group>";
-		};
-		5310AFB22B53EC4E00E75F9A /* iCarousel */ = {
-			isa = PBXGroup;
-			children = (
-				5310AFB32B53EC4E00E75F9A /* iCarousel.m */,
-				5310AFB42B53EC4E00E75F9A /* iCarousel.h */,
-			);
-			path = iCarousel;
 			sourceTree = "<group>";
 		};
 		5318F9312DBBB3B10008D9C8 /* shaders */ = {
@@ -2537,7 +2524,6 @@
 				5352B37629E149AC0011CE03 /* VLCLibraryWindowPersistentPreferences.m in Sources */,
 				7DBB7639227F3FBC002649E1 /* VLCLibraryCollectionViewSupplementaryElementView.m in Sources */,
 				1C3113A31E508C6900D4DD76 /* VLCCoreDialogProvider.m in Sources */,
-				5310AFB52B53EC4F00E75F9A /* iCarousel.m in Sources */,
 				6B2EFC631F281A0900F3C0EA /* VLCVolumeSliderCell.m in Sources */,
 				5387FFF52A15127100A3A70A /* NSWindow+VLCAdditions.m in Sources */,
 				1C3113A71E508C6900D4DD76 /* VLCLogWindowController.m in Sources */,

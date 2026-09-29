@@ -460,8 +460,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/preferences/prefs_widgets.h \
 	gui/macosx/preferences/prefs_widgets.m \
 	gui/macosx/shaders/VLCShaderTypes.h \
-	gui/macosx/views/iCarousel/iCarousel.h \
-	gui/macosx/views/iCarousel/iCarousel.m \
 	gui/macosx/views/VLCBasicView.h \
 	gui/macosx/views/VLCBasicView.m \
 	gui/macosx/views/VLCBottomBarView.h \
