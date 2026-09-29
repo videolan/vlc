@@ -71,6 +71,7 @@ if build_vlc and (host_system != 'darwin' or have_osx) and not have_win_store an
         install_dir: pkglibexecdir_path,
     )
 
+    if not meson.is_cross_build() or find_program('exe_wrapper', required: false).found()
     plugins_dat  = custom_target('plugins.dat',
         # `vlc_cache_gen_dep.full_path()` doesn't work since the executable is not built yet.
         # `vlc_cache_gen_dep` creates a build order dependency.
@@ -80,6 +81,7 @@ if build_vlc and (host_system != 'darwin' or have_osx) and not have_win_store an
         depends: vlc_plugins_targets_array,
         build_by_default: not meson.is_cross_build(),
     )
+    endif
 
     vlc_preparser_sources = [
       'preparser/main.c',
