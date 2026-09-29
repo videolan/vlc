@@ -25,7 +25,8 @@
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 
-#import "library/VLCLibraryCarouselViewItemView.h"
+#import "library/VLCLibraryCollectionView.h"
+#import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryDataTypes.h"
 
 #import "library/home-library/VLCLibraryHomeViewVideoContainerViewDataSource.h"
@@ -43,14 +44,19 @@
 - (void)setup
 {
     [super setup];
+    self.collectionViewDelegate.itemsAspectRatio = VLCLibraryCollectionViewItemAspectRatioVideoItem;
+    self.collectionViewDelegate.staticItemSize = NSMakeSize(VLCUIUnits.carouselViewVideoItemViewWidth,
+                                                            VLCUIUnits.carouselViewItemViewHeight);
+    self.itemHeight = VLCUIUnits.carouselViewItemViewHeight;
     [self setupDataSource];
 }
 
 - (void)setupDataSource
 {
     _dataSource = [[VLCLibraryHomeViewVideoContainerViewDataSource alloc] init];
-    self.dataSource.carouselView = self.carouselView;
+    self.dataSource.collectionView = self.collectionView;
     [self.dataSource setup];
+    [self registerCollectionViewItemClass];
 }
 
 - (void)setGroupDescriptor:(VLCLibraryVideoCollectionViewGroupDescriptor *)groupDescriptor
@@ -86,7 +92,8 @@
         return;
     }
 
-    [self.carouselView scrollToItemAtIndex:indexPath.item animated:YES];
+    [self.collectionView scrollToItemsAtIndexPaths:[NSSet setWithObject:indexPath]
+                                    scrollPosition:NSCollectionViewScrollPositionCenteredHorizontally];
 }
 
 @end

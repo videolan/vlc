@@ -24,7 +24,6 @@
 
 #import "library/home-library/VLCLibraryHomeViewBaseCarouselContainerView.h"
 #import "library/home-library/VLCLibraryHomeViewVideoContainerView.h"
-#import "views/iCarousel/iCarousel.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -22,6 +22,8 @@
 
 #import "VLCLibraryWindow.h"
 
+#import <QuartzCore/QuartzCore.h>
+
 #import <vlc_common.h>
 #import <vlc_configuration.h>
 #import <vlc_media_library.h>

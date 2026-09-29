@@ -25,11 +25,263 @@
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSTextField+VLCAdditions.h"
+#import "extensions/NSView+VLCAdditions.h"
 
+#import "library/VLCLibraryCollectionView.h"
+#import "library/VLCLibraryCollectionViewDelegate.h"
+#import "library/VLCLibraryCollectionViewFlowLayout.h"
+#import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCarouselViewItemView.h"
-#import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryRepresentedItem.h"
 
+#import "views/VLCSubScrollView.h"
 #import "views/VLCUIUnits.h"
+
+typedef NS_ENUM(NSUInteger, VLCLibraryHomeScrollAxis) {
+    VLCLibraryHomeScrollAxisUndecided = 0,
+    VLCLibraryHomeScrollAxisHorizontal,
+};
+
+static const CGFloat VLCLibraryHomeMouseDragThreshold = 3.;
+
+@interface VLCLibraryHomeViewHorizontalCollectionView : VLCLibraryCollectionView
+{
+    VLCLibraryHomeScrollAxis _scrollAxis;
+    BOOL _handlingMouseActivation;
+}
+
+@property (readonly, getter=isHandlingMouseActivation) BOOL handlingMouseActivation;
+
+- (void)activateItemAtIndexPath:(NSIndexPath *)indexPath;
+@end
+
+@implementation VLCLibraryHomeViewHorizontalCollectionView
+
+- (void)scrollWheel:(NSEvent *)event
+{
+    const CGFloat horizontalDelta = event.scrollingDeltaX;
+    const CGFloat verticalDelta = event.scrollingDeltaY;
+    const BOOL isTrackpadGesture = event.hasPreciseScrollingDeltas &&
+                                  (event.phase != NSEventPhaseNone || event.momentumPhase != NSEventPhaseNone);
+
+    if (!isTrackpadGesture) {
+        if (fabs(horizontalDelta) > fabs(verticalDelta) && fabs(horizontalDelta) > 0.1) {
+            [self scrollByOneItemForward:horizontalDelta < 0.];
+            return;
+        }
+        [super scrollWheel:event];
+        return;
+    }
+
+    // Vertical events are forwarded to the parent scroll view. It owns their
+    // gesture lifecycle, so do not retain a vertical lock here: the ending
+    // event may not be sent back to this nested collection view.
+    if (event.phase == NSEventPhaseBegan) {
+        _scrollAxis = VLCLibraryHomeScrollAxisUndecided;
+    }
+
+    if (_scrollAxis == VLCLibraryHomeScrollAxisUndecided) {
+        if (fabs(horizontalDelta) > fabs(verticalDelta)) {
+            _scrollAxis = VLCLibraryHomeScrollAxisHorizontal;
+        }
+    }
+
+    if (_scrollAxis == VLCLibraryHomeScrollAxisHorizontal) {
+        [self scrollByHorizontalDelta:horizontalDelta];
+        if (event.phase == NSEventPhaseEnded || event.phase == NSEventPhaseCancelled ||
+            event.momentumPhase == NSEventPhaseEnded || event.momentumPhase == NSEventPhaseCancelled) {
+            _scrollAxis = VLCLibraryHomeScrollAxisUndecided;
+        }
+        return;
+    }
+
+    [super scrollWheel:event];
+}
+
+- (void)mouseDown:(NSEvent *)event
+{
+    const NSPoint downPoint = [self convertPoint:event.locationInWindow fromView:nil];
+    NSIndexPath * const clickedIndexPath = [self indexPathForItemAtPoint:downPoint];
+    BOOL didDrag = NO;
+
+    while (true) {
+        NSEvent * const trackedEvent =
+            [self.window nextEventMatchingMask:NSEventMaskLeftMouseDragged | NSEventMaskLeftMouseUp
+                                      untilDate:NSDate.distantFuture
+                                         inMode:NSEventTrackingRunLoopMode
+                                        dequeue:YES];
+        const NSPoint point = [self convertPoint:trackedEvent.locationInWindow fromView:nil];
+
+        if (trackedEvent.type == NSEventTypeLeftMouseDragged) {
+            if (!didDrag && fabs(point.x - downPoint.x) >= VLCLibraryHomeMouseDragThreshold) {
+                didDrag = YES;
+            }
+            if (didDrag) {
+                [self scrollByHorizontalDelta:trackedEvent.deltaX];
+            }
+            continue;
+        }
+
+        break;
+    }
+
+    if (!didDrag && clickedIndexPath != nil) {
+        [self activateItemAtIndexPath:clickedIndexPath];
+    }
+}
+
+- (BOOL)isHandlingMouseActivation
+{
+    return _handlingMouseActivation;
+}
+
+- (void)activateItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    _handlingMouseActivation = YES;
+    self.selectionIndexPaths = [NSSet setWithObject:indexPath];
+    _handlingMouseActivation = NO;
+
+    id const item = [self itemAtIndexPath:indexPath];
+    if ([item respondsToSelector:@selector(playRepresentedItem)]) {
+        [item playRepresentedItem];
+    }
+}
+
+- (void)scrollByHorizontalDelta:(CGFloat)delta
+{
+    NSScrollView * const scrollView = self.enclosingScrollView;
+    if (scrollView == nil) {
+        return;
+    }
+
+    const NSRect visibleRect = scrollView.documentVisibleRect;
+    const CGFloat minimumOffset = NSMinX(self.frame);
+    const CGFloat maximumOffset = MAX(NSMaxX(self.frame) - NSWidth(visibleRect), minimumOffset);
+    const CGFloat offset = MIN(MAX(NSMinX(visibleRect) - delta, minimumOffset), maximumOffset);
+    [scrollView.contentView scrollToPoint:NSMakePoint(offset, NSMinY(visibleRect))];
+    [scrollView reflectScrolledClipView:scrollView.contentView];
+}
+
+- (NSArray<NSCollectionViewLayoutAttributes *> *)itemLayoutAttributes
+{
+    NSArray<NSCollectionViewLayoutAttributes *> * const attributes =
+        [self.collectionViewLayout layoutAttributesForElementsInRect:self.bounds];
+    NSPredicate * const itemPredicate = [NSPredicate predicateWithBlock:^BOOL(
+        NSCollectionViewLayoutAttributes * const attributes, NSDictionary * const __unused bindings
+    ) {
+        return attributes.representedElementCategory == NSCollectionElementCategoryItem;
+    }];
+    return [[attributes filteredArrayUsingPredicate:itemPredicate]
+        sortedArrayUsingComparator:^NSComparisonResult(
+            NSCollectionViewLayoutAttributes * const first,
+            NSCollectionViewLayoutAttributes * const second
+        ) {
+            const CGFloat firstX = NSMinX(first.frame);
+            const CGFloat secondX = NSMinX(second.frame);
+            return firstX < secondX ? NSOrderedAscending : firstX > secondX ? NSOrderedDescending : NSOrderedSame;
+        }];
+}
+
+- (void)scrollByOneItemForward:(BOOL)forward
+{
+    NSScrollView * const scrollView = self.enclosingScrollView;
+    if (scrollView == nil) {
+        return;
+    }
+
+    const CGFloat visibleOffset = NSMinX(scrollView.documentVisibleRect);
+    NSArray<NSCollectionViewLayoutAttributes *> * const attributes = self.itemLayoutAttributes;
+    VLCLibraryCollectionViewFlowLayout * const layout =
+        (VLCLibraryCollectionViewFlowLayout *)self.collectionViewLayout;
+    const CGFloat leadingInset = layout.sectionInset.left;
+    NSCollectionViewLayoutAttributes *targetAttributes = nil;
+    NSEnumerator * const enumerator = forward ? attributes.objectEnumerator : attributes.reverseObjectEnumerator;
+    for (NSCollectionViewLayoutAttributes * const attributes in enumerator) {
+        const CGFloat itemOffset = MAX(NSMinX(attributes.frame) - leadingInset, NSMinX(self.frame));
+        if ((forward && itemOffset > visibleOffset + 1.) ||
+            (!forward && itemOffset < visibleOffset - 1.)) {
+            targetAttributes = attributes;
+            break;
+        }
+    }
+
+    if (targetAttributes != nil) {
+        const CGFloat targetOffset = MAX(NSMinX(targetAttributes.frame) - leadingInset,
+                                         NSMinX(self.frame));
+        [self scrollByHorizontalDelta:visibleOffset - targetOffset];
+    }
+}
+
+@end
+
+@interface VLCLibraryHomeCarouselCollectionViewItem : NSCollectionViewItem
+
+@property (readwrite, strong, nonatomic) VLCLibraryRepresentedItem *representedItem;
+
+@end
+
+@implementation VLCLibraryHomeCarouselCollectionViewItem
+{
+    VLCLibraryCarouselViewItemView *_carouselItemView;
+}
+
+@synthesize representedItem = _representedItem;
+
+- (void)loadView
+{
+    _carouselItemView = [VLCLibraryCarouselViewItemView fromNibWithOwner:self];
+    self.view = _carouselItemView;
+}
+
+- (void)setRepresentedItem:(VLCLibraryRepresentedItem *)representedItem
+{
+    _representedItem = representedItem;
+    _carouselItemView.representedItem = representedItem;
+}
+
+- (void)setSelected:(BOOL)selected
+{
+    super.selected = selected;
+    _carouselItemView.selected = selected;
+}
+
+- (void)prepareForReuse
+{
+    [super prepareForReuse];
+    [_carouselItemView prepareForReuse];
+}
+
+- (void)playRepresentedItem
+{
+    [_carouselItemView playRepresentedItem];
+}
+
+@end
+
+@interface VLCLibraryHomeViewCollectionViewDelegate : VLCLibraryCollectionViewDelegate
+@end
+
+@implementation VLCLibraryHomeViewCollectionViewDelegate
+
+- (void)collectionView:(NSCollectionView *)collectionView
+didSelectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
+{
+    if ([collectionView isKindOfClass:VLCLibraryHomeViewHorizontalCollectionView.class] &&
+        ((VLCLibraryHomeViewHorizontalCollectionView *)collectionView).handlingMouseActivation) {
+        return;
+    }
+
+    if (collectionView.selectionIndexPaths.count != 1) {
+        return;
+    }
+
+    NSIndexPath * const indexPath = indexPaths.anyObject;
+    VLCLibraryHomeCarouselCollectionViewItem * const item =
+        (VLCLibraryHomeCarouselCollectionViewItem *)[collectionView itemAtIndexPath:indexPath];
+    [item playRepresentedItem];
+}
+
+@end
 
 @interface VLCLibraryHomeViewBaseCarouselContainerView ()
 {
@@ -37,13 +289,16 @@
 }
 
 @property (readonly) NSLayoutConstraint *heightConstraint;
-@property (readwrite) VLCLibraryCarouselViewItemView *selectedItemView;
-
 @end
 
 @implementation VLCLibraryHomeViewBaseCarouselContainerView
 
 @synthesize constraintsWithSuperview = _constraintsWithSuperview;
+
+- (void)dealloc
+{
+    [NSNotificationCenter.defaultCenter removeObserver:self];
+}
 
 - (instancetype)init
 {
@@ -96,15 +351,37 @@
         [self.topAnchor constraintEqualToAnchor:self.titleView.topAnchor],
     ]];
 
-    _carouselView = [[iCarousel alloc] initWithFrame:self.bounds];
-    self.carouselView.delegate = self;
-    [self addSubview:self.carouselView];
-    self.carouselView.translatesAutoresizingMaskIntoConstraints = NO;
+    _collectionViewLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
+    _collectionViewLayout.scrollDirection = NSCollectionViewScrollDirectionHorizontal;
+    _collectionViewLayout.sectionInset = NSEdgeInsetsMake(0., VLCUIUnits.mediumSpacing, 0., VLCUIUnits.mediumSpacing);
+    _collectionViewLayout.minimumLineSpacing = VLCUIUnits.mediumSpacing;
+    _collectionViewLayout.minimumInteritemSpacing = VLCUIUnits.mediumSpacing;
+
+    _collectionView = [[VLCLibraryHomeViewHorizontalCollectionView alloc] initWithFrame:NSZeroRect];
+    _collectionView.postsFrameChangedNotifications = YES;
+    _collectionView.collectionViewLayout = _collectionViewLayout;
+    _collectionView.selectable = YES;
+    _collectionView.allowsEmptySelection = YES;
+    _collectionView.allowsMultipleSelection = NO;
+
+    _collectionViewDelegate = [[VLCLibraryHomeViewCollectionViewDelegate alloc] init];
+    _collectionViewDelegate.dynamicItemSizing = NO;
+    _collectionView.delegate = _collectionViewDelegate;
+
+    _scrollView = [[VLCSubScrollView alloc] init];
+    _scrollView.scrollSelf = YES;
+    _scrollView.scrollParentY = YES;
+    _scrollView.forceHideVerticalScroller = YES;
+    _scrollView.forceHideHorizontalScroller = YES;
+    _scrollView.drawsBackground = NO;
+    _scrollView.translatesAutoresizingMaskIntoConstraints = NO;
+    _scrollView.documentView = _collectionView;
+    [self addSubview:self.scrollView];
     [NSLayoutConstraint activateConstraints:@[
-        [self.leadingAnchor constraintEqualToAnchor:self.carouselView.leadingAnchor],
-        [self.trailingAnchor constraintEqualToAnchor:self.carouselView.trailingAnchor],
-        [self.titleView.bottomAnchor constraintEqualToAnchor:self.carouselView.topAnchor], // titleView bottom
-        [self.bottomAnchor constraintEqualToAnchor:self.carouselView.bottomAnchor]
+        [self.leadingAnchor constraintEqualToAnchor:self.scrollView.leadingAnchor constant:VLCUIUnits.mediumSpacing],
+        [self.trailingAnchor constraintEqualToAnchor:self.scrollView.trailingAnchor constant:-VLCUIUnits.mediumSpacing],
+        [self.titleView.bottomAnchor constraintEqualToAnchor:self.scrollView.topAnchor constant:-VLCUIUnits.mediumSpacing],
+        [self.bottomAnchor constraintEqualToAnchor:self.scrollView.bottomAnchor]
     ]];
 
     const CGFloat buttonSize = VLCUIUnits.largeSpacing;
@@ -117,8 +394,8 @@
     self.leftButton.action = @selector(scrollLeft:);
     [self addSubview:self.leftButton];
     [NSLayoutConstraint activateConstraints:@[
-        [self.leftButton.leadingAnchor constraintEqualToAnchor:self.leadingAnchor],
-        [self.leftButton.centerYAnchor constraintEqualToAnchor:self.carouselView.centerYAnchor],
+        [self.leftButton.leadingAnchor constraintEqualToAnchor:self.scrollView.leadingAnchor],
+        [self.leftButton.centerYAnchor constraintEqualToAnchor:self.scrollView.centerYAnchor],
         [self.leftButton.widthAnchor constraintEqualToConstant:buttonSize],
         [self.leftButton.heightAnchor constraintEqualToConstant:buttonSize],
     ]];
@@ -131,8 +408,8 @@
     self.rightButton.action = @selector(scrollRight:);
     [self addSubview:self.rightButton];
     [NSLayoutConstraint activateConstraints:@[
-        [self.rightButton.trailingAnchor constraintEqualToAnchor:self.carouselView.trailingAnchor],
-        [self.rightButton.centerYAnchor constraintEqualToAnchor:self.carouselView.centerYAnchor],
+        [self.rightButton.trailingAnchor constraintEqualToAnchor:self.scrollView.trailingAnchor],
+        [self.rightButton.centerYAnchor constraintEqualToAnchor:self.scrollView.centerYAnchor],
         [self.rightButton.widthAnchor constraintEqualToConstant:buttonSize],
         [self.rightButton.heightAnchor constraintEqualToConstant:buttonSize],
     ]];
@@ -154,15 +431,31 @@
 #endif
 
     _itemHeight = VLCUIUnits.carouselViewItemViewHeight;
+    _collectionViewDelegate.staticItemSize = NSMakeSize(_itemHeight, _itemHeight);
 
     [self updateCarouselViewHeight];
-    [self updateCarouselOffset];
     [self updateCarouselButtonVisibility];
+
+    self.scrollView.contentView.postsBoundsChangedNotifications = YES;
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(scrollViewBoundsChanged:)
+                                               name:NSViewBoundsDidChangeNotification
+                                             object:self.scrollView.contentView];
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(scrollViewBoundsChanged:)
+                                               name:NSViewFrameDidChangeNotification
+                                             object:self.collectionView];
 }
 
 - (void)connect
 {
     [self.dataSource connect];
+}
+
+- (void)registerCollectionViewItemClass
+{
+    [self.collectionView registerClass:VLCLibraryHomeCarouselCollectionViewItem.class
+                forItemWithIdentifier:VLCLibraryCollectionViewItemIdentifier];
 }
 
 - (void)disconnect
@@ -172,44 +465,25 @@
 
 - (void)updateCarouselViewHeight
 {
-    const CGFloat viewHeight = self.titleView.frame.size.height +
-                               VLCUIUnits.largeSpacing * 2 +
-                               _itemHeight;
-
     if (self.heightConstraint == nil) {
-        _heightConstraint = [self.carouselView.heightAnchor constraintEqualToConstant:viewHeight];
+        _heightConstraint = [self.scrollView.heightAnchor constraintEqualToConstant:_itemHeight];
         self.heightConstraint.active = YES;
     } else {
-        self.heightConstraint.constant = viewHeight;
+        self.heightConstraint.constant = _itemHeight;
     }
-}
-
-- (void)updateCarouselOffset
-{
-    const CGFloat widthToFirstItemCenter = self.frame.size.width / 2;
-    const CGFloat itemWidth = self.carouselView.itemWidth;
-    const CGFloat horizontalOffset = (-(widthToFirstItemCenter - itemWidth / 2));
-    self.carouselView.contentOffset = NSMakeSize(horizontalOffset, 0);
 }
 
 - (void)updateCarouselButtonVisibility
 {
-    if (self.carouselView.numberOfItems <= 1) {
-        self.leftButton.hidden = YES;
-        self.rightButton.hidden = YES;
-        return;
-    }
-
-    const NSInteger currentItemIndex = self.carouselView.currentItemIndex;
-    const NSInteger numberOfItems = self.carouselView.numberOfItems;
-    self.leftButton.hidden = currentItemIndex == 0;
-    self.rightButton.hidden = currentItemIndex == numberOfItems - 1;
+    const NSRect visibleRect = self.scrollView.documentVisibleRect;
+    const NSRect documentRect = self.collectionView.frame;
+    self.leftButton.hidden = NSMinX(visibleRect) <= NSMinX(documentRect);
+    self.rightButton.hidden = NSMaxX(visibleRect) >= NSMaxX(documentRect);
 }
 
-- (void)resizeWithOldSuperviewSize:(NSSize)oldSize
+- (void)scrollViewBoundsChanged:(NSNotification *)notification
 {
-    [super resizeWithOldSuperviewSize:oldSize];
-    [self updateCarouselOffset];
+    [self updateCarouselButtonVisibility];
 }
 
 - (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
@@ -223,8 +497,8 @@
         return;
     }
 
-    const NSInteger itemIndex = itemIndexPath.item;
-    [self.carouselView scrollToItemAtIndex:itemIndex animated:YES];
+    [self.collectionView scrollToItemsAtIndexPaths:[NSSet setWithObject:itemIndexPath]
+                                    scrollPosition:NSCollectionViewScrollPositionCenteredHorizontally];
 }
 
 - (CGFloat)itemHeight
@@ -239,67 +513,19 @@
     }
 
     _itemHeight = itemHeight;
+    self.collectionViewDelegate.staticItemSize = NSMakeSize(self.collectionViewDelegate.staticItemSize.width,
+                                                            itemHeight);
     [self updateCarouselViewHeight];
 }
 
-- (void)scrollLeft:(id)sender
+- (void)scrollLeft:(__unused id)sender
 {
-    [self.carouselView scrollToItemAtIndex:self.carouselView.currentItemIndex - 1 animated:YES];
+    [(VLCLibraryHomeViewHorizontalCollectionView *)self.collectionView scrollByOneItemForward:NO];
 }
 
-- (void)scrollRight:(id)sender
+- (void)scrollRight:(__unused id)sender
 {
-    [self.carouselView scrollToItemAtIndex:self.carouselView.currentItemIndex + 1 animated:YES];
-}
-
-// pragma mark - iCarousel delegate methods
-
-- (CGFloat)carousel:(iCarousel *)carousel
-     valueForOption:(iCarouselOption)option
-        withDefault:(CGFloat)value
-{
-    switch (option) {
-    case iCarouselOptionSpacing:
-    {
-        // iCarousel calculates spacing as a multiplier on the item width.
-        // So a spacing of 1.2 means the item's width will grow to 1.2x its
-        // width, with the extra width as spacing.
-        //
-        // Because of this... interesting approach to spacing, we calculate
-        // the constant VLC-wide spacing relative to the width of the carousel's
-        // itemWidth.
-        const CGFloat itemWidth = carousel.itemWidth;
-        const CGFloat bothSidesSpacing = VLCUIUnits.mediumSpacing * 2;
-        const CGFloat desiredWidthWithSpacing = itemWidth + bothSidesSpacing;
-        const CGFloat desiredMultiple = desiredWidthWithSpacing / itemWidth;
-        return desiredMultiple;
-    }
-    default:
-        return value;
-    }
-}
-
-- (void)carouselCurrentItemIndexDidChange:(iCarousel *)carousel
-{
-    NSView * const currentItemView = carousel.currentItemView;
-    if (currentItemView == nil) {
-        return;
-    }
-
-    VLCLibraryCarouselViewItemView * const carouselItemView = (VLCLibraryCarouselViewItemView *)currentItemView;
-    NSAssert(carouselItemView != nil, @"Expected carousel item view to be non-nil!");
-    self.selectedItemView.selected = NO;
-    carouselItemView.selected = YES;
-    self.selectedItemView = carouselItemView;
-
-    [self updateCarouselButtonVisibility];
-}
-
-- (void)carousel:(iCarousel *)carousel didSelectItemAtIndex:(NSInteger)index
-{
-    VLCLibraryCarouselViewItemView * const carouselItemView = (VLCLibraryCarouselViewItemView *)[carousel itemViewAtIndex:index];
-    NSAssert(carouselItemView != nil, @"Expected carousel item view to be non-nil!");
-    [carouselItemView playRepresentedItem];
+    [(VLCLibraryHomeViewHorizontalCollectionView *)self.collectionView scrollByOneItemForward:YES];
 }
 
 @end

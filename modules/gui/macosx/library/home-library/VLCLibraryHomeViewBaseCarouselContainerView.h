@@ -25,25 +25,28 @@
 #import "VLCLibraryHomeViewContainerView.h"
 
 #import "library/VLCLibraryCollectionViewDataSource.h"
-#import "views/iCarousel/iCarousel.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryHomeViewBaseCarouselContainerView : NSView<VLCLibraryHomeViewContainerView, iCarouselDelegate>
+@class VLCSubScrollView;
+@class VLCLibraryCollectionView;
+@class VLCLibraryCollectionViewDelegate;
+@class VLCLibraryCollectionViewFlowLayout;
+
+@interface VLCLibraryHomeViewBaseCarouselContainerView : NSView<VLCLibraryHomeViewContainerView>
 
 @property (readonly) NSTextField *titleView;
-@property (readonly) iCarousel *carouselView;
+@property (readonly) VLCSubScrollView *scrollView;
+@property (readonly) VLCLibraryCollectionView *collectionView;
+@property (readonly) VLCLibraryCollectionViewDelegate *collectionViewDelegate;
+@property (readonly) VLCLibraryCollectionViewFlowLayout *collectionViewLayout;
 @property (readonly) NSButton *leftButton;
 @property (readonly) NSButton *rightButton;
-@property (readonly) NSObject<VLCLibraryCollectionViewDataSource, iCarouselDataSource> *dataSource;
-// We want the carousel view to be packed tight around the actual items and not have excess space.
-// To do this we need to be aware of the carousel view item height so we can resize the view.
-// Changing this property DOES NOT affect the actual sie of the carousel view items, though!
-// This is decided in the carousel view data sources' method:
-// carousel:(iCarousel *)carousel viewForItemAtIndex:(NSInteger)index reusingView:(NSView *)view
+@property (readonly) NSObject<VLCLibraryCollectionViewDataSource> *dataSource;
 @property (readwrite, nonatomic) CGFloat itemHeight;
 
 - (void)setup;
+- (void)registerCollectionViewItemClass;
 
 @end
 

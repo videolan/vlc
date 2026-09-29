@@ -24,7 +24,6 @@
 
 #import "extensions/NSView+VLCAdditions.h"
 
-#import "library/VLCLibraryCarouselViewItemView.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
@@ -191,8 +190,8 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
 
 - (void)reloadData
 {
-    if((self.collectionView == nil && self.carouselView == nil) || !_groupDescriptor) {
-        NSLog(@"Null collection view/carousel view or video group descriptor");
+    if(self.collectionView == nil || !_groupDescriptor) {
+        NSLog(@"Null collection view or video group descriptor");
         return;
     }
 
@@ -212,7 +211,6 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
         dispatch_async(dispatch_get_main_queue(), ^{
             self.collectionArray = [newCollectionArray mutableCopy];
             [self.collectionView reloadData];
-            [self.carouselView reloadData];
             [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification
                                                               object:self];
         });
@@ -230,7 +228,6 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
 
     NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:mediaItemIndex inSection:0];
     [self.collectionView reloadItemsAtIndexPaths:[NSSet setWithObject:indexPath]];
-    [self.carouselView reloadData];
     [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification
                                                       object:self];
 }
@@ -246,7 +243,6 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
 
     NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:mediaItemIndex inSection:0];
     [self.collectionView deleteItemsAtIndexPaths:[NSSet setWithObject:indexPath]];
-    [self.carouselView reloadData];
     [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification
                                                       object:self];
 }
@@ -266,7 +262,6 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
 {
     _collectionViewFlowLayout = _collectionView.collectionViewLayout;
     self.collectionView.dataSource = self;
-    self.carouselView.dataSource = self;
 
     [self.collectionView registerClass:VLCLibraryCollectionViewItem.class
                  forItemWithIdentifier:VLCLibraryCollectionViewItemIdentifier];
@@ -383,37 +378,6 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     }
 
     return representedItems;
-}
-
-// pragma mark: iCarouselDataSource methods
-
-- (NSInteger)numberOfItemsInCarousel:(iCarousel *)carousel
-{
-    if (self.collectionArray == nil) {
-        return 0;
-    }
-    
-    return self.collectionArray.count;
-}
-
-- (NSView *)carousel:(iCarousel *)carousel viewForItemAtIndex:(NSInteger)index reusingView:(NSView *)view
-{
-    VLCLibraryCarouselViewItemView *carouselItemView = (VLCLibraryCarouselViewItemView *)view;
-    if (carouselItemView == nil) {
-        const NSRect itemFrame = NSMakeRect(0,
-                                            0,
-                                            VLCUIUnits.carouselViewVideoItemViewWidth,
-                                            VLCUIUnits.carouselViewItemViewHeight);
-        carouselItemView = [VLCLibraryCarouselViewItemView fromNibWithOwner:self];
-        carouselItemView.frame = itemFrame;
-    }
-
-    const id<VLCMediaLibraryItemProtocol> libraryItem = self.collectionArray[index];
-    VLCLibraryRepresentedItem * const representedItem =
-        [[VLCLibraryRepresentedItem alloc] initWithItem:libraryItem
-                                             parentType:self.groupDescriptor.group];
-    carouselItemView.representedItem = representedItem;
-    return carouselItemView;
 }
 
 - (NSString *)supplementaryDetailViewKind
