@@ -709,8 +709,14 @@
     VLCMediaLibraryMediaItem * const item =
         [VLCMediaLibraryMediaItem mediaItemForLibraryID:
             VLCLibraryDataTypesIntegrationFactoryAudioMediaID()];
+    VLCMediaLibraryMediaItem * const excluded =
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:
+            VLCLibraryDataTypesIntegrationSortingAudioAlphaMediaID()];
     XCTAssertNotNil(item);
+    XCTAssertNotNil(excluded);
     XCTAssertEqual([item setFavorite:YES], VLC_SUCCESS);
+    XCTAssertEqual([excluded setFavorite:YES], VLC_SUCCESS);
+    XCTAssertEqual(self.model.listOfFavoriteAudioMedia.count, (NSUInteger)2);
     NSArray<VLCMediaLibraryMediaItem *> * const favorites =
         [self itemsAfterFilter:@"Factory Track"
                         loader:^NSArray *{
@@ -722,6 +728,7 @@
     XCTAssertEqual(self.model.numberOfFavoriteAudioMedia, (size_t)1);
 
     XCTAssertEqual([item setFavorite:NO], VLC_SUCCESS);
+    XCTAssertEqual([excluded setFavorite:NO], VLC_SUCCESS);
 }
 
 - (void)testFavoriteVideoQueryUsesFilter
@@ -729,8 +736,14 @@
     VLCMediaLibraryMediaItem * const item =
         [VLCMediaLibraryMediaItem mediaItemForLibraryID:
             VLCLibraryDataTypesIntegrationFactoryVideoMediaID()];
+    VLCMediaLibraryMediaItem * const excluded =
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:
+            VLCLibraryDataTypesIntegrationSortingVideoAlphaMediaID()];
     XCTAssertNotNil(item);
+    XCTAssertNotNil(excluded);
     XCTAssertEqual([item setFavorite:YES], VLC_SUCCESS);
+    XCTAssertEqual([excluded setFavorite:YES], VLC_SUCCESS);
+    XCTAssertEqual(self.model.listOfFavoriteVideoMedia.count, (NSUInteger)2);
     NSArray<VLCMediaLibraryMediaItem *> * const favorites =
         [self itemsAfterFilter:@"Factory Show"
                         loader:^NSArray *{
@@ -742,6 +755,7 @@
     XCTAssertEqual(self.model.numberOfFavoriteVideoMedia, (size_t)1);
 
     XCTAssertEqual([item setFavorite:NO], VLC_SUCCESS);
+    XCTAssertEqual([excluded setFavorite:NO], VLC_SUCCESS);
 }
 
 - (void)testFavoriteAlbumQueryUsesFilter
@@ -749,9 +763,18 @@
     VLCMediaLibraryMediaItem * const track =
         [VLCMediaLibraryMediaItem mediaItemForLibraryID:
             VLCLibraryDataTypesIntegrationFactoryAudioMediaID()];
+    VLCMediaLibraryMediaItem * const excludedTrack =
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:
+            VLCLibraryDataTypesIntegrationSortingAudioAlphaMediaID()];
     VLCMediaLibraryAlbum * const album = [VLCMediaLibraryAlbum albumWithID:track.albumID];
+    VLCMediaLibraryAlbum * const excluded =
+        [VLCMediaLibraryAlbum albumWithID:excludedTrack.albumID];
     XCTAssertNotNil(album);
+    XCTAssertNotNil(excluded);
+    XCTAssertNotEqual(album.libraryID, excluded.libraryID);
     XCTAssertEqual([album setFavorite:YES], VLC_SUCCESS);
+    XCTAssertEqual([excluded setFavorite:YES], VLC_SUCCESS);
+    XCTAssertEqual(self.model.listOfFavoriteAlbums.count, (NSUInteger)2);
     NSArray<VLCMediaLibraryAlbum *> * const favorites =
         [self itemsAfterFilter:@"Factory Album"
                         loader:^NSArray *{
@@ -763,6 +786,7 @@
     XCTAssertEqual(self.model.numberOfFavoriteAlbums, (size_t)1);
 
     XCTAssertEqual([album setFavorite:NO], VLC_SUCCESS);
+    XCTAssertEqual([excluded setFavorite:NO], VLC_SUCCESS);
 }
 
 - (void)testFavoriteArtistQueryUsesFilter
@@ -770,9 +794,18 @@
     VLCMediaLibraryMediaItem * const track =
         [VLCMediaLibraryMediaItem mediaItemForLibraryID:
             VLCLibraryDataTypesIntegrationFactoryAudioMediaID()];
+    VLCMediaLibraryMediaItem * const excludedTrack =
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:
+            VLCLibraryDataTypesIntegrationSortingAudioAlphaMediaID()];
     VLCMediaLibraryArtist * const artist = [VLCMediaLibraryArtist artistWithID:track.artistID];
+    VLCMediaLibraryArtist * const excluded =
+        [VLCMediaLibraryArtist artistWithID:excludedTrack.artistID];
     XCTAssertNotNil(artist);
+    XCTAssertNotNil(excluded);
+    XCTAssertNotEqual(artist.libraryID, excluded.libraryID);
     XCTAssertEqual([artist setFavorite:YES], VLC_SUCCESS);
+    XCTAssertEqual([excluded setFavorite:YES], VLC_SUCCESS);
+    XCTAssertEqual(self.model.listOfFavoriteArtists.count, (NSUInteger)2);
     NSArray<VLCMediaLibraryArtist *> * const favorites =
         [self itemsAfterFilter:@"Factory Artist"
                         loader:^NSArray *{
@@ -784,6 +817,7 @@
     XCTAssertEqual(self.model.numberOfFavoriteArtists, (size_t)1);
 
     XCTAssertEqual([artist setFavorite:NO], VLC_SUCCESS);
+    XCTAssertEqual([excluded setFavorite:NO], VLC_SUCCESS);
 }
 
 - (void)testFavoriteGenreQueryUsesFilter
@@ -791,9 +825,18 @@
     VLCMediaLibraryMediaItem * const track =
         [VLCMediaLibraryMediaItem mediaItemForLibraryID:
             VLCLibraryDataTypesIntegrationFactoryAudioMediaID()];
+    VLCMediaLibraryMediaItem * const excludedTrack =
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:
+            VLCLibraryDataTypesIntegrationSortingAudioAlphaMediaID()];
     VLCMediaLibraryGenre * const genre = [VLCMediaLibraryGenre genreWithID:track.genreID];
+    VLCMediaLibraryGenre * const excluded =
+        [VLCMediaLibraryGenre genreWithID:excludedTrack.genreID];
     XCTAssertNotNil(genre);
+    XCTAssertNotNil(excluded);
+    XCTAssertNotEqual(genre.libraryID, excluded.libraryID);
     XCTAssertEqual([genre setFavorite:YES], VLC_SUCCESS);
+    XCTAssertEqual([excluded setFavorite:YES], VLC_SUCCESS);
+    XCTAssertEqual(self.model.listOfFavoriteGenres.count, (NSUInteger)2);
     NSArray<VLCMediaLibraryGenre *> * const favorites =
         [self itemsAfterFilter:@"Rock"
                         loader:^NSArray *{
@@ -805,6 +848,7 @@
     XCTAssertEqual(self.model.numberOfFavoriteGenres, (size_t)1);
 
     XCTAssertEqual([genre setFavorite:NO], VLC_SUCCESS);
+    XCTAssertEqual([excluded setFavorite:NO], VLC_SUCCESS);
 }
 
 - (void)testAllFavoritesParentQueryUsesFilter
@@ -812,8 +856,16 @@
     VLCMediaLibraryMediaItem * const item =
         [VLCMediaLibraryMediaItem mediaItemForLibraryID:
             VLCLibraryDataTypesIntegrationFactoryAudioMediaID()];
+    VLCMediaLibraryMediaItem * const excluded =
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:
+            VLCLibraryDataTypesIntegrationSortingAudioAlphaMediaID()];
     XCTAssertNotNil(item);
+    XCTAssertNotNil(excluded);
     XCTAssertEqual([item setFavorite:YES], VLC_SUCCESS);
+    XCTAssertEqual([excluded setFavorite:YES], VLC_SUCCESS);
+    XCTAssertEqual([self.model listOfLibraryItemsOfParentType:
+        VLCMediaLibraryParentGroupTypeAllFavorites].count,
+                   (NSUInteger)2);
     NSArray<id<VLCMediaLibraryItemProtocol>> * const favorites =
         [self itemsAfterFilter:@"Factory Track"
                         loader:^NSArray *{
@@ -826,6 +878,7 @@
                    item.libraryID);
 
     XCTAssertEqual([item setFavorite:NO], VLC_SUCCESS);
+    XCTAssertEqual([excluded setFavorite:NO], VLC_SUCCESS);
 }
 
 - (void)testAudioLibraryParentQueryReturnsAudioMedia
