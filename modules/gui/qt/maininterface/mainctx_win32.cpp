@@ -1013,6 +1013,7 @@ bool InterfaceWindowHandlerWin32::eventFilter(QObject* obj, QEvent* ev)
     MSG* msg = static_cast<MSG*>( message );
 
     short cmd;
+    bool handled = false;
     switch( msg->message )
     {
         case WM_APPCOMMAND:
@@ -1026,7 +1027,7 @@ bool InterfaceWindowHandlerWin32::eventFilter(QObject* obj, QEvent* ev)
                 break;
             }
 
-            *result = TRUE;
+            handled = true;
 
             switch(cmd)
             {
@@ -1076,10 +1077,13 @@ bool InterfaceWindowHandlerWin32::eventFilter(QObject* obj, QEvent* ev)
                     break;
                 default:
                      msg_Dbg( p_intf, "unknown APPCOMMAND = %d", cmd);
-                     *result = FALSE;
+                     handled = false;
                      break;
             }
-            if (*result) return true;
+            if( result )
+                *result = handled ? TRUE : FALSE;
+            if( handled )
+                return true;
             break;
     }
     return false;
