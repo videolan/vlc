@@ -1925,7 +1925,13 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, video_form
     msg_Dbg( vd, "Using pixel format %s for chroma %4.4s", sys->pool_d3dfmt->name,
                  (char *)&fmt->i_chroma );
     fmt->i_chroma = sys->pool_d3dfmt->fourcc;
-    DxgiFormatMask( sys->picQuad.formatInfo->formatTexture, fmt );
+    if (sys->picQuad.formatInfo->formatTexture == DXGI_FORMAT_B8G8R8X8_UNORM)
+    {
+        // BGRX in RV32, similar to the BGRX mask set in screen/win32.c
+        fmt->i_rmask = 0x00ff0000;
+        fmt->i_gmask = 0x0000ff00;
+        fmt->i_bmask = 0x000000ff;
+    }
 
     InitTonemapProcessor(vd, quad_fmt);
 
