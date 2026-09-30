@@ -686,6 +686,15 @@ vlc_modules += {
     'plugin_dir' : 'demux',
 }
 
+vlc_modules += {
+    'name' : 'ytdl',
+    'sources' : files('ytdl.c'),
+    'c_args' : host_system == 'windows' ? '-DEXEEXT=".exe"' : '-DEXEEXT=""',
+    'link_with' : vlc_json_lib,
+    'plugin_dir' : 'demux',
+    'enabled' : host_system not in ['android', 'emscripten']
+}
+
 # noseek demux
 vlc_modules += {
     'name' : 'noseek',
