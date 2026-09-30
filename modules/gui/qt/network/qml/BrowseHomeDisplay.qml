@@ -111,7 +111,7 @@ Widgets.PageExt {
     T.Label {
         anchors.centerIn: parent
 
-        visible: [foldersSection, deviceSection, lanSection]
+        visible: [foldersSection, computerSection, deviceSection, lanSection]
                  .every(section => !section.model.loading && section.model.count === 0)
 
         font.pixelSize: VLCStyle.fontHeight_xxlarge
