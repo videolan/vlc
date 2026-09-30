@@ -1,0 +1,6 @@
+LIBRARY "nsProcess.dll"
+EXPORTS
+_FindProcess
+_KillProcess
+_CloseProcess
+_Unload
