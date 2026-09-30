@@ -24,20 +24,19 @@
 
 #import "VLCLibraryHomeViewContainerView.h"
 
+#import "library/VLCLibraryCarouselView.h"
 #import "library/VLCLibraryCollectionViewDataSource.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCSubScrollView;
-@class VLCLibraryCollectionView;
 @class VLCLibraryCollectionViewDelegate;
 @class VLCLibraryCollectionViewFlowLayout;
-
 @interface VLCLibraryHomeViewBaseCarouselContainerView : NSView<VLCLibraryHomeViewContainerView>
 
 @property (readonly) NSTextField *titleView;
 @property (readonly) VLCSubScrollView *scrollView;
-@property (readonly) VLCLibraryCollectionView *collectionView;
+@property (readonly) VLCLibraryCarouselView *collectionView;
 @property (readonly) VLCLibraryCollectionViewDelegate *collectionViewDelegate;
 @property (readonly) VLCLibraryCollectionViewFlowLayout *collectionViewLayout;
 @property (readonly) NSButton *leftButton;
@@ -46,7 +45,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, nonatomic) CGFloat itemHeight;
 
 - (void)setup;
-- (void)registerCollectionViewItemClass;
 
 @end
 

@@ -22,7 +22,7 @@
 
 #import "VLCLibraryWindow.h"
 
-#import <QuartzCore/QuartzCore.h>
+#import <QuartzCore/CAMediaTimingFunction.h>
 
 #import <vlc_common.h>
 #import <vlc_configuration.h>

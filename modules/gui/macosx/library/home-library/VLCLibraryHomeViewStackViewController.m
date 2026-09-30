@@ -29,6 +29,7 @@
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryHeroView.h"
+#import "library/VLCLibraryItemPresentingCapable.h"
 #import "library/VLCLibraryModel.h"
 
 #import "library/home-library/VLCLibraryHomeViewActionsView.h"
@@ -390,7 +391,8 @@
     }
 
     // TODO: Make this work agnostically of video type
-    NSView<VLCLibraryHomeViewVideoContainerView> * const containerView = (NSView<VLCLibraryHomeViewVideoContainerView> *)[self containerViewForGroup:VLCMediaLibraryParentGroupTypeVideoLibrary];
+    NSView<VLCLibraryHomeViewVideoContainerView, VLCLibraryItemPresentingCapable> * const containerView =
+        (NSView<VLCLibraryHomeViewVideoContainerView, VLCLibraryItemPresentingCapable> *)[self containerViewForGroup:VLCMediaLibraryParentGroupTypeVideoLibrary];
     if (containerView == nil) {
         return;
     }

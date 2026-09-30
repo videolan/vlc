@@ -34,6 +34,7 @@ extern NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollecti
 @interface VLCLibraryHomeViewVideoContainerViewDataSource : NSObject <VLCLibraryCollectionViewDataSource>
 
 @property (readwrite, weak) NSCollectionView *collectionView;
+@property (readwrite, copy) NSUserInterfaceItemIdentifier collectionViewItemIdentifier;
 @property (readwrite, assign, nonatomic) VLCLibraryVideoCollectionViewGroupDescriptor *groupDescriptor;
 @property (readwrite, assign) VLCLibraryHomeViewVideoGridContainerView *parentCell;
 

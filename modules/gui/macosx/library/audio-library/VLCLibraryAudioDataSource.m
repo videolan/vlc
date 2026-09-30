@@ -128,6 +128,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
     self = [super init];
     if(self) {
         _displayedCollectionUpdating = NO;
+        _collectionViewItemIdentifier = VLCLibraryCollectionViewItemIdentifier;
     }
 
     return self;
@@ -1017,9 +1018,10 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
      itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
 {
-    VLCLibraryCollectionViewItem * const viewItem =
-        [collectionView makeItemWithIdentifier:VLCLibraryCollectionViewItemIdentifier
-                                  forIndexPath:indexPath];
+    NSCollectionViewItem<VLCLibraryRepresentedItemCollectionViewItem> * const viewItem =
+        (NSCollectionViewItem<VLCLibraryRepresentedItemCollectionViewItem> *)[collectionView
+            makeItemWithIdentifier:self.collectionViewItemIdentifier
+                       forIndexPath:indexPath];
     const id<VLCMediaLibraryItemProtocol> actualItem = self.displayedCollection[indexPath.item];
     VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:actualItem parentType:_currentParentType];
 

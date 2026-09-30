@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryCarouselViewItemView.m: MacOS X interface module
+ * VLCLibraryCarouselCollectionViewItem.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2023 VLC authors and VideoLAN
  *
@@ -20,61 +20,35 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCLibraryCarouselViewItemView.h"
+#import "VLCLibraryCarouselCollectionViewItem.h"
 
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSFont+VLCAdditions.h"
-#import "extensions/NSString+Helpers.h"
 #import "extensions/NSView+VLCAdditions.h"
 
-#import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryImageCache.h"
 #import "library/VLCLibraryMenuController.h"
-#import "library/VLCLibraryRepresentedItem.h"
-
-#import "main/VLCMain.h"
+#import "VLCLibraryRepresentedItem.h"
 
 #import "views/VLCImageView.h"
 #import "views/VLCLinearProgressIndicator.h"
 
-@interface VLCLibraryCarouselViewItemView ()
+NSString * const VLCLibraryCarouselCollectionViewItemIdentifier =
+    @"VLCLibraryCarouselCollectionViewItemIdentifier";
 
-@property (readonly) VLCLibraryMenuController *menuController;
-
-@end
-
-@implementation VLCLibraryCarouselViewItemView
-
-- (instancetype)init
+@implementation VLCLibraryCarouselCollectionViewItem
 {
-    self = [super init];
-    if (self) {
-        [self setup];
-    }
-    return self;
+    VLCLibraryMenuController *_menuController;
 }
 
-- (instancetype)initWithCoder:(NSCoder *)coder
-{
-    self = [super initWithCoder:coder];
-    if (self) {
-        [self setup];
-    }
-    return self;
-}
+@synthesize representedItem = _representedItem;
 
-- (instancetype)initWithFrame:(NSRect)frame
+- (void)loadView
 {
-    self = [super initWithFrame:frame];
-    if (self) {
-        [self setup];
-    }
-    return self;
-}
-
-- (void)awakeFromNib
-{
+    self.view = [NSView fromNibNamed:NSStringFromClass(self.class)
+                           withClass:NSView.class
+                           withOwner:self];
     [self setup];
 }
 
@@ -90,16 +64,31 @@
     [self prepareForReuse];
 }
 
+- (void)setRepresentedItem:(VLCLibraryRepresentedItem *)representedItem
+{
+    if (representedItem == _representedItem) {
+        return;
+    }
+
+    _representedItem = representedItem;
+    [self updateRepresentation];
+}
+
+- (void)setSelected:(BOOL)selected
+{
+    [super setSelected:selected];
+    self.highlightBox.hidden = !selected;
+}
+
 - (void)prepareForReuse
 {
-    self.selected = NO;
+    [super prepareForReuse];
     self.highlightBox.hidden = YES;
-    self.playButton.hidden = YES;
     self.annotationTextField.hidden = YES;
     self.progressIndicator.hidden = YES;
     self.titleTextField.stringValue = @"";
     self.detailTextField.stringValue = @"";
-    self.imageView.image = nil;
+    self.coverImageView.image = nil;
 }
 
 - (void)updateRepresentation
@@ -113,7 +102,7 @@
         if (!weakSelf || weakSelf.representedItem.item != actualItem) {
             return;
         }
-        weakSelf.imageView.image = thumbnail;
+        weakSelf.coverImageView.image = thumbnail;
     }];
 
     self.titleTextField.stringValue = actualItem.displayString;
@@ -139,26 +128,6 @@
     }
 }
 
-- (void)setRepresentedItem:(VLCLibraryRepresentedItem *)representedItem
-{
-    if (representedItem == _representedItem) {
-        return;
-    }
-
-    _representedItem = representedItem;
-    [self updateRepresentation];
-}
-
-- (void)setSelected:(BOOL)selected
-{
-    if (_selected == selected) {
-        return;
-    }
-
-    _selected = selected;
-    self.highlightBox.hidden = !selected;
-}
-
 - (void)playRepresentedItem
 {
     [self.representedItem play];
@@ -166,12 +135,12 @@
 
 - (void)openContextMenu:(NSEvent *)event
 {
-    if (self.menuController == nil) {
+    if (_menuController == nil) {
         _menuController = [[VLCLibraryMenuController alloc] init];
     }
 
-    self.menuController.representedItems = @[self.representedItem];
-    [self.menuController popupMenuWithEvent:event forView:self];
+    _menuController.representedItems = @[self.representedItem];
+    [_menuController popupMenuWithEvent:event forView:self.view];
 }
 
 @end

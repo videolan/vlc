@@ -67,6 +67,7 @@ extern NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotif
 @property (readwrite, weak, nonatomic) NSTableView *collectionSelectionTableView;
 @property (readwrite, weak, nonatomic) NSTableView *songsTableView;
 @property (readwrite, weak, nonatomic) NSCollectionView *collectionView;
+@property (readwrite, copy, nonatomic) NSUserInterfaceItemIdentifier collectionViewItemIdentifier;
 @property (readwrite, weak, nonatomic) NSTableView *gridModeListTableView;
 @property (readwrite, weak, nullable) id<VLCLibraryGroupHeaderDelegate> headerDelegate;
 

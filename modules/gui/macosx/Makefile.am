@@ -161,8 +161,10 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryAbstractSegmentViewController.m \
 	gui/macosx/library/VLCLibraryAddToPlaylistMenuController.h \
 	gui/macosx/library/VLCLibraryAddToPlaylistMenuController.m \
-	gui/macosx/library/VLCLibraryCarouselViewItemView.h \
-	gui/macosx/library/VLCLibraryCarouselViewItemView.m \
+	gui/macosx/library/VLCLibraryCarouselCollectionViewItem.h \
+	gui/macosx/library/VLCLibraryCarouselCollectionViewItem.m \
+	gui/macosx/library/VLCLibraryCarouselView.h \
+	gui/macosx/library/VLCLibraryCarouselView.m \
 	gui/macosx/library/VLCLibraryCollectionView.h \
 	gui/macosx/library/VLCLibraryCollectionView.m \
 	gui/macosx/library/VLCLibraryCollectionViewDataSource.h \
@@ -211,6 +213,7 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryModelChangeDelegate.m \
 	gui/macosx/library/VLCLibraryRepresentedItem.h \
 	gui/macosx/library/VLCLibraryRepresentedItem.m \
+	gui/macosx/library/VLCLibraryRepresentedItemCollectionViewItem.h \
 	gui/macosx/library/VLCLibrarySegment.h \
 	gui/macosx/library/VLCLibrarySegment.m \
 	gui/macosx/library/VLCLibrarySegmentBookmarkedLocation.h \
@@ -462,6 +465,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/shaders/VLCShaderTypes.h \
 	gui/macosx/views/VLCBasicView.h \
 	gui/macosx/views/VLCBasicView.m \
+	gui/macosx/views/VLCCarouselView.h \
+	gui/macosx/views/VLCCarouselView.m \
 	gui/macosx/views/VLCBottomBarView.h \
 	gui/macosx/views/VLCBottomBarView.m \
 	gui/macosx/views/VLCDefaultValueSlider.h \
@@ -606,7 +611,7 @@ libmacosx_plugin_la_XIB_SOURCES = \
 	gui/macosx/UI/VLCLibraryTableCellView.xib \
 	gui/macosx/UI/VLCLibraryVideoTableCellView.xib \
 	gui/macosx/UI/VLCPlayQueueTableCellView.xib \
-	gui/macosx/UI/VLCLibraryCarouselViewItemView.xib \
+	gui/macosx/UI/VLCLibraryCarouselCollectionViewItem.xib \
 	gui/macosx/UI/VLCLibraryCollectionViewMediaItemListSupplementaryDetailView.xib \
 	gui/macosx/UI/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.xib \
 	gui/macosx/UI/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.xib \

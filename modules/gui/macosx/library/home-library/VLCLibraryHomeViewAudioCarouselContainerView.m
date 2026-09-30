@@ -25,6 +25,7 @@
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCLibraryController.h"
+#import "library/VLCLibraryCarouselCollectionViewItem.h"
 #import "library/VLCLibraryCollectionView.h"
 #import "library/VLCLibraryModel.h"
 
@@ -45,11 +46,11 @@
 - (void)setupDataSource
 {
     VLCLibraryAudioDataSource * const audioDataSource = [[VLCLibraryAudioDataSource alloc] init];
+    audioDataSource.collectionViewItemIdentifier = VLCLibraryCarouselCollectionViewItemIdentifier;
     self.collectionView.dataSource = audioDataSource;
     audioDataSource.libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
     audioDataSource.collectionView = self.collectionView;
     [audioDataSource setup];
-    [self registerCollectionViewItemClass];
     _dataSource = audioDataSource;
 }
 

@@ -5,10 +5,19 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
-        <customObject id="-2" userLabel="File's Owner"/>
+        <customObject id="-2" userLabel="File's Owner" customClass="VLCLibraryCarouselCollectionViewItem">
+            <connections>
+                <outlet property="annotationTextField" destination="isd-eb-9XW" id="fvc-2y-amx"/>
+                <outlet property="detailTextField" destination="orq-rq-pBK" id="czh-aO-pe4"/>
+                <outlet property="highlightBox" destination="gbr-Zj-SfM" id="0nG-FQ-W3p"/>
+                <outlet property="coverImageView" destination="6QI-EH-rMu" id="B23-fp-a2H"/>
+                <outlet property="progressIndicator" destination="yL8-2q-Oke" id="Pys-e7-wrU"/>
+                <outlet property="titleTextField" destination="CKr-3L-pMu" id="ot4-iB-tBK"/>
+            </connections>
+        </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <customView wantsLayer="YES" appearanceType="darkAqua" id="Hib-tD-Vvh" customClass="VLCLibraryCarouselViewItemView">
+        <customView wantsLayer="YES" appearanceType="darkAqua" id="Hib-tD-Vvh">
             <rect key="frame" x="0.0" y="0.0" width="468" height="454"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
@@ -134,14 +143,6 @@
                     </userDefinedRuntimeAttributes>
                 </constraint>
             </constraints>
-            <connections>
-                <outlet property="annotationTextField" destination="isd-eb-9XW" id="fvc-2y-amx"/>
-                <outlet property="detailTextField" destination="orq-rq-pBK" id="czh-aO-pe4"/>
-                <outlet property="highlightBox" destination="gbr-Zj-SfM" id="0nG-FQ-W3p"/>
-                <outlet property="imageView" destination="6QI-EH-rMu" id="B23-fp-a2H"/>
-                <outlet property="progressIndicator" destination="yL8-2q-Oke" id="Pys-e7-wrU"/>
-                <outlet property="titleTextField" destination="CKr-3L-pMu" id="ot4-iB-tBK"/>
-            </connections>
             <point key="canvasLocation" x="3" y="162"/>
         </customView>
     </objects>

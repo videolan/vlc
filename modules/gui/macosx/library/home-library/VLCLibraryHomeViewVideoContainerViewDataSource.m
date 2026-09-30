@@ -62,6 +62,7 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
     self = [super init];
     if(self) {
         _libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
+        _collectionViewItemIdentifier = VLCLibraryCollectionViewItemIdentifier;
         self.collectionArray = [NSMutableArray array];
         [self connect];
     }
@@ -294,9 +295,10 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
      itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
 {
-    VLCLibraryCollectionViewItem * const viewItem =
-        [collectionView makeItemWithIdentifier:VLCLibraryCollectionViewItemIdentifier
-                                  forIndexPath:indexPath];
+    NSCollectionViewItem<VLCLibraryRepresentedItemCollectionViewItem> * const viewItem =
+        (NSCollectionViewItem<VLCLibraryRepresentedItemCollectionViewItem> *)[collectionView
+            makeItemWithIdentifier:self.collectionViewItemIdentifier
+                       forIndexPath:indexPath];
     const id<VLCMediaLibraryItemProtocol> item = self.collectionArray[indexPath.item];
     VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:self.groupDescriptor.group];
 

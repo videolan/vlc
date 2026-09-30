@@ -22,14 +22,13 @@
  *****************************************************************************/
 
 #import "views/VLCMediaItemCollectionViewItem.h"
+#import "VLCLibraryRepresentedItemCollectionViewItem.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class VLCLibraryRepresentedItem;
-
 extern NSString *VLCLibraryCollectionViewItemIdentifier;
 
-@interface VLCLibraryCollectionViewItem : VLCMediaItemCollectionViewItem
+@interface VLCLibraryCollectionViewItem : VLCMediaItemCollectionViewItem <VLCLibraryRepresentedItemCollectionViewItem>
 
 @property (readwrite, strong, nonatomic, nullable) VLCLibraryRepresentedItem *representedItem;
 
