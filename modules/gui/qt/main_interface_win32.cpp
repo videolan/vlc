@@ -231,6 +231,7 @@ bool MainInterfaceWin32::nativeEventFilter(const QByteArray &, void *message, lo
     }
 
     short cmd;
+    bool handled = false;
     switch( msg->message )
     {
         case WM_COMMAND:
@@ -262,7 +263,7 @@ bool MainInterfaceWin32::nativeEventFilter(const QByteArray &, void *message, lo
                 break;
             }
 
-            *result = TRUE;
+            handled = TRUE;
 
             switch(cmd)
             {
@@ -312,10 +313,13 @@ bool MainInterfaceWin32::nativeEventFilter(const QByteArray &, void *message, lo
                     break;
                 default:
                      msg_Dbg( p_intf, "unknown APPCOMMAND = %d", cmd);
-                     *result = FALSE;
+                     handled = false;
                      break;
             }
-            if (*result) return true;
+            if( result )
+                *result = handled ? TRUE : FALSE;
+            if( handled )
+                return true;
             break;
     }
     return false;
