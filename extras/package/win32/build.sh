@@ -576,6 +576,10 @@ if [ -n "$BUILD_MESON" ]; then
         VLC_LDFLAGS="$VLC_LDFLAGS -Wl,-pdb="
     fi
 
+    if [ "$INSTALLER" = "n" ] || [ "$INSTALLER" = "r" ] || [ "$INSTALLER" = "u" ]; then
+        MCONFIGFLAGS="$MCONFIGFLAGS -Dnsis=enabled"
+    fi
+
     BUILD_PATH="$( pwd -P )"
 
     # we don't want to install in <destdir>/usr/local, just <destdir>
