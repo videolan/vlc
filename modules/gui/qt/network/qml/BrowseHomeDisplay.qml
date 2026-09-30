@@ -96,6 +96,8 @@ Widgets.PageExt {
     function setCurrentItemFocus(reason) {
         if (foldersSection.visible)
             foldersSection.setCurrentItemFocus(reason);
+        else if (computerSection.visible)
+            computerSection.setCurrentItemFocus(reason);
         else if (deviceSection.visible)
             deviceSection.setCurrentItemFocus(reason);
         else if (lanSection.visible)
