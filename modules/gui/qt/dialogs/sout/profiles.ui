@@ -461,6 +461,9 @@
                 <property name="value">
                  <number>800</number>
                 </property>
+                <property name="stepType">
+                 <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
+                </property>
                </widget>
               </item>
              </layout>
