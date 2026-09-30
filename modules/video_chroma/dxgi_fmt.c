@@ -119,16 +119,6 @@ const d3d_format_t *GetRenderFormatList(void)
     return d3d_formats;
 }
 
-void DxgiFormatMask(DXGI_FORMAT format, video_format_t *fmt)
-{
-    if (format == DXGI_FORMAT_B8G8R8X8_UNORM)
-    {
-        fmt->i_rmask = 0x0000ff00;
-        fmt->i_gmask = 0x00ff0000;
-        fmt->i_bmask = 0xff000000;
-    }
-}
-
 const char *DxgiVendorStr(int gpu_vendor)
 {
     static const struct {
