@@ -46,7 +46,6 @@ nsProcess = shared_library('nsProcess',
                            c_args: nsProcess_cargs,
                            link_args: nsProcess_link_args,
                            objects: nsProcess_obj,
-                           dependencies : [ cc.find_library('ole32', required: true) ],
                            name_prefix: '',
                            install: true,
                            install_dir: 'NSIS')
