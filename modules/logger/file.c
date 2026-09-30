@@ -174,7 +174,7 @@ static const struct vlc_logger_operations *Open(vlc_object_t *obj,
         char *home = config_GetUserDir(VLC_HOME_DIR);
         if (home != NULL)
         {
-            if (asprintf(&path, "%s/Library/Logs/%s", home, path) == -1)
+            if (asprintf(&path, "%s/Library/Logs/%s", home, filename) == -1)
                 path = NULL;
             free(home);
         }
