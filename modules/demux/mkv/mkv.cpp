@@ -638,7 +638,7 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simp
         }
         if ( track.fmt.i_codec == VLC_CODEC_PRORES )
         {
-            SetDWBE( p_block->p_buffer, p_block->i_buffer - 8);
+            SetDWBE( p_block->p_buffer, p_block->i_buffer + 8);
             memcpy( p_block->p_buffer + 4, "icpf", 4 );
         }
 
