@@ -32,7 +32,7 @@
 TCHAR szBuf[NSIS_MAX_STRLEN];
 
 /* Funtions prototypes and macros */
-int FIND_PROC_BY_NAME(TCHAR *szProcessName, BOOL bTerminate, BOOL bClose);
+int FIND_PROC_BY_NAME(TCHAR *szProcessName, BOOL bTerminate);
 
 /* NSIS functions code */
 void __declspec(dllexport) _FindProcess(HWND hwndParent, int string_size,
@@ -43,7 +43,7 @@ void __declspec(dllexport) _FindProcess(HWND hwndParent, int string_size,
     int nError;
 
     popstringn(szBuf, NSIS_MAX_STRLEN);
-    nError=FIND_PROC_BY_NAME(szBuf, FALSE, FALSE);
+    nError=FIND_PROC_BY_NAME(szBuf, FALSE);
     pushint(nError);
   }
 }
@@ -56,7 +56,7 @@ void __declspec(dllexport) _CloseProcess(HWND hwndParent, int string_size,
     int nError=0;
 
     popstringn(szBuf, NSIS_MAX_STRLEN);
-    nError=FIND_PROC_BY_NAME(szBuf, TRUE, TRUE);
+    nError=FIND_PROC_BY_NAME(szBuf, TRUE);
     pushint(nError);
   }
 }
@@ -128,7 +128,7 @@ void NiceTerminate(DWORD id, BOOL bClose, BOOL *bSuccess, BOOL *bFailed)
   }
 }
 
-int FIND_PROC_BY_NAME(TCHAR *szProcessName, BOOL bTerminate, BOOL bClose)
+int FIND_PROC_BY_NAME(TCHAR *szProcessName, BOOL bTerminate)
 // Find the process "szProcessName" if it is currently running.
 // This works for Win95/98/ME and also WinNT/2000/XP.
 // The process name is case-insensitive, i.e. "notepad.exe" and "NOTEPAD.EXE"
@@ -245,7 +245,7 @@ int FIND_PROC_BY_NAME(TCHAR *szProcessName, BOOL bTerminate, BOOL bClose)
 
             if (bTerminate == TRUE)
             {
-              NiceTerminate(processIDs[i], bClose, &bSuccess, &bFailed);
+              NiceTerminate(processIDs[i], TRUE, &bSuccess, &bFailed);
             }
             else break;
           }
