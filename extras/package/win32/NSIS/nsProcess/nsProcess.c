@@ -28,9 +28,6 @@
 #define NSIS_MAX_STRLEN 1024
 
 
-/* Global variables */
-TCHAR szBuf[NSIS_MAX_STRLEN];
-
 /* Funtions prototypes and macros */
 int FIND_PROC_BY_NAME(TCHAR *szProcessName, BOOL bTerminate);
 
@@ -43,6 +40,7 @@ void __declspec(dllexport) _FindProcess(HWND hwndParent, int string_size,
   EXDLL_INIT();
   {
     int nError;
+    TCHAR szBuf[NSIS_MAX_STRLEN];
 
     popstringn(szBuf, NSIS_MAX_STRLEN);
     nError=FIND_PROC_BY_NAME(szBuf, FALSE);
@@ -58,6 +56,7 @@ void __declspec(dllexport) _CloseProcess(HWND hwndParent, int string_size,
   EXDLL_INIT();
   {
     int nError=0;
+    TCHAR szBuf[NSIS_MAX_STRLEN];
 
     popstringn(szBuf, NSIS_MAX_STRLEN);
     nError=FIND_PROC_BY_NAME(szBuf, TRUE);
