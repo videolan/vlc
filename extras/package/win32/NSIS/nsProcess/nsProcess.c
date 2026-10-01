@@ -48,19 +48,6 @@ void __declspec(dllexport) _FindProcess(HWND hwndParent, int string_size,
   }
 }
 
-void __declspec(dllexport) _KillProcess(HWND hwndParent, int string_size,
-                                      TCHAR *variables, stack_t **stacktop, extra_parameters *extra)
-{
-  EXDLL_INIT();
-  {
-    int nError=0;
-
-    popstringn(szBuf, NSIS_MAX_STRLEN);
-    nError=FIND_PROC_BY_NAME(szBuf, TRUE, FALSE);
-    pushint(nError);
-  }
-}
-
 void __declspec(dllexport) _CloseProcess(HWND hwndParent, int string_size,
                                       TCHAR *variables, stack_t **stacktop, extra_parameters *extra)
 {
