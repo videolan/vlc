@@ -306,10 +306,8 @@ Function CheckRunningProcesses
     goto end
 
     stop:
-    ${nsProcess::Unload}
     MessageBox MB_OK|MB_ICONEXCLAMATION "$(MessageBox_InstallAborted)"
     Quit
 
     end:
-    ${nsProcess::Unload}
 FunctionEnd

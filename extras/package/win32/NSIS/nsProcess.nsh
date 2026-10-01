@@ -12,10 +12,3 @@
 	nsProcess::_CloseProcess /NOUNLOAD `${_FILE}`
 	Pop ${_ERR}
 !macroend
-
-
-!define nsProcess::Unload `!insertmacro nsProcess::Unload`
-
-!macro nsProcess::Unload
-	nsProcess::_Unload
-!macroend
