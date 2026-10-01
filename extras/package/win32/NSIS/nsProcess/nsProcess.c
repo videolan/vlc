@@ -42,8 +42,10 @@ void __declspec(dllexport) _FindProcess(HWND hwndParent, int string_size,
     int nError;
     TCHAR szBuf[NSIS_MAX_STRLEN];
 
-    popstringn(szBuf, NSIS_MAX_STRLEN);
-    nError=FIND_PROC_BY_NAME(szBuf, FALSE);
+    if (popstringn(szBuf, NSIS_MAX_STRLEN))
+      nError = 612;
+    else
+      nError=FIND_PROC_BY_NAME(szBuf, FALSE);
     pushint(nError);
   }
 }
@@ -58,8 +60,10 @@ void __declspec(dllexport) _CloseProcess(HWND hwndParent, int string_size,
     int nError=0;
     TCHAR szBuf[NSIS_MAX_STRLEN];
 
-    popstringn(szBuf, NSIS_MAX_STRLEN);
-    nError=FIND_PROC_BY_NAME(szBuf, TRUE);
+    if (popstringn(szBuf, NSIS_MAX_STRLEN))
+      nError = 612;
+    else
+      nError=FIND_PROC_BY_NAME(szBuf, TRUE);
     pushint(nError);
   }
 }
