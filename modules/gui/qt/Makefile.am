@@ -1860,6 +1860,25 @@ test_vlc_dialog_model_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
 check_PROGRAMS += test_vlc_dialog_model
 TESTS += test_vlc_dialog_model
 
+# test_qt_csd_button_model
+check_PROGRAMS += test_qt_csd_button_model
+TESTS += test_qt_csd_button_model
+
+test_qt_csd_button_model_SOURCES = \
+	tests/vlc_stub_modules.cpp \
+	tests/test_qt_csd_button_model.cpp \
+	util/csdbuttonmodel.hpp \
+	util/csdbuttonmodel.cpp
+nodist_test_qt_csd_button_model_SOURCES = \
+	tests/test_qt_csd_button_model.moc \
+	util/csdbuttonmodel.moc.cpp
+BUILT_SOURCES += tests/test_qt_csd_button_model.moc
+CLEANFILES += tests/test_qt_csd_button_model.moc
+test_qt_csd_button_model_CPPFLAGS = $(QT_QTEST_COMMON_cppflags)
+test_qt_csd_button_model_CXXFLAGS = $(QT_QTEST_COMMON_cxxflags)
+test_qt_csd_button_model_LDADD = $(QT_QTEST_COMMON_ldadd)
+test_qt_csd_button_model_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
+
 
 test_qt_navigation_model_SOURCES = \
 	tests/vlc_stub_modules.cpp \
