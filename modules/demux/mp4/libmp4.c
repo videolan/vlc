@@ -1763,19 +1763,19 @@ static int MP4_ReadBox_cslg( stream_t *p_stream, MP4_Box_t *p_box )
     union { int32_t s; uint32_t u; } u32;
     union { int64_t s; uint64_t u; } u64;
 #define DOREAD_CSLG( readbytes, temp, member ) \
-        { readbytes( temp.u ); member = temp.s; }
+        do { readbytes( temp.u ); member = temp.s; } while (0)
 
-#define READ_CSLG( readbytes, temp ) {\
+#define READ_CSLG( readbytes, temp ) do {\
     DOREAD_CSLG( readbytes, temp, p_box->data.p_cslg->ct_to_dts_shift );\
     DOREAD_CSLG( readbytes, temp, p_box->data.p_cslg->i_least_delta );\
     DOREAD_CSLG( readbytes, temp, p_box->data.p_cslg->i_max_delta );\
     DOREAD_CSLG( readbytes, temp, p_box->data.p_cslg->i_composition_starttime );\
-    DOREAD_CSLG( readbytes, temp, p_box->data.p_cslg->i_composition_endtime ); }
+    DOREAD_CSLG( readbytes, temp, p_box->data.p_cslg->i_composition_endtime ); } while (0)
 
     if( i_version == 0 )
-        READ_CSLG( MP4_GET4BYTES, u32 )
+        READ_CSLG( MP4_GET4BYTES, u32 );
     else
-        READ_CSLG( MP4_GET8BYTES, u64 )
+        READ_CSLG( MP4_GET8BYTES, u64 );
 
     MP4_READBOX_EXIT( 1 );
 }
