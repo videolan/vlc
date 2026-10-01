@@ -2204,13 +2204,15 @@ static int MP4_ReadBox_strf( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_GET4BYTESLE( p_strf->bmiHeader.biClrUsed );
     MP4_GET4BYTESLE( p_strf->bmiHeader.biClrImportant );
 
+    if( i_read > UINT32_MAX )
+        goto error;
     p_strf->i_extra = i_read;
     if ( p_strf->i_extra )
     {
         p_strf->p_extra = malloc( p_strf->i_extra );
         if ( ! p_strf->p_extra )
             goto error;
-        memcpy( p_strf->p_extra, p_peek, i_read );
+        memcpy( p_strf->p_extra, p_peek, p_strf->i_extra );
     }
 
     MP4_READBOX_EXIT( 1 );
