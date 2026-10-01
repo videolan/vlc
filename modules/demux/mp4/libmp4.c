@@ -129,9 +129,9 @@ static char * MP4_Time2Str( stime_t i_duration, uint32_t i_scale )
 #define MP4_GET8BYTESLE( dst ) MP4_GETX_PRIVATE( dst, GetQWLE(p_peek), 8 )
 #define MP4_GETFOURCC( dst )   MP4_GET4BYTESLE( dst )
 
-#define MP4_GETVERSIONFLAGS( p_void ) \
+#define MP4_GETVERSIONFLAGS( p_void ) do { \
     MP4_GET1BYTE( p_void->i_version ); \
-    MP4_GET3BYTES( p_void->i_flags )
+    MP4_GET3BYTES( p_void->i_flags ); } while (0)
 
 #define READ_SAMPLE_DESC_COMMON_8BYTES_HEADER \
     do\
