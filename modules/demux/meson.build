@@ -117,6 +117,12 @@ vlc_modules += {
     'plugin_dir' : 'demux',
 }
 
+vlc_modules += {
+    'name' : 'psmf',
+    'sources' : files('psmf.c'),
+    'plugin_dir' : 'demux',
+}
+
 # libmodplug
 libmodplug_dep = dependency('libmodplug', version: ['>= 0.8.4', '!= 0.8.8'],
     required: get_option('libmodplug'))

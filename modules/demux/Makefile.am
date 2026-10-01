@@ -63,6 +63,9 @@ demux_PLUGINS += libhx_plugin.la
 libps_plugin_la_SOURCES = demux/mpeg/ps.c demux/mpeg/ps.h demux/mpeg/pes.h
 demux_PLUGINS += libps_plugin.la
 
+libpsmf_plugin_la_SOURCES = demux/psmf.c
+demux_PLUGINS += libpsmf_plugin.la
+
 libmod_plugin_la_SOURCES = demux/mod.c
 libmod_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_mod)
 libmod_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(demux_RPATH)
