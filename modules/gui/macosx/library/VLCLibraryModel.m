@@ -1259,8 +1259,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         const NSUInteger recentsIndex = cachedRecents ? [cachedRecents indexOfObjectPassingTest:idCheckBlock] : NSNotFound;
         const NSUInteger videoIndex = cachedVideos ? [cachedVideos indexOfObjectPassingTest:idCheckBlock] : NSNotFound;
 
-        if (videoIndex != NSNotFound) {
-            // Found in video cache - search shows for episode match
+        if (videoIndex != NSNotFound || recentsIndex != NSNotFound) {
+            // Search shows for a matching episode.
             NSInteger showIndex = NSNotFound;
             NSInteger episodeIndex = NSNotFound;
             NSUInteger currentShowIndex = 0;
@@ -1289,15 +1289,15 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             return;
         }
 
-        // Not in video cache, check audio cache
+        // Not in either video cache, check the audio caches.
         NSArray<VLCMediaLibraryMediaItem *> * const cachedRecentAudios = self.cachedRecentAudioMedia;
         NSArray<VLCMediaLibraryMediaItem *> * const cachedAudios = self.cachedAudioMedia;
 
         const NSUInteger recentAudiosIndex = cachedRecentAudios ? [cachedRecentAudios indexOfObjectPassingTest:idCheckBlock] : NSNotFound;
         const NSUInteger audioIndex = cachedAudios ? [cachedAudios indexOfObjectPassingTest:idCheckBlock] : NSNotFound;
 
-        if (audioIndex != NSNotFound) {
-            // Found in audio cache - create mutable copies for modification
+        if (audioIndex != NSNotFound || recentAudiosIndex != NSNotFound) {
+            // Found in an audio cache - create mutable copies for modification.
             NSMutableArray<VLCMediaLibraryMediaItem *> * const recentAudiosMutable = cachedRecentAudios.mutableCopy;
             NSMutableArray<VLCMediaLibraryMediaItem *> * const audioMutable = cachedAudios.mutableCopy;
 
@@ -1333,13 +1333,15 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         const NSUInteger showIndex,
         const NSUInteger __unused showEpisodeIndex
     ) {
-        if (cachedMediaArray == nil || cachedMediaIndex == NSNotFound) {
+        if (cachedMediaIndex == NSNotFound && recentMediaIndex == NSNotFound) {
             NSLog(@"Could not handle update for media library item with id %lld in model", itemId);
             return;
         }
 
         // Notify what happened
-        [cachedMediaArray replaceObjectAtIndex:cachedMediaIndex withObject:mediaItem];
+        if (cachedMediaIndex != NSNotFound) {
+            [cachedMediaArray replaceObjectAtIndex:cachedMediaIndex withObject:mediaItem];
+        }
 
         if (recentMediaArray != nil && recentMediaIndex != NSNotFound) {
             [recentMediaArray replaceObjectAtIndex:recentMediaIndex withObject:mediaItem];
@@ -1404,14 +1406,17 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         const NSUInteger __unused showEpisodeIndex
     ) {
 
-        if (cachedMediaArray == nil || cachedMediaIndex == NSNotFound) {
+        if (cachedMediaIndex == NSNotFound && recentMediaIndex == NSNotFound) {
             NSLog(@"Could not handle deletion for media library item with id %lld in model", itemId);
             return;
         }
 
-        VLCMediaLibraryMediaItem * const mediaItem = cachedMediaArray[cachedMediaIndex];
+        VLCMediaLibraryMediaItem * const mediaItem = cachedMediaIndex != NSNotFound
+            ? cachedMediaArray[cachedMediaIndex] : recentMediaArray[recentMediaIndex];
         // Notify what happened
-        [cachedMediaArray removeObjectAtIndex:cachedMediaIndex];
+        if (cachedMediaIndex != NSNotFound) {
+            [cachedMediaArray removeObjectAtIndex:cachedMediaIndex];
+        }
 
         if (recentMediaArray != nil && recentMediaIndex != NSNotFound) {
             [recentMediaArray removeObjectAtIndex:recentMediaIndex];
