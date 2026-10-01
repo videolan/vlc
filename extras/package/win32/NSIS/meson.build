@@ -21,7 +21,7 @@ nsProcess_link_args = ['-static-libgcc']
 # TODO use nsis-pluginapi if possible to be compatible with the system makensis
 # it provides the matching pluginapi.h and a library to link with
 
-nsProcess_sources = files('nsProcess/nsProcess.c', 'nsProcess/pluginapi.c')
+nsProcess_sources = files('nsProcess/nsProcess.c', 'nsProcess/nsis/pluginapi.c')
 nsProcess_src = []
 nsProcess_obj = []
 if host_machine.cpu_family() != 'x86'

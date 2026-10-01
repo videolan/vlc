@@ -124,7 +124,7 @@ endif
 	  fi ; \
 	done
 
-$(win32_destdir)/NSIS/nsProcess.dll: extras/package/win32/NSIS/nsProcess/nsProcess.c extras/package/win32/NSIS/nsProcess/pluginapi.c
+$(win32_destdir)/NSIS/nsProcess.dll: extras/package/win32/NSIS/nsProcess/nsProcess.c extras/package/win32/NSIS/nsProcess/nsis/pluginapi.c
 	mkdir -p "$(win32_destdir)/NSIS/"
 if HAVE_WIN64
 	i686-w64-mingw32-gcc $^ -shared -o $@ -static-libgcc -D_UNICODE=1 -DUNICODE=1

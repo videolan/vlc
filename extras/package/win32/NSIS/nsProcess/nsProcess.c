@@ -21,7 +21,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <psapi.h>
-#include "pluginapi.h"
+#include "nsis/pluginapi.h"
 #include <stdlib.h>
 
 /* Defines */
