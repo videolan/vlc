@@ -1507,6 +1507,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
         if (p_media->i_subtype == VLC_ML_MEDIA_SUBTYPE_SHOW_EPISODE) {
             [self resetCachedListOfShows];
+        } else if (p_media->i_subtype == VLC_ML_MEDIA_SUBTYPE_MOVIE) {
+            [self resetCachedListOfMovies];
         }
     }
 }
@@ -1903,6 +1905,10 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         return;
     }
 
+    if (mediaItem.mediaSubType == VLC_ML_MEDIA_SUBTYPE_MOVIE) {
+        [self resetCachedListOfMovies];
+    }
+
     [self performActionOnMediaItemInCache:itemId action:^(
         NSMutableArray * const cachedMediaArray,
         const NSUInteger cachedMediaIndex,
@@ -1992,6 +1998,18 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     NSParameterAssert(p_event != NULL);
 
     const int64_t itemId = p_event->modification.i_entity_id;
+
+    NSArray<VLCMediaLibraryMovie *> * const cachedMovies =
+        [self readCachedArrayFromGetter:@selector(cachedListOfMovies)
+                             fromQueue:_mediaItemCacheModificationQueue];
+    if (cachedMovies != nil &&
+        [cachedMovies indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMovie * const movie,
+                                                    const NSUInteger __unused index,
+                                                    BOOL * const __unused stop) {
+        return movie.libraryID == itemId;
+    }] != NSNotFound) {
+        [self resetCachedListOfMovies];
+    }
 
     [self performActionOnMediaItemInCache:itemId action:^(
         NSMutableArray * const cachedMediaArray,
