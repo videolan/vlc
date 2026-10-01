@@ -81,14 +81,14 @@ else
 endif
 
 if makensis.found()
-    spad_nsis = custom_target('spad-nsis',
+    spad_nsis = custom_target(
         command: [makensis, nsi_script_dir / 'spad.nsi'],
         input: spad_nsi,
         output: 'spad-setup.exe', # real name but located in installed folder
         build_by_default: false,
         console: true)
 
-    vlc_nsis = custom_target('vlc-nsis',
+    vlc_nsis = custom_target(
         command: [makensis, nsi_script_dir / 'vlc.win32.nsi'],
         input: vlc_nsi,
         output: 'vlc-' + vlc_version + '-' + winstaller_suffix + '.exe', # real name but root build folder
