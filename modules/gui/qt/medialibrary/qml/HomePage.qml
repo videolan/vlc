@@ -97,6 +97,14 @@ Widgets.PageExt {
 
         property bool _hasMedias: true
 
+        Binding on _hasMedias {
+            when: !continueWatchingRow.model.loading && !favoritesRow.model.loading
+                  && !newVideoRow.model.loading && !newMusicRow.model.loading
+            value: continueWatchingRow.visible || favoritesRow.visible
+                   || newVideoRow.visible || newMusicRow.visible
+            restoreMode: Binding.RestoreNone
+        }
+
         T.ScrollBar.vertical: Widgets.ScrollBarExt {}
 
         // This behavior allows to have similar "smooth" animation
@@ -133,10 +141,6 @@ Widgets.PageExt {
                 // it if touch is detected through the hover handler:
                 MainCtx.setFiltersChildMouseEvents(flickable, false)
             }
-
-            MainCtx.setTimeout(() => {
-                flickable._hasMedias = Qt.binding(() => { return continueWatchingRow.visible || favoritesRow.visible || newVideoRow.visible || newMusicRow.visible } )
-            }, 50, [], flickable)
         }
 
         readonly property bool usingTouch: MainCtx.usingTouch
