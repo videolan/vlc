@@ -29,7 +29,7 @@
 
 
 /* Funtions prototypes and macros */
-int FIND_PROC_BY_NAME(TCHAR *szProcessName, BOOL bTerminate);
+int FIND_PROC_BY_NAME(const TCHAR *szProcessName, BOOL bTerminate);
 
 /* NSIS functions code */
 void __declspec(dllexport) _FindProcess(HWND hwndParent, int string_size,
@@ -120,7 +120,7 @@ static void NiceTerminate(DWORD id, BOOL *bSuccess, BOOL *bFailed)
   }
 }
 
-int FIND_PROC_BY_NAME(TCHAR *szProcessName, BOOL bTerminate)
+int FIND_PROC_BY_NAME(const TCHAR *szProcessName, BOOL bTerminate)
 // Find the process "szProcessName" if it is currently running.
 // This works for Win95/98/ME and also WinNT/2000/XP.
 // The process name is case-insensitive, i.e. "notepad.exe" and "NOTEPAD.EXE"
