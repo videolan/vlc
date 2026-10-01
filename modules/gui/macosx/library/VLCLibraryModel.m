@@ -1999,9 +1999,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
     const int64_t itemId = p_event->modification.i_entity_id;
 
-    NSArray<VLCMediaLibraryMovie *> * const cachedMovies =
-        [self readCachedArrayFromGetter:@selector(cachedListOfMovies)
-                             fromQueue:_mediaItemCacheModificationQueue];
+    NSArray<VLCMediaLibraryMovie *> * const cachedMovies = self.cachedListOfMovies;
     if (cachedMovies != nil &&
         [cachedMovies indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMovie * const movie,
                                                     const NSUInteger __unused index,
