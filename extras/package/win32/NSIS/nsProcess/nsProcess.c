@@ -61,11 +61,6 @@ void __declspec(dllexport) _CloseProcess(HWND hwndParent, int string_size,
   }
 }
 
-BOOL WINAPI DllMain(HANDLE hInst, ULONG ul_reason_for_call, LPVOID lpReserved)
-{
-  return TRUE;
-}
-
 struct win_id
 {
     DWORD proc_id;
