@@ -277,11 +277,7 @@ public:
             // Map the point to client coordinates.
             ::MapWindowPoints(nullptr, msg->hwnd, &point, 1);
 
-            const double scaleFactor = m_window->devicePixelRatio();
-
-            //divide by scale factor as buttons coordinates will be in dpr
-            const QPoint qtPoint {static_cast<int>(point.x / scaleFactor), static_cast<int>(point.y / scaleFactor)};
-            auto button = overlappingButton(qtPoint);
+            auto button = buttonAtMsgPoint(msg);
             if (!button)
             {
                 if (!m_platformHandlesResize)
@@ -395,29 +391,35 @@ public:
         case WM_NCLBUTTONUP:
         case WM_NCLBUTTONDOWN:
         {
-            const bool pressed = (msg->message == WM_NCLBUTTONDOWN);
-
-            // manually trigger button here, UI will never get click
-            // signal because we have captured the mouse in non client area
+            CSDButton::ButtonType type{};
             switch ( msg->wParam )
             {
-            case HTCLOSE:
-                handleButtonActionExclusive(CSDButton::Close, pressed);
-                break;
-            case HTMINBUTTON:
-                handleButtonActionExclusive(CSDButton::Minimize, pressed);
-                break;
-            case HTMAXBUTTON:
-                handleButtonActionExclusive(CSDButton::MaximizeRestore, pressed);
-                break;
+            case HTCLOSE:     type = CSDButton::Close; break;
+            case HTMINBUTTON: type = CSDButton::Minimize; break;
+            case HTMAXBUTTON: type = CSDButton::MaximizeRestore; break;
             default:
                 resetPressedState();
                 return false;
             }
 
+            // manually trigger here: the mouse is captured in the non-client area, so the UI never gets a click signal
+            if (msg->message == WM_NCLBUTTONDOWN)
+            {
+                handleButtonActionExclusive(type, true);
+                // required for win7 compositor, otherwise this
+                // paints default min/max/close buttons
+                return true;
+            }
 
-            // required for win7 compositor, otherwise this
-            // paints default min/max/close buttons
+            // Complete the click only when released over a visible button of
+            // the same type: a button hidden or destroyed between press and
+            // release must not complete the click.
+            const CSDButton *releaseButton = buttonAtMsgPoint(msg);
+            if (releaseButton && releaseButton->type() == type)
+                handleButtonActionExclusive(type, false);
+            else
+                resetPressedState();
+
             return true;
         }
 
@@ -485,21 +487,18 @@ private:
             SWP_NOSENDCHANGING | SWP_NOSIZE | SWP_NOZORDER);
     }
 
-    CSDButton *overlappingButton(const QPoint point)
+    // hit-tests the registered CSD button sets: any registered item
+    // visible+enabled, against the QML-written rect (see
+    // CSDButton::containsScenePos); nullptr when nothing matches
+    CSDButton *buttonAtMsgPoint(const MSG *msg)
     {
-        const auto& buttons = m_buttonmodel->windowCSDButtons();
-        const auto it = std::find_if(buttons.begin(), buttons.end(), [&point](const auto& button)
-        {
-            QRect rect = button->rect();
-            rect.setY(rect.y() + 2); // leave a small gap for top resize which is always within the caption area
-            if (rect.contains(point))
-                return true;
-            return false;
-        });
-        if (it == buttons.end())
-            return nullptr;
+        POINT point = { GET_X_LPARAM(msg->lParam), GET_Y_LPARAM(msg->lParam) };
+        ::MapWindowPoints(nullptr, msg->hwnd, &point, 1);
 
-        return *it;
+        const double scaleFactor = m_window->devicePixelRatio();
+        const QPoint qtPoint { static_cast<int>(point.x / scaleFactor),
+                               static_cast<int>(point.y / scaleFactor) };
+        return m_buttonmodel->buttonAt(qtPoint);
     }
 
     void hoverExclusive(CSDButton::ButtonType type)

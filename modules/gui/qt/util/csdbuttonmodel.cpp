@@ -24,6 +24,9 @@
 #include "maininterface/mainctx.hpp"
 
 #include <QWindow>
+#include <QQuickItem>
+
+#include <algorithm>
 
 CSDButton::CSDButton(ButtonType type, QObject *parent)
     : QObject {parent}
@@ -106,6 +109,49 @@ void CSDButton::doubleClick()
     emit doubleClicked();
 }
 
+void CSDButton::registerItem(QQuickItem *item)
+{
+    if (!item || m_items.contains(item))
+        return;
+    m_items.append(item);
+    connect(item, &QObject::destroyed, this, [this, item] {
+        m_items.removeAll(item);
+        resetInteractionStateIfUnused();
+    });
+}
+
+// Hide contract: the hit-test sees only each registered item's own
+// visible/enabled flags plus the rect written by QML's updateRect().
+// Hides must therefore make those flags false on the items; Qt
+// propagates an ancestor's hidden or disabled state into each child's
+// own flags. Opacity-only hides are not detected; Qt does not block
+// input for transparent items either.
+bool CSDButton::containsScenePos(const QPointF &scenePos) const
+{
+    if (m_items.isEmpty())
+        return false;
+
+    const bool usable = std::any_of(m_items.cbegin(), m_items.cend(),
+                                    [](const QQuickItem *item) {
+                                        return item->isVisible() && item->isEnabled();
+                                    });
+    if (!usable)
+        return false;
+
+    QRect rect = m_rect;
+    rect.setY(rect.y() + 2); // leave a small gap for top resize which is always within the caption area
+    return rect.contains(scenePos.toPoint());
+}
+
+void CSDButton::resetInteractionStateIfUnused()
+{
+    if (!m_items.isEmpty())
+        return;
+    setRect({});              // a destroyed set must not leave a stale hitbox
+    unsetExternalPressed();
+    setShowHovered(false);
+}
+
 CSDButtonModel::CSDButtonModel(MainCtx *mainCtx, QObject *parent)
     : QObject {parent}
     , m_mainCtx {mainCtx}
@@ -125,6 +171,15 @@ CSDButtonModel::CSDButtonModel(MainCtx *mainCtx, QObject *parent)
 const QList<CSDButton *> &CSDButtonModel::windowCSDButtons() const
 {
     return m_windowCSDButtons;
+}
+
+CSDButton *CSDButtonModel::buttonAt(const QPointF &scenePos)
+{
+    const auto it = std::find_if(m_windowCSDButtons.begin(), m_windowCSDButtons.end(),
+                                 [&scenePos](const CSDButton *b) {
+                                     return b->containsScenePos(scenePos);
+                                 });
+    return it == m_windowCSDButtons.end() ? nullptr : *it;
 }
 
 
