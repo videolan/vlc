@@ -124,15 +124,20 @@ struct dialog_i11e_context
 };
 
 static inline vlc_dialog_provider *
-get_dialog_provider(vlc_object_t *p_obj, bool b_check_interact)
+get_dialog_provider(vlc_object_t *p_obj)
 {
-    if ((b_check_interact && p_obj->no_interact) || vlc_killed())
-        return NULL;
-
     vlc_dialog_provider *p_provider =
         libvlc_priv(vlc_object_instance(p_obj))->p_dialog_provider;
     assert(p_provider != NULL);
     return p_provider;
+}
+
+static inline vlc_dialog_provider *
+get_interactive_dialog_provider(vlc_object_t *p_obj)
+{
+    if (p_obj->no_interact || vlc_killed())
+        return NULL;
+    return get_dialog_provider(p_obj);
 }
 
 static void
@@ -260,7 +265,7 @@ vlc_dialog_provider_set_callbacks(vlc_object_t *p_obj,
                                   const vlc_dialog_cbs *p_cbs, void *p_data)
 {
     assert(p_obj != NULL);
-    vlc_dialog_provider *p_provider = get_dialog_provider(p_obj, false);
+    vlc_dialog_provider *p_provider = get_dialog_provider(p_obj);
 
     vlc_mutex_lock(&p_provider->lock);
     dialog_clear_all_locked(p_provider);
@@ -284,7 +289,7 @@ vlc_dialog_provider_set_error_callback(vlc_object_t *p_obj,
                                   vlc_dialog_error_cbs p_cbs, void *p_data)
 {
     assert(p_obj != NULL);
-    vlc_dialog_provider *p_provider = get_dialog_provider(p_obj, false);
+    vlc_dialog_provider *p_provider = get_dialog_provider(p_obj);
 
     vlc_mutex_lock(&p_provider->lock);
 
@@ -384,7 +389,7 @@ vlc_dialog_display_error_va(vlc_object_t *p_obj, const char *psz_title,
 {
     assert(p_obj != NULL && psz_title != NULL && psz_fmt != NULL);
     int i_ret;
-    vlc_dialog_provider *p_provider = get_dialog_provider(p_obj, true);
+    vlc_dialog_provider *p_provider = get_interactive_dialog_provider(p_obj);
 
     if (p_provider != NULL)
         i_ret = dialog_display_error_va(p_provider, psz_title, psz_fmt, ap);
@@ -458,7 +463,7 @@ vlc_dialog_wait_login_va(vlc_object_t *p_obj,  char **ppsz_username,
     assert(p_obj != NULL && ppsz_username != NULL && ppsz_password != NULL
         && psz_fmt != NULL && psz_title != NULL);
 
-    vlc_dialog_provider *p_provider = get_dialog_provider(p_obj, true);
+    vlc_dialog_provider *p_provider = get_interactive_dialog_provider(p_obj);
     if (p_provider == NULL)
         return VLC_EGENERIC;
 
@@ -547,7 +552,7 @@ vlc_dialog_wait_question_va(vlc_object_t *p_obj,
     assert(p_obj != NULL && psz_fmt != NULL && psz_title != NULL
         && psz_cancel != NULL);
 
-    vlc_dialog_provider *p_provider = get_dialog_provider(p_obj, true);
+    vlc_dialog_provider *p_provider = get_interactive_dialog_provider(p_obj);
     if (p_provider == NULL)
         return VLC_EGENERIC;
 
@@ -635,7 +640,7 @@ vlc_dialog_display_progress_va(vlc_object_t *p_obj, bool b_indeterminate,
 {
     assert(p_obj != NULL && psz_title != NULL && psz_fmt != NULL);
 
-    vlc_dialog_provider *p_provider = get_dialog_provider(p_obj, true);
+    vlc_dialog_provider *p_provider = get_interactive_dialog_provider(p_obj);
     if (p_provider == NULL)
         return NULL;
     vlc_dialog_id *p_id;
@@ -666,7 +671,7 @@ dialog_update_progress(vlc_object_t *p_obj, vlc_dialog_id *p_id, float f_value,
                        char *psz_text)
 {
     assert(p_obj != NULL && p_id != NULL);
-    vlc_dialog_provider *p_provider = get_dialog_provider(p_obj, false);
+    vlc_dialog_provider *p_provider = get_dialog_provider(p_obj);
 
     vlc_mutex_lock(&p_provider->lock);
     if (p_provider->cbs.pf_update_progress == NULL ||
@@ -732,13 +737,7 @@ void
 vlc_dialog_release(vlc_object_t *p_obj, vlc_dialog_id *p_id)
 {
     assert(p_obj != NULL && p_id != NULL);
-    /* We can't use get_dialog_provider here because when vlc_killed is true,
-     * get_dialog_provider returns NULL, and we can't release the dialog
-     * properly. Moreover, since the dialog has been created by the provider,
-     * we can be sure that one exists. */
-    vlc_dialog_provider *p_provider =
-        libvlc_priv(vlc_object_instance(p_obj))->p_dialog_provider;
-    assert(p_provider != NULL);
+    vlc_dialog_provider *p_provider = get_dialog_provider(p_obj);
 
     vlc_mutex_lock(&p_provider->lock);
     dialog_cancel_locked(p_provider, p_id);
@@ -856,7 +855,7 @@ vlc_dialog_provider_set_ext_callback(vlc_object_t *p_obj,
                                      void *p_data)
 {
     assert(p_obj != NULL);
-    vlc_dialog_provider *p_provider = get_dialog_provider(p_obj, false);
+    vlc_dialog_provider *p_provider = get_dialog_provider(p_obj);
 
     vlc_mutex_lock(&p_provider->lock);
 
@@ -871,7 +870,7 @@ int
 vlc_ext_dialog_update(vlc_object_t *p_obj, extension_dialog_t *p_ext_dialog)
 {
     assert(p_obj != NULL);
-    vlc_dialog_provider *p_provider = get_dialog_provider(p_obj, false);
+    vlc_dialog_provider *p_provider = get_dialog_provider(p_obj);
 
     vlc_mutex_lock(&p_provider->lock);
     if (p_provider->pf_ext_update == NULL)
