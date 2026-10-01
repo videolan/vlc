@@ -92,7 +92,7 @@ BOOL CALLBACK EnumWindowsProc(          HWND hwnd,
 	return TRUE;
 }
 
-void NiceTerminate(DWORD id, BOOL bClose, BOOL *bSuccess, BOOL *bFailed)
+void NiceTerminate(DWORD id, BOOL *bSuccess, BOOL *bFailed)
 {
   HANDLE hProc;
   DWORD ec;
@@ -101,8 +101,7 @@ void NiceTerminate(DWORD id, BOOL bClose, BOOL *bSuccess, BOOL *bFailed)
   {
 	struct win_id window = { id, NULL };
 
-	if (bClose)
-		EnumWindows(EnumWindowsProc, (LPARAM)&window);
+	EnumWindows(EnumWindowsProc, (LPARAM)&window);
 	if (window.prev_hwnd != NULL)
 	{
 	  if (GetExitCodeProcess(hProc,&ec) && ec == STILL_ACTIVE)
@@ -245,7 +244,7 @@ int FIND_PROC_BY_NAME(TCHAR *szProcessName, BOOL bTerminate)
 
             if (bTerminate == TRUE)
             {
-              NiceTerminate(processIDs[i], TRUE, &bSuccess, &bFailed);
+              NiceTerminate(processIDs[i], &bSuccess, &bFailed);
             }
             else break;
           }
