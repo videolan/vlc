@@ -2570,9 +2570,11 @@ static int MP4_ReadBox_dvc1( stream_t *p_stream, MP4_Box_t *p_box )
 
     MP4_Box_data_dvc1_t *p_dvc1 = p_box->data.p_dvc1;
     MP4_GET1BYTE( p_dvc1->i_profile_level );
+    if( i_read > UINT32_MAX )
+        MP4_READBOX_EXIT( 0 );
     p_dvc1->i_vc1 = i_read; /* Header + profile_level */
     if( p_dvc1->i_vc1 > 0 && (p_dvc1->p_vc1 = malloc( p_dvc1->i_vc1 )) )
-        memcpy( p_dvc1->p_vc1, p_peek, i_read );
+        memcpy( p_dvc1->p_vc1, p_peek, p_dvc1->i_vc1 );
 
 #ifdef MP4_VERBOSE
     uint8_t i_profile = (p_dvc1->i_profile_level & 0xf0) >> 4;
