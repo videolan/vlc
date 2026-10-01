@@ -38,6 +38,8 @@ int FIND_PROC_BY_NAME(TCHAR *szProcessName, BOOL bTerminate);
 void __declspec(dllexport) _FindProcess(HWND hwndParent, int string_size,
                                       TCHAR *variables, stack_t **stacktop, extra_parameters *extra)
 {
+  (void)hwndParent;
+  (void)extra;
   EXDLL_INIT();
   {
     int nError;
@@ -51,6 +53,8 @@ void __declspec(dllexport) _FindProcess(HWND hwndParent, int string_size,
 void __declspec(dllexport) _CloseProcess(HWND hwndParent, int string_size,
                                       TCHAR *variables, stack_t **stacktop, extra_parameters *extra)
 {
+  (void)hwndParent;
+  (void)extra;
   EXDLL_INIT();
   {
     int nError=0;
@@ -67,7 +71,7 @@ struct win_id
     HWND prev_hwnd;
 };
 
-BOOL CALLBACK EnumWindowsProc(          HWND hwnd,
+static BOOL CALLBACK EnumWindowsProc(          HWND hwnd,
     LPARAM lParam
 )
 {
@@ -82,7 +86,7 @@ BOOL CALLBACK EnumWindowsProc(          HWND hwnd,
 	return TRUE;
 }
 
-void NiceTerminate(DWORD id, BOOL *bSuccess, BOOL *bFailed)
+static void NiceTerminate(DWORD id, BOOL *bSuccess, BOOL *bFailed)
 {
   HANDLE hProc;
   DWORD ec;
@@ -172,7 +176,6 @@ int FIND_PROC_BY_NAME(TCHAR *szProcessName, BOOL bTerminate)
   TCHAR szName[MAX_PATH];
   OSVERSIONINFO osvi;
   HANDLE hProc;
-  ULONG uError;
   BOOL bFound=FALSE;
   BOOL bSuccess=FALSE;
   BOOL bFailed=FALSE;

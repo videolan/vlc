@@ -74,6 +74,7 @@ void NSISCALL setuservariable(const int varnum, const TCHAR *var);
 #define SetUserVariableW(x,y) setuservariable(x,y)
 
 int  NSISCALL PopStringA(char* ansiStr);
+int  NSISCALL PopStringNA(char* ansiStr, int maxlen);
 void NSISCALL PushStringA(const char* ansiStr);
 void NSISCALL GetUserVariableW(const int varnum, wchar_t* wideStr);
 void NSISCALL GetUserVariableA(const int varnum, char* ansiStr);
