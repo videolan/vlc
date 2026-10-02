@@ -44,7 +44,7 @@ static void CopyExtradata( const uint8_t *p_extra, size_t i_extra,
     if( i_extra > 0 && !fmt->i_extra )
     {
         fmt->p_extra = malloc( i_extra );
-        if( i_extra )
+        if( fmt->p_extra )
         {
             fmt->i_extra = i_extra;
             memcpy( fmt->p_extra, p_extra, i_extra );
