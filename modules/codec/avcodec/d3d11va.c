@@ -708,6 +708,10 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
     {
         msg_Warn(va, "not enough decoding slices in the texture (%d/%d)",
                  sys->totalTextureSlices, *surface_count);
+
+        // extra surfaces for the pictures kept in the display module
+        *surface_count += 3;
+
         dx_sys->can_extern_pool = false;
     }
 #if VLC_WINSTORE_APP
