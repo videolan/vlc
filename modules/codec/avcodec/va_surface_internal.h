@@ -61,7 +61,7 @@ typedef struct
      */
     int (*pf_create_decoder_surfaces)(vlc_va_t *, int codec_id,
                                       const video_format_t *fmt,
-                                      unsigned surface_count);
+                                      unsigned *surface_count);
     /**
      * Destroy resources allocated with the surfaces and the associated decoder
      */
@@ -80,7 +80,7 @@ typedef struct
 
 int va_pool_Open(vlc_va_t *, va_pool_t *);
 void va_pool_Close(vlc_va_t *va, va_pool_t *);
-int va_pool_SetupDecoder(vlc_va_t *, va_pool_t *, const AVCodecContext *, unsigned count, int surface_width, int surface_height);
+int va_pool_SetupDecoder(vlc_va_t *, va_pool_t *, const AVCodecContext *, unsigned *count, int surface_width, int surface_height);
 int va_pool_SetupSurfaces(vlc_va_t *, va_pool_t *, unsigned count);
 int va_pool_Get(va_pool_t *, picture_t *);
 void va_surface_AddRef(vlc_va_surface_t *surface);

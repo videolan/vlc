@@ -138,7 +138,7 @@ static int DxGetInputList(vlc_va_t *, input_list_t *);
 static int DxSetupOutput(vlc_va_t *, const GUID *, int surface_width, int surface_height);
 
 static int DxCreateDecoderSurfaces(vlc_va_t *, int codec_id,
-                                   const video_format_t *fmt, unsigned surface_count);
+                                   const video_format_t *fmt, unsigned *surface_count);
 static void DxDestroySurfaces(vlc_va_t *);
 static void SetupAVCodecContext(vlc_va_t *);
 
@@ -676,7 +676,7 @@ static bool CanUseDecoderPadding(const vlc_va_sys_t *sys)
  * It creates a Direct3D11 decoder using the given video format
  */
 static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
-                                   const video_format_t *fmt, unsigned surface_count)
+                                   const video_format_t *fmt, unsigned *surface_count)
 {
     vlc_va_sys_t *sys = va->sys;
     directx_sys_t *dx_sys = &va->sys->dx_sys;
@@ -704,10 +704,10 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
         sys->textureWidth  = fmt->i_width;
         sys->textureHeight = fmt->i_height;
     }
-    if (sys->totalTextureSlices && sys->totalTextureSlices < surface_count)
+    if (sys->totalTextureSlices && sys->totalTextureSlices < *surface_count)
     {
         msg_Warn(va, "not enough decoding slices in the texture (%d/%d)",
-                 sys->totalTextureSlices, surface_count);
+                 sys->totalTextureSlices, *surface_count);
         dx_sys->can_extern_pool = false;
     }
 #if VLC_WINSTORE_APP
@@ -748,13 +748,13 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
     {
 #if !D3D11_DIRECT_DECODE
         size_t surface_idx;
-        for (surface_idx = 0; surface_idx < surface_count; surface_idx++) {
+        for (surface_idx = 0; surface_idx < *surface_count; surface_idx++) {
             picture_t *pic = decoder_NewPicture( (decoder_t*) va->obj.parent );
             sys->extern_pics[surface_idx] = pic;
             dx_sys->hw_surface[surface_idx] = NULL;
             if (pic==NULL)
             {
-                msg_Warn(va, "not enough decoder pictures %d out of %d", surface_idx, surface_count);
+                msg_Warn(va, "not enough decoder pictures %d out of %d", surface_idx, *surface_count);
                 dx_sys->can_extern_pool = false;
                 break;
             }
@@ -822,7 +822,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
         texDesc.Format = sys->render;
         texDesc.SampleDesc.Count = 1;
         texDesc.MiscFlags = 0;
-        texDesc.ArraySize = surface_count;
+        texDesc.ArraySize = *surface_count;
         texDesc.Usage = D3D11_USAGE_DEFAULT;
         texDesc.BindFlags = D3D11_BIND_DECODER;
         texDesc.CPUAccessFlags = 0;
@@ -833,12 +833,12 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
         ID3D11Texture2D *p_texture;
         hr = ID3D11Device_CreateTexture2D( sys->d3d_dev.d3ddevice, &texDesc, NULL, &p_texture );
         if (FAILED(hr)) {
-            msg_Err(va, "CreateTexture2D %d failed. (hr=0x%lX)", surface_count, hr);
+            msg_Err(va, "CreateTexture2D %u failed. (hr=0x%lX)", *surface_count, hr);
             return VLC_EGENERIC;
         }
 
         unsigned surface_idx;
-        for (surface_idx = 0; surface_idx < surface_count; surface_idx++) {
+        for (surface_idx = 0; surface_idx < *surface_count; surface_idx++) {
             sys->extern_pics[surface_idx] = NULL;
             viewDesc.Texture2D.ArraySlice = surface_idx;
 
@@ -861,7 +861,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
         }
     }
     msg_Dbg(va, "ID3D11VideoDecoderOutputView succeed with %d surfaces (%dx%d)",
-            surface_count, fmt->i_width, fmt->i_height);
+            *surface_count, fmt->i_width, fmt->i_height);
 
     D3D11_VIDEO_DECODER_DESC decoderDesc;
     ZeroMemory(&decoderDesc, sizeof(decoderDesc));

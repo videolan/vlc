@@ -54,13 +54,13 @@ static void DestroyVideoDecoder(vlc_va_t *va, va_pool_t *va_pool)
 }
 
 /* */
-int va_pool_SetupDecoder(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext *avctx, unsigned count,
+int va_pool_SetupDecoder(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext *avctx, unsigned *count,
                          int surface_width, int surface_height)
 {
     int err = VLC_ENOMEM;
     unsigned i = va_pool->surface_count;
 
-    if ( va_pool->surface_count >= count &&
+    if ( va_pool->surface_count >= *count &&
          va_pool->surface_width == surface_width &&
          va_pool->surface_height == surface_height )
     {
@@ -73,9 +73,9 @@ int va_pool_SetupDecoder(vlc_va_t *va, va_pool_t *va_pool, const AVCodecContext 
     DestroyVideoDecoder(va, va_pool);
 
     /* */
-    msg_Dbg(va, "va_pool_SetupDecoder id %d %dx%d count: %d", avctx->codec_id, avctx->coded_width, avctx->coded_height, count);
+    msg_Dbg(va, "va_pool_SetupDecoder id %d %dx%d count: %u", avctx->codec_id, avctx->coded_width, avctx->coded_height, *count);
 
-    if (count > MAX_SURFACE_COUNT)
+    if (*count > MAX_SURFACE_COUNT)
         return VLC_EGENERIC;
 
     /* FIXME transmit a video_format_t by VaSetup directly */

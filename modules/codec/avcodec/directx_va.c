@@ -389,7 +389,7 @@ int directx_va_Setup(vlc_va_t *va, directx_sys_t *dx_sys,
         return VLC_EGENERIC;
     }
 
-    int err = va_pool_SetupDecoder(va, &dx_sys->va_pool, avctx, surface_count, surface_width, surface_height);
+    int err = va_pool_SetupDecoder(va, &dx_sys->va_pool, avctx, &surface_count, surface_width, surface_height);
     if (err != VLC_SUCCESS)
         return err;
     if (dx_sys->can_extern_pool)
