@@ -59,6 +59,17 @@ typedef struct
     int width;
     int height;
 
+    // Store the position, because we need
+    // to respect the old position when the
+    // video window gets re-enabled. We do
+    // not need to store the scale or size
+    // for this purpose, because the surface
+    // itself remains when the window gets
+    // disabled, only the subsurface role
+    // is destroyed.
+    int x;
+    int y;
+
     uint32_t compositor_interface_version;
 } qtwayland_priv_t;
 
@@ -297,6 +308,10 @@ static void Enable(qtwayland_t* obj, const vlc_window_cfg_t * conf)
     sys->video_subsurface = wl_subcompositor_get_subsurface(sys->subcompositor, sys->video_surface, sys->interface_surface);
     wl_subsurface_place_below(sys->video_subsurface, sys->interface_surface);
     wl_subsurface_set_desync(sys->video_subsurface);
+
+    if ((sys->x >= 0) && (sys->y >= 0))
+        wl_subsurface_set_position(sys->video_subsurface, sys->x, sys->y);
+
     CommitSurface(obj);
 }
 
@@ -314,10 +329,22 @@ static void Move(struct qtwayland_t* obj, int x, int y, bool commitSurface)
 {
     qtwayland_priv_t* sys = (qtwayland_priv_t*)obj->p_sys;
     if(sys->video_subsurface == NULL)
+    {
+        // `Enable()` is going to respect this:
+        sys->x = x;
+        sys->y = y;
         return;
-    wl_subsurface_set_position(sys->video_subsurface, x, y);
-    if (commitSurface)
-        CommitSurface(obj);
+    }
+
+    if ((sys->x != x) || (sys->y != y))
+    {
+        wl_subsurface_set_position(sys->video_subsurface, x, y);
+        sys->x = x;
+        sys->y = y;
+
+        if (commitSurface)
+            CommitSurface(obj);
+    }
 }
 
 static void Resize(struct qtwayland_t* obj, size_t width, size_t height, bool commitSurface)
@@ -463,6 +490,8 @@ int OpenCompositor(vlc_object_t* p_this)
     if (!sys)
         return VLC_ENOMEM;
 
+    sys->x = -1;
+    sys->y = -1;
 
     //module functions
     obj->init = Init;
