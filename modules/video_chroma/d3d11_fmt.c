@@ -418,20 +418,6 @@ bool isXboxHardware(const d3d11_device_t *d3ddev)
     return result;
 }
 
-static bool isNvidiaHardware(ID3D11Device *d3ddev)
-{
-    IDXGIAdapter *p_adapter = D3D11DeviceAdapter(d3ddev);
-    if (!p_adapter)
-        return false;
-
-    DXGI_ADAPTER_DESC adapterDesc;
-    if (FAILED(IDXGIAdapter_GetDesc(p_adapter, &adapterDesc)))
-        adapterDesc.VendorId = 0;
-    IDXGIAdapter_Release(p_adapter);
-
-    return adapterDesc.VendorId == GPU_MANUFACTURER_NVIDIA;
-}
-
 bool CanUseVoutPool(d3d11_device_t *d3d_dev, UINT slices)
 {
 #if VLC_WINSTORE_APP
@@ -439,9 +425,24 @@ bool CanUseVoutPool(d3d11_device_t *d3d_dev, UINT slices)
      * which is always smaller, we still get direct rendering from the decoder */
     return false;
 #else
+    if (slices <= 30 || d3d_dev->adapterDesc.VendorId != GPU_MANUFACTURER_NVIDIA)
+        return true;
+
     /* NVIDIA cards crash when calling CreateVideoDecoderOutputView
-     * on more than 30 slices */
-    return slices <= 30 || !isNvidiaHardware(d3d_dev->d3ddevice);
+     * on more than 30 slices
+     * 31.0.15.2225 is wrong - 2022/10/06 - 522.25 WHQL
+     * 31.0.15.2647 is good  - 2022/10/25 - 526.47 WHQL
+     */
+    struct wddm_version WDDM_os = {
+        .wddm         = 31,
+        .d3d_features = 0,
+        .revision     = 15,
+        .build        = 2647,
+    };
+    if (D3D11CheckDriverVersion(d3d_dev, GPU_MANUFACTURER_NVIDIA, &WDDM_os) != VLC_SUCCESS)
+        return false;
+
+    return true;
 #endif
 }
 
