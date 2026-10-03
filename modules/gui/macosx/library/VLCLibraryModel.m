@@ -1629,9 +1629,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
                 action(videoMutable, videoIndex, recentsMutable, recentsIndex, showsMutable, showIndex, episodeIndex);
                 // Item handlers adjust title counts individually inside this barrier.
                 self->_cachedVideoMedia = videoMutable.copy;
-                self.cachedRecentMedia = recentsMutable.copy;
+                self->_cachedRecentMedia = recentsMutable.copy;
                 if (showsMutable)
-                    self.cachedListOfShows = showsMutable.copy;
+                    self->_cachedListOfShows = showsMutable.copy;
             }];
             return;
         }
@@ -1652,7 +1652,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             [self performCacheMutationForGetters:getters count:2 block:^{
                 action(audioMutable, audioIndex, recentAudiosMutable, recentAudiosIndex, nil, NSNotFound, NSNotFound);
                 self->_cachedAudioMedia = audioMutable.copy;
-                self.cachedRecentAudioMedia = recentAudiosMutable.copy;
+                self->_cachedRecentAudioMedia = recentAudiosMutable.copy;
             }];
             return;
         }
@@ -1842,12 +1842,12 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 - (void)updateAudioGroupItem:(const id<VLCMediaLibraryAudioGroupProtocol>)audioGroupItem
                  usingGetter:(NSArray *(^)(void))cacheGetter
                     forCache:(SEL)getter
-                 usingSetter:(const SEL)setterSelector
+                 usingSetter:(void (^)(NSArray *))cacheSetter
                   usingQueue:(const dispatch_queue_t)queue
         withNotificationName:(const NSNotificationName)notificationName
 {
     NSParameterAssert(cacheGetter != nil);
-    NSParameterAssert([self respondsToSelector:setterSelector]);
+    NSParameterAssert(cacheSetter != nil);
     const int64_t itemId = audioGroupItem.libraryID;
 
     dispatch_barrier_async(queue, ^{
@@ -1868,10 +1868,10 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         NSMutableArray * const mutableAudioGroupCache = [cache mutableCopy];
         [mutableAudioGroupCache replaceObjectAtIndex:audioGroupIndex withObject:audioGroupItem];
 
+        // Complete the read-modify-write within this barrier, before another
+        // event can take a snapshot of the same cache.
         [self performCacheMutationForGetter:getter block:^{
-            const IMP cacheSetterImp = [self methodForSelector:setterSelector];
-            void (*cacheSetterFunction)(id, SEL, NSArray *) = (void *)cacheSetterImp;
-            cacheSetterFunction(self, setterSelector, mutableAudioGroupCache.copy);
+            cacheSetter(mutableAudioGroupCache.copy);
         }];
 
         [self performAfterCacheWritesOnQueue:queue block:^{
@@ -1883,12 +1883,12 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 - (void)deleteAudioGroupItemWithId:(const int64_t)itemId
                        usingGetter:(NSArray *(^)(void))cacheGetter
                           forCache:(SEL)getter
-                       usingSetter:(const SEL)setterSelector
+                       usingSetter:(void (^)(NSArray *))cacheSetter
                         usingQueue:(const dispatch_queue_t)queue
               withNotificationName:(const NSNotificationName)notificationName
 {
     NSParameterAssert(cacheGetter != nil);
-    NSParameterAssert([self respondsToSelector:setterSelector]);
+    NSParameterAssert(cacheSetter != nil);
 
     dispatch_barrier_async(queue, ^{
         NSArray * const cache = cacheGetter();
@@ -1911,9 +1911,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         [mutableAudioGroupCache removeObjectAtIndex:audioGroupIndex];
 
         [self performCacheMutationForGetter:getter block:^{
-            const IMP cacheSetterImp = [self methodForSelector:setterSelector];
-            void (*cacheSetterFunction)(id, SEL, NSArray *) = (void *)cacheSetterImp;
-            cacheSetterFunction(self, setterSelector, mutableAudioGroupCache.copy);
+            cacheSetter(mutableAudioGroupCache.copy);
         }];
 
         [self performAfterCacheWritesOnQueue:queue block:^{
@@ -1937,7 +1935,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     [self updateAudioGroupItem:album
                    usingGetter:^NSArray *{ return self->_cachedAlbums; }
                       forCache:@selector(cachedAlbums)
-                   usingSetter:@selector(setCachedAlbums:)
+                   usingSetter:^(NSArray *cache) {
+        self->_cachedAlbums = cache;
+    }
                     usingQueue:_albumCacheModificationQueue
           withNotificationName:VLCLibraryModelAlbumUpdated];
 }
@@ -1951,7 +1951,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     [self deleteAudioGroupItemWithId:itemId
                          usingGetter:^NSArray *{ return self->_cachedAlbums; }
                             forCache:@selector(cachedAlbums)
-                         usingSetter:@selector(setCachedAlbums:)
+                         usingSetter:^(NSArray *cache) {
+        self->_cachedAlbums = cache;
+    }
                           usingQueue:_albumCacheModificationQueue
                 withNotificationName:VLCLibraryModelAlbumDeleted];
 }
@@ -1971,7 +1973,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     [self updateAudioGroupItem:artist
                    usingGetter:^NSArray *{ return self->_cachedArtists; }
                       forCache:@selector(cachedArtists)
-                   usingSetter:@selector(setCachedArtists:)
+                   usingSetter:^(NSArray *cache) {
+        self->_cachedArtists = cache;
+    }
                     usingQueue:_artistCacheModificationQueue
           withNotificationName:VLCLibraryModelArtistUpdated];
 }
@@ -1985,7 +1989,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     [self deleteAudioGroupItemWithId:itemId
                          usingGetter:^NSArray *{ return self->_cachedArtists; }
                             forCache:@selector(cachedArtists)
-                         usingSetter:@selector(setCachedArtists:)
+                         usingSetter:^(NSArray *cache) {
+        self->_cachedArtists = cache;
+    }
                           usingQueue:_artistCacheModificationQueue
                 withNotificationName:VLCLibraryModelArtistDeleted];
 }
@@ -2005,7 +2011,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     [self updateAudioGroupItem:genre
                    usingGetter:^NSArray *{ return self->_cachedGenres; }
                       forCache:@selector(cachedGenres)
-                   usingSetter:@selector(setCachedGenres:)
+                   usingSetter:^(NSArray *cache) {
+        self->_cachedGenres = cache;
+    }
                     usingQueue:_genreCacheModificationQueue
           withNotificationName:VLCLibraryModelGenreUpdated];
 }
@@ -2019,7 +2027,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     [self deleteAudioGroupItemWithId:itemId
                          usingGetter:^NSArray *{ return self->_cachedGenres; }
                             forCache:@selector(cachedGenres)
-                         usingSetter:@selector(setCachedGenres:)
+                         usingSetter:^(NSArray *cache) {
+        self->_cachedGenres = cache;
+    }
                           usingQueue:_genreCacheModificationQueue
                 withNotificationName:VLCLibraryModelGenreDeleted];
 }
@@ -2053,7 +2063,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         NSMutableArray * const mutableGroups = cachedGroups.mutableCopy;
         [mutableGroups removeObjectAtIndex:groupIdx];
         [self performCacheMutationForGetter:@selector(cachedListOfGroups) block:^{
-            self.cachedListOfGroups = mutableGroups.copy;
+            self->_cachedListOfGroups = mutableGroups.copy;
         }];
 
         [self performAfterCacheWritesOnQueue:self->_groupCacheModificationQueue block:^{
@@ -2096,7 +2106,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         NSMutableArray * const mutableGroups = cachedGroups.mutableCopy;
         [mutableGroups replaceObjectAtIndex:groupIdx withObject:group];
         [self performCacheMutationForGetter:@selector(cachedListOfGroups) block:^{
-            self.cachedListOfGroups = mutableGroups.copy;
+            self->_cachedListOfGroups = mutableGroups.copy;
         }];
 
         [self performAfterCacheWritesOnQueue:self->_groupCacheModificationQueue block:^{
