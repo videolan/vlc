@@ -954,8 +954,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
                                       getter:@selector(cachedVideoMedia)
                                      onQueue:self->_mediaItemCacheModificationQueue
                                        block:^{
-            [self replaceMediaTitlesFromMedia:self->_cachedVideoMedia withMedia:mutableArray.copy];
-            self->_cachedVideoMedia = mutableArray.copy;
+            NSArray<VLCMediaLibraryMediaItem *> * const media = mutableArray.copy;
+            [self replaceMediaTitlesFromMedia:self->_cachedVideoMedia withMedia:media];
+            self->_cachedVideoMedia = media;
             [self performAfterCacheWritesOnQueue:self->_mediaItemCacheModificationQueue block:^{
                 [self.changeDelegate notifyChange:VLCLibraryModelVideoMediaListReset withObject:self];
             }];
