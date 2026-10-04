@@ -117,10 +117,6 @@ extern NSString * const VLCLibraryModelDiscoveryFailed;
 
 @property (readonly) NSArray <VLCMediaLibraryEntryPoint *> *listOfMonitoredFolders;
 
-@property (readonly) NSDictionary<NSNumber *, NSString *> *albumDict;
-@property (readonly) NSDictionary<NSNumber *, NSString *> *artistDict;
-@property (readonly) NSDictionary<NSNumber *, NSString *> *genreDict;
-
 @property (readwrite, nonatomic) NSString *filterString;
 
 - (size_t)numberOfPlaylistsOfType:(const enum vlc_ml_playlist_type_t)playlistType;

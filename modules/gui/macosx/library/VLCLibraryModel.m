@@ -640,14 +640,12 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         vlc_ml_artist_list_t * const p_artist_list = vlc_ml_list_artists(self->_p_mediaLibrary, &queryParams, YES);
         const size_t numberOfArtists = p_artist_list->i_nb_items;
         NSMutableArray * const mutableArtistArray = [[NSMutableArray alloc] initWithCapacity:numberOfArtists];
-        NSMutableDictionary * const mutableArtistDict = [NSMutableDictionary dictionaryWithCapacity:numberOfArtists];
 
         for (size_t x = 0; x < numberOfArtists; x++) {
             VLCMediaLibraryArtist * const artist = [[VLCMediaLibraryArtist alloc] initWithArtist:&p_artist_list->p_items[x]];
 
             if (artist != nil) {
                 [mutableArtistArray addObject:artist];
-                [mutableArtistDict setObject:artist.name forKey:@(artist.libraryID)];
             }
         }
 
@@ -655,7 +653,6 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
         dispatch_async(dispatch_get_main_queue(), ^{
             self.cachedArtists = mutableArtistArray.copy;
-            self->_artistDict = mutableArtistDict.copy;
             [self performAfterCacheWritesOnQueue:self->_artistCacheModificationQueue block:^{
                 [self.changeDelegate notifyChange:VLCLibraryModelArtistListReset withObject:self];
             }];
@@ -690,19 +687,16 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         vlc_ml_album_list_t * const p_album_list = vlc_ml_list_albums(self->_p_mediaLibrary, &queryParams);
         const size_t numberOfAlbums = p_album_list->i_nb_items;
         NSMutableArray * const mutableAlbumArray = [[NSMutableArray alloc] initWithCapacity:numberOfAlbums];
-        NSMutableDictionary * const mutableAlbumDict = [NSMutableDictionary dictionaryWithCapacity:numberOfAlbums];
 
         for (size_t x = 0; x < numberOfAlbums; x++) {
             VLCMediaLibraryAlbum * const album = [[VLCMediaLibraryAlbum alloc] initWithAlbum:&p_album_list->p_items[x]];
             [mutableAlbumArray addObject:album];
-            [mutableAlbumDict setObject:album.title forKey:@(album.libraryID)];
         }
 
         vlc_ml_album_list_release(p_album_list);
 
         dispatch_async(dispatch_get_main_queue(), ^{
             self.cachedAlbums = mutableAlbumArray.copy;
-            self->_albumDict = mutableAlbumDict.copy;
             [self performAfterCacheWritesOnQueue:self->_albumCacheModificationQueue block:^{
                 [self.changeDelegate notifyChange:VLCLibraryModelAlbumListReset withObject:self];
             }];
@@ -737,19 +731,16 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         vlc_ml_genre_list_t * const p_genre_list = vlc_ml_list_genres(self->_p_mediaLibrary, &queryParams);
         const size_t numberOfGenres = p_genre_list->i_nb_items;
         NSMutableArray * const mutableGenreArray = [[NSMutableArray alloc] initWithCapacity:numberOfGenres];
-        NSMutableDictionary * const mutableGenreDict = [NSMutableDictionary dictionaryWithCapacity:numberOfGenres];
 
         for (size_t x = 0; x < numberOfGenres; x++) {
             VLCMediaLibraryGenre * const genre = [[VLCMediaLibraryGenre alloc] initWithGenre:&p_genre_list->p_items[x]];
             [mutableGenreArray addObject:genre];
-            [mutableGenreDict setObject:genre.name forKey:@(genre.libraryID)];
         }
 
         vlc_ml_genre_list_release(p_genre_list);
 
         dispatch_async(dispatch_get_main_queue(), ^{
             self.cachedGenres = mutableGenreArray.copy;
-            self->_genreDict = mutableGenreDict.copy;
             [self performAfterCacheWritesOnQueue:self->_genreCacheModificationQueue block:^{
                 [self.changeDelegate notifyChange:VLCLibraryModelGenreListReset withObject:self];
             }];
