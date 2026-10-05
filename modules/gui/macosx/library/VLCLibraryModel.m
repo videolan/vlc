@@ -1273,13 +1273,13 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
 - (void)refreshCachedShowForEpisodeID:(int64_t)episodeID
 {
-    NSNumber * const showID = _showIDsByEpisodeID[@(episodeID)];
-    if (showID == nil) {
+    if ([self invalidateCacheUpdateForGetter:@selector(cachedListOfShows)]) {
+        // The pending list may contain an episode not mapped by the old cache.
+        [self resetCachedListOfShows];
         return;
     }
-    if ([self invalidateCacheUpdateForGetter:@selector(cachedListOfShows)]) {
-        // A parent-only lookup would lose other shows in the pending full list.
-        [self resetCachedListOfShows];
+    NSNumber * const showID = _showIDsByEpisodeID[@(episodeID)];
+    if (showID == nil) {
         return;
     }
     const BOOL refreshPending = _showRefreshTokens[showID] != nil;
@@ -1782,8 +1782,20 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             return;
         }
 
-        // Not found in any cache
-        action(nil, NSNotFound, nil, NSNotFound);
+        // An ongoing medialibrary fetch may have retrieved this item without
+        // writing it to the cache yet. Restart pending fetches so an outdated
+        // result cannot restore a deleted item or overwrite an updated one.
+        // Its media type is unknown here, so check all four caches, but only
+        // restart fetches already in progress
+        const SEL getters[] = {
+            @selector(cachedAudioMedia),
+            @selector(cachedRecentAudioMedia),
+            @selector(cachedVideoMedia),
+            @selector(cachedRecentMedia),
+        };
+        [self performCacheMutationForGetters:getters count:4 block:^{
+            action(nil, NSNotFound, nil, NSNotFound);
+        }];
     });
 }
 
@@ -2112,36 +2124,35 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     NSParameterAssert(reloadPending != NULL);
 
     dispatch_barrier_async(queue, ^{
-        NSArray * const cache = cacheGetter();
-
-        if (cache == nil) {
-            return;
-        }
-
-        if (*reloadPending) {
-            cacheRefresh();
-            return;
-        }
-
-        const NSUInteger audioGroupIndex = [self indexForAudioGroupInCache:cache
-                                                                withItemId:itemId];
-        if (audioGroupIndex == NSNotFound) {
-            NSLog(@"Did not find audio group item with id %lli in cache.", itemId);
-            return;
-        }
-
-        const id<VLCMediaLibraryAudioGroupProtocol> audioGroupItem = cache[audioGroupIndex];
-
-        // Create mutable copy for modification
-        NSMutableArray * const mutableAudioGroupCache = [cache mutableCopy];
-        [mutableAudioGroupCache removeObjectAtIndex:audioGroupIndex];
-
         [self performCacheMutationForGetter:getter block:^{
-            cacheSetter(mutableAudioGroupCache.copy);
-        }];
+            NSArray * const cache = cacheGetter();
 
-        [self performAfterCacheWritesOnQueue:queue block:^{
-            [self.changeDelegate notifyChange:notificationName withObject:audioGroupItem];
+            if (cache == nil) {
+                return;
+            }
+
+            if (*reloadPending) {
+                cacheRefresh();
+                return;
+            }
+
+            const NSUInteger audioGroupIndex = [self indexForAudioGroupInCache:cache
+                                                                    withItemId:itemId];
+            if (audioGroupIndex == NSNotFound) {
+                NSLog(@"Did not find audio group item with id %lli in cache.", itemId);
+                return;
+            }
+
+            const id<VLCMediaLibraryAudioGroupProtocol> audioGroupItem = cache[audioGroupIndex];
+
+            // Create mutable copy for modification
+            NSMutableArray * const mutableAudioGroupCache = [cache mutableCopy];
+            [mutableAudioGroupCache removeObjectAtIndex:audioGroupIndex];
+            cacheSetter(mutableAudioGroupCache.copy);
+
+            [self performAfterCacheWritesOnQueue:queue block:^{
+                [self.changeDelegate notifyChange:notificationName withObject:audioGroupItem];
+            }];
         }];
     });
 }
@@ -2279,34 +2290,34 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     const int64_t itemId = p_event->modification.i_entity_id;
 
     dispatch_barrier_async(_groupCacheModificationQueue, ^{
-        NSArray<VLCMediaLibraryGroup *> * const cachedGroups = self->_cachedListOfGroups;
-        if (cachedGroups == nil) {
-            return;
-        }
-
-        const NSUInteger groupIdx =
-            [cachedGroups indexOfObjectPassingTest:^BOOL(VLCMediaLibraryGroup * const group,
-                                                         const NSUInteger __unused idx,
-                                                         BOOL * const __unused stop) {
-            return group.libraryID == itemId;
-        }];
-
-        if (groupIdx == NSNotFound) {
-            NSLog(@"Could not handle deletion of group with id %lld in model", itemId);
-            return;
-        }
-
-        VLCMediaLibraryGroup * const groupToDelete = cachedGroups[groupIdx];
-
-        NSMutableArray * const mutableGroups = cachedGroups.mutableCopy;
-        [mutableGroups removeObjectAtIndex:groupIdx];
         [self performCacheMutationForGetter:@selector(cachedListOfGroups) block:^{
-            self->_cachedListOfGroups = mutableGroups.copy;
-        }];
+            NSArray<VLCMediaLibraryGroup *> * const cachedGroups = self->_cachedListOfGroups;
+            if (cachedGroups == nil) {
+                return;
+            }
 
-        [self performAfterCacheWritesOnQueue:self->_groupCacheModificationQueue block:^{
-            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelGroupDeleted
-                                                            object:groupToDelete];
+            const NSUInteger groupIdx =
+                [cachedGroups indexOfObjectPassingTest:^BOOL(VLCMediaLibraryGroup * const group,
+                                                             const NSUInteger __unused idx,
+                                                             BOOL * const __unused stop) {
+                return group.libraryID == itemId;
+            }];
+
+            if (groupIdx == NSNotFound) {
+                NSLog(@"Could not handle deletion of group with id %lld in model", itemId);
+                return;
+            }
+
+            VLCMediaLibraryGroup * const groupToDelete = cachedGroups[groupIdx];
+
+            NSMutableArray * const mutableGroups = cachedGroups.mutableCopy;
+            [mutableGroups removeObjectAtIndex:groupIdx];
+            self->_cachedListOfGroups = mutableGroups.copy;
+
+            [self performAfterCacheWritesOnQueue:self->_groupCacheModificationQueue block:^{
+                [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelGroupDeleted
+                                                                object:groupToDelete];
+            }];
         }];
     });
 }
