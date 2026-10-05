@@ -82,4 +82,29 @@ static inline const char * ID3TextConvert( const uint8_t *p_buf, size_t i_buf,
     return ID3TextConv( &p_buf[1], i_buf - 1, p_buf[0], ppsz_allocated );
 }
 
+/* Size in bytes of the terminator of a string: UTF-16 strings end with a
+ * null code unit */
+static inline size_t ID3TextTerminatorSize( uint8_t i_charset )
+{
+    return ( i_charset == ID3_ENCODING_UTF16 ||
+             i_charset == ID3_ENCODING_UTF16BE ) ? 2 : 1;
+}
+
+/* Length in bytes of the first string of the buffer, terminator excluded,
+ * or -1 if it is not terminated */
+static inline ssize_t ID3TextLength( const uint8_t *p_buf, size_t i_buf,
+                                     uint8_t i_charset )
+{
+    if( ID3TextTerminatorSize( i_charset ) == 2 )
+    {
+        for( size_t i = 0; i + 1 < i_buf; i += 2 )
+            if( GetWBE( &p_buf[i] ) == 0 )
+                return i;
+        return -1;
+    }
+
+    const size_t i_len = strnlen( (const char *) p_buf, i_buf );
+    return i_len < i_buf ? (ssize_t) i_len : -1;
+}
+
 #endif

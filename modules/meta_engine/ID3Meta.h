@@ -111,7 +111,11 @@ static bool ID3HandleTag( const uint8_t *p_buf, size_t i_buf,
         const char *psz_key = ID3TextConvert( p_buf, i_buf, &psz_key_alloc );
         if( psz_key )
         {
-            const size_t i_len = strlen( psz_key ) + 2;
+            /* The value follows the encoding byte and the key, whose size
+             * depends on the encoding, not on its UTF-8 conversion */
+            const ssize_t i_keylen = ID3TextLength( &p_buf[1], i_buf - 1, p_buf[0] );
+            const size_t i_len = i_keylen < 0 ? i_buf
+                               : 1 + (size_t) i_keylen + ID3TextTerminatorSize( p_buf[0] );
             if( i_len < i_buf )
             {
                 /* Only set those which are known as non binary */
