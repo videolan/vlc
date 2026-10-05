@@ -166,6 +166,13 @@ static int Open( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
 
+    const uint8_t *p_peek;
+
+    if( vlc_stream_Peek( p_demux->s, &p_peek, 12 ) < 12 )
+        return VLC_EGENERIC;
+    if( memcmp( p_peek, "FORM", 4 ) || memcmp( &p_peek[8], "AIFF", 4 ) )
+        return VLC_EGENERIC;
+
     bool b_canseek = false;
     vlc_stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_canseek );
     if (!b_canseek)
@@ -173,13 +180,6 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_demux, "AIFF parsing requires seeking" );
         return VLC_EGENERIC;
     }
-
-    const uint8_t *p_peek;
-
-    if( vlc_stream_Peek( p_demux->s, &p_peek, 12 ) < 12 )
-        return VLC_EGENERIC;
-    if( memcmp( p_peek, "FORM", 4 ) || memcmp( &p_peek[8], "AIFF", 4 ) )
-        return VLC_EGENERIC;
 
     /* skip aiff header */
     if( vlc_stream_Read( p_demux->s, NULL, 12 ) != 12 )
