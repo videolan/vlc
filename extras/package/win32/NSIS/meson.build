@@ -48,6 +48,7 @@ nsProcess = shared_library('nsProcess',
                            objects: nsProcess_obj,
                            vs_module_defs: 'nsProcess.def',
                            name_prefix: '',
+                           link_language: 'c',  # avoid using nasm linker and miss the .dll.a
                            install: true,
                            install_dir: 'NSIS')
 
