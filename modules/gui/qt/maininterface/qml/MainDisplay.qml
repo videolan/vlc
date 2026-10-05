@@ -497,37 +497,23 @@ FocusScope {
                 rightPadding: playlistLoader.shown ? 0 : VLCStyle.applicationHorizontalMargin
 
                 // Top-left corner rounding:
-                Widgets.AcrylicBackground {
+                // `RoundedCornerMask` replaces the area outside of the arc with anti-aliasing,
+                // regardless of the page content, but it requires RHI. Otherwise, we don't draw the rounded corner
+                Widgets.RoundedCornerMask {
                     id: topLeftCornerBackground
 
-                    z: 99
-                    color: sidebar.background.color
-                    visible: sidebar.visible && (stackViewTopLeftRadiusRectangle.topLeftRadius !== undefined)
-
                     anchors.left: stackView.left
-                    anchors.leftMargin: -1
+                    anchors.leftMargin: 0
                     anchors.top: stackView.top
 
-                    // (-1) is to prevent seams
-                    width: stackViewTopLeftRadiusRectangle.width - 1
-                    height: stackViewTopLeftRadiusRectangle.height - 1
+                    z: 99
 
-                    Rectangle {
-                        id: stackViewTopLeftRadiusRectangle
+                    width: VLCStyle.mainView_topLeftRadius
+                    height: VLCStyle.mainView_topLeftRadius
 
-                        width: (stackViewTopLeftRadiusRectangle.topLeftRadius * 2)
-                        height: (stackViewTopLeftRadiusRectangle.topLeftRadius * 2)
+                    visible: supported && sidebar.visible
 
-                        anchors.top: parent.top
-                        anchors.left: parent.left
-                        anchors.leftMargin: 1
-
-                        color: stackViewParent.color
-
-                        property real implicitTopLeftRadius: VLCStyle.mainView_topLeftRadius
-
-                        topLeftRadius: implicitTopLeftRadius
-                    }
+                    color: sidebar.background.color
                 }
 
                 onCurrentItemChanged: {
