@@ -2245,33 +2245,33 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     }
 
     dispatch_barrier_async(_groupCacheModificationQueue, ^{
-        NSArray<VLCMediaLibraryGroup *> * const cachedGroups = self->_cachedListOfGroups;
-        if (cachedGroups == nil) {
-            return;
-        }
-
-        const NSUInteger groupIdx = 
-            [cachedGroups indexOfObjectPassingTest:^BOOL(VLCMediaLibraryGroup * const group,
-                                                         const NSUInteger __unused idx,
-                                                         BOOL * const __unused stop) {
-            NSAssert(group != nil, @"Cache list should not contain nil groups");
-            return group.libraryID == itemId;
-        }];
-
-        if (groupIdx == NSNotFound) {
-            NSLog(@"Could not handle update of group with id %lld in model", itemId);
-            return;
-        }
-
-        NSMutableArray * const mutableGroups = cachedGroups.mutableCopy;
-        [mutableGroups replaceObjectAtIndex:groupIdx withObject:group];
         [self performCacheMutationForGetter:@selector(cachedListOfGroups) block:^{
-            self->_cachedListOfGroups = mutableGroups.copy;
-        }];
+            NSArray<VLCMediaLibraryGroup *> * const cachedGroups = self->_cachedListOfGroups;
+            if (cachedGroups == nil) {
+                return;
+            }
 
-        [self performAfterCacheWritesOnQueue:self->_groupCacheModificationQueue block:^{
-            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelGroupUpdated
-                                                            object:group];
+            const NSUInteger groupIdx =
+                [cachedGroups indexOfObjectPassingTest:^BOOL(VLCMediaLibraryGroup * const group,
+                                                             const NSUInteger __unused idx,
+                                                             BOOL * const __unused stop) {
+                NSAssert(group != nil, @"Cache list should not contain nil groups");
+                return group.libraryID == itemId;
+            }];
+            VLCMediaLibraryGroup * const previousGroup = groupIdx == NSNotFound ? nil : cachedGroups[groupIdx];
+            if ([self shouldReloadCacheForUpdatedItem:group previousItem:previousGroup]) {
+                [self resetCachedListOfGroups];
+                return;
+            }
+
+            NSMutableArray * const mutableGroups = cachedGroups.mutableCopy;
+            [mutableGroups replaceObjectAtIndex:groupIdx withObject:group];
+            self->_cachedListOfGroups = mutableGroups.copy;
+
+            [self performAfterCacheWritesOnQueue:self->_groupCacheModificationQueue block:^{
+                [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelGroupUpdated
+                                                                object:group];
+            }];
         }];
     });
 }
