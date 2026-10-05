@@ -752,6 +752,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
                 [self resetCachedListOfGroups];
             else if (getter == @selector(cachedListOfShows))
                 [self resetCachedListOfShows];
+            else if (getter == @selector(cachedListOfMovies))
+                [self resetCachedListOfMovies];
         }
     }
 }
@@ -1999,15 +2001,22 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
     const int64_t itemId = p_event->modification.i_entity_id;
 
-    NSArray<VLCMediaLibraryMovie *> * const cachedMovies = self.cachedListOfMovies;
-    if (cachedMovies != nil &&
-        [cachedMovies indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMovie * const movie,
-                                                    const NSUInteger __unused index,
-                                                    BOOL * const __unused stop) {
-        return movie.libraryID == itemId;
-    }] != NSNotFound) {
-        [self resetCachedListOfMovies];
-    }
+    dispatch_barrier_async(_mediaItemCacheModificationQueue,
+                           ^{
+        // A pending movie fetch may contain this item even if the cache does not.
+        [self performCacheMutationForGetter:@selector(cachedListOfMovies)
+                                     block:^{
+            NSArray<VLCMediaLibraryMovie *> * const cachedMovies = self->_cachedListOfMovies;
+            if (cachedMovies != nil &&
+                [cachedMovies indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMovie * const movie,
+                                                            const NSUInteger __unused index,
+                                                            BOOL * const __unused stop) {
+                return movie.libraryID == itemId;
+            }] != NSNotFound) {
+                [self resetCachedListOfMovies];
+            }
+        }];
+    });
 
     [self performActionOnMediaItemInCache:itemId action:^(
         NSMutableArray * const cachedMediaArray,
