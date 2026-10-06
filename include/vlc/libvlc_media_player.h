@@ -1653,7 +1653,7 @@ typedef void (*libvlc_audio_resume_cb)(void *data, int64_t pts);
  *
  * \param[in] data data pointer as passed to libvlc_audio_set_callbacks()
  */
-typedef void (*libvlc_audio_flush_cb)(void *data, int64_t pts);
+typedef void (*libvlc_audio_flush_cb)(void *data);
 
 /**
  * Callback prototype for audio buffer drain.
