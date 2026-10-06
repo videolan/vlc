@@ -51,6 +51,13 @@ Item {
 
     property int mode: DualKawaseBlur.Mode.FourPass
 
+    // Setting `inhibit` deinitializes the effect.
+    // This property is added for a Qt bug that causes crash when `ShaderEffect` is
+    // destroyed. If you plan to destroy the effect (relevant if `layer.enabled` is
+    // turned off and this effect is used in `layer.effect`), you may want to set
+    // this property to `true` in `Component.onDestruction`.
+    property bool inhibit: false
+
     /// <postprocess>
     // The following property must be set in order to make other properties respected:
     property bool postprocess: false
@@ -271,7 +278,7 @@ Item {
 
     component DefaultShaderEffectSource : ShaderEffectSource {
         // This is necessary to release resources even if `sourceItem` becomes null (non-live case):
-        parent: sourceItem ? root : null
+        parent: (sourceItem && !root.inhibit) ? root : null
 
         visible: false
         live: root.live
@@ -340,7 +347,7 @@ Item {
         }
 
         // Qt uses reference counting, otherwise ds1layer may not be released, even if it has no parent (see `QQuickItemPrivate::derefWindow()`):
-        source: ((root.mode === DualKawaseBlur.Mode.TwoPass) || !ds1layer.parent) ? null : ds1layer
+        source: ((root.mode === DualKawaseBlur.Mode.TwoPass) || !ds1layer.parent || root.inhibit) ? null : ds1layer
     }
 
     DefaultShaderEffectSource {
@@ -394,7 +401,7 @@ Item {
         }
 
         // Qt uses reference counting, otherwise ds2layer may not be released, even if it has no parent (see `QQuickItemPrivate::derefWindow()`):
-        source: ((root.mode !== DualKawaseBlur.Mode.SixPass) || !ds2layer.parent) ? null : ds2layer
+        source: ((root.mode !== DualKawaseBlur.Mode.SixPass) || !ds2layer.parent || root.inhibit) ? null : ds2layer
     }
 
     DefaultShaderEffectSource {
@@ -444,7 +451,7 @@ Item {
         }
 
         // Qt uses reference counting, otherwise ds3layer may not be released, even if it has no parent (see `QQuickItemPrivate::derefWindow()`):
-        source: ((root.mode !== DualKawaseBlur.Mode.SixPass) || !ds3layer.parent) ? null : ds3layer
+        source: ((root.mode !== DualKawaseBlur.Mode.SixPass) || !ds3layer.parent || root.inhibit) ? null : ds3layer
     }
 
     DefaultShaderEffectSource {
@@ -507,6 +514,9 @@ Item {
 
         // Qt uses reference counting, otherwise ds2layer may not be released, even if it has no parent (see `QQuickItemPrivate::derefWindow()`):
         source: {
+            if (root.inhibit)
+                return null
+
             switch (root.mode) {
             case DualKawaseBlur.Mode.FourPass:
                 if (ds2layer.parent)
@@ -638,7 +648,8 @@ Item {
 
         visible: tpObserver.isValid && root.available
 
-        source: (root.mode === DualKawaseBlur.Mode.TwoPass) ? ds1layer : us1layer
+        source: !root.inhibit ? ((root.mode === DualKawaseBlur.Mode.TwoPass) ? ds1layer : us1layer)
+                              : null
 
         property alias tint: root.tint
         property alias tintStrength: root.tintStrength
