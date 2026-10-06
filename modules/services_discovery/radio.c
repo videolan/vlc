@@ -505,8 +505,8 @@ static int ReadDirectory(stream_t *p_access, input_item_node_t *p_node)
             SetMetaFromField(station_item, parser, tags_index, vlc_meta_Genre);
             SetMetaFromField(station_item, parser, language_index, vlc_meta_Language);
 
-            SetMetaExtraFromField(station_item, parser, codec_index, "Codec");
-            SetMetaExtraFromField(station_item, parser, bitrate_index, "Bitrate (kb/s)");
+            SetMetaExtraFromField(station_item, parser, codec_index, "codec");
+            SetMetaExtraFromField(station_item, parser, bitrate_index, "bitrate");
             SetMetaExtraFromField(station_item, parser, votes_index, "votes");
             SetMetaExtraFromField(station_item, parser, clickcount_index, "clickcount");
             SetMetaExtraFromField(station_item, parser, state_index, "state");
