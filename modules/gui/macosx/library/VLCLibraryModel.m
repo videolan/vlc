@@ -1565,9 +1565,6 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     }
 
     dispatch_group_notify(cacheDropGroup, _mediaTitlesCacheModificationQueue, ^{
-        // Source setters have now submitted their title updates. Queue the final
-        // clear after those updates so none can restore the dropped title cache.
-        self.cachedMediaTitles = nil;
         [self performAfterCacheWritesOnQueue:self->_mediaTitlesCacheModificationQueue block:^{
             [self.changeDelegate notifyChange:VLCLibraryModelAllCachesDropped withObject:self];
         }];
