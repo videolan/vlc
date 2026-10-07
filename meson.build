@@ -1135,7 +1135,7 @@ if get_option('default_monospace_font_family') != ''
 endif
 
 gcrypt_dep = dependency('libgcrypt',
-                         version: '>= 1.6.0',
+                         version: '>= 1.8.5',
                          required: get_option('libgcrypt'))
 if gcrypt_dep.found()
     cdata.set('HAVE_GCRYPT', 1)

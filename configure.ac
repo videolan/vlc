@@ -5003,12 +5003,12 @@ AC_ARG_ENABLE([libgcrypt],
   AS_HELP_STRING([--disable-libgcrypt], [gcrypt support (default enabled)]))
 have_gcrypt="no"
 AS_IF([test "${enable_libgcrypt}" != "no"], [
-  PKG_CHECK_MODULES([GCRYPT], [libgcrypt >= 1.6.0], [
+  PKG_CHECK_MODULES([GCRYPT], [libgcrypt >= 1.8.5], [
     have_gcrypt="yes"
     AC_DEFINE([HAVE_GCRYPT], 1, [Defined if having gcrypt])
   ], [
     AS_IF([test "${enable_libgcrypt}" = "yes"], [
-      AC_MSG_ERROR([libgcrypt version 1.6.0 or higher not found. Install libgcrypt or pass --disable-libgcrypt.])
+      AC_MSG_ERROR([libgcrypt version 1.8.5 or higher not found. Install libgcrypt or pass --disable-libgcrypt.])
     ])
   ])
 ])
