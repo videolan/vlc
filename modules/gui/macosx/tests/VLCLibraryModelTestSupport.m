@@ -25,6 +25,145 @@
 #import "VLCLibraryDataTypesIntegrationTestSupport.h"
 #import "extensions/NSArray+VLCAdditions.h"
 
+@implementation VLCLibraryModelTestShowQueries {
+    NSUInteger _showListQueryCount;
+    NSMutableDictionary<NSNumber *, NSNumber *> *_showQueryCounts;
+    NSMutableSet<NSNumber *> *_expectedDeletionIDs;
+    dispatch_block_t _deletionsSubmitted;
+    dispatch_semaphore_t _showQueryRelease;
+    dispatch_block_t _showQueryCaptured;
+    dispatch_block_t _showQueryProcessed;
+    dispatch_group_t _targetedShowQueries;
+}
+
+- (NSUInteger)showListQueryCount
+{
+    @synchronized (self) {
+        return _showListQueryCount;
+    }
+}
+
+- (NSDictionary<NSNumber *, NSNumber *> *)showQueryCounts
+{
+    @synchronized (self) {
+        return _showQueryCounts.copy ?: @{};
+    }
+}
+
+- (void)resetCachedListOfShows
+{
+    @synchronized (self) {
+        _showListQueryCount++;
+    }
+    [super resetCachedListOfShows];
+}
+
+- (void)refreshCachedShowForLibraryID:(int64_t)libraryID
+{
+    @synchronized (self) {
+        if (_targetedShowQueries == nil)
+            _targetedShowQueries = dispatch_group_create();
+        dispatch_group_enter(_targetedShowQueries);
+        if (_showQueryCounts == nil) {
+            _showQueryCounts = NSMutableDictionary.dictionary;
+        }
+        NSNumber * const key = @(libraryID);
+        _showQueryCounts[key] = @(_showQueryCounts[key].unsignedIntegerValue + 1);
+    }
+    [super refreshCachedShowForLibraryID:libraryID];
+}
+
+- (void)observeDeletionsForMediaIDs:(NSArray<NSNumber *> *)mediaIDs
+                          handler:(dispatch_block_t)handler
+{
+    @synchronized (self) {
+        _expectedDeletionIDs = [NSMutableSet setWithArray:mediaIDs];
+        _deletionsSubmitted = [handler copy];
+    }
+}
+
+- (void)holdNextShowQueryResultWithHandler:(dispatch_block_t)handler
+                         completionHandler:(dispatch_block_t)completionHandler
+{
+    @synchronized (self) {
+        _showQueryRelease = dispatch_semaphore_create(0);
+        _showQueryCaptured = [handler copy];
+        _showQueryProcessed = [completionHandler copy];
+    }
+}
+
+- (void)releaseShowQuery
+{
+    dispatch_semaphore_signal(_showQueryRelease);
+}
+
+- (void)updateCachedShow:(VLCMediaLibraryShow *)show
+               libraryID:(int64_t)libraryID
+              generation:(NSUInteger)generation
+                   token:(NSObject *)token
+{
+    dispatch_block_t captured = nil;
+    dispatch_block_t processed = nil;
+    dispatch_semaphore_t release = nil;
+    @synchronized (self) {
+        captured = _showQueryCaptured;
+        processed = _showQueryProcessed;
+        release = _showQueryRelease;
+        _showQueryCaptured = nil;
+        _showQueryProcessed = nil;
+    }
+    if (captured != nil) {
+        dispatch_async(dispatch_get_main_queue(), captured);
+        dispatch_semaphore_wait(release, dispatch_time(DISPATCH_TIME_NOW, 10 * NSEC_PER_SEC));
+    }
+    [super updateCachedShow:show
+                  libraryID:libraryID
+                 generation:generation
+                      token:token];
+    // Drain the submitted write without holding the model lock. A superseded
+    // result can start another targeted lookup from inside that cache barrier;
+    // its group entry must precede this lookup's departure.
+    (void)self.cachedListOfShows;
+    dispatch_group_t queries;
+    @synchronized (self) {
+        queries = _targetedShowQueries;
+    }
+    dispatch_group_leave(queries);
+    if (processed != nil) {
+        // The real write has now executed or been rejected by the model.
+        dispatch_async(dispatch_get_main_queue(), processed);
+    }
+}
+
+- (void)finishPendingQueriesWithCompletion:(dispatch_block_t)completion
+{
+    [super finishPendingQueriesWithCompletion:^{
+        dispatch_group_t queries;
+        @synchronized (self) {
+            queries = self->_targetedShowQueries;
+        }
+        if (queries == nil)
+            dispatch_async(dispatch_get_main_queue(), completion);
+        else
+            dispatch_group_notify(queries, dispatch_get_main_queue(), completion);
+    }];
+}
+
+- (void)handleMediaItemDeletionEvent:(const vlc_ml_event_t *)event
+{
+    [super handleMediaItemDeletionEvent:event];
+    @synchronized (self) {
+        [_expectedDeletionIDs removeObject:@(event->deletion.i_entity_id)];
+        if (_expectedDeletionIDs != nil && _expectedDeletionIDs.count == 0) {
+            dispatch_async(dispatch_get_main_queue(), _deletionsSubmitted);
+            _expectedDeletionIDs = nil;
+            _deletionsSubmitted = nil;
+        }
+    }
+}
+
+@end
+
 @implementation VLCLibraryModelTestCacheReadGate {
     dispatch_semaphore_t _cacheReadRelease;
     dispatch_block_t _cacheReadCaptured;

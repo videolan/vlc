@@ -116,6 +116,15 @@
 
 // Counts full/targeted show queries and observes removal submissions, allowing
 // tests to distinguish a targeted refresh from a complete show-list rebuild.
+@interface VLCLibraryModelTestShowQueries : VLCLibraryModelTestQueryGate
+@property (readonly) NSUInteger showListQueryCount;
+@property (readonly) NSDictionary<NSNumber *, NSNumber *> *showQueryCounts;
+- (void)observeDeletionsForMediaIDs:(NSArray<NSNumber *> *)mediaIDs
+                          handler:(dispatch_block_t)handler;
+- (void)holdNextShowQueryResultWithHandler:(dispatch_block_t)handler
+                         completionHandler:(dispatch_block_t)completionHandler;
+- (void)releaseShowQuery;
+@end
 
 // Holds the title queue after a read, delaying title writes but not media writes.
 

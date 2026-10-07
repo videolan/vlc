@@ -47,6 +47,7 @@ BOOL VLCLibraryDataTypesIntegrationRenameAlbum(int64_t libraryID, NSString *titl
 BOOL VLCLibraryDataTypesIntegrationRenameArtist(int64_t libraryID, NSString *name);
 BOOL VLCLibraryDataTypesIntegrationRenameGenre(int64_t libraryID, NSString *name);
 BOOL VLCLibraryDataTypesIntegrationRenameMedia(int64_t libraryID, NSString *title);
+BOOL VLCLibraryDataTypesIntegrationClearEpisodeSubtype(int64_t mediaID);
 BOOL VLCLibraryDataTypesIntegrationSetShowSummary(int64_t showID, NSString *summary);
 BOOL VLCLibraryDataTypesIntegrationMoveMediaToAlbum(int64_t mediaID, int64_t albumID);
 BOOL VLCLibraryDataTypesIntegrationMoveMediaToArtist(int64_t mediaID, int64_t artistID);

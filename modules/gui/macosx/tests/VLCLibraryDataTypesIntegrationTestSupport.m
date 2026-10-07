@@ -1004,6 +1004,15 @@ BOOL VLCLibraryDataTypesIntegrationRenameMedia(int64_t libraryID, NSString *titl
             title);
 }
 
+BOOL VLCLibraryDataTypesIntegrationClearEpisodeSubtype(int64_t mediaID)
+{
+    // Retain the relationship so the model must use its cached episode->show
+    // mapping after a preceding media update has cleared the subtype.
+    return VLCLibraryDataTypesIntegrationExecuteEntityStatement(
+        "UPDATE Media SET subtype = ?2 WHERE id_media = ?1",
+        mediaID,
+        @(VLC_ML_MEDIA_SUBTYPE_UNKNOWN));
+}
 
 BOOL VLCLibraryDataTypesIntegrationSetShowSummary(int64_t showID, NSString *summary)
 {

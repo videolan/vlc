@@ -1315,3 +1315,311 @@
 }
 
 @end
+
+@interface VLCLibraryModelShowsTest : VLCLibraryModelPersistedTestCase
+@property (strong) VLCLibraryModelTestShowQueries *model;
+@property BOOL holdingShowQuery;
+@end
+
+@implementation VLCLibraryModelShowsTest
+
+- (void)setUp
+{
+    [super setUp];
+    self.model = [[VLCLibraryModelTestShowQueries alloc]
+        initWithLibrary:VLCLibraryDataTypesIntegrationMediaLibrary()
+          observeEvents:NO];
+    self.model.changeDelegate.throttleInterval = 0.;
+    // Keep the real ML queries, but deliver mutations in a controlled order.
+}
+
+- (void)tearDown
+{
+    [self releaseHeldShowQuery];
+    if (self.model != nil) {
+        XCTestExpectation * const finished = [self expectationWithDescription:@"Show fixture reads finished"];
+        [self.model finishPendingQueriesWithCompletion:^{
+            [finished fulfill];
+        }];
+        [self waitForExpectations:@[ finished ] timeout:10.];
+    }
+    self.model = nil;
+    [super tearDown];
+}
+
+- (VLCMediaLibraryShow *)createShowWithName:(NSString *)name episodeCount:(NSUInteger)episodeCount
+{
+    XCTestExpectation * const scanned = [self expectationWithDescription:@"Persisted show episodes scanned"];
+    __block int64_t showID = 0;
+    __block BOOL sameShow = YES;
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0),
+                   ^{
+        for (NSUInteger index = 0; index < episodeCount; index++) {
+            const int64_t ID = VLCLibraryDataTypesIntegrationCreateScannedShow(name);
+            if (ID == 0 || (showID != 0 && ID != showID)) {
+                sameShow = NO;
+                break;
+            }
+            showID = ID;
+        }
+        [scanned fulfill];
+    });
+    [self waitForExpectations:@[ scanned ] timeout:15.];
+    XCTAssertTrue(sameShow);
+    XCTAssertGreaterThan(showID, (int64_t)0);
+    VLCMediaLibraryShow * const show = [VLCMediaLibraryShow showWithLibraryId:showID];
+    XCTAssertNotNil(show);
+    XCTAssertEqual(show.episodeCount, episodeCount);
+    XCTAssertEqual(show.episodes.count, episodeCount);
+    return show;
+}
+
+- (void)loadShows
+{
+    XCTestExpectation * const loaded = [self expectationForNotification:VLCLibraryModelListOfShowsReset
+                                                                 object:self.model
+                                                                handler:nil];
+    [self.model resetCachedListOfShows];
+    [self waitForExpectations:@[ loaded ] timeout:5.];
+    XCTAssertNotNil(self.model.cachedListOfShows);
+}
+
+- (VLCMediaLibraryShow *)cachedShowWithID:(int64_t)showID
+{
+    return [self itemWithID:showID inItems:self.model.cachedListOfShows];
+}
+
+- (XCTestExpectation *)expectShowNotification:(NSNotificationName)name showID:(int64_t)showID
+{
+    return [self expectationForNotification:name
+                                     object:nil
+                                    handler:^BOOL(NSNotification *notification) {
+        id const object = notification.object;
+        if ([object isKindOfClass:NSNumber.class])
+            return [object longLongValue] == showID;
+        return [object isKindOfClass:VLCMediaLibraryShow.class] && [object libraryID] == showID;
+    }];
+}
+
+- (void)assertShowWithID:(int64_t)showID hasEpisodeCount:(NSUInteger)count replacing:(VLCMediaLibraryShow *)previous
+{
+    VLCMediaLibraryShow * const persisted = [VLCMediaLibraryShow showWithLibraryId:showID];
+    VLCMediaLibraryShow * const cached = [self cachedShowWithID:showID];
+    XCTAssertNotNil(persisted);
+    XCTAssertNotNil(cached);
+    XCTAssertEqual(persisted.episodeCount, count);
+    XCTAssertEqual(persisted.episodes.count, count);
+    XCTAssertEqual(cached.episodeCount, persisted.episodeCount);
+    XCTAssertEqualObjects(cached.primaryDetailString, persisted.primaryDetailString);
+    XCTAssertNotEqual(cached, previous);
+    // A fresh lazy episode lookup alone would not prove the show snapshot changed.
+    XCTAssertNotEqualObjects(cached.primaryDetailString, previous.primaryDetailString);
+}
+
+- (void)deletePersistedEpisode:(int64_t)mediaID
+{
+    XCTAssertTrue(VLCLibraryDataTypesIntegrationDeleteEntity(VLC_ML_EVENT_MEDIA_DELETED, mediaID));
+    XCTAssertNil([VLCMediaLibraryMediaItem mediaItemForLibraryID:mediaID]);
+}
+
+- (void)deliverEpisodeDeletion:(int64_t)mediaID
+{
+    const vlc_ml_event_t event = {
+        .i_type = VLC_ML_EVENT_MEDIA_DELETED,
+        .deletion.i_entity_id = mediaID,
+    };
+    [self.model handleMediaItemDeletionEvent:&event];
+}
+
+- (void)deleteAndDeliverEpisode:(int64_t)mediaID
+{
+    [self deletePersistedEpisode:mediaID];
+    [self deliverEpisodeDeletion:mediaID];
+}
+
+- (void)holdShowResultWithCaptured:(XCTestExpectation *)captured processed:(XCTestExpectation *)processed
+{
+    self.holdingShowQuery = YES;
+    [self.model holdNextShowQueryResultWithHandler:^{
+        [captured fulfill];
+    }
+                                 completionHandler:^{
+        [processed fulfill];
+    }];
+}
+
+- (void)releaseHeldShowQuery
+{
+    if (self.holdingShowQuery) {
+        [self.model releaseShowQuery];
+        self.holdingShowQuery = NO;
+    }
+}
+
+- (void)testEpisodeDeletionRefreshesOnlyItsSettledCachedShow
+{
+    VLCMediaLibraryShow * const show = [self createShowWithName:@"Targeted Show" episodeCount:2];
+    [self loadShows];
+    VLCMediaLibraryShow * const previous = [self cachedShowWithID:show.libraryID];
+    VLCMediaLibraryShow * const unrelated = [self cachedShowWithID:VLCLibraryDataTypesIntegrationShowID()];
+    XCTAssertNotNil(previous);
+    XCTAssertNotNil(unrelated);
+    const NSUInteger fullQueryCount = self.model.showListQueryCount;
+    XCTestExpectation * const updated = [self expectShowNotification:VLCLibraryModelShowUpdated showID:show.libraryID];
+
+    [self deleteAndDeliverEpisode:show.episodes.firstObject.libraryID];
+    [self waitForExpectations:@[ updated ] timeout:5.];
+
+    [self assertShowWithID:show.libraryID hasEpisodeCount:1 replacing:previous];
+    XCTAssertEqual([self cachedShowWithID:unrelated.libraryID], unrelated);
+    XCTAssertEqual(self.model.showListQueryCount, fullQueryCount);
+    XCTAssertEqual(self.model.showQueryCounts[@(show.libraryID)].unsignedIntegerValue, (NSUInteger)1);
+    XCTAssertNil(self.model.showQueryCounts[@(unrelated.libraryID)]);
+}
+
+- (void)testRepeatedEpisodeDeletionsCoalesceTheSameShowRefresh
+{
+    VLCMediaLibraryShow * const show = [self createShowWithName:@"Coalesced Show" episodeCount:3];
+    NSArray<VLCMediaLibraryMediaItem *> * const episodes = show.episodes;
+    [self loadShows];
+    VLCMediaLibraryShow * const previous = [self cachedShowWithID:show.libraryID];
+    const NSUInteger fullQueryCount = self.model.showListQueryCount;
+    XCTestExpectation * const captured = [self expectationWithDescription:@"Two-episode show snapshot captured"];
+    XCTestExpectation * const processed = [self expectationWithDescription:@"Superseded show snapshot processed"];
+    [self holdShowResultWithCaptured:captured processed:processed];
+    [self deleteAndDeliverEpisode:episodes[0].libraryID];
+    [self waitForExpectations:@[ captured ] timeout:5.];
+    XCTAssertEqual([VLCMediaLibraryShow showWithLibraryId:show.libraryID].episodeCount, (NSUInteger)2);
+    XCTestExpectation * const updated = [self expectShowNotification:VLCLibraryModelShowUpdated showID:show.libraryID];
+    [self deleteAndDeliverEpisode:episodes[1].libraryID];
+    // This synchronized read drains the second deletion's cache handler.
+    XCTAssertEqual([self cachedShowWithID:show.libraryID], previous);
+    XCTAssertEqual(self.model.showQueryCounts[@(show.libraryID)].unsignedIntegerValue, (NSUInteger)1);
+    XCTAssertEqual([VLCMediaLibraryShow showWithLibraryId:show.libraryID].episodeCount, (NSUInteger)1);
+    [self releaseHeldShowQuery];
+    [self waitForExpectations:@[ processed, updated ] timeout:5.];
+    [self assertShowWithID:show.libraryID hasEpisodeCount:1 replacing:previous];
+    XCTAssertEqual(self.model.showListQueryCount, fullQueryCount);
+    XCTAssertEqual(self.model.showQueryCounts[@(show.libraryID)].unsignedIntegerValue, (NSUInteger)2);
+}
+
+- (void)testOverlappingChangesToDistinctShowsDoNotSupersedeEachOther
+{
+    VLCMediaLibraryShow * const first = [self createShowWithName:@"Independent First Show" episodeCount:2];
+    VLCMediaLibraryShow * const second = [self createShowWithName:@"Independent Second Show" episodeCount:2];
+    [self loadShows];
+    VLCMediaLibraryShow * const previousFirst = [self cachedShowWithID:first.libraryID];
+    VLCMediaLibraryShow * const previousSecond = [self cachedShowWithID:second.libraryID];
+    const NSUInteger fullQueryCount = self.model.showListQueryCount;
+    XCTestExpectation * const captured = [self expectationWithDescription:@"First show lookup captured"];
+    XCTestExpectation * const processed = [self expectationWithDescription:@"First show lookup processed"];
+    [self holdShowResultWithCaptured:captured processed:processed];
+    [self deleteAndDeliverEpisode:first.episodes.firstObject.libraryID];
+    [self waitForExpectations:@[ captured ] timeout:5.];
+    XCTestExpectation * const secondUpdated = [self expectShowNotification:VLCLibraryModelShowUpdated showID:second.libraryID];
+    [self deleteAndDeliverEpisode:second.episodes.firstObject.libraryID];
+    [self waitForExpectations:@[ secondUpdated ] timeout:5.];
+    [self assertShowWithID:second.libraryID hasEpisodeCount:1 replacing:previousSecond];
+    XCTAssertEqual([self cachedShowWithID:first.libraryID], previousFirst);
+    XCTAssertEqual(previousFirst.episodeCount, (NSUInteger)2);
+    XCTestExpectation * const firstUpdated = [self expectShowNotification:VLCLibraryModelShowUpdated showID:first.libraryID];
+    [self releaseHeldShowQuery];
+    [self waitForExpectations:@[ processed, firstUpdated ] timeout:5.];
+    [self assertShowWithID:first.libraryID hasEpisodeCount:1 replacing:previousFirst];
+    XCTAssertEqual(self.model.showListQueryCount, fullQueryCount);
+    XCTAssertEqual(self.model.showQueryCounts[@(first.libraryID)].unsignedIntegerValue, (NSUInteger)1);
+    XCTAssertEqual(self.model.showQueryCounts[@(second.libraryID)].unsignedIntegerValue, (NSUInteger)1);
+}
+
+- (void)testDeletingTheFinalEpisodeRemovesItsCachedShow
+{
+    VLCMediaLibraryShow * const show = [self createShowWithName:@"Final Episode Show" episodeCount:1];
+    const int64_t mediaID = show.episodes.firstObject.libraryID;
+    [self loadShows];
+    XCTAssertNotNil([self cachedShowWithID:show.libraryID]);
+    const NSUInteger fullQueryCount = self.model.showListQueryCount;
+    XCTestExpectation * const deleted = [self expectShowNotification:VLCLibraryModelShowDeleted showID:show.libraryID];
+
+    [self deleteAndDeliverEpisode:mediaID];
+    [self waitForExpectations:@[ deleted ] timeout:5.];
+
+    VLCMediaLibraryShow * const persisted = [VLCMediaLibraryShow showWithLibraryId:show.libraryID];
+    XCTAssertEqual(persisted.episodeCount, (NSUInteger)0);
+    XCTAssertEqual(persisted.episodes.count, (NSUInteger)0);
+    XCTAssertNil([self cachedShowWithID:show.libraryID]);
+    XCTAssertNotNil([self cachedShowWithID:VLCLibraryDataTypesIntegrationShowID()]);
+    XCTAssertEqual(self.model.showListQueryCount, fullQueryCount);
+    XCTAssertEqual(self.model.showQueryCounts[@(show.libraryID)].unsignedIntegerValue, (NSUInteger)1);
+}
+
+- (void)testClearedEpisodeSubtypeDoesNotLoseItsCachedShowRelationship
+{
+    VLCMediaLibraryShow * const show = [self createShowWithName:@"Cleared Subtype Show" episodeCount:1];
+    const int64_t mediaID = show.episodes.firstObject.libraryID;
+    [self loadShows];
+    const NSUInteger fullQueryCount = self.model.showListQueryCount;
+    XCTAssertTrue(VLCLibraryDataTypesIntegrationClearEpisodeSubtype(mediaID));
+    VLCMediaLibraryMediaItem * const updatedMedia = [VLCMediaLibraryMediaItem mediaItemForLibraryID:mediaID];
+    XCTAssertNotNil(updatedMedia);
+    XCTAssertEqual(updatedMedia.mediaSubType, VLC_ML_MEDIA_SUBTYPE_UNKNOWN);
+    XCTAssertEqual([VLCMediaLibraryShow showWithLibraryId:show.libraryID].episodeCount, (NSUInteger)1);
+    XCTestExpectation * const updated = [self expectShowNotification:VLCLibraryModelShowUpdated showID:show.libraryID];
+    const vlc_ml_event_t update = {
+        .i_type = VLC_ML_EVENT_MEDIA_UPDATED,
+        .modification.i_entity_id = mediaID,
+    };
+    [self.model handleMediaItemUpdateEvent:&update];
+    [self waitForExpectations:@[ updated ] timeout:5.];
+    XCTestExpectation * const deleted = [self expectShowNotification:VLCLibraryModelShowDeleted showID:show.libraryID];
+    [self deleteAndDeliverEpisode:mediaID];
+    [self waitForExpectations:@[ deleted ] timeout:5.];
+    XCTAssertNil([self cachedShowWithID:show.libraryID]);
+    XCTAssertEqual(self.model.showListQueryCount, fullQueryCount);
+    XCTAssertEqual(self.model.showQueryCounts[@(show.libraryID)].unsignedIntegerValue, (NSUInteger)2);
+}
+
+- (void)testDroppingCachesRejectsAPendingTargetedShowResult
+{
+    VLCMediaLibraryShow * const show = [self createShowWithName:@"Dropped Targeted Show" episodeCount:2];
+    [self loadShows];
+    XCTestExpectation * const captured = [self expectationWithDescription:@"Targeted show result captured before drop"];
+    XCTestExpectation * const processed = [self expectationWithDescription:@"Targeted show result processed after drop"];
+    [self holdShowResultWithCaptured:captured processed:processed];
+    [self deleteAndDeliverEpisode:show.episodes.firstObject.libraryID];
+    [self waitForExpectations:@[ captured ] timeout:5.];
+    XCTestExpectation * const dropped = [self expectationForNotification:VLCLibraryModelAllCachesDropped
+                                                                  object:self.model
+                                                                 handler:nil];
+    self.model.filterString = @"Different Filter";
+    [self waitForExpectations:@[ dropped ] timeout:5.];
+    XCTAssertNil(self.model.cachedListOfShows);
+    [self releaseHeldShowQuery];
+    [self waitForExpectations:@[ processed ] timeout:5.];
+    // Reading the owning queue waits until the stale targeted write was rejected.
+    XCTAssertNil(self.model.cachedListOfShows);
+    XCTAssertEqual([VLCMediaLibraryShow showWithLibraryId:show.libraryID].episodeCount, (NSUInteger)1);
+}
+
+- (void)testReplacingTheShowListRejectsAnOlderTargetedShowResult
+{
+    VLCMediaLibraryShow * const show = [self createShowWithName:@"Replaced Targeted Show" episodeCount:3];
+    NSArray<VLCMediaLibraryMediaItem *> * const episodes = show.episodes;
+    [self loadShows];
+    XCTestExpectation * const captured = [self expectationWithDescription:@"Older two-episode show snapshot captured"];
+    XCTestExpectation * const processed = [self expectationWithDescription:@"Older targeted show snapshot rejected"];
+    [self holdShowResultWithCaptured:captured processed:processed];
+    [self deleteAndDeliverEpisode:episodes[0].libraryID];
+    [self waitForExpectations:@[ captured ] timeout:5.];
+    [self deletePersistedEpisode:episodes[1].libraryID];
+    [self loadShows];
+    VLCMediaLibraryShow * const replacement = [self cachedShowWithID:show.libraryID];
+    XCTAssertEqual(replacement.episodeCount, (NSUInteger)1);
+    XCTAssertEqual([VLCMediaLibraryShow showWithLibraryId:show.libraryID].episodeCount, (NSUInteger)1);
+    [self releaseHeldShowQuery];
+    [self waitForExpectations:@[ processed ] timeout:5.];
+    XCTAssertEqual([self cachedShowWithID:show.libraryID], replacement);
+    XCTAssertEqual([self cachedShowWithID:show.libraryID].episodeCount, (NSUInteger)1);
+    XCTAssertEqual(self.model.showQueryCounts[@(show.libraryID)].unsignedIntegerValue, (NSUInteger)1);
+}
+
+@end
