@@ -1036,6 +1036,409 @@
 
 @end
 
+@interface VLCLibraryModelEventsTest : VLCLibraryModelPersistedTestCase
+@property (strong, nonatomic) VLCLibraryModelTestQueryGate *model;
+@property BOOL callbackStopped;
+@end
+
+@implementation VLCLibraryModelEventsTest
+
+- (void)tearDown
+{
+    [self stopModelCallback];
+    if (_model != nil) {
+        XCTestExpectation * const finished = [self expectationWithDescription:@"Native event queries finished"];
+        [_model finishPendingQueriesWithCompletion:^{
+            [finished fulfill];
+        }];
+        [self waitForExpectations:@[ finished ] timeout:10.];
+    }
+    self.model = nil;
+    [super tearDown];
+}
+
+- (VLCLibraryModelTestQueryGate *)model
+{
+    if (_model == nil) {
+        _model = [[VLCLibraryModelTestQueryGate alloc] initWithLibrary:
+            VLCLibraryDataTypesIntegrationMediaLibrary()];
+        _model.changeDelegate.throttleInterval = 0.;
+    }
+    return _model;
+}
+
+- (void)stopModelCallback
+{
+    if (_model != nil && !self.callbackStopped) {
+        [_model applicationWillTerminate:nil];
+        self.callbackStopped = YES;
+    }
+}
+
+- (NSArray<VLCMediaLibraryMediaItem *> *)loadRecentHistoryForAudio:(BOOL)audio
+{
+    NSNotificationName const name = audio
+        ? VLCLibraryModelRecentAudioMediaListReset
+        : VLCLibraryModelRecentsMediaListReset;
+    XCTestExpectation * const loaded = [self expectationForNotification:name
+                                                                 object:self.model
+                                                                handler:nil];
+    [self.model refreshCacheForGetter:audio
+        ? @selector(cachedRecentAudioMedia)
+        : @selector(cachedRecentMedia)];
+    [self waitForExpectations:@[ loaded ] timeout:5.];
+    return audio
+        ? self.model.listOfRecentAudioMedia
+        : self.model.listOfRecentMedia;
+}
+
+- (void)assertDroppedMonitoredFoldersRejectsPendingWrite:(BOOL)queuedWrite
+{
+    XCTestExpectation * const loaded = [self expectationForNotification:VLCLibraryModelListOfMonitoredFoldersUpdated
+                                                                 object:self.model
+                                                                handler:nil];
+    [self.model resetCachedListOfMonitoredFolders];
+    [self waitForExpectations:@[ loaded ] timeout:5.];
+    XCTAssertGreaterThan(self.model.cachedListOfMonitoredFolders.count, (NSUInteger)0);
+    NSArray<VLCMediaLibraryFolderObserver *> * const previousObservers = self.model.folderObservers;
+    XCTAssertGreaterThan(previousObservers.count, (NSUInteger)0);
+    [self stopModelCallback];
+
+    XCTestExpectation * const captured = [self expectationWithDescription:@"Older monitored-folder result held"];
+    XCTestExpectation * const processed = [self expectationWithDescription:@"Older monitored-folder write processed"];
+    if (queuedWrite) {
+        [self.model holdNextCacheWriteForGetter:@selector(cachedListOfMonitoredFolders)
+                                        handler:^{
+            [captured fulfill];
+        }
+                              completionHandler:^{
+            [processed fulfill];
+        }];
+    } else {
+        [self.model holdNextQueryResultForGetter:@selector(cachedListOfMonitoredFolders)
+                                         handler:^{
+            [captured fulfill];
+        }
+                               completionHandler:^{
+            [processed fulfill];
+        }];
+    }
+    VLCLibraryModelTestQueryGate * const model = self.model;
+    dispatch_block_t const releaseHeldWork = ^{
+        if (queuedWrite)
+            [model releaseCacheWrite];
+        else
+            [model releaseQuery];
+    };
+    [self addTeardownBlock:releaseHeldWork];
+    __block NSUInteger publishedCount = 0;
+    id const observer = [NSNotificationCenter.defaultCenter
+        addObserverForName:VLCLibraryModelListOfMonitoredFoldersUpdated
+                    object:self.model
+                     queue:nil
+                usingBlock:^(NSNotification * __unused notification) {
+        publishedCount++;
+    }];
+    [self addTeardownBlock:^{
+        [NSNotificationCenter.defaultCenter removeObserver:observer];
+    }];
+    [self.model resetCachedListOfMonitoredFolders];
+    [self waitForExpectations:@[ captured ] timeout:5.];
+    XCTestExpectation * const dropped = [self expectationForNotification:VLCLibraryModelAllCachesDropped
+                                                                  object:self.model
+                                                                 handler:nil];
+    [self.model dropCaches];
+    if (!queuedWrite)
+        [self waitForExpectations:@[ dropped ] timeout:5.];
+    releaseHeldWork();
+    [self waitForExpectations:@[ processed ] timeout:5.];
+    if (queuedWrite)
+        [self waitForExpectations:@[ dropped ] timeout:5.];
+    // Read the cache rather than its lazy loader, which would start a fresh query.
+    XCTAssertNil(self.model.cachedListOfMonitoredFolders);
+    XCTAssertEqual(publishedCount,
+                   (NSUInteger)0,
+                   @"A rejected folder result must not publish a cache update");
+    XCTAssertEqual(self.model.folderObservers,
+                   previousObservers,
+                   @"The rejected folder write must not recreate its observers");
+    if (queuedWrite)
+        XCTAssertFalse(self.model.didExecuteHeldCacheWrite,
+                       @"A stale folder write must not recreate its observers");
+}
+
+- (NSArray<VLCMediaLibraryMediaItem *> *)loadMediaForAudio:(BOOL)audio
+{
+    NSNotificationName const name = audio
+        ? VLCLibraryModelAudioMediaListReset
+        : VLCLibraryModelVideoMediaListReset;
+    XCTestExpectation * const loaded = [self expectationForNotification:name
+                                                                 object:self.model
+                                                                handler:nil];
+    [self.model refreshCacheForGetter:audio
+        ? @selector(cachedAudioMedia)
+        : @selector(cachedVideoMedia)];
+    [self waitForExpectations:@[ loaded ] timeout:5.];
+    return audio
+        ? self.model.listOfAudioMedia
+        : self.model.listOfVideoMedia;
+}
+
+- (void)assertNativeMediaUpdateForAudio:(BOOL)audio
+{
+    const int64_t libraryID = audio
+        ? VLCLibraryDataTypesIntegrationFactoryAudioMediaID()
+        : VLCLibraryDataTypesIntegrationFactoryVideoMediaID();
+    VLCMediaLibraryMediaItem * const previous =
+        (VLCMediaLibraryMediaItem *)[self itemWithID:libraryID inItems:[self loadMediaForAudio:audio]];
+    XCTAssertNotNil(previous);
+    XCTAssertFalse(previous.favorited);
+    __block VLCMediaLibraryMediaItem *received = nil;
+    NSNotificationName const name = audio
+        ? VLCLibraryModelAudioMediaItemUpdated
+        : VLCLibraryModelVideoMediaItemUpdated;
+    XCTestExpectation * const updated = [self expectationForNotification:name
+                                                                  object:nil
+                                                                 handler:^BOOL(NSNotification *notification) {
+        if (![notification.object isKindOfClass:VLCMediaLibraryMediaItem.class] ||
+            [notification.object libraryID] != libraryID)
+            return NO;
+        XCTAssertTrue(NSThread.isMainThread);
+        received = notification.object;
+        XCTAssertTrue(received.favorited);
+        NSArray * const cache = audio
+            ? self.model.listOfAudioMedia
+            : self.model.listOfVideoMedia;
+        XCTAssertTrue([self itemWithID:libraryID inItems:cache].favorited);
+        return YES;
+    }];
+    XCTAssertEqual(vlc_ml_media_set_favorite(VLCLibraryDataTypesIntegrationMediaLibrary(), libraryID, true), VLC_SUCCESS);
+    [self waitForExpectations:@[ updated ] timeout:5.];
+    XCTAssertNotEqual(received, previous);
+    XCTAssertTrue([VLCMediaLibraryMediaItem mediaItemForLibraryID:libraryID].favorited);
+}
+
+- (void)assertNativeMediaDeletionForAudio:(BOOL)audio
+{
+    const vlc_ml_media_type_t type = audio
+        ? VLC_ML_MEDIA_TYPE_AUDIO
+        : VLC_ML_MEDIA_TYPE_VIDEO;
+    const int64_t libraryID = VLCLibraryDataTypesIntegrationCreateExternalMediaOfType(
+        audio
+            ? "https://example.invalid/native-deleted-audio.mp3"
+            : "https://example.invalid/native-deleted-video.mp4",
+        type);
+    XCTAssertGreaterThan(libraryID, (int64_t)0);
+    vlc_medialibrary_t * const library = VLCLibraryDataTypesIntegrationMediaLibrary();
+    XCTAssertEqual(vlc_ml_media_set_played(library, libraryID, true), VLC_SUCCESS);
+    VLCMediaLibraryMediaItem * const previous =
+        (VLCMediaLibraryMediaItem *)[self itemWithID:libraryID inItems:[self loadRecentHistoryForAudio:audio]];
+    XCTAssertNotNil(previous);
+    XCTAssertEqual(previous.mediaType, type);
+    NSNotificationName const name = audio
+        ? VLCLibraryModelRecentAudioMediaItemDeleted
+        : VLCLibraryModelRecentsMediaItemDeleted;
+    XCTestExpectation * const deleted = [self expectationForNotification:name
+                                                                  object:nil
+                                                                 handler:^BOOL(NSNotification *notification) {
+        if (![notification.object isKindOfClass:VLCMediaLibraryMediaItem.class] ||
+            [notification.object libraryID] != libraryID)
+            return NO;
+        XCTAssertTrue(NSThread.isMainThread);
+        XCTAssertEqual(notification.object, previous);
+        NSArray * const cache = audio
+            ? self.model.listOfRecentAudioMedia
+            : self.model.listOfRecentMedia;
+        XCTAssertNil([self itemWithID:libraryID inItems:cache]);
+        return YES;
+    }];
+    XCTAssertEqual(vlc_ml_remove_stream(library, libraryID), VLC_SUCCESS);
+    [self waitForExpectations:@[ deleted ] timeout:5.];
+    XCTAssertNil([VLCMediaLibraryMediaItem mediaItemForLibraryID:libraryID]);
+}
+
+- (void)testNativePlaylistCreationPublishesAddedPlaylistOnMainThread
+{
+    (void)self.model;
+    NSString * const name = @"Native added playlist";
+    __block int64_t libraryID = 0;
+    __block VLCMediaLibraryPlaylist *received = nil;
+    XCTestExpectation * const added = [self expectationForNotification:VLCLibraryModelPlaylistAdded
+                                                                object:nil
+                                                               handler:^BOOL(NSNotification *notification) {
+        if (![notification.object isKindOfClass:VLCMediaLibraryPlaylist.class] ||
+            [notification.object libraryID] != libraryID)
+            return NO;
+        XCTAssertTrue(NSThread.isMainThread);
+        received = notification.object;
+        XCTAssertEqualObjects(received.displayString, name);
+        XCTAssertEqualObjects([VLCMediaLibraryPlaylist playlistForLibraryID:libraryID].displayString, name);
+        return YES;
+    }];
+    vlc_ml_playlist_t * const playlist = vlc_ml_playlist_create(
+        VLCLibraryDataTypesIntegrationMediaLibrary(),
+        name.UTF8String);
+    XCTAssertNotEqual(playlist, (vlc_ml_playlist_t *)NULL);
+    libraryID = playlist->i_id;
+    vlc_ml_playlist_release(playlist);
+    [self waitForExpectations:@[ added ] timeout:5.];
+    XCTAssertEqual(received.libraryID, libraryID);
+}
+
+- (void)testNativePlaylistRenamePublishesPersistedPlaylistOnMainThread
+{
+    const int64_t libraryID = VLCLibraryDataTypesIntegrationCreatePlaylist();
+    XCTAssertGreaterThan(libraryID, (int64_t)0);
+    (void)self.model;
+    NSString * const name = @"Native renamed playlist";
+    XCTestExpectation * const updated = [self expectationForNotification:VLCLibraryModelPlaylistUpdated
+                                                                  object:nil
+                                                                 handler:^BOOL(NSNotification *notification) {
+        if (![notification.object isKindOfClass:VLCMediaLibraryPlaylist.class] ||
+            [notification.object libraryID] != libraryID ||
+            ![[notification.object displayString] isEqualToString:name])
+            return NO;
+        XCTAssertTrue(NSThread.isMainThread);
+        XCTAssertEqualObjects([VLCMediaLibraryPlaylist playlistForLibraryID:libraryID].displayString, name);
+        return YES;
+    }];
+    XCTAssertEqual(vlc_ml_playlist_rename(VLCLibraryDataTypesIntegrationMediaLibrary(), libraryID, name.UTF8String),
+                   VLC_SUCCESS);
+    [self waitForExpectations:@[ updated ] timeout:5.];
+}
+
+- (void)testNativePlaylistDeletionPublishesDeletedIDOnMainThread
+{
+    const int64_t libraryID = VLCLibraryDataTypesIntegrationCreatePlaylist();
+    XCTAssertGreaterThan(libraryID, (int64_t)0);
+    (void)self.model;
+    XCTestExpectation * const deleted = [self expectationForNotification:VLCLibraryModelPlaylistDeleted
+                                                                  object:nil
+                                                                 handler:^BOOL(NSNotification *notification) {
+        if (![notification.object isEqual:@(libraryID)])
+            return NO;
+        XCTAssertTrue(NSThread.isMainThread);
+        XCTAssertTrue([notification.object isKindOfClass:NSNumber.class]);
+        XCTAssertNil([VLCMediaLibraryPlaylist playlistForLibraryID:libraryID]);
+        return YES;
+    }];
+    XCTAssertEqual(vlc_ml_playlist_delete(VLCLibraryDataTypesIntegrationMediaLibrary(), libraryID), VLC_SUCCESS);
+    [self waitForExpectations:@[ deleted ] timeout:5.];
+}
+
+- (void)testNativeFavoriteChangePublishesAllFavoriteListsOnMainThread
+{
+    VLCLibraryModel * const model = self.model;
+    NSArray<NSNotificationName> * const names = @[
+        VLCLibraryModelFavoriteAudioMediaListReset,
+        VLCLibraryModelFavoriteVideoMediaListReset,
+        VLCLibraryModelFavoriteAlbumsListReset,
+        VLCLibraryModelFavoriteArtistsListReset,
+        VLCLibraryModelFavoriteGenresListReset,
+    ];
+    NSMutableArray<XCTestExpectation *> * const notifications = NSMutableArray.array;
+    for (NSNotificationName name in names) {
+        [notifications addObject:[self expectationForNotification:name
+                                                           object:model
+                                                          handler:^BOOL(NSNotification *notification) {
+            XCTAssertTrue(NSThread.isMainThread);
+            XCTAssertEqual(notification.object, model);
+            return YES;
+        }]];
+    }
+    const int64_t libraryID = VLCLibraryDataTypesIntegrationFactoryAudioMediaID();
+    XCTAssertEqual(vlc_ml_media_set_favorite(VLCLibraryDataTypesIntegrationMediaLibrary(), libraryID, true), VLC_SUCCESS);
+    [self waitForExpectations:notifications timeout:5.];
+    XCTAssertNotNil([self itemWithID:libraryID inItems:model.listOfFavoriteAudioMedia]);
+}
+
+- (void)testNativeAudioUpdatePublishesUpdatedCachedItem
+{
+    [self assertNativeMediaUpdateForAudio:YES];
+}
+
+- (void)testNativeVideoUpdatePublishesUpdatedCachedItem
+{
+    [self assertNativeMediaUpdateForAudio:NO];
+}
+
+- (void)testNativeAudioDeletionPublishesRemovedCachedItem
+{
+    [self assertNativeMediaDeletionForAudio:YES];
+}
+
+- (void)testNativeVideoDeletionPublishesRemovedCachedItem
+{
+    [self assertNativeMediaDeletionForAudio:NO];
+}
+
+- (void)testUnregisteringCallbackStopsNativeFavoriteNotifications
+{
+    VLCLibraryModel * const model = self.model;
+    [self stopModelCallback];
+    XCTestExpectation * const favorites = [self expectationForNotification:VLCLibraryModelFavoriteAudioMediaListReset
+                                                                    object:model
+                                                                   handler:nil];
+    favorites.inverted = YES;
+    // The VLC favorite control sends FAVORITES_CHANGED synchronously, so this
+    // checks callback removal without waiting for the ML modification timer.
+    XCTAssertEqual(vlc_ml_media_set_favorite(VLCLibraryDataTypesIntegrationMediaLibrary(),
+                                             VLCLibraryDataTypesIntegrationFactoryAudioMediaID(),
+                                             true),
+                   VLC_SUCCESS);
+    [self waitForExpectations:@[ favorites ] timeout:0.2];
+}
+
+- (void)testReloadingMonitoredFoldersReplacesAndReleasesPreviousObservers
+{
+    XCTestExpectation * const loaded = [self expectationForNotification:VLCLibraryModelListOfMonitoredFoldersUpdated
+                                                                 object:self.model
+                                                                handler:nil];
+    [self.model resetCachedListOfMonitoredFolders];
+    [self waitForExpectations:@[ loaded ] timeout:5.];
+    __weak VLCMediaLibraryFolderObserver *previousObserver = nil;
+    NSSet<NSURL *> *previousURLs = nil;
+    @autoreleasepool {
+        NSArray<VLCMediaLibraryFolderObserver *> * const observers = self.model.folderObservers;
+        XCTAssertGreaterThan(observers.count, (NSUInteger)0);
+        previousObserver = observers.firstObject;
+        NSMutableSet<NSURL *> * const URLs = NSMutableSet.set;
+        for (VLCMediaLibraryFolderObserver *observer in observers)
+            [URLs addObject:observer.url];
+        previousURLs = URLs.copy;
+    }
+    XCTestExpectation * const dropped = [self expectationForNotification:VLCLibraryModelAllCachesDropped
+                                                                  object:self.model
+                                                                 handler:nil];
+    self.model.filterString = @"Reload folder observers";
+    [self waitForExpectations:@[ dropped ] timeout:5.];
+    XCTestExpectation * const reloaded = [self expectationForNotification:VLCLibraryModelListOfMonitoredFoldersUpdated
+                                                                   object:self.model
+                                                                  handler:nil];
+    (void)self.model.listOfMonitoredFolders;
+    [self waitForExpectations:@[ reloaded ] timeout:5.];
+    XCTAssertNil(previousObserver);
+    NSMutableSet<NSURL *> * const URLs = NSMutableSet.set;
+    for (VLCMediaLibraryFolderObserver *observer in self.model.folderObservers)
+        [URLs addObject:observer.url];
+    XCTAssertEqualObjects(URLs, previousURLs);
+    XCTAssertEqual(self.model.folderObservers.count,
+                   URLs.count,
+                   @"Each monitored URL must have exactly one active observer");
+}
+
+- (void)testDroppingCachesRejectsAPendingMonitoredFolderResult
+{
+    [self assertDroppedMonitoredFoldersRejectsPendingWrite:NO];
+}
+
+- (void)testDroppingCachesRejectsAnAlreadyQueuedMonitoredFolderWrite
+{
+    [self assertDroppedMonitoredFoldersRejectsPendingWrite:YES];
+}
+
+@end
+
 @interface VLCLibraryModelSelectionTest : VLCLibraryModelPersistedTestCase
 @property (strong) VLCLibraryModelTestOverlapFixture *fixture;
 @end

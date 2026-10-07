@@ -19,6 +19,7 @@ void VLCLibraryDataTypesIntegrationStop(void);
 vlc_medialibrary_t *VLCLibraryDataTypesIntegrationMediaLibrary(void);
 int64_t VLCLibraryDataTypesIntegrationMediaID(void);
 int64_t VLCLibraryDataTypesIntegrationCreateExternalMedia(const char *mrl);
+int64_t VLCLibraryDataTypesIntegrationCreateExternalMediaOfType(const char *mrl, vlc_ml_media_type_t type);
 int64_t VLCLibraryDataTypesIntegrationCreatePlaylist(void);
 BOOL VLCLibraryDataTypesIntegrationPrepareFactoryFixtures(void);
 BOOL VLCLibraryDataTypesIntegrationPrepareMovieFixture(void);

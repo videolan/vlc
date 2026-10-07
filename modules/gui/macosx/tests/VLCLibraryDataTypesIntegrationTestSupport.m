@@ -908,6 +908,22 @@ static BOOL VLCLibraryDataTypesIntegrationExecuteEntityStatement(const char *sql
     return success;
 }
 
+int64_t VLCLibraryDataTypesIntegrationCreateExternalMediaOfType(const char *mrl, vlc_ml_media_type_t type)
+{
+    const int64_t mediaID = VLCLibraryDataTypesIntegrationCreateExternalMedia(mrl);
+    if (mediaID == 0)
+        return 0;
+    // Keep the native external import type: remove_stream only accepts genuine
+    // external records. Main audio/video listings exclude these; history does not.
+    if (!VLCLibraryDataTypesIntegrationExecuteEntityStatement(
+        "UPDATE Media SET type = ?2, is_present = 1 WHERE id_media = ?1",
+        mediaID,
+        @(type))) {
+        vlc_ml_remove_stream(sMediaLibrary, mediaID);
+        return 0;
+    }
+    return mediaID;
+}
 
 BOOL VLCLibraryDataTypesIntegrationSetAlbumDuration(int64_t libraryID, int64_t duration)
 {
