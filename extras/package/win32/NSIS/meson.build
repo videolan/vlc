@@ -57,6 +57,7 @@ vlc_nsi = configure_file(
   input: 'vlc.win32.nsi.in',
   output: 'vlc.win32.nsi',
   configuration: nsi_conf,
+  format: 'cmake@',
   install: true,
   install_dir: '.',
 )
@@ -65,6 +66,7 @@ spad_nsi = configure_file(
   input: 'spad.nsi.in',
   output: 'spad.nsi',
   configuration: nsi_conf,
+  format: 'cmake@',
   install: true,
   install_dir: '.',
 )
