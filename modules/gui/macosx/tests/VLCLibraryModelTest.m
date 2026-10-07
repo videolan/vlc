@@ -22,25 +22,8 @@
 
 #import <XCTest/XCTest.h>
 
-#import "library/VLCLibraryModel.h"
+#import "VLCLibraryModelTestSupport.h"
 #import "library/VLCLibraryModelChangeDelegate.h"
-
-@interface VLCLibraryModel ()
-- (instancetype)initWithoutMediaLibrary;
-- (vlc_ml_query_params_t)queryParams;
-@property (readwrite, nonatomic) NSArray<VLCMediaLibraryMediaItem *> *cachedAudioMedia;
-@property (readwrite, nonatomic) NSArray<VLCMediaLibraryMediaItem *> *cachedVideoMedia;
-@property (readwrite, nonatomic) NSArray<VLCMediaLibraryAlbum *> *cachedAlbums;
-@property (readwrite, nonatomic) NSArray<VLCMediaLibraryArtist *> *cachedArtists;
-@property (readwrite, nonatomic) NSArray<VLCMediaLibraryGenre *> *cachedGenres;
-@property (readwrite, nonatomic) NSArray<VLCMediaLibraryShow *> *cachedListOfShows;
-@property (readwrite, nonatomic) NSArray<VLCMediaLibraryMovie *> *cachedListOfMovies;
-@property (readwrite, nonatomic) NSArray<VLCMediaLibraryGroup *> *cachedListOfGroups;
-@property (readwrite, nonatomic) NSArray<VLCMediaLibraryMediaItem *> *cachedRecentMedia;
-@property (readwrite, nonatomic) NSArray<VLCMediaLibraryMediaItem *> *cachedRecentAudioMedia;
-@property (readwrite, nonatomic) NSArray<VLCMediaLibraryEntryPoint *> *cachedListOfMonitoredFolders;
-@property (readwrite, nonatomic) NSArray<NSString *> *cachedMediaTitles;
-@end
 
 @interface VLCLibraryModelTest : XCTestCase
 @property (nonatomic, strong) VLCLibraryModel *model;

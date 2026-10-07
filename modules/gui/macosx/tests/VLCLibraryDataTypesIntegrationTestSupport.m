@@ -16,6 +16,7 @@
 #import <vlc/libvlc.h>
 
 #include <string.h>
+#include <ctype.h>
 #include <dispatch/dispatch.h>
 #include <sqlite3.h>
 #include <unistd.h>
@@ -51,6 +52,64 @@ static int64_t sGroupID;
 static BOOL sFactoryFixturesPrepared;
 static NSString *sUserDataPath;
 
+// Match medialibrary 0.13.2's sqlite::Connection::collateFilename, including
+// its leading-number comparison and length-bounded case-insensitive suffix.
+// Adapted from SqliteConnection.cpp.
+static int VLCLibraryDataTypesIntegrationCompareFilenames(void * __unused context,
+                                                          int lhsSize,
+                                                          const void *lhs,
+                                                          int rhsSize,
+                                                          const void *rhs)
+{
+    const char *left = lhs;
+    const char *right = rhs;
+    int size = MIN(lhsSize, rhsSize);
+    if (size == 0)
+        return lhsSize - rhsSize;
+    if (!isdigit((unsigned char)*left) || !isdigit((unsigned char)*right))
+        return sqlite3_strnicmp(left, right, size);
+
+    int leftNumber = 0;
+    while (lhsSize > 0 && isdigit((unsigned char)*left)) {
+        leftNumber = leftNumber * 10 + (*left++ - '0');
+        lhsSize--;
+    }
+    int rightNumber = 0;
+    while (rhsSize > 0 && isdigit((unsigned char)*right)) {
+        rightNumber = rightNumber * 10 + (*right++ - '0');
+        rhsSize--;
+    }
+    if (leftNumber != rightNumber)
+        return leftNumber - rightNumber;
+    return sqlite3_strnicmp(left, right, MIN(lhsSize, rhsSize));
+}
+
+static BOOL VLCLibraryDataTypesIntegrationOpenDatabase(sqlite3 **database)
+{
+    NSString * const path = [sUserDataPath stringByAppendingPathComponent:@"ml/ml.db"];
+    BOOL success = sqlite3_open_v2(path.fileSystemRepresentation,
+                                   database,
+                                   SQLITE_OPEN_READWRITE,
+                                   NULL) == SQLITE_OK;
+    if (success) {
+        success = sqlite3_busy_timeout(*database, 5000) == SQLITE_OK &&
+            sqlite3_create_collation_v2(*database,
+                                        "FILENAME",
+                                        SQLITE_UTF8,
+                                        NULL,
+                                        VLCLibraryDataTypesIntegrationCompareFilenames,
+                                        NULL) == SQLITE_OK &&
+            sqlite3_exec(*database, "PRAGMA foreign_keys = ON", NULL, NULL, NULL) == SQLITE_OK &&
+            sqlite3_exec(*database, "PRAGMA recursive_triggers = ON", NULL, NULL, NULL) == SQLITE_OK;
+    }
+    if (!success && *database != NULL) {
+        NSLog(@"Could not open fixture database: %s", sqlite3_errmsg(*database));
+        sqlite3_close(*database);
+        *database = NULL;
+    }
+    return success;
+}
+
 typedef struct
 {
     dispatch_semaphore_t semaphore;
@@ -81,20 +140,10 @@ static BOOL VLCLibraryDataTypesIntegrationSetMovieMetadata(int64_t mediaID)
     /* The VLC medialibrary bridge exposes movie fields as read-only. Seed the
      * persisted media and movie rows so the wrapper conversion is tested with
      * a real video-typed movie and non-empty metadata. */
-    NSString * const databasePath =
-        [sUserDataPath stringByAppendingPathComponent:@"ml/ml.db"];
     sqlite3 *database = NULL;
-    if (sqlite3_open_v2(databasePath.fileSystemRepresentation,
-                        &database,
-                        SQLITE_OPEN_READWRITE,
-                        NULL) != SQLITE_OK) {
-        if (database != NULL) {
-            sqlite3_close(database);
-        }
+    if (!VLCLibraryDataTypesIntegrationOpenDatabase(&database))
         return NO;
-    }
 
-    sqlite3_busy_timeout(database, 5000);
     sqlite3_stmt *statement = NULL;
     BOOL success = sqlite3_prepare_v2(database,
                                       "UPDATE Media SET type = ?, subtype = ? "
@@ -145,20 +194,10 @@ static BOOL VLCLibraryDataTypesIntegrationSetMovieMetadata(int64_t mediaID)
 static BOOL VLCLibraryDataTypesIntegrationSetMediaType(int64_t mediaID,
                                                        int type)
 {
-    NSString * const databasePath =
-        [sUserDataPath stringByAppendingPathComponent:@"ml/ml.db"];
     sqlite3 *database = NULL;
-    if (sqlite3_open_v2(databasePath.fileSystemRepresentation,
-                        &database,
-                        SQLITE_OPEN_READWRITE,
-                        NULL) != SQLITE_OK) {
-        if (database != NULL) {
-            sqlite3_close(database);
-        }
+    if (!VLCLibraryDataTypesIntegrationOpenDatabase(&database))
         return NO;
-    }
 
-    sqlite3_busy_timeout(database, 5000);
     sqlite3_stmt *statement = NULL;
     BOOL success = sqlite3_prepare_v2(database,
                                       "UPDATE Media SET type = ?, import_type = 0, "
@@ -191,7 +230,10 @@ static void VLCLibraryDataTypesIntegrationMediaLibraryEvent(void *data,
                     break;
                 }
             }
-            if (wait->mediaAddedCount == wait->mediaMRLCount) {
+            break;
+        case VLC_ML_EVENT_BACKGROUND_IDLE_CHANGED:
+            if (event->background_idle_changed.b_idle &&
+                wait->mediaAddedCount == wait->mediaMRLCount) {
                 dispatch_semaphore_signal(wait->semaphore);
             }
             break;
@@ -241,6 +283,12 @@ static BOOL VLCLibraryDataTypesIntegrationWaitForMediaAdded(NSString *folderURL,
                     wait.mediaAddedCount == wait.mediaMRLCount && !wait.failed;
     }
     vlc_ml_event_unregister_callback(sMediaLibrary, callback);
+    if (!completed) {
+        NSLog(@"Fixture discovery did not finish: %zu/%zu media added, discovery failed: %d",
+              wait.mediaAddedCount,
+              wait.mediaMRLCount,
+              wait.failed);
+    }
     return completed;
 }
 
@@ -301,6 +349,7 @@ BOOL VLCLibraryDataTypesIntegrationStart(void)
     }
 
     const char * const args[] = {
+        "--ignore-config",
         "--no-plugins-scan",
         "--vout=dummy",
         "--aout=dummy",
@@ -653,6 +702,7 @@ BOOL VLCLibraryDataTypesIntegrationPrepareFactoryFixtures(void)
     sFactoryFixturesPrepared = YES;
     return YES;
 }
+
 
 BOOL VLCLibraryDataTypesIntegrationPrepareMovieFixture(void)
 {

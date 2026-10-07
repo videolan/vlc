@@ -11,6 +11,7 @@
  * version.
  *****************************************************************************/
 
+#import <Foundation/Foundation.h>
 #import <vlc_media_library.h>
 
 BOOL VLCLibraryDataTypesIntegrationStart(void);
@@ -32,3 +33,5 @@ int64_t VLCLibraryDataTypesIntegrationAlbumID(void);
 int64_t VLCLibraryDataTypesIntegrationGenreID(void);
 int64_t VLCLibraryDataTypesIntegrationShowID(void);
 int64_t VLCLibraryDataTypesIntegrationGroupID(void);
+// Delete persisted fixture entities and relationships. Callers replay model
+// events separately to control their order relative to a pending cache query.

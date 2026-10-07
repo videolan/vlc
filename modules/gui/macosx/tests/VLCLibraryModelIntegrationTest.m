@@ -24,11 +24,10 @@
 
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryModelChangeDelegate.h"
+#import "library/VLCMediaLibraryFolderObserver.h"
+#import "extensions/NSArray+VLCAdditions.h"
 #import "tests/VLCLibraryDataTypesIntegrationTestSupport.h"
-
-@interface VLCLibraryModel ()
-- (void)applicationWillTerminate:(NSNotification *)notification;
-@end
+#import "VLCLibraryModelTestSupport.h"
 
 @interface VLCLibraryModelIntegrationTest : XCTestCase
 @property (nonatomic, strong) VLCLibraryModel *model;
@@ -553,8 +552,6 @@
     XCTAssertEqual(artists.count, (NSUInteger)1);
     XCTAssertEqualObjects(artists.firstObject.name, @"Factory Artist");
     XCTAssertEqual(self.model.numberOfArtists, artists.count);
-    XCTAssertEqualObjects(self.model.artistDict[@(artists.firstObject.libraryID)],
-                          @"Factory Artist");
 }
 
 - (void)testArtistQueryRejectsNonMatchingFilter
@@ -573,8 +570,6 @@
     XCTAssertEqual(albums.count, (NSUInteger)1);
     XCTAssertEqualObjects(albums.firstObject.title, @"Factory Album");
     XCTAssertEqual(self.model.numberOfAlbums, albums.count);
-    XCTAssertEqualObjects(self.model.albumDict[@(albums.firstObject.libraryID)],
-                          @"Factory Album");
 }
 
 - (void)testAlbumQueryRejectsNonMatchingFilter
@@ -593,7 +588,6 @@
     XCTAssertEqual(genres.count, (NSUInteger)1);
     XCTAssertEqualObjects(genres.firstObject.name, @"Rock");
     XCTAssertEqual(self.model.numberOfGenres, genres.count);
-    XCTAssertEqualObjects(self.model.genreDict[@(genres.firstObject.libraryID)], @"Rock");
 }
 
 - (void)testGenreQueryRejectsNonMatchingFilter

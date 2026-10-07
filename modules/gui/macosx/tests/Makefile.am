@@ -20,6 +20,7 @@ VLCMacOSXTests_SOURCES = \
 	gui/macosx/tests/VLCMediaSourceTableViewSortingTest.m \
 	gui/macosx/tests/VLCLibraryModelTest.m \
 	gui/macosx/tests/VLCLibraryModelIntegrationTest.m \
+	gui/macosx/tests/VLCLibraryModelTestSupport.m \
 	gui/macosx/tests/VLCLibraryDataTypesIntegrationTest.m \
 	gui/macosx/tests/VLCLibraryDataTypesIntegrationTestSupport.m \
 	gui/macosx/tests/VLCLibraryHomeBrowseCardTest.m \
@@ -69,6 +70,7 @@ noinst_HEADERS += \
 	gui/macosx/tests/VLCAppKitMockingTestCase.h \
 	gui/macosx/tests/VLCInputItemTestSupport.h \
 	gui/macosx/tests/VLCLibraryDataTypesTestSupport.h \
+	gui/macosx/tests/VLCLibraryModelTestSupport.h \
 	gui/macosx/tests/VLCLibraryDataTypesIntegrationTestSupport.h \
 	gui/macosx/tests/VLCMacOSXTestDefaults.h
 
