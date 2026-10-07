@@ -1075,6 +1075,32 @@
     }
 }
 
+- (NSArray<NSNumber *> *)prepareHistoryForAudio:(BOOL)audio
+{
+    // Establish distinct persisted dates rather than relying on second-resolution
+    // markAsPlayed timestamps or sleeps to distinguish the three records.
+    NSArray<NSNumber *> * const oldestToNewest = audio
+        ? @[
+            @(VLCLibraryDataTypesIntegrationSortingAudioAlphaMediaID()),
+            @(VLCLibraryDataTypesIntegrationFactoryAudioMediaID()),
+            @(VLCLibraryDataTypesIntegrationSortingAudioZuluMediaID())
+        ]
+        : @[
+            @(VLCLibraryDataTypesIntegrationSortingVideoAlphaMediaID()),
+            @(VLCLibraryDataTypesIntegrationFactoryVideoMediaID()),
+            @(VLCLibraryDataTypesIntegrationSortingVideoZuluMediaID())
+        ];
+    vlc_medialibrary_t * const library = VLCLibraryDataTypesIntegrationMediaLibrary();
+    XCTAssertEqual(vlc_ml_clear_history(library, VLC_ML_HISTORY_TYPE_GLOBAL), VLC_SUCCESS);
+    NSUInteger index = 0;
+    for (NSNumber *ID in oldestToNewest) {
+        XCTAssertEqual(vlc_ml_media_set_played(library, ID.longLongValue, true), VLC_SUCCESS);
+        NSDate * const date = [NSDate dateWithTimeIntervalSince1970:1000 + index++ * 1000];
+        XCTAssertTrue(VLCLibraryDataTypesIntegrationSetMediaLastPlayedDate(ID.longLongValue, date));
+    }
+    return oldestToNewest.reverseObjectEnumerator.allObjects;
+}
+
 - (NSArray<VLCMediaLibraryMediaItem *> *)loadRecentHistoryForAudio:(BOOL)audio
 {
     NSNotificationName const name = audio
@@ -1090,6 +1116,112 @@
     return audio
         ? self.model.listOfRecentAudioMedia
         : self.model.listOfRecentMedia;
+}
+
+- (void)assertColdCountForGetter:(SEL)getter
+                          filter:(NSString *)filter
+                   expectedCount:(size_t)expectedCount
+                         counter:(size_t (^)(void))counter
+                          loader:(NSArray *(^)(void))loader
+{
+    [self stopModelCallback];
+    const struct {
+        SEL getter;
+        __unsafe_unretained NSNotificationName notification;
+    } resetNotifications[] = {
+        {
+            @selector(cachedAudioMedia),
+            VLCLibraryModelAudioMediaListReset
+        },
+        {
+            @selector(cachedVideoMedia),
+            VLCLibraryModelVideoMediaListReset
+        },
+        {
+            @selector(cachedArtists),
+            VLCLibraryModelArtistListReset
+        },
+        {
+            @selector(cachedAlbums),
+            VLCLibraryModelAlbumListReset
+        },
+        {
+            @selector(cachedGenres),
+            VLCLibraryModelGenreListReset
+        },
+        {
+            @selector(cachedListOfGroups),
+            VLCLibraryModelListOfGroupsReset
+        },
+        {
+            @selector(cachedRecentAudioMedia),
+            VLCLibraryModelRecentAudioMediaListReset
+        },
+        {
+            @selector(cachedRecentMedia),
+            VLCLibraryModelRecentsMediaListReset
+        },
+    };
+    NSNotificationName resetName = nil;
+    for (NSUInteger index = 0; index < sizeof(resetNotifications) / sizeof(resetNotifications[0]); index++) {
+        if (getter == resetNotifications[index].getter) {
+            resetName = resetNotifications[index].notification;
+            break;
+        }
+    }
+    XCTAssertNotNil(resetName);
+    XCTestExpectation * const unfiltered = [self expectationForNotification:resetName
+                                                                     object:self.model
+                                                                    handler:nil];
+    [self.model refreshCacheForGetter:getter];
+    [self waitForExpectations:@[ unfiltered ] timeout:5.];
+    const size_t unfilteredCount = loader().count;
+    XCTAssertGreaterThan(unfilteredCount,
+                         expectedCount,
+                         @"The search must exclude real records from the previously loaded list");
+    XCTAssertEqual(counter(), unfilteredCount);
+
+    XCTestExpectation * const dropped = [self expectationForNotification:VLCLibraryModelAllCachesDropped
+                                                                  object:self.model
+                                                                 handler:nil];
+    self.model.filterString = filter;
+    [self waitForExpectations:@[ dropped ] timeout:5.];
+    XCTestExpectation * const captured = [self expectationWithDescription:@"Filtered count cache is still cold"];
+    XCTestExpectation * const processed = [self expectationWithDescription:@"Filtered count cache written"];
+    [self.model holdNextQueryResultForGetter:getter
+                                     handler:^{
+        [captured fulfill];
+    }
+                           completionHandler:^{
+        [processed fulfill];
+    }];
+    VLCLibraryModelTestQueryGate * const model = self.model;
+    [self addTeardownBlock:^{
+        [model releaseQuery];
+    }];
+    const size_t coldCount = counter();
+    [self waitForExpectations:@[ captured ] timeout:5.];
+    [self.model releaseQuery];
+    [self waitForExpectations:@[ processed ] timeout:5.];
+    XCTAssertEqual(coldCount,
+                   expectedCount,
+                   @"A search count must describe the filtered result even before its cache loads");
+    XCTAssertEqual(loader().count, expectedCount);
+    XCTAssertEqual(counter(), expectedCount);
+}
+
+- (void)assertRecentHistoryIgnoresAlphabeticalSortForAudio:(BOOL)audio
+{
+    [self prepareHistoryForAudio:audio];
+    NSArray<NSNumber *> * const baseline =
+        [self libraryIDsForItems:[self loadRecentHistoryForAudio:audio]];
+    XCTAssertEqual(baseline.count, (NSUInteger)3);
+    XCTestExpectation * const dropped = [self expectationForNotification:VLCLibraryModelAllCachesDropped
+                                                                  object:self.model
+                                                                 handler:nil];
+    [self.model sortByCriteria:VLC_ML_SORTING_ALPHA andDescending:NO];
+    [self waitForExpectations:@[ dropped ] timeout:5.];
+    XCTAssertEqualObjects([self libraryIDsForItems:[self loadRecentHistoryForAudio:audio]], baseline);
 }
 
 - (void)assertDroppedMonitoredFoldersRejectsPendingWrite:(BOOL)queuedWrite
@@ -1387,6 +1519,152 @@
                                              true),
                    VLC_SUCCESS);
     [self waitForExpectations:@[ favorites ] timeout:0.2];
+}
+
+- (void)testRecentAudioHistoryReturnsMostRecentlyPlayedFirst
+{
+    NSArray * const expected = [self prepareHistoryForAudio:YES];
+    XCTAssertEqualObjects([self libraryIDsForItems:[self loadRecentHistoryForAudio:YES]], expected);
+}
+
+- (void)testRecentVideoHistoryReturnsMostRecentlyPlayedFirst
+{
+    NSArray * const expected = [self prepareHistoryForAudio:NO];
+    XCTAssertEqualObjects([self libraryIDsForItems:[self loadRecentHistoryForAudio:NO]], expected);
+}
+
+- (void)testRecentAudioHistoryHonorsCountLimit
+{
+    NSArray * const expected = [[self prepareHistoryForAudio:YES] subarrayWithRange:NSMakeRange(0, 2)];
+    self.model.recentAudioMediaLimit = 2;
+    NSArray * const actual = [self loadRecentHistoryForAudio:YES];
+    XCTAssertEqualObjects([self libraryIDsForItems:actual], expected);
+    XCTAssertEqual(self.model.numberOfRecentAudioMedia, (size_t)2);
+}
+
+- (void)testRecentVideoHistoryHonorsCountLimit
+{
+    NSArray * const expected = [[self prepareHistoryForAudio:NO] subarrayWithRange:NSMakeRange(0, 2)];
+    self.model.recentMediaLimit = 2;
+    NSArray * const actual = [self loadRecentHistoryForAudio:NO];
+    XCTAssertEqualObjects([self libraryIDsForItems:actual], expected);
+    XCTAssertEqual(self.model.numberOfRecentMedia, (size_t)2);
+}
+
+- (void)testRecentAudioHistoryIgnoresLibraryAlphabeticalSort
+{
+    [self assertRecentHistoryIgnoresAlphabeticalSortForAudio:YES];
+}
+
+- (void)testRecentVideoHistoryIgnoresLibraryAlphabeticalSort
+{
+    [self assertRecentHistoryIgnoresAlphabeticalSortForAudio:NO];
+}
+
+- (void)testColdAudioCountUsesActiveFilter
+{
+    [self assertColdCountForGetter:@selector(cachedAudioMedia)
+                            filter:@"Factory Track"
+                     expectedCount:1
+                           counter:^size_t {
+        return self.model.numberOfAudioMedia;
+    }
+                            loader:^NSArray * {
+        return self.model.listOfAudioMedia;
+    }];
+}
+
+- (void)testColdVideoCountUsesActiveFilter
+{
+    [self assertColdCountForGetter:@selector(cachedVideoMedia)
+                            filter:@"Factory Show"
+                     expectedCount:1
+                           counter:^size_t {
+        return self.model.numberOfVideoMedia;
+    }
+                            loader:^NSArray * {
+        return self.model.listOfVideoMedia;
+    }];
+}
+
+- (void)testColdArtistCountUsesActiveFilter
+{
+    [self assertColdCountForGetter:@selector(cachedArtists)
+                            filter:@"Factory Artist"
+                     expectedCount:1
+                           counter:^size_t {
+        return self.model.numberOfArtists;
+    }
+                            loader:^NSArray * {
+        return self.model.listOfArtists;
+    }];
+}
+
+- (void)testColdAlbumCountUsesActiveFilter
+{
+    [self assertColdCountForGetter:@selector(cachedAlbums)
+                            filter:@"Factory Album"
+                     expectedCount:1
+                           counter:^size_t {
+        return self.model.numberOfAlbums;
+    }
+                            loader:^NSArray * {
+        return self.model.listOfAlbums;
+    }];
+}
+
+- (void)testColdGenreCountUsesActiveFilter
+{
+    [self assertColdCountForGetter:@selector(cachedGenres)
+                            filter:@"Rock"
+                     expectedCount:1
+                           counter:^size_t {
+        return self.model.numberOfGenres;
+    }
+                            loader:^NSArray * {
+        return self.model.listOfGenres;
+    }];
+}
+
+- (void)testColdGroupCountUsesActiveFilter
+{
+    [self assertColdCountForGetter:@selector(cachedListOfGroups)
+                            filter:@"Factory Show"
+                     expectedCount:1
+                           counter:^size_t {
+        return self.model.numberOfGroups;
+    }
+                            loader:^NSArray * {
+        return self.model.listOfGroups;
+    }];
+}
+
+- (void)testColdRecentAudioCountUsesActiveFilter
+{
+    [self prepareHistoryForAudio:YES];
+    [self assertColdCountForGetter:@selector(cachedRecentAudioMedia)
+                            filter:@"Factory Track"
+                     expectedCount:1
+                           counter:^size_t {
+        return self.model.numberOfRecentAudioMedia;
+    }
+                            loader:^NSArray * {
+        return self.model.listOfRecentAudioMedia;
+    }];
+}
+
+- (void)testColdRecentVideoCountUsesActiveFilter
+{
+    [self prepareHistoryForAudio:NO];
+    [self assertColdCountForGetter:@selector(cachedRecentMedia)
+                            filter:@"Factory Show"
+                     expectedCount:1
+                           counter:^size_t {
+        return self.model.numberOfRecentMedia;
+    }
+                            loader:^NSArray * {
+        return self.model.listOfRecentMedia;
+    }];
 }
 
 - (void)testReloadingMonitoredFoldersReplacesAndReleasesPreviousObservers

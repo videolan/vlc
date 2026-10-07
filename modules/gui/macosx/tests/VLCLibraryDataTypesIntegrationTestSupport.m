@@ -1038,6 +1038,13 @@ BOOL VLCLibraryDataTypesIntegrationSetShowSummary(int64_t showID, NSString *summ
         summary);
 }
 
+BOOL VLCLibraryDataTypesIntegrationSetMediaLastPlayedDate(int64_t mediaID, NSDate *date)
+{
+    return VLCLibraryDataTypesIntegrationExecuteEntityStatement(
+        "UPDATE Media SET last_played_date = ?2 WHERE id_media = ?1",
+        mediaID,
+        @((int64_t)date.timeIntervalSince1970));
+}
 
 BOOL VLCLibraryDataTypesIntegrationMoveMediaToAlbum(int64_t mediaID, int64_t albumID)
 {
