@@ -134,3 +134,32 @@ typedef NS_ENUM(NSUInteger, VLCLibraryModelTestCacheKind) {
 
 // Real persisted records and queries, with model events delivered explicitly so
 // the tests control their order. No database query results are mocked.
+@interface VLCLibraryModelTestOverlapFixture : NSObject
+- (instancetype)initWithCacheKind:(VLCLibraryModelTestCacheKind)kind;
+- (instancetype)initWithGroupName:(NSString *)groupName
+                  otherGroupName:(NSString *)otherGroupName;
+@property (readonly) VLCLibraryModelTestQueryGate *model;
+@property (readonly) SEL cacheGetter;
+@property (readonly) NSArray<NSNotificationName> *changeNotifications;
+@property (readonly) id<VLCMediaLibraryItemProtocol> pendingItem;
+@property (readonly) id<VLCMediaLibraryItemProtocol> changedItem;
+- (NSArray<id<VLCMediaLibraryItemProtocol>> *)libraryItems;
+- (NSArray<id<VLCMediaLibraryItemProtocol>> *)cachedItems;
+- (void)seedCacheWithItems:(NSArray<id<VLCMediaLibraryItemProtocol>> *)items;
+- (BOOL)preparePendingChange;
+- (void)deliverRefreshEvent;
+- (void)refreshCache;
+- (BOOL)updateChangedItem;
+- (BOOL)setChangedItemFavorite:(BOOL)favorite;
+- (BOOL)setChangedItemPresent:(BOOL)present;
+- (id<VLCMediaLibraryItemProtocol>)refetchChangedItem;
+- (BOOL)deleteChangedItem;
+- (BOOL)deletePendingItem;
+- (void)deliverUpdateEvent;
+- (void)deliverUpdateEventForID:(int64_t)libraryID;
+- (BOOL)renameItemWithID:(int64_t)libraryID
+                    to:(NSString *)name;
+- (void)deliverDeletionEvent;
+- (void)deliverPendingDeletionEvent;
+- (void)deliverDeletionEventForID:(int64_t)libraryID;
+@end

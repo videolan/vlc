@@ -20,6 +20,7 @@ VLCMacOSXTests_SOURCES = \
 	gui/macosx/tests/VLCMediaSourceTableViewSortingTest.m \
 	gui/macosx/tests/VLCLibraryModelTest.m \
 	gui/macosx/tests/VLCLibraryModelIntegrationTest.m \
+	gui/macosx/tests/VLCLibraryModelConcurrencyTest.m \
 	gui/macosx/tests/VLCLibraryModelTestSupport.m \
 	gui/macosx/tests/VLCLibraryDataTypesIntegrationTest.m \
 	gui/macosx/tests/VLCLibraryDataTypesIntegrationTestSupport.m \

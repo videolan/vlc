@@ -22,6 +22,7 @@ int64_t VLCLibraryDataTypesIntegrationCreateExternalMedia(const char *mrl);
 int64_t VLCLibraryDataTypesIntegrationCreatePlaylist(void);
 BOOL VLCLibraryDataTypesIntegrationPrepareFactoryFixtures(void);
 BOOL VLCLibraryDataTypesIntegrationPrepareMovieFixture(void);
+BOOL VLCLibraryDataTypesIntegrationConvertMediaToMovie(int64_t mediaID);
 int64_t VLCLibraryDataTypesIntegrationFactoryAudioMediaID(void);
 int64_t VLCLibraryDataTypesIntegrationFactoryVideoMediaID(void);
 int64_t VLCLibraryDataTypesIntegrationFactoryMovieMediaID(void);
@@ -33,5 +34,16 @@ int64_t VLCLibraryDataTypesIntegrationAlbumID(void);
 int64_t VLCLibraryDataTypesIntegrationGenreID(void);
 int64_t VLCLibraryDataTypesIntegrationShowID(void);
 int64_t VLCLibraryDataTypesIntegrationGroupID(void);
+int64_t VLCLibraryDataTypesIntegrationCreateScannedShow(NSString *name);
 // Delete persisted fixture entities and relationships. Callers replay model
 // events separately to control their order relative to a pending cache query.
+BOOL VLCLibraryDataTypesIntegrationDeleteEntity(enum vlc_ml_event_type eventType, int64_t libraryID);
+BOOL VLCLibraryDataTypesIntegrationRenameGroup(int64_t libraryID, NSString *name);
+int64_t VLCLibraryDataTypesIntegrationCreateNamedGroup(int64_t mediaID, NSString *name);
+BOOL VLCLibraryDataTypesIntegrationRenameAlbum(int64_t libraryID, NSString *title);
+BOOL VLCLibraryDataTypesIntegrationRenameArtist(int64_t libraryID, NSString *name);
+BOOL VLCLibraryDataTypesIntegrationRenameGenre(int64_t libraryID, NSString *name);
+BOOL VLCLibraryDataTypesIntegrationRenameMedia(int64_t libraryID, NSString *title);
+BOOL VLCLibraryDataTypesIntegrationSetShowSummary(int64_t showID, NSString *summary);
+BOOL VLCLibraryDataTypesIntegrationSetMediaPresent(int64_t libraryID, BOOL present);
+BOOL VLCLibraryDataTypesIntegrationSetGroupModificationDate(int64_t libraryID, NSDate *date);

@@ -703,6 +703,17 @@ BOOL VLCLibraryDataTypesIntegrationPrepareFactoryFixtures(void)
     return YES;
 }
 
+BOOL VLCLibraryDataTypesIntegrationConvertMediaToMovie(int64_t mediaID)
+{
+    if (!VLCLibraryDataTypesIntegrationSetMovieMetadata(mediaID) ||
+        !VLCLibraryDataTypesIntegrationSetMediaType(mediaID, VLC_ML_MEDIA_TYPE_VIDEO))
+        return NO;
+    vlc_ml_media_t * const media = vlc_ml_get_media(sMediaLibrary, mediaID);
+    const BOOL isMovie = media != NULL && media->i_subtype == VLC_ML_MEDIA_SUBTYPE_MOVIE;
+    if (media != NULL)
+        vlc_ml_media_release(media);
+    return isMovie;
+}
 
 BOOL VLCLibraryDataTypesIntegrationPrepareMovieFixture(void)
 {
@@ -828,4 +839,285 @@ int64_t VLCLibraryDataTypesIntegrationShowID(void)
 int64_t VLCLibraryDataTypesIntegrationGroupID(void)
 {
     return sGroupID;
+}
+
+int64_t VLCLibraryDataTypesIntegrationCreateScannedShow(NSString *name)
+{
+    NSString * const directory = [sUserDataPath stringByAppendingPathComponent:NSUUID.UUID.UUIDString];
+    NSString * const path = [directory stringByAppendingPathComponent:
+        [name stringByAppendingString:@" S01E01.mp4"]];
+    NSData * const data = [[NSData alloc]
+        initWithBase64EncodedString:VLCLibraryDataTypesIntegrationVideoFixtureBase64()
+                            options:0];
+    if (![NSFileManager.defaultManager createDirectoryAtPath:directory
+                                 withIntermediateDirectories:YES
+                                                  attributes:nil
+                                                       error:nil] ||
+        ![data writeToFile:path atomically:YES] ||
+        !VLCLibraryDataTypesIntegrationWaitForMediaAdded(
+            [NSURL fileURLWithPath:directory].absoluteString,
+            @[[NSURL fileURLWithPath:path].absoluteString])) {
+        return 0;
+    }
+    vlc_ml_media_t * const media = vlc_ml_get_media_by_mrl(sMediaLibrary,
+                                                           [NSURL fileURLWithPath:path].absoluteString.UTF8String);
+    if (media == NULL) {
+        return 0;
+    }
+    const BOOL episode = media->i_subtype == VLC_ML_MEDIA_SUBTYPE_SHOW_EPISODE;
+    const int64_t mediaID = media->i_id;
+    vlc_ml_media_release(media);
+    if (!episode || !VLCLibraryDataTypesIntegrationSetMediaType(mediaID, VLC_ML_MEDIA_TYPE_VIDEO))
+        return 0;
+    vlc_ml_show_list_t * const shows = vlc_ml_list_shows(sMediaLibrary, NULL);
+    if (shows == NULL)
+        return 0;
+    int64_t showID = 0;
+    for (size_t index = 0; index < shows->i_nb_items; index++) {
+        if (shows->p_items[index].psz_name != NULL &&
+            strcmp(shows->p_items[index].psz_name, name.UTF8String) == 0) {
+            showID = shows->p_items[index].i_id;
+            break;
+        }
+    }
+    vlc_ml_show_list_release(shows);
+    return showID;
+}
+
+static BOOL VLCLibraryDataTypesIntegrationExecuteEntityStatement(const char *sql,
+                                                                 int64_t libraryID,
+                                                                 id value)
+{
+    sqlite3 *database = NULL;
+    if (!VLCLibraryDataTypesIntegrationOpenDatabase(&database))
+        return NO;
+    sqlite3_stmt *statement = NULL;
+    BOOL success = sqlite3_prepare_v2(database, sql, -1, &statement, NULL) == SQLITE_OK;
+    if (success) {
+        sqlite3_bind_int64(statement, 1, libraryID);
+        if ([value isKindOfClass:NSNumber.class])
+            sqlite3_bind_int64(statement, 2, [value longLongValue]);
+        else if ([value isKindOfClass:NSString.class])
+            sqlite3_bind_text(statement, 2, [value UTF8String], -1, SQLITE_TRANSIENT);
+        success = sqlite3_step(statement) == SQLITE_DONE && sqlite3_changes(database) > 0;
+    }
+    if (!success)
+        NSLog(@"Could not modify fixture entity %lld: %s", libraryID, sqlite3_errmsg(database));
+    sqlite3_finalize(statement);
+    sqlite3_close(database);
+    return success;
+}
+
+BOOL VLCLibraryDataTypesIntegrationRenameAlbum(int64_t libraryID, NSString *title)
+{
+    return VLCLibraryDataTypesIntegrationExecuteEntityStatement(
+        "UPDATE Album SET title = ?2 WHERE id_album = ?1",
+        libraryID,
+        title) &&
+        VLCLibraryDataTypesIntegrationExecuteEntityStatement(
+            "UPDATE AlbumFts SET title = ?2 WHERE rowid = ?1",
+            libraryID,
+            title);
+}
+
+BOOL VLCLibraryDataTypesIntegrationSetMediaPresent(int64_t libraryID, BOOL present)
+{
+    // Real presence triggers update the album, artist, and group counts.
+    return VLCLibraryDataTypesIntegrationExecuteEntityStatement(
+        "UPDATE Media SET is_present = ?2 WHERE id_media = ?1",
+        libraryID,
+        @(present));
+}
+
+BOOL VLCLibraryDataTypesIntegrationRenameArtist(int64_t libraryID, NSString *name)
+{
+    return VLCLibraryDataTypesIntegrationExecuteEntityStatement(
+        "UPDATE Artist SET name = ?2 WHERE id_artist = ?1",
+        libraryID,
+        name) &&
+        VLCLibraryDataTypesIntegrationExecuteEntityStatement(
+            "UPDATE ArtistFts SET name = ?2 WHERE rowid = ?1",
+            libraryID,
+            name) &&
+        VLCLibraryDataTypesIntegrationExecuteEntityStatement(
+            "UPDATE AlbumFts SET artist = ?2 WHERE rowid IN "
+            "(SELECT id_album FROM Album WHERE artist_id = ?1)",
+            libraryID,
+            name);
+}
+
+BOOL VLCLibraryDataTypesIntegrationRenameGenre(int64_t libraryID, NSString *name)
+{
+    return VLCLibraryDataTypesIntegrationExecuteEntityStatement(
+        "UPDATE Genre SET name = ?2 WHERE id_genre = ?1",
+        libraryID,
+        name) &&
+        VLCLibraryDataTypesIntegrationExecuteEntityStatement(
+            "UPDATE GenreFts SET name = ?2 WHERE rowid = ?1",
+            libraryID,
+            name);
+}
+
+BOOL VLCLibraryDataTypesIntegrationRenameMedia(int64_t libraryID, NSString *title)
+{
+    return VLCLibraryDataTypesIntegrationExecuteEntityStatement(
+        "UPDATE Media SET title = ?2 WHERE id_media = ?1",
+        libraryID,
+        title) &&
+        VLCLibraryDataTypesIntegrationExecuteEntityStatement(
+            "UPDATE MediaFts SET title = ?2 WHERE rowid = ?1",
+            libraryID,
+            title);
+}
+
+
+BOOL VLCLibraryDataTypesIntegrationSetShowSummary(int64_t showID, NSString *summary)
+{
+    return VLCLibraryDataTypesIntegrationExecuteEntityStatement(
+        "UPDATE Show SET short_summary = ?2 WHERE id_show = ?1",
+        showID,
+        summary);
+}
+
+BOOL VLCLibraryDataTypesIntegrationSetGroupModificationDate(int64_t libraryID, NSDate *date)
+{
+    return VLCLibraryDataTypesIntegrationExecuteEntityStatement(
+        "UPDATE MediaGroup SET last_modification_date = ?2 WHERE id_group = ?1",
+        libraryID,
+        @((int64_t)date.timeIntervalSince1970));
+}
+
+BOOL VLCLibraryDataTypesIntegrationDeleteEntity(enum vlc_ml_event_type eventType, int64_t libraryID)
+{
+    vlc_ml_media_list_t *media = NULL;
+    switch (eventType) {
+        case VLC_ML_EVENT_MEDIA_DELETED: {
+            // Controlled-event tests delete persisted rows through the schema's
+            // cascades, without changing the import type of in-flight native objects.
+            // Native callback tests instead delete genuinely external records.
+            if (!VLCLibraryDataTypesIntegrationExecuteEntityStatement(
+                "DELETE FROM Media WHERE id_media = ?1",
+                libraryID,
+                nil))
+                return NO;
+            vlc_ml_media_t * const remaining = vlc_ml_get_media(sMediaLibrary, libraryID);
+            const BOOL deleted = remaining == NULL;
+            if (remaining != NULL)
+                vlc_ml_media_release(remaining);
+            return deleted;
+        }
+        case VLC_ML_EVENT_ARTIST_DELETED:
+            media = vlc_ml_list_artist_tracks(sMediaLibrary, NULL, libraryID);
+            break;
+        case VLC_ML_EVENT_ALBUM_DELETED:
+            media = vlc_ml_list_album_tracks(sMediaLibrary, NULL, libraryID);
+            break;
+        case VLC_ML_EVENT_GENRE_DELETED:
+            media = vlc_ml_list_genre_tracks(sMediaLibrary, NULL, libraryID);
+            break;
+        case VLC_ML_EVENT_GROUP_DELETED: {
+            // Ungroup its real members. The database trigger removes a group
+            // after its last member has been detached.
+            if (!VLCLibraryDataTypesIntegrationExecuteEntityStatement(
+                "UPDATE Media SET group_id = NULL WHERE group_id = ?1",
+                libraryID,
+                nil))
+                return NO;
+            vlc_ml_group_t * const group = vlc_ml_get_group(sMediaLibrary, libraryID);
+            if (group == NULL)
+                return YES;
+            vlc_ml_group_release(group);
+            return VLCLibraryDataTypesIntegrationExecuteEntityStatement(
+                "DELETE FROM MediaGroup WHERE id_group = ?1",
+                libraryID,
+                nil);
+        }
+        default:
+            return NO;
+    }
+    if (media == NULL || media->i_nb_items == 0) {
+        if (media != NULL)
+            vlc_ml_media_list_release(media);
+        return NO;
+    }
+    NSMutableArray<NSNumber *> * const IDs = NSMutableArray.array;
+    for (size_t index = 0; index < media->i_nb_items; index++)
+        [IDs addObject:@(media->p_items[index].i_id)];
+    vlc_ml_media_list_release(media);
+    for (NSNumber *ID in IDs) {
+        if (!VLCLibraryDataTypesIntegrationDeleteEntity(VLC_ML_EVENT_MEDIA_DELETED, ID.longLongValue))
+            return NO;
+    }
+    // The schema's deletion cascades through the real artist/album/genre/group
+    // relationships. Confirm the parent is truly gone, not merely uncached.
+    switch (eventType) {
+        case VLC_ML_EVENT_ARTIST_DELETED: {
+            vlc_ml_artist_t * const item = vlc_ml_get_artist(sMediaLibrary, libraryID);
+            if (item == NULL)
+                return YES;
+            vlc_ml_artist_release(item);
+            return NO;
+        }
+        case VLC_ML_EVENT_ALBUM_DELETED: {
+            vlc_ml_album_t * const item = vlc_ml_get_album(sMediaLibrary, libraryID);
+            if (item == NULL)
+                return YES;
+            vlc_ml_album_release(item);
+            return NO;
+        }
+        case VLC_ML_EVENT_GENRE_DELETED: {
+            vlc_ml_genre_t * const item = vlc_ml_get_genre(sMediaLibrary, libraryID);
+            if (item == NULL)
+                return YES;
+            vlc_ml_genre_release(item);
+            return NO;
+        }
+        default:
+            return NO;
+    }
+}
+
+BOOL VLCLibraryDataTypesIntegrationRenameGroup(int64_t libraryID, NSString *name)
+{
+    // VLC's ML bridge has no group-rename API. Seed both the stored name and
+    // its full-text search entry so real filtered queries see the new name.
+    return VLCLibraryDataTypesIntegrationExecuteEntityStatement(
+        "UPDATE MediaGroup SET name = ?2 WHERE id_group = ?1",
+        libraryID,
+        name) &&
+        VLCLibraryDataTypesIntegrationExecuteEntityStatement(
+            "UPDATE MediaGroupFts SET name = ?2 WHERE rowid = ?1",
+            libraryID,
+            name);
+}
+
+int64_t VLCLibraryDataTypesIntegrationCreateNamedGroup(int64_t mediaID, NSString *name)
+{
+    // Seed a user-created group rather than renaming an automatically managed
+    // scanner group. The real database triggers index it and maintain counts
+    // as its real persisted media is reassigned.
+    if (!VLCLibraryDataTypesIntegrationExecuteEntityStatement(
+            "INSERT INTO MediaGroup(name, creation_date, last_modification_date, "
+            "user_interacted, forced_singleton) VALUES(?2, strftime('%s'), strftime('%s'), 1, 0)",
+            mediaID,
+            name) ||
+        !VLCLibraryDataTypesIntegrationExecuteEntityStatement(
+            "UPDATE Media SET group_id = (SELECT id_group FROM MediaGroup WHERE name = ?2) "
+            "WHERE id_media = ?1",
+            mediaID,
+            name))
+        return 0;
+    vlc_ml_group_list_t * const groups = vlc_ml_list_groups(sMediaLibrary, NULL);
+    if (groups == NULL)
+        return 0;
+    int64_t groupID = 0;
+    for (size_t index = 0; index < groups->i_nb_items; index++) {
+        if (groups->p_items[index].psz_name != NULL &&
+            strcmp(groups->p_items[index].psz_name, name.UTF8String) == 0) {
+            groupID = groups->p_items[index].i_id;
+            break;
+        }
+    }
+    vlc_ml_group_list_release(groups);
+    return groupID;
 }

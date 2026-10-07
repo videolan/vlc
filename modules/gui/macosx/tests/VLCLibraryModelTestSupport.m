@@ -392,3 +392,545 @@
 }
 
 @end
+
+@implementation VLCLibraryModelTestOverlapFixture {
+    VLCLibraryModelTestCacheKind _kind;
+    int64_t _changedMediaID;
+    int64_t _pendingMediaID;
+}
+
+- (instancetype)initWithCacheKind:(VLCLibraryModelTestCacheKind)kind
+{
+    return [self initWithCacheKind:kind groupName:nil otherGroupName:nil];
+}
+
+- (instancetype)initWithGroupName:(NSString *)groupName
+                  otherGroupName:(NSString *)otherGroupName
+{
+    return [self initWithCacheKind:VLCLibraryModelTestGroupCache groupName:groupName otherGroupName:otherGroupName];
+}
+
+- (instancetype)initWithCacheKind:(VLCLibraryModelTestCacheKind)kind
+                        groupName:(NSString *)groupName
+                   otherGroupName:(NSString *)otherGroupName
+{
+    self = [super init];
+    if (self == nil)
+        return nil;
+    _kind = kind;
+    VLCMediaLibraryMediaItem * const audio = [VLCMediaLibraryMediaItem mediaItemForLibraryID:
+        VLCLibraryDataTypesIntegrationFactoryAudioMediaID()];
+    VLCMediaLibraryMediaItem * const otherAudio = [VLCMediaLibraryMediaItem mediaItemForLibraryID:
+        VLCLibraryDataTypesIntegrationSortingAudioAlphaMediaID()];
+    VLCMediaLibraryMediaItem * const video = [VLCMediaLibraryMediaItem mediaItemForLibraryID:
+        VLCLibraryDataTypesIntegrationFactoryVideoMediaID()];
+    VLCMediaLibraryMediaItem * const otherVideo = [VLCMediaLibraryMediaItem mediaItemForLibraryID:
+        VLCLibraryDataTypesIntegrationSortingVideoAlphaMediaID()];
+    switch (kind) {
+        case VLCLibraryModelTestAudioCache:
+        case VLCLibraryModelTestRecentAudioCache:
+            _pendingItem = audio;
+            _changedItem = otherAudio;
+            break;
+        case VLCLibraryModelTestVideoCache:
+        case VLCLibraryModelTestRecentVideoCache:
+            _pendingItem = video;
+            _changedItem = otherVideo;
+            break;
+        case VLCLibraryModelTestArtistCache:
+            _pendingItem = [VLCMediaLibraryArtist artistWithID:audio.artistID];
+            _changedItem = [VLCMediaLibraryArtist artistWithID:otherAudio.artistID];
+            break;
+        case VLCLibraryModelTestAlbumCache:
+            _pendingItem = [VLCMediaLibraryAlbum albumWithID:audio.albumID];
+            _changedItem = [VLCMediaLibraryAlbum albumWithID:otherAudio.albumID];
+            break;
+        case VLCLibraryModelTestGenreCache:
+            _pendingItem = [VLCMediaLibraryGenre genreWithID:audio.genreID];
+            _changedItem = [VLCMediaLibraryGenre genreWithID:otherAudio.genreID];
+            break;
+        case VLCLibraryModelTestGroupCache: {
+            if (groupName != nil && otherGroupName != nil) {
+                _pendingItem = [VLCMediaLibraryGroup groupWithID:
+                    VLCLibraryDataTypesIntegrationCreateNamedGroup(video.libraryID, groupName)];
+                _changedItem = [VLCMediaLibraryGroup groupWithID:
+                    VLCLibraryDataTypesIntegrationCreateNamedGroup(otherVideo.libraryID, otherGroupName)];
+                break;
+            }
+            _pendingItem = [VLCMediaLibraryGroup groupWithID:VLCLibraryDataTypesIntegrationGroupID()];
+            for (id<VLCMediaLibraryItemProtocol> item in self.libraryItems) {
+                if (item.libraryID != _pendingItem.libraryID) {
+                    _changedItem = item;
+                    break;
+                }
+            }
+            break;
+        }
+        case VLCLibraryModelTestShowCache: {
+            const int64_t showID = VLCLibraryDataTypesIntegrationCreateScannedShow(@"Overlap New Show");
+            _pendingItem = [VLCMediaLibraryShow showWithLibraryId:showID];
+            _pendingMediaID = _pendingItem.firstMediaItem.libraryID;
+            _changedItem = [VLCMediaLibraryShow showWithLibraryId:VLCLibraryDataTypesIntegrationShowID()];
+            _changedMediaID = video.libraryID;
+            break;
+        }
+        case VLCLibraryModelTestMovieCache: {
+            if (!VLCLibraryDataTypesIntegrationPrepareMovieFixture() ||
+                !VLCLibraryDataTypesIntegrationConvertMediaToMovie(otherVideo.libraryID))
+                return nil;
+            for (id<VLCMediaLibraryItemProtocol> movie in self.libraryItems) {
+                if (movie.libraryID == VLCLibraryDataTypesIntegrationFactoryMovieMediaID())
+                    _pendingItem = movie;
+                else if (movie.libraryID == otherVideo.libraryID)
+                    _changedItem = movie;
+            }
+            break;
+        }
+    }
+    if (_pendingItem == nil || _changedItem == nil || _pendingItem.libraryID == _changedItem.libraryID)
+        return nil;
+    if (kind == VLCLibraryModelTestRecentAudioCache || kind == VLCLibraryModelTestRecentVideoCache) {
+        vlc_medialibrary_t * const library = VLCLibraryDataTypesIntegrationMediaLibrary();
+        if (vlc_ml_clear_history(library, VLC_ML_HISTORY_TYPE_GLOBAL) != VLC_SUCCESS ||
+            vlc_ml_media_set_played(library, _changedItem.libraryID, true) != VLC_SUCCESS)
+            return nil;
+    }
+    _model = [[VLCLibraryModelTestQueryGate alloc] initWithLibrary:VLCLibraryDataTypesIntegrationMediaLibrary()
+                                                  observeEvents:NO];
+    _model.changeDelegate.throttleInterval = 0.;
+    // Replay events in the test's chosen order. Queries still go to the real ML.
+    return self;
+}
+
+- (SEL)cacheGetter
+{
+    switch (_kind) {
+        case VLCLibraryModelTestAudioCache:
+            return @selector(cachedAudioMedia);
+        case VLCLibraryModelTestVideoCache:
+            return @selector(cachedVideoMedia);
+        case VLCLibraryModelTestArtistCache:
+            return @selector(cachedArtists);
+        case VLCLibraryModelTestAlbumCache:
+            return @selector(cachedAlbums);
+        case VLCLibraryModelTestGenreCache:
+            return @selector(cachedGenres);
+        case VLCLibraryModelTestGroupCache:
+            return @selector(cachedListOfGroups);
+        case VLCLibraryModelTestShowCache:
+            return @selector(cachedListOfShows);
+        case VLCLibraryModelTestMovieCache:
+            return @selector(cachedListOfMovies);
+        case VLCLibraryModelTestRecentAudioCache:
+            return @selector(cachedRecentAudioMedia);
+        case VLCLibraryModelTestRecentVideoCache:
+            return @selector(cachedRecentMedia);
+    }
+}
+
+- (NSArray<NSNotificationName> *)changeNotifications
+{
+    switch (_kind) {
+        case VLCLibraryModelTestAudioCache:
+            return @[ VLCLibraryModelAudioMediaListReset, VLCLibraryModelAudioMediaItemUpdated, VLCLibraryModelAudioMediaItemDeleted ];
+        case VLCLibraryModelTestVideoCache:
+            return @[ VLCLibraryModelVideoMediaListReset, VLCLibraryModelVideoMediaItemUpdated, VLCLibraryModelVideoMediaItemDeleted ];
+        case VLCLibraryModelTestArtistCache:
+            return @[ VLCLibraryModelArtistListReset, VLCLibraryModelArtistUpdated, VLCLibraryModelArtistDeleted ];
+        case VLCLibraryModelTestAlbumCache:
+            return @[ VLCLibraryModelAlbumListReset, VLCLibraryModelAlbumUpdated, VLCLibraryModelAlbumDeleted ];
+        case VLCLibraryModelTestGenreCache:
+            return @[ VLCLibraryModelGenreListReset, VLCLibraryModelGenreUpdated, VLCLibraryModelGenreDeleted ];
+        case VLCLibraryModelTestGroupCache:
+            return @[ VLCLibraryModelListOfGroupsReset, VLCLibraryModelGroupUpdated, VLCLibraryModelGroupDeleted ];
+        case VLCLibraryModelTestShowCache:
+            return @[ VLCLibraryModelListOfShowsReset, VLCLibraryModelShowUpdated, VLCLibraryModelShowDeleted ];
+        case VLCLibraryModelTestMovieCache:
+            return @[ VLCLibraryModelListOfMoviesReset ];
+        case VLCLibraryModelTestRecentAudioCache:
+            return @[ VLCLibraryModelRecentAudioMediaListReset, VLCLibraryModelRecentAudioMediaItemUpdated, VLCLibraryModelRecentAudioMediaItemDeleted ];
+        case VLCLibraryModelTestRecentVideoCache:
+            return @[ VLCLibraryModelRecentsMediaListReset, VLCLibraryModelRecentsMediaItemUpdated, VLCLibraryModelRecentsMediaItemDeleted ];
+    }
+}
+
+- (NSArray<id<VLCMediaLibraryItemProtocol>> *)cachedItems
+{
+    switch (_kind) {
+        case VLCLibraryModelTestAudioCache:
+            return _model.cachedAudioMedia;
+        case VLCLibraryModelTestVideoCache:
+            return _model.cachedVideoMedia;
+        case VLCLibraryModelTestArtistCache:
+            return _model.cachedArtists;
+        case VLCLibraryModelTestAlbumCache:
+            return _model.cachedAlbums;
+        case VLCLibraryModelTestGenreCache:
+            return _model.cachedGenres;
+        case VLCLibraryModelTestGroupCache:
+            return _model.cachedListOfGroups;
+        case VLCLibraryModelTestShowCache:
+            return _model.cachedListOfShows;
+        case VLCLibraryModelTestMovieCache:
+            return _model.cachedListOfMovies;
+        case VLCLibraryModelTestRecentAudioCache:
+            return _model.cachedRecentAudioMedia;
+        case VLCLibraryModelTestRecentVideoCache:
+            return _model.cachedRecentMedia;
+    }
+}
+
+- (void)seedCacheWithItems:(NSArray<id<VLCMediaLibraryItemProtocol>> *)items
+{
+    switch (_kind) {
+        case VLCLibraryModelTestAudioCache:
+            _model.cachedAudioMedia = (id)items;
+            break;
+        case VLCLibraryModelTestVideoCache:
+            _model.cachedVideoMedia = (id)items;
+            break;
+        case VLCLibraryModelTestArtistCache:
+            _model.cachedArtists = (id)items;
+            break;
+        case VLCLibraryModelTestAlbumCache:
+            _model.cachedAlbums = (id)items;
+            break;
+        case VLCLibraryModelTestGenreCache:
+            _model.cachedGenres = (id)items;
+            break;
+        case VLCLibraryModelTestGroupCache:
+            _model.cachedListOfGroups = (id)items;
+            break;
+        case VLCLibraryModelTestShowCache:
+            _model.cachedListOfShows = (id)items;
+            break;
+        case VLCLibraryModelTestMovieCache:
+            _model.cachedListOfMovies = (id)items;
+            break;
+        case VLCLibraryModelTestRecentAudioCache:
+            _model.cachedRecentAudioMedia = (id)items;
+            break;
+        case VLCLibraryModelTestRecentVideoCache:
+            _model.cachedRecentMedia = (id)items;
+            break;
+    }
+}
+
+- (NSArray<id<VLCMediaLibraryItemProtocol>> *)libraryItems
+{
+    vlc_medialibrary_t * const library = VLCLibraryDataTypesIntegrationMediaLibrary();
+    const vlc_ml_query_params_t params = _model == nil
+        ? (vlc_ml_query_params_t){0}
+        : [_model queryParams];
+    NSMutableArray * const items = NSMutableArray.array;
+    switch (_kind) {
+        case VLCLibraryModelTestAudioCache:
+        case VLCLibraryModelTestVideoCache:
+        case VLCLibraryModelTestRecentAudioCache:
+        case VLCLibraryModelTestRecentVideoCache: {
+            vlc_ml_media_list_t *list;
+            if (_kind == VLCLibraryModelTestAudioCache)
+                list = vlc_ml_list_audio_media(library, &params);
+            else if (_kind == VLCLibraryModelTestVideoCache)
+                list = vlc_ml_list_video_media(library, &params);
+            else if (_kind == VLCLibraryModelTestRecentAudioCache)
+                list = vlc_ml_list_audio_history(library, &params);
+            else
+                list = vlc_ml_list_video_history(library, &params);
+            if (list == NULL)
+                return nil;
+            NSArray * const media = [NSArray arrayFromVlcMediaList:list];
+            vlc_ml_media_list_release(list);
+            return media;
+        }
+        case VLCLibraryModelTestArtistCache: {
+            vlc_ml_artist_list_t * const list = vlc_ml_list_artists(library, &params, YES);
+            if (list == NULL)
+                return nil;
+            for (size_t i = 0; i < list->i_nb_items; i++)
+                [items addObject:[[VLCMediaLibraryArtist alloc] initWithArtist:&list->p_items[i]]];
+            vlc_ml_artist_list_release(list);
+            break;
+        }
+        case VLCLibraryModelTestAlbumCache: {
+            vlc_ml_album_list_t * const list = vlc_ml_list_albums(library, &params);
+            if (list == NULL)
+                return nil;
+            for (size_t i = 0; i < list->i_nb_items; i++)
+                [items addObject:[[VLCMediaLibraryAlbum alloc] initWithAlbum:&list->p_items[i]]];
+            vlc_ml_album_list_release(list);
+            break;
+        }
+        case VLCLibraryModelTestGenreCache: {
+            vlc_ml_genre_list_t * const list = vlc_ml_list_genres(library, &params);
+            if (list == NULL)
+                return nil;
+            for (size_t i = 0; i < list->i_nb_items; i++)
+                [items addObject:[[VLCMediaLibraryGenre alloc] initWithGenre:&list->p_items[i]]];
+            vlc_ml_genre_list_release(list);
+            break;
+        }
+        case VLCLibraryModelTestGroupCache: {
+            vlc_ml_group_list_t * const list = vlc_ml_list_groups(library, &params);
+            if (list == NULL)
+                return nil;
+            for (size_t i = 0; i < list->i_nb_items; i++)
+                [items addObject:[[VLCMediaLibraryGroup alloc] initWithGroup:&list->p_items[i]]];
+            vlc_ml_group_list_release(list);
+            break;
+        }
+        case VLCLibraryModelTestShowCache: {
+            vlc_ml_show_list_t * const list = vlc_ml_list_shows(library, NULL);
+            if (list == NULL)
+                return nil;
+            for (size_t i = 0; i < list->i_nb_items; i++)
+                [items addObject:[[VLCMediaLibraryShow alloc] initWithShow:&list->p_items[i]]];
+            vlc_ml_show_list_release(list);
+            break;
+        }
+        case VLCLibraryModelTestMovieCache: {
+            vlc_ml_media_list_t * const list = vlc_ml_list_movies(library, NULL);
+            if (list == NULL)
+                return nil;
+            for (size_t i = 0; i < list->i_nb_items; i++)
+                [items addObject:[[VLCMediaLibraryMovie alloc] initWithMediaItem:&list->p_items[i]]];
+            vlc_ml_media_list_release(list);
+            break;
+        }
+    }
+    return items.copy;
+}
+
+- (BOOL)preparePendingChange
+{
+    if (_kind == VLCLibraryModelTestRecentAudioCache || _kind == VLCLibraryModelTestRecentVideoCache)
+        return vlc_ml_media_set_played(VLCLibraryDataTypesIntegrationMediaLibrary(),
+                                       _pendingItem.libraryID,
+                                       true) == VLC_SUCCESS;
+    // Other caches hold the real pre-add snapshot. The added record is already
+    // persisted; only delivery of its refresh event remains pending.
+    return YES;
+}
+
+- (void)refreshCache
+{
+    // Exercise one refresh in isolation; native callback fan-out is covered by
+    // the event suite rather than leaving unrelated queries running at teardown.
+    [_model refreshCacheForGetter:self.cacheGetter];
+}
+
+- (void)deliverRefreshEvent
+{
+    switch (_kind) {
+        case VLCLibraryModelTestAudioCache:
+        case VLCLibraryModelTestVideoCache:
+        case VLCLibraryModelTestMovieCache:
+        case VLCLibraryModelTestShowCache: {
+            const int64_t mediaID = _kind == VLCLibraryModelTestShowCache
+                ? _pendingItem.firstMediaItem.libraryID
+                : _pendingItem.libraryID;
+            vlc_ml_media_t * const media = vlc_ml_get_media(VLCLibraryDataTypesIntegrationMediaLibrary(),
+                                                            mediaID);
+            vlc_ml_event_t event = { .i_type = VLC_ML_EVENT_MEDIA_ADDED, .creation.p_media = media };
+            [_model handleMediaItemAddedEvent:&event];
+            vlc_ml_media_release(media);
+            break;
+        }
+        // These are the same refresh calls made by libraryCallback for additions
+        // and HISTORY_CHANGED; only their delivery order is controlled here.
+        case VLCLibraryModelTestArtistCache:
+            [_model resetCachedListOfArtists];
+            break;
+        case VLCLibraryModelTestAlbumCache:
+            [_model resetCachedListOfAlbums];
+            break;
+        case VLCLibraryModelTestGenreCache:
+            [_model resetCachedListOfGenres];
+            break;
+        case VLCLibraryModelTestGroupCache:
+            [_model resetCachedListOfGroups];
+            break;
+        case VLCLibraryModelTestRecentAudioCache:
+            [_model resetCachedListOfRecentAudioMedia];
+            break;
+        case VLCLibraryModelTestRecentVideoCache:
+            [_model resetCachedListOfRecentMedia];
+            break;
+    }
+}
+
+- (BOOL)updateChangedItem
+{
+    if (_kind == VLCLibraryModelTestGroupCache)
+        return VLCLibraryDataTypesIntegrationRenameGroup(_changedItem.libraryID, @"Overlap Updated Group");
+    if (_kind == VLCLibraryModelTestShowCache)
+        return VLCLibraryDataTypesIntegrationSetShowSummary(_changedItem.libraryID, @"Overlap Updated Show") &&
+            vlc_ml_media_set_favorite(VLCLibraryDataTypesIntegrationMediaLibrary(),
+                                      _changedMediaID,
+                                      true) == VLC_SUCCESS;
+    return [_changedItem setFavorite:YES] == VLC_SUCCESS;
+}
+
+- (BOOL)setChangedItemFavorite:(BOOL)favorite
+{
+    return [_changedItem setFavorite:favorite] == VLC_SUCCESS;
+}
+
+- (BOOL)setChangedItemPresent:(BOOL)present
+{
+    NSArray<VLCMediaLibraryMediaItem *> * const media = _changedItem.mediaItems;
+    if (media.count == 0)
+        return NO;
+    for (VLCMediaLibraryMediaItem *item in media) {
+        if (!VLCLibraryDataTypesIntegrationSetMediaPresent(item.libraryID, present))
+            return NO;
+    }
+    return YES;
+}
+
+- (id<VLCMediaLibraryItemProtocol>)refetchChangedItem
+{
+    const int64_t libraryID = _changedItem.libraryID;
+    switch (_kind) {
+        case VLCLibraryModelTestArtistCache:
+            return [VLCMediaLibraryArtist artistWithID:libraryID];
+        case VLCLibraryModelTestAlbumCache:
+            return [VLCMediaLibraryAlbum albumWithID:libraryID];
+        case VLCLibraryModelTestGenreCache:
+            return [VLCMediaLibraryGenre genreWithID:libraryID];
+        case VLCLibraryModelTestGroupCache:
+            return [VLCMediaLibraryGroup groupWithID:libraryID];
+        case VLCLibraryModelTestShowCache:
+            return [VLCMediaLibraryShow showWithLibraryId:libraryID];
+        case VLCLibraryModelTestMovieCache:
+            return [VLCMediaLibraryMediaItem mediaItemForLibraryID:libraryID].movie;
+        default:
+            return [VLCMediaLibraryMediaItem mediaItemForLibraryID:libraryID];
+    }
+}
+
+- (enum vlc_ml_event_type)deletionEventType
+{
+    switch (_kind) {
+        case VLCLibraryModelTestArtistCache:
+            return VLC_ML_EVENT_ARTIST_DELETED;
+        case VLCLibraryModelTestAlbumCache:
+            return VLC_ML_EVENT_ALBUM_DELETED;
+        case VLCLibraryModelTestGenreCache:
+            return VLC_ML_EVENT_GENRE_DELETED;
+        case VLCLibraryModelTestGroupCache:
+            return VLC_ML_EVENT_GROUP_DELETED;
+        default:
+            return VLC_ML_EVENT_MEDIA_DELETED;
+    }
+}
+
+- (BOOL)deleteChangedItem
+{
+    return VLCLibraryDataTypesIntegrationDeleteEntity(self.deletionEventType,
+                                                      _kind == VLCLibraryModelTestShowCache
+                                                          ? _changedMediaID
+                                                          : _changedItem.libraryID);
+}
+
+- (BOOL)deletePendingItem
+{
+    return VLCLibraryDataTypesIntegrationDeleteEntity(self.deletionEventType,
+                                                      _kind == VLCLibraryModelTestShowCache
+                                                          ? _pendingMediaID
+                                                          : _pendingItem.libraryID);
+}
+
+- (void)deliverUpdateEvent
+{
+    [self deliverUpdateEventForID:_kind == VLCLibraryModelTestShowCache
+        ? _changedMediaID
+        : _changedItem.libraryID];
+}
+
+- (void)deliverUpdateEventForID:(int64_t)libraryID
+{
+    vlc_ml_event_t event = { .modification.i_entity_id = libraryID };
+    switch (_kind) {
+        case VLCLibraryModelTestArtistCache:
+            event.i_type = VLC_ML_EVENT_ARTIST_UPDATED;
+            [_model handleArtistUpdateEvent:&event];
+            break;
+        case VLCLibraryModelTestAlbumCache:
+            event.i_type = VLC_ML_EVENT_ALBUM_UPDATED;
+            [_model handleAlbumUpdateEvent:&event];
+            break;
+        case VLCLibraryModelTestGenreCache:
+            event.i_type = VLC_ML_EVENT_GENRE_UPDATED;
+            [_model handleGenreUpdateEvent:&event];
+            break;
+        case VLCLibraryModelTestGroupCache:
+            event.i_type = VLC_ML_EVENT_GROUP_UPDATED;
+            [_model handleGroupUpdateEvent:&event];
+            break;
+        default:
+            event.i_type = VLC_ML_EVENT_MEDIA_UPDATED;
+            [_model handleMediaItemUpdateEvent:&event];
+            break;
+    }
+}
+
+- (BOOL)renameItemWithID:(int64_t)libraryID
+                    to:(NSString *)name
+{
+    switch (_kind) {
+        case VLCLibraryModelTestArtistCache:
+            return VLCLibraryDataTypesIntegrationRenameArtist(libraryID, name);
+        case VLCLibraryModelTestAlbumCache:
+            return VLCLibraryDataTypesIntegrationRenameAlbum(libraryID, name);
+        case VLCLibraryModelTestGenreCache:
+            return VLCLibraryDataTypesIntegrationRenameGenre(libraryID, name);
+        case VLCLibraryModelTestGroupCache:
+            return VLCLibraryDataTypesIntegrationRenameGroup(libraryID, name);
+        default:
+            return VLCLibraryDataTypesIntegrationRenameMedia(libraryID, name);
+    }
+}
+
+- (void)deliverDeletionEventForID:(int64_t)libraryID
+{
+    vlc_ml_event_t event = {
+        .i_type = self.deletionEventType,
+        .deletion.i_entity_id = libraryID
+    };
+    switch (_kind) {
+        case VLCLibraryModelTestArtistCache:
+            [_model handleArtistDeletionEvent:&event];
+            break;
+        case VLCLibraryModelTestAlbumCache:
+            [_model handleAlbumDeletionEvent:&event];
+            break;
+        case VLCLibraryModelTestGenreCache:
+            [_model handleGenreDeletionEvent:&event];
+            break;
+        case VLCLibraryModelTestGroupCache:
+            [_model handleGroupDeletionEvent:&event];
+            break;
+        default:
+            [_model handleMediaItemDeletionEvent:&event];
+            break;
+    }
+}
+
+- (void)deliverDeletionEvent
+{
+    [self deliverDeletionEventForID:
+        _kind == VLCLibraryModelTestShowCache
+            ? _changedMediaID
+            : _changedItem.libraryID];
+}
+
+- (void)deliverPendingDeletionEvent
+{
+    [self deliverDeletionEventForID:
+        _kind == VLCLibraryModelTestShowCache
+            ? _pendingMediaID
+            : _pendingItem.libraryID];
+}
+
+@end
