@@ -82,6 +82,9 @@
 @property (readonly, nonatomic) NSArray<VLCMediaLibraryFolderObserver *> *folderObservers;
 @end
 
+VLCMediaLibraryMediaItem *VLCLibraryModelTestMediaItem(vlc_ml_media_type_t type,
+                                                       int64_t libraryID,
+                                                       NSString *title);
 
 // Installs a blocking barrier after a read, so the test can enqueue a pending
 // write. Subsequent reads and writes on that queue wait until the gate is released.
@@ -127,6 +130,10 @@
 @end
 
 // Holds the title queue after a read, delaying title writes but not media writes.
+@interface VLCLibraryModelTestTitleReadGate : VLCLibraryModelTestCacheReadGate
+- (void)holdNextTitleReadWithHandler:(dispatch_block_t)handler;
+- (void)releaseTitleRead;
+@end
 
 typedef NS_ENUM(NSUInteger, VLCLibraryModelTestCacheKind) {
     VLCLibraryModelTestAudioCache,

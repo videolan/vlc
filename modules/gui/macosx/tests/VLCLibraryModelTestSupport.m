@@ -25,6 +25,22 @@
 #import "VLCLibraryDataTypesIntegrationTestSupport.h"
 #import "extensions/NSArray+VLCAdditions.h"
 
+VLCMediaLibraryMediaItem *VLCLibraryModelTestMediaItem(vlc_ml_media_type_t type,
+                                                       int64_t libraryID,
+                                                       NSString *title)
+{
+    vlc_ml_file_list_t files = {0};
+    vlc_ml_media_track_list_t tracks = {0};
+    vlc_ml_media_t media = {
+        .i_id = libraryID,
+        .i_type = type,
+        .p_files = &files,
+        .p_tracks = &tracks,
+        .psz_title = (char *)title.UTF8String
+    };
+    return [[VLCMediaLibraryMediaItem alloc] initWithMediaItem:&media];
+}
+
 @implementation VLCLibraryModelTestShowQueries {
     NSUInteger _showListQueryCount;
     NSMutableDictionary<NSNumber *, NSNumber *> *_showQueryCounts;
@@ -212,6 +228,38 @@
 
 @end
 
+@implementation VLCLibraryModelTestTitleReadGate {
+    dispatch_block_t _titleReadCaptured;
+}
+
+- (void)holdNextTitleReadWithHandler:(dispatch_block_t)handler
+{
+    @synchronized (self) {
+        _titleReadCaptured = [handler copy];
+    }
+}
+
+- (void)releaseTitleRead
+{
+    @synchronized (self) {
+        _titleReadCaptured = nil;
+    }
+    [self releaseCacheReads];
+}
+
+- (NSArray<NSString *> *)cachedMediaTitles
+{
+    @synchronized (self) {
+        if (_titleReadCaptured != nil) {
+            [self holdWritesFollowingNextCacheReadWithHandler:_titleReadCaptured];
+            _titleReadCaptured = nil;
+        }
+        // Keep the gate tied to this getter even if another cache is read concurrently.
+        return [super cachedMediaTitles];
+    }
+}
+
+@end
 
 @implementation VLCLibraryModelTestQueryGate {
     dispatch_semaphore_t _queryRelease;

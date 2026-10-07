@@ -1623,3 +1623,209 @@
 }
 
 @end
+
+@interface VLCLibraryModelTitlesIntegrationTest : VLCLibraryModelPersistedTestCase
+@property (strong) VLCLibraryModelTestQueryGate *model;
+@end
+
+@implementation VLCLibraryModelTitlesIntegrationTest
+
+- (void)setUp
+{
+    [super setUp];
+    self.model = [[VLCLibraryModelTestQueryGate alloc]
+        initWithLibrary:VLCLibraryDataTypesIntegrationMediaLibrary()
+          observeEvents:NO];
+    self.model.changeDelegate.throttleInterval = 0.;
+    // Native records are real; replay only their model events to control timing.
+}
+
+- (void)tearDown
+{
+    if (self.model != nil) {
+        XCTestExpectation * const finished = [self expectationWithDescription:@"Persisted title queries finished"];
+        [self.model finishPendingQueriesWithCompletion:^{
+            [finished fulfill];
+        }];
+        [self waitForExpectations:@[ finished ] timeout:10.];
+    }
+    self.model = nil;
+    [super tearDown];
+}
+
+- (void)seedSourcesWithAudioTitles:(NSArray<NSString *> *)titles
+{
+    const int64_t IDs[] = {
+        VLCLibraryDataTypesIntegrationFactoryAudioMediaID(),
+        VLCLibraryDataTypesIntegrationSortingAudioAlphaMediaID(),
+    };
+    XCTAssertEqual(titles.count, (NSUInteger)2);
+    for (NSUInteger index = 0; index < titles.count; index++)
+        XCTAssertTrue(VLCLibraryDataTypesIntegrationRenameMedia(IDs[index], titles[index]));
+    vlc_medialibrary_t * const library = VLCLibraryDataTypesIntegrationMediaLibrary();
+    vlc_ml_query_params_t params = vlc_ml_query_params_create();
+    vlc_ml_media_list_t * const audio = vlc_ml_list_audio_media(library, &params);
+    vlc_ml_media_list_t * const video = vlc_ml_list_video_media(library, &params);
+    XCTAssertNotEqual(audio, (vlc_ml_media_list_t *)NULL);
+    XCTAssertNotEqual(video, (vlc_ml_media_list_t *)NULL);
+    self.model.cachedAudioMedia = [NSArray arrayFromVlcMediaList:audio];
+    self.model.cachedVideoMedia = [NSArray arrayFromVlcMediaList:video];
+    vlc_ml_media_list_release(audio);
+    vlc_ml_media_list_release(video);
+    XCTAssertGreaterThan(self.model.cachedAudioMedia.count, (NSUInteger)0);
+    XCTAssertGreaterThan(self.model.cachedVideoMedia.count, (NSUInteger)0);
+    XCTAssertTrue([self.model.listOfMediaTitles containsObject:titles.firstObject]);
+}
+
+- (void)renameMediaID:(int64_t)mediaID toTitle:(NSString *)title
+{
+    XCTestExpectation * const refreshed =
+        [self expectationForNotification:VLCLibraryModelAudioMediaListReset object:self.model handler:nil];
+    XCTAssertTrue(VLCLibraryDataTypesIntegrationRenameMedia(mediaID, title));
+    vlc_ml_event_t event = { .i_type = VLC_ML_EVENT_MEDIA_UPDATED };
+    event.modification.i_entity_id = mediaID;
+    [self.model handleMediaItemUpdateEvent:&event];
+    [self waitForExpectations:@[ refreshed ] timeout:5.];
+}
+
+- (void)deleteMediaID:(int64_t)mediaID
+{
+    XCTestExpectation * const removed =
+        [self expectationForNotification:VLCLibraryModelAudioMediaItemDeleted object:nil handler:nil];
+    XCTAssertTrue(VLCLibraryDataTypesIntegrationDeleteEntity(VLC_ML_EVENT_MEDIA_DELETED, mediaID));
+    vlc_ml_event_t event = { .i_type = VLC_ML_EVENT_MEDIA_DELETED };
+    event.deletion.i_entity_id = mediaID;
+    [self.model handleMediaItemDeletionEvent:&event];
+    [self waitForExpectations:@[ removed ] timeout:5.];
+}
+
+- (void)testTitleLookupLoadsBothMissingSourcesFromMediaLibrary
+{
+    const int64_t IDs[] = {
+        VLCLibraryDataTypesIntegrationFactoryAudioMediaID(),
+        VLCLibraryDataTypesIntegrationSortingAudioAlphaMediaID(),
+        VLCLibraryDataTypesIntegrationSortingAudioZuluMediaID(),
+        VLCLibraryDataTypesIntegrationFactoryVideoMediaID(),
+        VLCLibraryDataTypesIntegrationSortingVideoAlphaMediaID(),
+        VLCLibraryDataTypesIntegrationSortingVideoZuluMediaID(),
+    };
+    NSMutableSet<NSString *> * const persistedTitles = NSMutableSet.set;
+    for (NSUInteger index = 0; index < sizeof(IDs) / sizeof(IDs[0]); index++) {
+        VLCMediaLibraryMediaItem * const item = [VLCMediaLibraryMediaItem mediaItemForLibraryID:IDs[index]];
+        XCTAssertNotNil(item);
+        [persistedTitles addObject:item.displayString];
+    }
+    XCTestExpectation * const audioLoaded =
+        [self expectationForNotification:VLCLibraryModelAudioMediaListReset object:self.model handler:nil];
+    XCTestExpectation * const videoLoaded =
+        [self expectationForNotification:VLCLibraryModelVideoMediaListReset object:self.model handler:nil];
+
+    (void)self.model.listOfMediaTitles;
+    [self waitForExpectations:@[ audioLoaded, videoLoaded ] timeout:5.];
+
+    NSArray * const expected = [persistedTitles.allObjects sortedArrayUsingSelector:
+        @selector(localizedCaseInsensitiveCompare:)];
+    XCTAssertEqualObjects(self.model.listOfMediaTitles, expected);
+}
+
+- (void)testDroppingCachesPreservesTitlesFromNewMediaLibraryQueries
+{
+    [self seedSourcesWithAudioTitles:@[ @"Reloaded alpha", @"Reloaded bravo" ]];
+    VLCLibraryModelTestQueryGate * const model = self.model;
+    NSArray<NSString *> * const expectedTitles = model.listOfMediaTitles;
+    VLCMediaLibraryMediaItem * const oldAudio = model.cachedAudioMedia.firstObject;
+    VLCMediaLibraryMediaItem * const oldVideo = model.cachedVideoMedia.firstObject;
+    XCTestExpectation * const titleQueueHeld = [self expectationWithDescription:@"Title writes held during native refetch"];
+    [model holdWritesFollowingNextCacheReadWithHandler:^{
+        [titleQueueHeld fulfill];
+    }];
+    [self addTeardownBlock:^{
+        [model releaseCacheReads];
+    }];
+    XCTAssertEqualObjects(model.cachedMediaTitles, expectedTitles);
+    [self waitForExpectations:@[ titleQueueHeld ] timeout:5.];
+    XCTestExpectation * const dropped =
+        [self expectationForNotification:VLCLibraryModelAllCachesDropped object:model handler:nil];
+    XCTestExpectation * const audioLoaded =
+        [self expectationForNotification:VLCLibraryModelAudioMediaListReset object:model handler:nil];
+    XCTestExpectation * const videoLoaded =
+        [self expectationForNotification:VLCLibraryModelVideoMediaListReset object:model handler:nil];
+    XCTestExpectation * const lookupFinished = [self expectationWithDescription:@"Initial title lookup finished"];
+
+    [model dropCaches];
+    XCTAssertNil(model.cachedAudioMedia);
+    XCTAssertNil(model.cachedVideoMedia);
+    // The lookup starts real audio/video queries, then waits on the held
+    // title queue. Source writes must still finish without blocking on it.
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0),
+                   ^{
+        (void)model.listOfMediaTitles;
+        [lookupFinished fulfill];
+    });
+    [self waitForExpectations:@[ audioLoaded, videoLoaded ] timeout:5.];
+    XCTAssertNotEqual(model.cachedAudioMedia.firstObject, oldAudio);
+    XCTAssertNotEqual(model.cachedVideoMedia.firstObject, oldVideo);
+    [model releaseCacheReads];
+    [self waitForExpectations:@[ dropped, lookupFinished ] timeout:5.];
+
+    XCTAssertEqualObjects(model.listOfMediaTitles, expectedTitles);
+}
+
+- (void)testRenamingOneDuplicatePreservesOriginalTitle
+{
+    [self seedSourcesWithAudioTitles:@[ @"Shared title", @"Shared title" ]];
+
+    [self renameMediaID:VLCLibraryDataTypesIntegrationFactoryAudioMediaID() toTitle:@"Renamed title"];
+
+    NSArray * const titles = self.model.listOfMediaTitles;
+    XCTAssertTrue([titles containsObject:@"Shared title"]);
+    XCTAssertTrue([titles containsObject:@"Renamed title"]);
+    NSArray * const sharedTitles = [titles filteredArrayUsingPredicate:
+        [NSPredicate predicateWithFormat:@"SELF == %@", @"Shared title"]];
+    XCTAssertEqual(sharedTitles.count, (NSUInteger)1);
+}
+
+- (void)testRenamingLastReferenceRemovesOriginalTitle
+{
+    [self seedSourcesWithAudioTitles:@[ @"Original title", @"Other title" ]];
+
+    [self renameMediaID:VLCLibraryDataTypesIntegrationFactoryAudioMediaID() toTitle:@"Renamed title"];
+
+    NSArray * const titles = self.model.listOfMediaTitles;
+    XCTAssertFalse([titles containsObject:@"Original title"]);
+    XCTAssertTrue([titles containsObject:@"Renamed title"]);
+    XCTAssertTrue([titles containsObject:@"Other title"]);
+}
+
+- (void)testDeletingOneDuplicatePreservesTitleReferencedByOtherItem
+{
+    [self seedSourcesWithAudioTitles:@[ @"Shared title", @"Shared title" ]];
+
+    [self deleteMediaID:VLCLibraryDataTypesIntegrationFactoryAudioMediaID()];
+
+    XCTAssertTrue([self.model.listOfMediaTitles containsObject:@"Shared title"]);
+}
+
+- (void)testDeletingDuplicateReferencesRemovesTitleOnlyAfterFinalDeletion
+{
+    [self seedSourcesWithAudioTitles:@[ @"Shared title", @"Shared title" ]];
+
+    [self deleteMediaID:VLCLibraryDataTypesIntegrationFactoryAudioMediaID()];
+    XCTAssertTrue([self.model.listOfMediaTitles containsObject:@"Shared title"]);
+    [self deleteMediaID:VLCLibraryDataTypesIntegrationSortingAudioAlphaMediaID()];
+
+    XCTAssertFalse([self.model.listOfMediaTitles containsObject:@"Shared title"]);
+}
+
+- (void)testDeletingLastReferenceRemovesTitle
+{
+    [self seedSourcesWithAudioTitles:@[ @"Deleted title", @"Retained title" ]];
+
+    [self deleteMediaID:VLCLibraryDataTypesIntegrationFactoryAudioMediaID()];
+
+    NSArray * const titles = self.model.listOfMediaTitles;
+    XCTAssertFalse([titles containsObject:@"Deleted title"]);
+    XCTAssertTrue([titles containsObject:@"Retained title"]);
+}
+
+@end

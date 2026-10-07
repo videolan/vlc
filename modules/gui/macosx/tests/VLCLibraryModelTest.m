@@ -23,6 +23,7 @@
 #import <XCTest/XCTest.h>
 
 #import "VLCLibraryModelTestSupport.h"
+#import "VLCLibraryDataTypesIntegrationTestSupport.h"
 #import "library/VLCLibraryModelChangeDelegate.h"
 
 @interface VLCLibraryModelTest : XCTestCase
@@ -252,6 +253,379 @@
 
     XCTAssertEqual(queryParams.i_sort, VLC_ML_SORTING_ALPHA);
     XCTAssertFalse(queryParams.b_desc);
+}
+
+@end
+
+#pragma mark - Media title reference counts
+
+@interface VLCLibraryModelTitlesTest : XCTestCase
+@property (strong) VLCLibraryModelTestTitleReadGate *model;
+@end
+
+@implementation VLCLibraryModelTitlesTest
+
++ (void)setUp
+{
+    [super setUp];
+    // Media wrappers use the real temporary library while these tests isolate
+    // the model's source setters from asynchronous library queries/events.
+    XCTAssertTrue(VLCLibraryDataTypesIntegrationStart());
+}
+
++ (void)tearDown
+{
+    VLCLibraryDataTypesIntegrationStop();
+    [super tearDown];
+}
+
+- (void)setUp
+{
+    [super setUp];
+    self.continueAfterFailure = NO;
+    self.model = [[VLCLibraryModelTestTitleReadGate alloc] initWithoutMediaLibrary];
+    self.model.changeDelegate.throttleInterval = 0.;
+}
+
+- (void)tearDown
+{
+    [self.model releaseTitleRead];
+    self.model = nil;
+    [super tearDown];
+}
+
+- (void)seedAudioMedia:(NSArray<VLCMediaLibraryMediaItem *> *)audio
+            videoMedia:(NSArray<VLCMediaLibraryMediaItem *> *)video
+{
+    self.model.cachedAudioMedia = audio;
+    self.model.cachedVideoMedia = video;
+    // Source getters wait for the writes to submit their title-count changes.
+    XCTAssertEqualObjects(self.model.cachedAudioMedia, audio);
+    XCTAssertEqualObjects(self.model.cachedVideoMedia, video);
+}
+
+- (void)holdTitleUpdatesAfterReadingTitles:(NSArray<NSString *> *)titles
+{
+    XCTestExpectation * const held = [self expectationWithDescription:@"Title queue held"];
+    [self.model holdNextTitleReadWithHandler:^{
+        [held fulfill];
+    }];
+    XCTAssertEqualObjects(self.model.listOfMediaTitles, titles);
+    [self waitForExpectations:@[ held ] timeout:5.];
+}
+
+- (void)testTitleLookupReturnsSortedAudioAndVideoUnion
+{
+    [self seedAudioMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_AUDIO, 1, @"Zulu"),
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_AUDIO, 2, @"alpha"),
+    ]
+              videoMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_VIDEO, 3, @"Bravo"),
+    ]];
+
+    XCTAssertEqualObjects(self.model.listOfMediaTitles, (@[ @"alpha", @"Bravo", @"Zulu" ]));
+}
+
+- (void)testRepeatedAudioTitleIsReturnedOnlyOnce
+{
+    [self seedAudioMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_AUDIO, 1, @"Shared"),
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_AUDIO, 2, @"Shared"),
+    ]
+              videoMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_VIDEO, 3, @"Video"),
+    ]];
+
+    XCTAssertEqualObjects(self.model.listOfMediaTitles, (@[ @"Shared", @"Video" ]));
+}
+
+- (void)testTitleSharedAcrossAudioAndVideoIsReturnedOnlyOnce
+{
+    [self seedAudioMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_AUDIO, 1, @"Shared"),
+    ]
+              videoMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_VIDEO, 2, @"Shared"),
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_VIDEO, 3, @"Video"),
+    ]];
+
+    XCTAssertEqualObjects(self.model.listOfMediaTitles, (@[ @"Shared", @"Video" ]));
+}
+
+- (void)testReplacingAudioPreservesTitlesStillReferencedByVideo
+{
+    [self seedAudioMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_AUDIO, 1, @"Audio only"),
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_AUDIO, 2, @"Shared"),
+    ]
+              videoMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_VIDEO, 3, @"Shared"),
+    ]];
+
+    self.model.cachedAudioMedia = @[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_AUDIO, 4, @"Replacement"),
+    ];
+
+    XCTAssertEqual(self.model.cachedAudioMedia.count, (NSUInteger)1);
+    XCTAssertEqualObjects(self.model.listOfMediaTitles, (@[ @"Replacement", @"Shared" ]));
+}
+
+- (void)testReplacingVideoPreservesTitlesStillReferencedByAudio
+{
+    [self seedAudioMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_AUDIO, 1, @"Shared"),
+    ]
+              videoMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_VIDEO, 2, @"Shared"),
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_VIDEO, 3, @"Video only"),
+    ]];
+
+    self.model.cachedVideoMedia = @[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_VIDEO, 4, @"Replacement"),
+    ];
+
+    XCTAssertEqual(self.model.cachedVideoMedia.count, (NSUInteger)1);
+    XCTAssertEqualObjects(self.model.listOfMediaTitles, (@[ @"Replacement", @"Shared" ]));
+}
+
+- (void)testReplacingAudioRemovesTitleAfterItsLastSourceReferenceDisappears
+{
+    [self seedAudioMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_AUDIO, 1, @"Duplicate"),
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_AUDIO, 2, @"Duplicate"),
+    ]
+              videoMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_VIDEO, 3, @"Video"),
+    ]];
+
+    self.model.cachedAudioMedia = @[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_AUDIO, 4, @"Replacement"),
+    ];
+
+    XCTAssertEqual(self.model.cachedAudioMedia.count, (NSUInteger)1);
+    XCTAssertEqualObjects(self.model.listOfMediaTitles, (@[ @"Replacement", @"Video" ]));
+}
+
+- (void)testRepeatedReplacementDoesNotAccumulateTitleReferences
+{
+    VLCMediaLibraryMediaItem * const audio =
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_AUDIO, 1, @"Audio");
+    [self seedAudioMedia:@[ audio ] videoMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_VIDEO, 2, @"Video"),
+    ]];
+
+    self.model.cachedAudioMedia = @[ audio ];
+    self.model.cachedAudioMedia = @[ audio ];
+    self.model.cachedAudioMedia = @[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_AUDIO, 3, @"Replacement"),
+    ];
+
+    XCTAssertEqual(self.model.cachedAudioMedia.count, (NSUInteger)1);
+    XCTAssertEqualObjects(self.model.listOfMediaTitles, (@[ @"Replacement", @"Video" ]));
+}
+
+- (void)testClearingAudioPreservesOnlyVideoTitleReferences
+{
+    [self seedAudioMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_AUDIO, 1, @"Audio only"),
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_AUDIO, 2, @"Shared"),
+    ]
+              videoMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_VIDEO, 3, @"Shared"),
+    ]];
+
+    self.model.cachedAudioMedia = nil;
+
+    XCTAssertNil(self.model.cachedAudioMedia);
+    // Avoid the public getter here: it intentionally queries missing sources.
+    XCTAssertEqualObjects(self.model.cachedMediaTitles, (@[ @"Shared" ]));
+}
+
+- (void)testClearingVideoPreservesOnlyAudioTitleReferences
+{
+    [self seedAudioMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_AUDIO, 1, @"Shared"),
+    ]
+              videoMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_VIDEO, 2, @"Shared"),
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_VIDEO, 3, @"Video only"),
+    ]];
+
+    self.model.cachedVideoMedia = nil;
+
+    XCTAssertNil(self.model.cachedVideoMedia);
+    XCTAssertEqualObjects(self.model.cachedMediaTitles, (@[ @"Shared" ]));
+}
+
+- (void)testRecentAudioDoesNotAddTitleReferences
+{
+    [self seedAudioMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_AUDIO, 1, @"Audio"),
+    ]
+              videoMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_VIDEO, 2, @"Video"),
+    ]];
+
+    self.model.cachedRecentAudioMedia = @[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_AUDIO, 3, @"History only"),
+    ];
+
+    XCTAssertEqual(self.model.cachedRecentAudioMedia.count, (NSUInteger)1);
+    XCTAssertEqualObjects(self.model.listOfMediaTitles, (@[ @"Audio", @"Video" ]));
+}
+
+- (void)testDelayedTitleUpdatesDoNotBlockAudioCacheReplacement
+{
+    [self seedAudioMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_AUDIO, 1, @"Original"),
+    ]
+              videoMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_VIDEO, 2, @"Video"),
+    ]];
+    [self holdTitleUpdatesAfterReadingTitles:@[ @"Original", @"Video" ]];
+
+    NSArray * const replacement = @[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_AUDIO, 3, @"Replacement"),
+    ];
+    self.model.cachedAudioMedia = replacement;
+    XCTestExpectation * const audioWritten = [self expectationWithDescription:@"Audio write completes while titles wait"];
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0),
+                   ^{
+        XCTAssertEqualObjects(self.model.cachedAudioMedia, replacement);
+        [audioWritten fulfill];
+    });
+    [self waitForExpectations:@[ audioWritten ] timeout:5.];
+    [self.model releaseTitleRead];
+
+    XCTAssertEqualObjects(self.model.listOfMediaTitles, (@[ @"Replacement", @"Video" ]));
+}
+
+- (void)testDroppingAndRebuildingSourcesDoesNotRetainOldTitleReferences
+{
+    [self seedAudioMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_AUDIO, 1, @"Shared"),
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_AUDIO, 2, @"Old audio"),
+    ]
+              videoMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_VIDEO, 3, @"Shared"),
+    ]];
+    XCTAssertEqualObjects(self.model.listOfMediaTitles, (@[ @"Old audio", @"Shared" ]));
+    XCTestExpectation * const dropped =
+        [self expectationForNotification:VLCLibraryModelAllCachesDropped object:self.model handler:nil];
+
+    [self.model dropCaches];
+    [self waitForExpectations:@[ dropped ] timeout:5.];
+    XCTAssertNil(self.model.cachedMediaTitles);
+    [self seedAudioMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_AUDIO, 4, @"New audio"),
+    ]
+              videoMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_VIDEO, 5, @"New video"),
+    ]];
+
+    XCTAssertEqualObjects(self.model.listOfMediaTitles, (@[ @"New audio", @"New video" ]));
+}
+
+- (void)testDroppingCachesDoesNotEraseTitlesRebuiltByNewSourceWrites
+{
+    [self seedAudioMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_AUDIO, 1, @"Old audio"),
+    ]
+              videoMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_VIDEO, 2, @"Old video"),
+    ]];
+    [self holdTitleUpdatesAfterReadingTitles:@[ @"Old audio", @"Old video" ]];
+    XCTestExpectation * const dropped =
+        [self expectationForNotification:VLCLibraryModelAllCachesDropped object:self.model handler:nil];
+
+    [self.model dropCaches];
+    // A new query can publish its source after a drop starts but before the
+    // delayed final title clear. Reproduce those source writes directly.
+    [self seedAudioMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_AUDIO, 3, @"New audio"),
+    ]
+              videoMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_VIDEO, 4, @"New video"),
+    ]];
+    [self.model releaseTitleRead];
+    [self waitForExpectations:@[ dropped ] timeout:5.];
+
+    XCTAssertEqualObjects(self.model.listOfMediaTitles, (@[ @"New audio", @"New video" ]));
+}
+
+- (void)testOverlappingDropAndRebuildPreservesOnlyTheRebuiltTitleReferences
+{
+    [self seedAudioMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_AUDIO, 1, @"Shared"),
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_AUDIO, 2, @"Old audio"),
+    ]
+              videoMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_VIDEO, 3, @"Shared"),
+    ]];
+    VLCMediaLibraryMediaItem * const firstAudio =
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_AUDIO, 4, @"Shared");
+    VLCMediaLibraryMediaItem * const secondAudio =
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_AUDIO, 5, @"Shared");
+    VLCMediaLibraryMediaItem * const sharedVideo =
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_VIDEO, 6, @"Shared");
+    VLCMediaLibraryMediaItem * const otherVideo =
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_VIDEO, 7, @"Video only");
+    [self holdTitleUpdatesAfterReadingTitles:@[ @"Old audio", @"Shared" ]];
+    XCTestExpectation * const dropped =
+        [self expectationForNotification:VLCLibraryModelAllCachesDropped object:self.model handler:nil];
+    [self.model dropCaches];
+    [self seedAudioMedia:@[ firstAudio, secondAudio ] videoMedia:@[ sharedVideo, otherVideo ]];
+    [self.model releaseTitleRead];
+    [self waitForExpectations:@[ dropped ] timeout:5.];
+    XCTAssertEqualObjects(self.model.listOfMediaTitles, (@[ @"Shared", @"Video only" ]));
+
+    self.model.cachedAudioMedia = @[ secondAudio ];
+    XCTAssertEqualObjects(self.model.listOfMediaTitles, (@[ @"Shared", @"Video only" ]));
+    self.model.cachedAudioMedia = @[];
+    XCTAssertEqualObjects(self.model.listOfMediaTitles, (@[ @"Shared", @"Video only" ]));
+    self.model.cachedVideoMedia = @[ otherVideo ];
+    XCTAssertEqualObjects(self.model.listOfMediaTitles,
+                          (@[ @"Video only" ]),
+                          @"Dropped references must not keep a title alive after its rebuilt references are gone");
+}
+
+- (void)testConsecutiveOverlappingDropsKeepOnlyTheFinalSourceTitles
+{
+    [self seedAudioMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_AUDIO, 1, @"Old audio"),
+    ]
+              videoMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_VIDEO, 2, @"Old video"),
+    ]];
+    [self holdTitleUpdatesAfterReadingTitles:@[ @"Old audio", @"Old video" ]];
+    XCTestExpectation * const dropped =
+        [self expectationForNotification:VLCLibraryModelAllCachesDropped object:self.model handler:nil];
+    [self.model dropCaches];
+    [self seedAudioMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_AUDIO, 3, @"Intermediate audio"),
+    ]
+              videoMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_VIDEO, 4, @"Intermediate video"),
+    ]];
+    [self.model dropCaches];
+    [self seedAudioMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_AUDIO, 5, @"Final audio"),
+    ]
+              videoMedia:@[
+        VLCLibraryModelTestMediaItem(VLC_ML_MEDIA_TYPE_VIDEO, 6, @"Final video"),
+    ]];
+    [self.model releaseTitleRead];
+    // Cache-drop notifications can be throttled together. Their publication
+    // follows the final queued title writes, without clearing the rebuilt list.
+    [self waitForExpectations:@[ dropped ] timeout:5.];
+    XCTAssertEqualObjects(self.model.listOfMediaTitles, (@[ @"Final audio", @"Final video" ]));
+    self.model.cachedAudioMedia = @[];
+    XCTAssertEqualObjects(self.model.listOfMediaTitles, (@[ @"Final video" ]));
+    self.model.cachedVideoMedia = @[];
+    XCTAssertEqualObjects(self.model.listOfMediaTitles,
+                          @[],
+                          @"Neither the old nor intermediate source titles may retain references");
 }
 
 @end
