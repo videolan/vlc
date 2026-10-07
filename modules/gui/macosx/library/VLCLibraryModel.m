@@ -1679,11 +1679,83 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 - (BOOL)shouldReloadCacheForUpdatedItem:(id<VLCMediaLibraryItemProtocol>)item
                            previousItem:(id<VLCMediaLibraryItemProtocol>)previousItem
 {
-    // Search can match metadata other than the displayed name, and non-alpha
-    // sort keys are entity-specific. Let the ML query decide membership/order.
+    if (previousItem == nil || item.class != previousItem.class ||
+        item.libraryID != previousItem.libraryID)
+        return YES;
+
+    if ([item isKindOfClass:VLCMediaLibraryGenre.class]) {
+        // Genre queries search and sort by name, regardless of sort criterion.
+        return ![((VLCMediaLibraryGenre *)item).name isEqualToString:((VLCMediaLibraryGenre *)previousItem).name];
+    }
+
+    if ([item isKindOfClass:VLCMediaLibraryArtist.class]) {
+        VLCMediaLibraryArtist * const artist = (id)item;
+        VLCMediaLibraryArtist * const previousArtist = (id)previousItem;
+        if (![artist.name isEqualToString:previousArtist.name] ||
+            (artist.numberOfPresentTracks > 0) != (previousArtist.numberOfPresentTracks > 0) ||
+            (artist.numberOfTracks > 0) != (previousArtist.numberOfTracks > 0))
+            return YES;
+        switch (_sortCriteria) {
+            case VLC_ML_SORTING_DEFAULT:
+            case VLC_ML_SORTING_ALPHA:
+                return NO;
+            case VLC_ML_SORTING_TRACKNUMBER:
+                return artist.numberOfTracks != previousArtist.numberOfTracks;
+            default:
+                return YES;
+        }
+    }
+
+    if ([item isKindOfClass:VLCMediaLibraryAlbum.class]) {
+        VLCMediaLibraryAlbum * const album = (id)item;
+        VLCMediaLibraryAlbum * const previousAlbum = (id)previousItem;
+        if (![album.title isEqualToString:previousAlbum.title] ||
+            (album.numberOfPresentTracks > 0) != (previousAlbum.numberOfPresentTracks > 0) ||
+            (_filterString.length > 0 && ![album.artistName isEqualToString:previousAlbum.artistName]))
+            return YES;
+        switch (_sortCriteria) {
+            case VLC_ML_SORTING_DEFAULT:
+            case VLC_ML_SORTING_ALPHA:
+                return ![album.artistName isEqualToString:previousAlbum.artistName];
+            case VLC_ML_SORTING_DURATION:
+                return album.duration != previousAlbum.duration;
+            case VLC_ML_SORTING_RELEASEDATE:
+                return album.year != previousAlbum.year;
+            case VLC_ML_SORTING_ARTIST:
+                return ![album.artistName isEqualToString:previousAlbum.artistName];
+            case VLC_ML_SORTING_TRACKNUMBER:
+                return album.numberOfTracks != previousAlbum.numberOfTracks;
+            default:
+                // Aggregate play counts and insertion dates are not in the snapshot.
+                return YES;
+        }
+    }
+
+    if ([item isKindOfClass:VLCMediaLibraryGroup.class]) {
+        VLCMediaLibraryGroup * const group = (id)item;
+        VLCMediaLibraryGroup * const previousGroup = (id)previousItem;
+        if (![group.name isEqualToString:previousGroup.name] ||
+            (group.numberOfPresentTotalItems > 0) != (previousGroup.numberOfPresentTotalItems > 0))
+            return YES;
+        switch (_sortCriteria) {
+            case VLC_ML_SORTING_DEFAULT:
+            case VLC_ML_SORTING_ALPHA:
+                return NO;
+            case VLC_ML_SORTING_DURATION:
+                return group.duration != previousGroup.duration;
+            case VLC_ML_SORTING_INSERTIONDATE:
+                return ![group.creationDate isEqualToDate:previousGroup.creationDate];
+            case VLC_ML_SORTING_LASTMODIFICATIONDATE:
+                return ![group.lastModificationDate isEqualToDate:previousGroup.lastModificationDate];
+            default:
+                return YES;
+        }
+    }
+
+    // Media labels are lazy lookups, not snapshots of the previous search data.
+    // Retain full queries where membership or sort keys cannot be compared safely.
     return _filterString.length > 0 ||
            (_sortCriteria != VLC_ML_SORTING_DEFAULT && _sortCriteria != VLC_ML_SORTING_ALPHA) ||
-           previousItem == nil ||
            ![previousItem.displayString isEqualToString:item.displayString];
 }
 

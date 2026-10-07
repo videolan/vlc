@@ -537,6 +537,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
         _musicBrainzID = toNSStr(p_artist->psz_mb_id);
         _numberOfAlbums = p_artist->i_nb_album;
         _numberOfTracks = p_artist->i_nb_tracks;
+        _numberOfPresentTracks = p_artist->i_nb_present_tracks;
         _favorited = p_artist->b_is_favorite;
     }
     return self;
@@ -676,6 +677,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
         _artistName = toNSStr(p_album->psz_artist);
         _artistID = p_album->i_artist_id;
         _numberOfTracks = p_album->i_nb_tracks;
+        _numberOfPresentTracks = p_album->i_nb_present_tracks;
         _duration = p_album->i_duration;
         _year = p_album->i_year;
         _favorited = p_album->b_is_favorite;

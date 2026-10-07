@@ -185,6 +185,7 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 @property (readonly) NSString *shortBiography;
 @property (readonly) NSString *musicBrainzID;
 @property (readonly) unsigned int numberOfAlbums;
+@property (readonly) uint32_t numberOfPresentTracks;
 
 @end
 
@@ -200,6 +201,7 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 @property (readonly) int64_t artistID;
 @property (readonly) int64_t duration;
 @property (readonly) unsigned int year;
+@property (readonly) uint32_t numberOfPresentTracks;
 
 @end
 
