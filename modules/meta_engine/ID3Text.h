@@ -22,26 +22,35 @@
 
 #include <vlc_charset.h>
 
+/* Text encoding byte of the ID3v2 frames */
+enum
+{
+    ID3_ENCODING_ISO_8859_1 = 0x00, // ISO-8859-1
+    ID3_ENCODING_UTF16      = 0x01, // UTF-16 with BOM
+    ID3_ENCODING_UTF16BE    = 0x02, // UTF-16BE without BOM, ID3v2.4
+    ID3_ENCODING_UTF8       = 0x03, // UTF-8, ID3v2.4
+};
+
 static const char * ID3TextConv( const uint8_t *p_buf, size_t i_buf,
                                  uint8_t i_charset, char **ppsz_allocated )
 {
     char *p_alloc = NULL;
     const char *psz = p_alloc;
-    if( i_buf > 0 && i_charset < 0x04 )
+    if( i_buf > 0 && i_charset <= ID3_ENCODING_UTF8 )
     {
         switch( i_charset )
         {
-            case 0x00:
+            case ID3_ENCODING_ISO_8859_1:
                 psz = p_alloc = FromCharset( "ISO_8859-1", p_buf, i_buf );
                 break;
-            case 0x01:
+            case ID3_ENCODING_UTF16:
                 psz = p_alloc = FromCharset( "UTF-16LE", p_buf, i_buf );
                 break;
-            case 0x02:
+            case ID3_ENCODING_UTF16BE:
                 psz = p_alloc = FromCharset( "UTF-16BE", p_buf, i_buf );
                 break;
             default:
-            case 0x03:
+            case ID3_ENCODING_UTF8:
                 if( p_buf[ i_buf - 1 ] != 0x00 )
                 {
                     psz = p_alloc = (char *) malloc( i_buf + 1 );

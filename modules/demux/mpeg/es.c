@@ -1515,7 +1515,8 @@ static int ID3TAG_Parse_Handler( uint32_t i_tag, const uint8_t *p_payload, size_
         const uint8_t *p = p_payload + 6;
         size_t i_remaining = i_payload - 6;
 
-        bool b_utf16 = (i_encoding == 0x01 || i_encoding == 0x02);
+        bool b_utf16 = (i_encoding == ID3_ENCODING_UTF16 ||
+                        i_encoding == ID3_ENCODING_UTF16BE);
 
         /* Skip content descriptor (null-terminated string) */
         if( b_utf16 ) /* UTF-16 */
@@ -1612,7 +1613,8 @@ static int ID3TAG_Parse_Handler( uint32_t i_tag, const uint8_t *p_payload, size_
         const uint8_t *p = p_payload + 4;
         size_t i_remaining = i_payload - 4;
 
-        bool b_utf16 = (i_encoding == 0x01 || i_encoding == 0x02);
+        bool b_utf16 = (i_encoding == ID3_ENCODING_UTF16 ||
+                        i_encoding == ID3_ENCODING_UTF16BE);
 
         if( b_utf16 )
         {
