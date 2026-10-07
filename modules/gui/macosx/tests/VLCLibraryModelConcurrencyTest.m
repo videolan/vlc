@@ -1144,6 +1144,413 @@ typedef NS_ENUM(NSUInteger, VLCLibraryModelOverlapChange) {
     } else if (change == VLCLibraryModelOverlapDeletion) {
         XCTAssertNil([self itemWithID:changedID inItems:actual]);
     }
+    // Both the later mutation and the original membership change must
+    // survive, not merely the rejection of the held query's token.
+    XCTAssertEqualObjects([self libraryIDsForItems:actual],
+                          [self libraryIDsForItems:expected],
+                          @"The final cache must match persisted membership after the later event");
+}
+
+- (NSArray<NSString *> *)groupFixtureNamesInItems:(NSArray<id<VLCMediaLibraryItemProtocol>> *)items
+{
+    NSMutableArray<NSString *> * const names = NSMutableArray.array;
+    for (id<VLCMediaLibraryItemProtocol> item in items) {
+        if (item.libraryID == self.fixture.changedItem.libraryID ||
+            item.libraryID == self.fixture.pendingItem.libraryID)
+            [names addObject:item.displayString];
+    }
+    return names.copy;
+}
+
+- (void)assertGroupRenameFrom:(NSString *)oldName
+                       toName:(NSString *)newName
+                       filter:(NSString *)filter
+                   descending:(BOOL)descending
+             expectedOldNames:(NSArray<NSString *> *)expectedOldNames
+             expectedNewNames:(NSArray<NSString *> *)expectedNewNames
+             overlappingFetch:(BOOL)overlappingFetch
+{
+    XCTestExpectation * const prepared = [self expectationWithDescription:@"Persisted groups prepared"];
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0),
+                   ^{
+        self.fixture = [[VLCLibraryModelTestOverlapFixture alloc] initWithGroupName:@"Group Cache Middle"
+                                                                     otherGroupName:oldName];
+        [prepared fulfill];
+    });
+    [self waitForExpectations:@[ prepared ] timeout:15.];
+    VLCLibraryModelTestOverlapFixture * const fixture = self.fixture;
+    XCTAssertNotNil(fixture);
+    VLCLibraryModelTestQueryGate * const model = fixture.model;
+    [model sortByCriteria:VLC_ML_SORTING_ALPHA andDescending:descending];
+    model.filterString = filter;
+    XCTAssertEqualObjects([self groupFixtureNamesInItems:fixture.libraryItems], expectedOldNames);
+    XCTestExpectation * const loaded = [self expectationForNotification:VLCLibraryModelListOfGroupsReset
+                                                                 object:model
+                                                                handler:nil];
+    [fixture deliverRefreshEvent];
+    [self waitForExpectations:@[ loaded ] timeout:5.];
+    XCTAssertEqualObjects([self groupFixtureNamesInItems:fixture.cachedItems], expectedOldNames);
+    XCTAssertEqualObjects([self orderedIDs:fixture.cachedItems],
+                          [self orderedIDs:fixture.libraryItems]);
+
+    XCTestExpectation *captured = nil;
+    XCTestExpectation *processed = nil;
+    if (overlappingFetch) {
+        captured = [self expectationWithDescription:@"Pre-rename group list fetched"];
+        processed = [self expectationWithDescription:@"Pre-rename group list processed"];
+        [model holdNextQueryResultForGetter:fixture.cacheGetter
+                                    handler:^{
+            [captured fulfill];
+        }
+                          completionHandler:^{
+            [processed fulfill];
+        }];
+        [self addTeardownBlock:^{
+            [model releaseQuery];
+        }];
+    }
+    if (overlappingFetch) {
+        [fixture deliverRefreshEvent];
+        [self waitForExpectations:@[ captured ] timeout:5.];
+    }
+    XCTAssertTrue(VLCLibraryDataTypesIntegrationRenameGroup(fixture.changedItem.libraryID, newName));
+    // Prove the real ML query sees the new membership/order before the
+    // model event is delivered, independently of its cached objects.
+    XCTAssertEqualObjects([self groupFixtureNamesInItems:fixture.libraryItems], expectedNewNames);
+    XCTAssertEqualObjects([VLCMediaLibraryGroup groupWithID:fixture.changedItem.libraryID].name, newName);
+
+    XCTestExpectation * const updated = [self expectationWithDescription:@"Group cache update published"];
+    __block BOOL fulfilled = NO;
+    for (NSNotificationName name in @[ VLCLibraryModelListOfGroupsReset, VLCLibraryModelGroupUpdated ]) {
+        [self observeNotification:name
+                           object:nil
+                            queue:NSOperationQueue.mainQueue
+                       usingBlock:^(NSNotification *notification) {
+            if (!fulfilled && (notification.object == model ||
+                ([notification.object isKindOfClass:VLCMediaLibraryGroup.class] &&
+                 [notification.object libraryID] == fixture.changedItem.libraryID))) {
+                fulfilled = YES;
+                [updated fulfill];
+            }
+        }];
+    }
+    [fixture deliverUpdateEvent];
+    // Drain the event handler before allowing its captured old result
+    // to write. This also exercises the uncached-group early return.
+    (void)fixture.cachedItems;
+    if (overlappingFetch) {
+        [model releaseQuery];
+        [self waitForExpectations:@[ processed ] timeout:5.];
+    }
+    [self waitForExpectations:@[ updated ] timeout:5.];
+    XCTAssertEqualObjects([self groupFixtureNamesInItems:fixture.cachedItems], expectedNewNames);
+    XCTAssertEqualObjects([self orderedIDs:fixture.cachedItems],
+                          [self orderedIDs:fixture.libraryItems]);
+    VLCMediaLibraryGroup * const cached = (id)[self itemWithID:fixture.changedItem.libraryID
+                                                       inItems:fixture.cachedItems];
+    if (cached != nil)
+        XCTAssertEqualObjects(cached.name, newName);
+}
+
+- (void)assertFavoriteUpdateStaysInCache:(VLCLibraryModelTestCacheKind)kind
+                                  filter:(BOOL)filtered
+                                 sorting:(enum vlc_ml_sorting_criteria_t)sorting
+{
+    XCTestExpectation * const prepared = [self expectationWithDescription:@"Update fixtures prepared"];
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0),
+                   ^{
+        self.fixture = kind == VLCLibraryModelTestGroupCache
+            ? [[VLCLibraryModelTestOverlapFixture alloc] initWithGroupName:@"Selective Middle"
+                                                            otherGroupName:@"Selective First"]
+            : [[VLCLibraryModelTestOverlapFixture alloc] initWithCacheKind:kind];
+        [prepared fulfill];
+    });
+    [self waitForExpectations:@[ prepared ] timeout:15.];
+    VLCLibraryModelTestOverlapFixture * const fixture = self.fixture;
+    XCTAssertNotNil(fixture);
+    VLCLibraryModelTestQueryGate * const model = fixture.model;
+    [model sortByCriteria:sorting andDescending:NO];
+    if (filtered)
+        model.filterString = fixture.changedItem.displayString;
+    XCTestExpectation * const loaded = [self expectationForNotification:fixture.changeNotifications.firstObject
+                                                                 object:model
+                                                                handler:nil];
+    [fixture deliverRefreshEvent];
+    [self waitForExpectations:@[ loaded ] timeout:5.];
+    NSArray * const before = fixture.cachedItems;
+    id<VLCMediaLibraryItemProtocol> const previous = [self itemWithID:fixture.changedItem.libraryID inItems:before];
+    XCTAssertNotNil(previous);
+    XCTAssertFalse(previous.favorited);
+    XCTAssertEqualObjects([self orderedIDs:before],
+                          [self orderedIDs:fixture.libraryItems]);
+    const NSUInteger queryCount = [model queryCountForGetter:fixture.cacheGetter];
+    XCTestExpectation * const updated = [self expectationWithDescription:@"Favorite change committed"];
+    __block BOOL fulfilled = NO;
+    for (NSNotificationName name in [fixture.changeNotifications subarrayWithRange:NSMakeRange(0, 2)]) {
+        [self observeNotification:name
+                           object:nil
+                            queue:NSOperationQueue.mainQueue
+                       usingBlock:^(NSNotification *notification) {
+            if (!fulfilled && (notification.object == model ||
+                ([notification.object conformsToProtocol:@protocol(VLCMediaLibraryItemProtocol)] &&
+                 [notification.object libraryID] == fixture.changedItem.libraryID))) {
+                fulfilled = YES;
+                [updated fulfill];
+            }
+        }];
+    }
+    XCTAssertTrue([fixture setChangedItemFavorite:YES]);
+    XCTAssertTrue([self itemWithID:fixture.changedItem.libraryID inItems:fixture.libraryItems].favorited);
+    [fixture deliverUpdateEvent];
+    [self waitForExpectations:@[ updated ] timeout:5.];
+    NSArray * const after = fixture.cachedItems;
+    XCTAssertTrue([self itemWithID:fixture.changedItem.libraryID inItems:after].favorited);
+    XCTAssertEqualObjects([self orderedIDs:after], [self orderedIDs:before]);
+    XCTAssertEqualObjects([self orderedIDs:after],
+                          [self orderedIDs:fixture.libraryItems]);
+    XCTAssertEqual([model queryCountForGetter:fixture.cacheGetter],
+                   queryCount,
+                   @"Unchanged search and sort fields should permit in-place replacement");
+}
+
+- (void)assertUpdateRefreshesCache:(VLCLibraryModelTestCacheKind)kind
+                            filter:(NSString *)filter
+                           sorting:(enum vlc_ml_sorting_criteria_t)sorting
+                           prepare:(BOOL (^)(VLCLibraryModelTestOverlapFixture *fixture))prepare
+                            change:(BOOL (^)(VLCLibraryModelTestOverlapFixture *fixture))change
+{
+    XCTestExpectation * const prepared = [self expectationWithDescription:@"Reload fixtures prepared"];
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0),
+                   ^{
+        self.fixture = kind == VLCLibraryModelTestGroupCache
+            ? [[VLCLibraryModelTestOverlapFixture alloc] initWithGroupName:@"Selective Middle"
+                                                            otherGroupName:@"Selective First"]
+            : [[VLCLibraryModelTestOverlapFixture alloc] initWithCacheKind:kind];
+        [prepared fulfill];
+    });
+    [self waitForExpectations:@[ prepared ] timeout:15.];
+    VLCLibraryModelTestOverlapFixture * const fixture = self.fixture;
+    XCTAssertNotNil(fixture);
+    VLCLibraryModelTestQueryGate * const model = fixture.model;
+    if (prepare != nil)
+        XCTAssertTrue(prepare(fixture));
+    [model sortByCriteria:sorting andDescending:NO];
+    model.filterString = filter;
+    XCTestExpectation * const loaded = [self expectationForNotification:fixture.changeNotifications.firstObject
+                                                                 object:model
+                                                                handler:nil];
+    [fixture deliverRefreshEvent];
+    [self waitForExpectations:@[ loaded ] timeout:5.];
+    NSArray * const before = fixture.cachedItems;
+    XCTAssertNotNil([self itemWithID:fixture.changedItem.libraryID inItems:before]);
+    XCTAssertEqualObjects([self orderedIDs:before],
+                          [self orderedIDs:fixture.libraryItems]);
+    const NSUInteger queryCount = [model queryCountForGetter:fixture.cacheGetter];
+    XCTAssertTrue(change(fixture));
+    id<VLCMediaLibraryItemProtocol> const freshItem = [fixture refetchChangedItem];
+    XCTAssertNotNil(freshItem);
+    XCTAssertEqualObjects(freshItem.displayString,
+                          [self itemWithID:fixture.changedItem.libraryID inItems:before].displayString,
+                          @"Membership and ordering changes must be detected even when the displayed name is unchanged");
+    NSArray * const expected = fixture.libraryItems;
+    XCTAssertGreaterThan(expected.count, (NSUInteger)0, @"Unaffected records must survive the update");
+    XCTAssertNotEqualObjects([self orderedIDs:expected],
+                             [self orderedIDs:before],
+                             @"The persisted change must really affect query membership or order");
+    XCTestExpectation * const reloaded = [self expectationForNotification:fixture.changeNotifications.firstObject
+                                                                   object:model
+                                                                  handler:nil];
+    [fixture deliverUpdateEvent];
+    [self waitForExpectations:@[ reloaded ] timeout:5.];
+    XCTAssertEqualObjects([self orderedIDs:fixture.cachedItems],
+                          [self orderedIDs:expected]);
+    XCTAssertEqual([model queryCountForGetter:fixture.cacheGetter], queryCount + 1);
+}
+
+- (void)testAlbumDurationChangeReordersDurationSortedCache
+{
+    [self assertUpdateRefreshesCache:VLCLibraryModelTestAlbumCache
+                              filter:nil
+                             sorting:VLC_ML_SORTING_DURATION
+                             prepare:nil
+                              change:^BOOL(VLCLibraryModelTestOverlapFixture *fixture) {
+        return VLCLibraryDataTypesIntegrationSetAlbumDuration(fixture.changedItem.libraryID, 1);
+    }];
+}
+
+- (void)testAlbumYearChangeReordersReleaseDateSortedCache
+{
+    [self assertUpdateRefreshesCache:VLCLibraryModelTestAlbumCache
+                              filter:nil
+                             sorting:VLC_ML_SORTING_RELEASEDATE
+                             prepare:nil
+                              change:^BOOL(VLCLibraryModelTestOverlapFixture *fixture) {
+        return VLCLibraryDataTypesIntegrationSetAlbumYear(fixture.changedItem.libraryID, 1900);
+    }];
+}
+
+- (void)testAlbumArtistChangeRemovesAlbumFromArtistNameFilter
+{
+    [self assertUpdateRefreshesCache:VLCLibraryModelTestAlbumCache
+                              filter:@"Artist"
+                             sorting:VLC_ML_SORTING_ALPHA
+                             prepare:nil
+                              change:^BOOL(VLCLibraryModelTestOverlapFixture *fixture) {
+        return VLCLibraryDataTypesIntegrationRenameAlbumArtist(fixture.changedItem.libraryID, @"Different Performer");
+    }];
+}
+
+- (void)testAlbumArtistChangeReordersArtistSortedCache
+{
+    [self assertUpdateRefreshesCache:VLCLibraryModelTestAlbumCache
+                              filter:nil
+                             sorting:VLC_ML_SORTING_ARTIST
+                             prepare:nil
+                              change:^BOOL(VLCLibraryModelTestOverlapFixture *fixture) {
+        return VLCLibraryDataTypesIntegrationRenameAlbumArtist(fixture.changedItem.libraryID, @"AAA Performer");
+    }];
+}
+
+- (void)testAlbumArtistChangeReordersAlphabeticalAlbumsWithSameTitle
+{
+    [self assertUpdateRefreshesCache:VLCLibraryModelTestAlbumCache
+                              filter:nil
+                             sorting:VLC_ML_SORTING_ALPHA
+                             prepare:^BOOL(VLCLibraryModelTestOverlapFixture *fixture) {
+        return VLCLibraryDataTypesIntegrationRenameAlbum(fixture.pendingItem.libraryID,
+                                                        fixture.changedItem.displayString);
+    }
+                              change:^BOOL(VLCLibraryModelTestOverlapFixture *fixture) {
+        return VLCLibraryDataTypesIntegrationRenameAlbumArtist(fixture.changedItem.libraryID, @"AAA Performer");
+    }];
+}
+
+- (void)testAlbumBecomingUnavailableRemovesItFromCache
+{
+    [self assertUpdateRefreshesCache:VLCLibraryModelTestAlbumCache
+                              filter:nil
+                             sorting:VLC_ML_SORTING_ALPHA
+                             prepare:nil
+                              change:^BOOL(VLCLibraryModelTestOverlapFixture *fixture) {
+        return [fixture setChangedItemPresent:NO];
+    }];
+}
+
+- (void)testArtistBecomingUnavailableRemovesItFromCache
+{
+    [self assertUpdateRefreshesCache:VLCLibraryModelTestArtistCache
+                              filter:nil
+                             sorting:VLC_ML_SORTING_ALPHA
+                             prepare:nil
+                              change:^BOOL(VLCLibraryModelTestOverlapFixture *fixture) {
+        return [fixture setChangedItemPresent:NO];
+    }];
+}
+
+- (void)testGroupBecomingUnavailableRemovesItFromCache
+{
+    [self assertUpdateRefreshesCache:VLCLibraryModelTestGroupCache
+                              filter:nil
+                             sorting:VLC_ML_SORTING_ALPHA
+                             prepare:nil
+                              change:^BOOL(VLCLibraryModelTestOverlapFixture *fixture) {
+        return [fixture setChangedItemPresent:NO];
+    }];
+}
+
+- (void)testGroupDurationChangeReordersDurationSortedCache
+{
+    [self assertUpdateRefreshesCache:VLCLibraryModelTestGroupCache
+                              filter:nil
+                             sorting:VLC_ML_SORTING_DURATION
+                             prepare:nil
+                              change:^BOOL(VLCLibraryModelTestOverlapFixture *fixture) {
+        return VLCLibraryDataTypesIntegrationSetGroupDuration(fixture.changedItem.libraryID, 1);
+    }];
+}
+
+- (void)testGroupModificationDateChangeReordersDateSortedCache
+{
+    [self assertUpdateRefreshesCache:VLCLibraryModelTestGroupCache
+                              filter:nil
+                             sorting:VLC_ML_SORTING_LASTMODIFICATIONDATE
+                             prepare:nil
+                              change:^BOOL(VLCLibraryModelTestOverlapFixture *fixture) {
+        return VLCLibraryDataTypesIntegrationSetGroupModificationDate(fixture.changedItem.libraryID,
+                                                                     [NSDate dateWithTimeIntervalSince1970:1]);
+    }];
+}
+
+- (void)testMediaLabelRemovalRemovesItemFromLabelFilterWithoutChangingTitle
+{
+    [self assertUpdateRefreshesCache:VLCLibraryModelTestAudioCache
+                              filter:@"Transient"
+                             sorting:VLC_ML_SORTING_ALPHA
+                             prepare:^BOOL(VLCLibraryModelTestOverlapFixture *fixture) {
+        vlc_medialibrary_t * const library = VLCLibraryDataTypesIntegrationMediaLibrary();
+        return vlc_ml_media_add_label(library, fixture.changedItem.libraryID, "Transient Changed") == VLC_SUCCESS &&
+               vlc_ml_media_add_label(library, fixture.pendingItem.libraryID, "Transient Pending") == VLC_SUCCESS;
+    }
+                              change:^BOOL(VLCLibraryModelTestOverlapFixture *fixture) {
+        return vlc_ml_media_remove_label(VLCLibraryDataTypesIntegrationMediaLibrary(),
+                                        fixture.changedItem.libraryID,
+                                        "Transient Changed") == VLC_SUCCESS;
+    }];
+}
+
+- (void)testFilteredArtistFavoriteUpdateDoesNotReloadCache
+{
+    [self assertFavoriteUpdateStaysInCache:VLCLibraryModelTestArtistCache filter:YES sorting:VLC_ML_SORTING_ALPHA];
+}
+
+- (void)testFilteredAlbumFavoriteUpdateDoesNotReloadCache
+{
+    [self assertFavoriteUpdateStaysInCache:VLCLibraryModelTestAlbumCache filter:YES sorting:VLC_ML_SORTING_ALPHA];
+}
+
+- (void)testFilteredGenreFavoriteUpdateDoesNotReloadCache
+{
+    [self assertFavoriteUpdateStaysInCache:VLCLibraryModelTestGenreCache filter:YES sorting:VLC_ML_SORTING_ALPHA];
+}
+
+- (void)testFilteredGroupFavoriteUpdateDoesNotReloadCache
+{
+    [self assertFavoriteUpdateStaysInCache:VLCLibraryModelTestGroupCache filter:YES sorting:VLC_ML_SORTING_ALPHA];
+}
+
+- (void)testDurationSortedAlbumFavoriteUpdateDoesNotReloadCache
+{
+    [self assertFavoriteUpdateStaysInCache:VLCLibraryModelTestAlbumCache filter:NO sorting:VLC_ML_SORTING_DURATION];
+}
+
+- (void)testReleaseDateSortedAlbumFavoriteUpdateDoesNotReloadCache
+{
+    [self assertFavoriteUpdateStaysInCache:VLCLibraryModelTestAlbumCache filter:NO sorting:VLC_ML_SORTING_RELEASEDATE];
+}
+
+- (void)testArtistSortedAlbumFavoriteUpdateDoesNotReloadCache
+{
+    [self assertFavoriteUpdateStaysInCache:VLCLibraryModelTestAlbumCache filter:NO sorting:VLC_ML_SORTING_ARTIST];
+}
+
+- (void)testTrackCountSortedAlbumFavoriteUpdateDoesNotReloadCache
+{
+    [self assertFavoriteUpdateStaysInCache:VLCLibraryModelTestAlbumCache filter:NO sorting:VLC_ML_SORTING_TRACKNUMBER];
+}
+
+- (void)testTrackCountSortedArtistFavoriteUpdateDoesNotReloadCache
+{
+    [self assertFavoriteUpdateStaysInCache:VLCLibraryModelTestArtistCache filter:NO sorting:VLC_ML_SORTING_TRACKNUMBER];
+}
+
+- (void)testDurationSortedGroupFavoriteUpdateDoesNotReloadCache
+{
+    [self assertFavoriteUpdateStaysInCache:VLCLibraryModelTestGroupCache filter:NO sorting:VLC_ML_SORTING_DURATION];
+}
+
+- (void)testCreationDateSortedGroupFavoriteUpdateDoesNotReloadCache
+{
+    [self assertFavoriteUpdateStaysInCache:VLCLibraryModelTestGroupCache filter:NO sorting:VLC_ML_SORTING_INSERTIONDATE];
 }
 
 - (void)testAudioAdditionRefreshWithoutOverlap
@@ -1310,6 +1717,61 @@ typedef NS_ENUM(NSUInteger, VLCLibraryModelOverlapChange) {
 - (void)testGroupAdditionRefreshWithoutOverlap
 {
     [self assertRefreshForCacheKind:VLCLibraryModelTestGroupCache overlappingChange:VLCLibraryModelOverlapNoChange];
+}
+
+- (void)testGroupRenameReordersAscendingCache
+{
+    [self assertGroupRenameFrom:@"Group Cache Alpha"
+                         toName:@"Group Cache Zulu"
+                         filter:@""
+                     descending:NO
+               expectedOldNames:@[ @"Group Cache Alpha", @"Group Cache Middle" ]
+               expectedNewNames:@[ @"Group Cache Middle", @"Group Cache Zulu" ]
+               overlappingFetch:NO];
+}
+
+- (void)testGroupRenameReordersDescendingCache
+{
+    [self assertGroupRenameFrom:@"Group Cache Zulu"
+                         toName:@"Group Cache Alpha"
+                         filter:@""
+                     descending:YES
+               expectedOldNames:@[ @"Group Cache Zulu", @"Group Cache Middle" ]
+               expectedNewNames:@[ @"Group Cache Middle", @"Group Cache Alpha" ]
+               overlappingFetch:NO];
+}
+
+- (void)testGroupRenameRemovesGroupNoLongerMatchingFilter
+{
+    [self assertGroupRenameFrom:@"Group Cache Alpha"
+                         toName:@"Outside Filter"
+                         filter:@"Group Cache"
+                     descending:NO
+               expectedOldNames:@[ @"Group Cache Alpha", @"Group Cache Middle" ]
+               expectedNewNames:@[ @"Group Cache Middle" ]
+               overlappingFetch:NO];
+}
+
+- (void)testGroupRenameAddsGroupNewlyMatchingFilter
+{
+    [self assertGroupRenameFrom:@"Outside Filter"
+                         toName:@"Group Cache Alpha"
+                         filter:@"Group Cache"
+                     descending:NO
+               expectedOldNames:@[ @"Group Cache Middle" ]
+               expectedNewNames:@[ @"Group Cache Alpha", @"Group Cache Middle" ]
+               overlappingFetch:NO];
+}
+
+- (void)testPendingGroupFetchPreservesRenameNewlyMatchingFilter
+{
+    [self assertGroupRenameFrom:@"Outside Filter"
+                         toName:@"Group Cache Alpha"
+                         filter:@"Group Cache"
+                     descending:NO
+               expectedOldNames:@[ @"Group Cache Middle" ]
+               expectedNewNames:@[ @"Group Cache Alpha", @"Group Cache Middle" ]
+               overlappingFetch:YES];
 }
 
 - (void)testGroupAdditionRefreshSurvivesUnrelatedUpdate

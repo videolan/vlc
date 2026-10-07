@@ -29,6 +29,56 @@
 #import "tests/VLCLibraryDataTypesIntegrationTestSupport.h"
 #import "VLCLibraryModelTestSupport.h"
 
+@interface VLCLibraryModelPersistedTestCase : XCTestCase
+- (NSArray<NSNumber *> *)libraryIDsForItems:(NSArray<id<VLCMediaLibraryItemProtocol>> *)items;
+- (id<VLCMediaLibraryItemProtocol>)itemWithID:(int64_t)libraryID
+                                      inItems:(NSArray<id<VLCMediaLibraryItemProtocol>> *)items;
+@end
+
+@implementation VLCLibraryModelPersistedTestCase
+
+- (void)setUp
+{
+    [super setUp];
+    self.continueAfterFailure = NO;
+    XCTestExpectation * const initialized = [self expectationWithDescription:@"Persisted library fixtures discovered"];
+    __block BOOL prepared = NO;
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0),
+                   ^{
+        prepared = VLCLibraryDataTypesIntegrationStart() &&
+            VLCLibraryDataTypesIntegrationPrepareFactoryFixtures();
+        [initialized fulfill];
+    });
+    [self waitForExpectations:@[ initialized ] timeout:20.];
+    XCTAssertTrue(prepared);
+}
+
+- (void)tearDown
+{
+    VLCLibraryDataTypesIntegrationStop();
+    [super tearDown];
+}
+
+- (NSArray<NSNumber *> *)libraryIDsForItems:(NSArray<id<VLCMediaLibraryItemProtocol>> *)items
+{
+    NSMutableArray<NSNumber *> * const IDs = NSMutableArray.array;
+    for (id<VLCMediaLibraryItemProtocol> item in items)
+        [IDs addObject:@(item.libraryID)];
+    return IDs.copy;
+}
+
+- (id<VLCMediaLibraryItemProtocol>)itemWithID:(int64_t)libraryID
+                                      inItems:(NSArray<id<VLCMediaLibraryItemProtocol>> *)items
+{
+    for (id<VLCMediaLibraryItemProtocol> item in items) {
+        if (item.libraryID == libraryID)
+            return item;
+    }
+    return nil;
+}
+
+@end
+
 @interface VLCLibraryModelIntegrationTest : XCTestCase
 @property (nonatomic, strong) VLCLibraryModel *model;
 @end
@@ -982,6 +1032,286 @@
     XCTAssertEqual(mediaItems.count, (NSUInteger)1);
     XCTAssertEqual(mediaItems.firstObject.libraryID,
                    VLCLibraryDataTypesIntegrationFactoryAudioMediaID());
+}
+
+@end
+
+@interface VLCLibraryModelSelectionTest : VLCLibraryModelPersistedTestCase
+@property (strong) VLCLibraryModelTestOverlapFixture *fixture;
+@end
+
+@implementation VLCLibraryModelSelectionTest
+
+- (void)tearDown
+{
+    if (self.fixture != nil) {
+        XCTestExpectation * const finished = [self expectationWithDescription:@"Selective refresh queries finished"];
+        [self.fixture.model finishPendingQueriesWithCompletion:^{
+            [finished fulfill];
+        }];
+        [self waitForExpectations:@[ finished ] timeout:10.];
+    }
+    self.fixture = nil;
+    [super tearDown];
+}
+
+- (void)prepareFixtureOfKind:(VLCLibraryModelTestCacheKind)kind
+                     sorting:(enum vlc_ml_sorting_criteria_t)sorting
+                  descending:(BOOL)descending
+{
+    XCTestExpectation * const prepared = [self expectationWithDescription:@"Selective cache entities prepared"];
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0),
+                   ^{
+        self.fixture = [[VLCLibraryModelTestOverlapFixture alloc] initWithCacheKind:kind];
+        [prepared fulfill];
+    });
+    [self waitForExpectations:@[ prepared ] timeout:15.];
+    XCTAssertNotNil(self.fixture);
+    XCTestExpectation * const dropped = [self expectationForNotification:VLCLibraryModelAllCachesDropped
+                                                                  object:self.fixture.model
+                                                                 handler:nil];
+    [self.fixture.model sortByCriteria:sorting andDescending:descending];
+    [self waitForExpectations:@[ dropped ] timeout:5.];
+}
+
+- (void)loadFixtureCache
+{
+    if (self.fixture.cacheGetter == @selector(cachedListOfMovies)) {
+        // Do not let a delayed notification from the initial snapshot satisfy
+        // the later movie-update expectation.
+        [self.fixture seedCacheWithItems:self.fixture.libraryItems];
+        XCTAssertNotNil(self.fixture.cachedItems);
+        return;
+    }
+    XCTestExpectation * const loaded = [self expectationForNotification:self.fixture.changeNotifications.firstObject
+                                                                 object:self.fixture.model
+                                                                handler:nil];
+    [self.fixture refreshCache];
+    [self waitForExpectations:@[ loaded ] timeout:5.];
+    XCTAssertNotNil(self.fixture.cachedItems);
+}
+
+- (uint32_t)presentTracksForItem:(id<VLCMediaLibraryItemProtocol>)item
+{
+    if ([item isKindOfClass:VLCMediaLibraryArtist.class])
+        return ((VLCMediaLibraryArtist *)item).numberOfPresentTracks;
+    XCTAssertTrue([item isKindOfClass:VLCMediaLibraryAlbum.class]);
+    return ((VLCMediaLibraryAlbum *)item).numberOfPresentTracks;
+}
+
+- (void)setMediaIDs:(NSArray<NSNumber *> *)mediaIDs present:(BOOL)present
+{
+    for (NSNumber *ID in mediaIDs)
+        XCTAssertTrue(VLCLibraryDataTypesIntegrationSetMediaPresent(ID.longLongValue, present));
+}
+
+- (void)assertAvailabilityRestoresItemForCacheKind:(VLCLibraryModelTestCacheKind)kind
+{
+    [self prepareFixtureOfKind:kind sorting:VLC_ML_SORTING_ALPHA descending:NO];
+    VLCLibraryModelTestOverlapFixture * const fixture = self.fixture;
+    NSArray<NSNumber *> * const mediaIDs = [self libraryIDsForItems:fixture.changedItem.mediaItems];
+    XCTAssertGreaterThan(mediaIDs.count, (NSUInteger)0);
+    [self setMediaIDs:mediaIDs present:NO];
+    XCTAssertEqual([self presentTracksForItem:[fixture refetchChangedItem]], (uint32_t)0);
+    XCTAssertNil([self itemWithID:fixture.changedItem.libraryID inItems:fixture.libraryItems]);
+    [self loadFixtureCache];
+    XCTAssertNil([self itemWithID:fixture.changedItem.libraryID inItems:fixture.cachedItems]);
+    const NSUInteger queries = [fixture.model queryCountForGetter:fixture.cacheGetter];
+
+    [self setMediaIDs:mediaIDs present:YES];
+    XCTAssertGreaterThan([self presentTracksForItem:[fixture refetchChangedItem]], (uint32_t)0);
+    XCTAssertNotNil([self itemWithID:fixture.changedItem.libraryID inItems:fixture.libraryItems]);
+    XCTestExpectation * const restored = [self expectationForNotification:fixture.changeNotifications.firstObject
+                                                                   object:fixture.model
+                                                                  handler:nil];
+    [fixture deliverUpdateEvent];
+    [self waitForExpectations:@[ restored ] timeout:5.];
+    id<VLCMediaLibraryItemProtocol> const cached = [self itemWithID:fixture.changedItem.libraryID
+                                                            inItems:fixture.cachedItems];
+    XCTAssertNotNil(cached);
+    XCTAssertEqual([self presentTracksForItem:cached], (uint32_t)mediaIDs.count);
+    XCTAssertNotNil([self itemWithID:fixture.pendingItem.libraryID inItems:fixture.cachedItems]);
+    XCTAssertEqualObjects([self libraryIDsForItems:fixture.cachedItems],
+                          [self libraryIDsForItems:fixture.libraryItems]);
+    XCTAssertEqual([fixture.model queryCountForGetter:fixture.cacheGetter], queries + 1);
+}
+
+- (void)assertPartialUnavailabilityPreservesTrackCountOrderForCacheKind:(VLCLibraryModelTestCacheKind)kind
+{
+    [self prepareFixtureOfKind:kind sorting:VLC_ML_SORTING_TRACKNUMBER descending:NO];
+    VLCLibraryModelTestOverlapFixture * const fixture = self.fixture;
+    [self loadFixtureCache];
+    NSArray<NSNumber *> * const beforeIDs = [self libraryIDsForItems:fixture.cachedItems];
+    id<VLCMediaLibraryAudioGroupProtocol> const previous = (id)[self itemWithID:fixture.changedItem.libraryID
+                                                                        inItems:fixture.cachedItems];
+    XCTAssertNotNil(previous);
+    XCTAssertEqual(previous.numberOfTracks, (unsigned int)2);
+    XCTAssertEqual([self presentTracksForItem:previous], (uint32_t)2);
+    const int64_t mediaID = previous.mediaItems.firstObject.libraryID;
+    const NSUInteger queries = [fixture.model queryCountForGetter:fixture.cacheGetter];
+    XCTAssertTrue(VLCLibraryDataTypesIntegrationSetMediaPresent(mediaID, NO));
+    id<VLCMediaLibraryAudioGroupProtocol> const persisted = (id)[fixture refetchChangedItem];
+    XCTAssertEqual(persisted.numberOfTracks, (unsigned int)2);
+    XCTAssertEqual([self presentTracksForItem:persisted], (uint32_t)1);
+    XCTestExpectation * const updated = [self expectationForNotification:fixture.changeNotifications[1]
+                                                                  object:nil
+                                                                 handler:^BOOL(NSNotification *notification) {
+        return [notification.object conformsToProtocol:@protocol(VLCMediaLibraryAudioGroupProtocol)] &&
+            [notification.object libraryID] == fixture.changedItem.libraryID;
+    }];
+    [fixture deliverUpdateEvent];
+    [self waitForExpectations:@[ updated ] timeout:5.];
+    id<VLCMediaLibraryAudioGroupProtocol> const cached = (id)[self itemWithID:fixture.changedItem.libraryID
+                                                                      inItems:fixture.cachedItems];
+    XCTAssertNotEqual(cached, previous);
+    XCTAssertEqual(cached.numberOfTracks, (unsigned int)2);
+    XCTAssertEqual([self presentTracksForItem:cached], (uint32_t)1);
+    XCTAssertEqualObjects([self libraryIDsForItems:fixture.cachedItems], beforeIDs);
+    XCTAssertEqualObjects([self libraryIDsForItems:fixture.libraryItems], beforeIDs);
+    XCTAssertEqual([fixture.model queryCountForGetter:fixture.cacheGetter], queries);
+}
+
+- (void)assertTrackTransferReordersCacheKind:(VLCLibraryModelTestCacheKind)kind
+                                  descending:(BOOL)descending
+{
+    [self prepareFixtureOfKind:kind sorting:VLC_ML_SORTING_TRACKNUMBER descending:descending];
+    VLCLibraryModelTestOverlapFixture * const fixture = self.fixture;
+    id<VLCMediaLibraryAudioGroupProtocol> const source = (id)fixture.changedItem;
+    id<VLCMediaLibraryAudioGroupProtocol> const destination = (id)fixture.pendingItem;
+    XCTAssertEqual(source.numberOfTracks, (unsigned int)2);
+    XCTAssertEqual(destination.numberOfTracks, (unsigned int)1);
+    NSNumber * const sourceID = @(source.libraryID);
+    NSNumber * const destinationID = @(destination.libraryID);
+    // Artist track-count order increases by default; album order decreases.
+    const BOOL sourceFirst = kind == VLCLibraryModelTestArtistCache
+        ? descending
+        : !descending;
+    NSArray<NSNumber *> * const beforeIDs = sourceFirst
+        ? @[ sourceID, destinationID ]
+        : @[ destinationID, sourceID ];
+    NSArray<NSNumber *> * const afterIDs = sourceFirst
+        ? @[ destinationID, sourceID ]
+        : @[ sourceID, destinationID ];
+    XCTAssertEqualObjects([self libraryIDsForItems:fixture.libraryItems], beforeIDs);
+    [self loadFixtureCache];
+    XCTAssertEqualObjects([self libraryIDsForItems:fixture.cachedItems], beforeIDs);
+    const NSUInteger queries = [fixture.model queryCountForGetter:fixture.cacheGetter];
+    const int64_t mediaID = source.mediaItems.firstObject.libraryID;
+    XCTAssertGreaterThan(mediaID, (int64_t)0);
+    XCTAssertTrue(kind == VLCLibraryModelTestArtistCache
+        ? VLCLibraryDataTypesIntegrationMoveMediaToArtist(mediaID, destination.libraryID)
+        : VLCLibraryDataTypesIntegrationMoveMediaToAlbum(mediaID, destination.libraryID));
+    // The independent persisted query must really reverse order before the
+    // model is told about the changed source entity.
+    XCTAssertEqualObjects([self libraryIDsForItems:fixture.libraryItems], afterIDs);
+    XCTestExpectation * const reordered = [self expectationForNotification:fixture.changeNotifications.firstObject
+                                                                    object:fixture.model
+                                                                   handler:nil];
+    [fixture deliverUpdateEvent];
+    [self waitForExpectations:@[ reordered ] timeout:5.];
+    XCTAssertEqualObjects([self libraryIDsForItems:fixture.cachedItems], afterIDs);
+    id<VLCMediaLibraryAudioGroupProtocol> const cachedSource = (id)[self itemWithID:source.libraryID inItems:fixture.cachedItems];
+    id<VLCMediaLibraryAudioGroupProtocol> const cachedDestination = (id)[self itemWithID:destination.libraryID inItems:fixture.cachedItems];
+    XCTAssertEqual(cachedSource.numberOfTracks, (unsigned int)1);
+    XCTAssertEqual(cachedDestination.numberOfTracks, (unsigned int)2);
+    XCTAssertEqual([fixture.model queryCountForGetter:fixture.cacheGetter], queries + 1);
+}
+
+- (void)testArtistBecomingAvailableRejoinsArtistCache
+{
+    [self assertAvailabilityRestoresItemForCacheKind:VLCLibraryModelTestArtistCache];
+}
+
+- (void)testAlbumBecomingAvailableRejoinsAlbumCache
+{
+    [self assertAvailabilityRestoresItemForCacheKind:VLCLibraryModelTestAlbumCache];
+}
+
+- (void)testGenreAvailabilityRestoresChildrenWithoutReloadingGenreList
+{
+    [self prepareFixtureOfKind:VLCLibraryModelTestGenreCache sorting:VLC_ML_SORTING_ALPHA descending:NO];
+    VLCLibraryModelTestOverlapFixture * const fixture = self.fixture;
+    NSArray<NSNumber *> * const mediaIDs = [self libraryIDsForItems:fixture.changedItem.mediaItems];
+    XCTAssertEqual(mediaIDs.count, (NSUInteger)2);
+    [self setMediaIDs:mediaIDs present:NO];
+    // Native genre lists intentionally retain genres with unavailable children.
+    XCTAssertNotNil([self itemWithID:fixture.changedItem.libraryID inItems:fixture.libraryItems]);
+    [self loadFixtureCache];
+    VLCMediaLibraryGenre * const previous = (id)[self itemWithID:fixture.changedItem.libraryID inItems:fixture.cachedItems];
+    XCTAssertNotNil(previous);
+    XCTAssertEqual(previous.mediaItems.count, (NSUInteger)0);
+    NSArray<NSNumber *> * const beforeIDs = [self libraryIDsForItems:fixture.cachedItems];
+    const NSUInteger queries = [fixture.model queryCountForGetter:fixture.cacheGetter];
+    [self setMediaIDs:mediaIDs present:YES];
+    XCTestExpectation * const updated = [self expectationForNotification:VLCLibraryModelGenreUpdated
+                                                                  object:nil
+                                                                 handler:^BOOL(NSNotification *notification) {
+        return [notification.object isKindOfClass:VLCMediaLibraryGenre.class] &&
+            [notification.object libraryID] == fixture.changedItem.libraryID;
+    }];
+    [fixture deliverUpdateEvent];
+    [self waitForExpectations:@[ updated ] timeout:5.];
+    VLCMediaLibraryGenre * const cached = (id)[self itemWithID:fixture.changedItem.libraryID inItems:fixture.cachedItems];
+    XCTAssertNotEqual(cached, previous);
+    XCTAssertEqualObjects([NSSet setWithArray:[self libraryIDsForItems:cached.mediaItems]],
+                          [NSSet setWithArray:mediaIDs]);
+    XCTAssertEqualObjects([self libraryIDsForItems:fixture.cachedItems], beforeIDs);
+    XCTAssertEqual([fixture.model queryCountForGetter:fixture.cacheGetter], queries);
+}
+
+- (void)testPartialArtistUnavailabilityPreservesTotalTrackCountSorting
+{
+    [self assertPartialUnavailabilityPreservesTrackCountOrderForCacheKind:VLCLibraryModelTestArtistCache];
+}
+
+- (void)testPartialAlbumUnavailabilityPreservesTotalTrackCountSorting
+{
+    [self assertPartialUnavailabilityPreservesTrackCountOrderForCacheKind:VLCLibraryModelTestAlbumCache];
+}
+
+- (void)testArtistTrackTransferReordersAscendingCountCache
+{
+    [self assertTrackTransferReordersCacheKind:VLCLibraryModelTestArtistCache descending:NO];
+}
+
+- (void)testArtistTrackTransferReordersDescendingCountCache
+{
+    [self assertTrackTransferReordersCacheKind:VLCLibraryModelTestArtistCache descending:YES];
+}
+
+- (void)testAlbumTrackTransferReordersDefaultCountCache
+{
+    [self assertTrackTransferReordersCacheKind:VLCLibraryModelTestAlbumCache descending:NO];
+}
+
+- (void)testAlbumTrackTransferReordersReversedCountCache
+{
+    [self assertTrackTransferReordersCacheKind:VLCLibraryModelTestAlbumCache descending:YES];
+}
+
+- (void)testMovieMetadataUpdateReplacesCachedMovieSnapshot
+{
+    [self prepareFixtureOfKind:VLCLibraryModelTestMovieCache sorting:VLC_ML_SORTING_ALPHA descending:NO];
+    VLCLibraryModelTestOverlapFixture * const fixture = self.fixture;
+    [self loadFixtureCache];
+    VLCMediaLibraryMovie * const previous = (id)[self itemWithID:fixture.changedItem.libraryID inItems:fixture.cachedItems];
+    XCTAssertNotNil(previous);
+    NSString * const summary = @"Updated persisted movie summary";
+    XCTAssertNotEqualObjects(previous.summary, summary);
+    NSArray<NSNumber *> * const beforeIDs = [self libraryIDsForItems:fixture.cachedItems];
+    const NSUInteger queries = [fixture.model queryCountForGetter:fixture.cacheGetter];
+    XCTAssertTrue(VLCLibraryDataTypesIntegrationSetMovieSummary(previous.libraryID, summary));
+    XCTAssertEqualObjects([VLCMediaLibraryMediaItem mediaItemForLibraryID:previous.libraryID].movie.summary, summary);
+    XCTestExpectation * const reloaded = [self expectationForNotification:VLCLibraryModelListOfMoviesReset
+                                                                   object:fixture.model
+                                                                  handler:nil];
+    [fixture deliverUpdateEvent];
+    [self waitForExpectations:@[ reloaded ] timeout:5.];
+    VLCMediaLibraryMovie * const cached = (id)[self itemWithID:previous.libraryID inItems:fixture.cachedItems];
+    XCTAssertNotEqual(cached, previous);
+    XCTAssertEqualObjects(cached.summary, summary);
+    XCTAssertEqualObjects([self libraryIDsForItems:fixture.cachedItems], beforeIDs);
+    XCTAssertEqual([fixture.model queryCountForGetter:fixture.cacheGetter], queries + 1);
 }
 
 @end

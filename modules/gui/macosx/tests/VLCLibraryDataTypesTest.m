@@ -380,6 +380,7 @@
     artistData.psz_mb_id = (char *)"mb-artist";
     artistData.i_nb_album = 2;
     artistData.i_nb_tracks = 3;
+    artistData.i_nb_present_tracks = 2;
     artistData.b_is_favorite = true;
     artistData.thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl =
         (char *)"file:///tmp/artist.jpg";
@@ -392,6 +393,7 @@
     XCTAssertEqualObjects(artist.shortBiography, @"Biography");
     XCTAssertEqualObjects(artist.musicBrainzID, @"mb-artist");
     XCTAssertEqual(artist.numberOfAlbums, (unsigned int)2);
+    XCTAssertEqual(artist.numberOfPresentTracks, (uint32_t)2);
     XCTAssertEqualObjects(artist.durationString, @"2 albums, 3 songs");
     XCTAssertTrue(artist.favorited);
     XCTAssertTrue(artist.smallArtworkGenerated);
@@ -615,6 +617,7 @@
     albumData.psz_artist = (char *)"Artist";
     albumData.i_artist_id = 7;
     albumData.i_nb_tracks = 10;
+    albumData.i_nb_present_tracks = 8;
     albumData.i_duration = 61000;
     albumData.i_year = 2026;
     albumData.b_is_favorite = true;
@@ -630,6 +633,7 @@
     XCTAssertEqualObjects(album.artistName, @"Artist");
     XCTAssertEqual(album.artistID, (int64_t)7);
     XCTAssertEqual(album.numberOfTracks, (unsigned int)10);
+    XCTAssertEqual(album.numberOfPresentTracks, (uint32_t)8);
     XCTAssertEqual(album.duration, (int64_t)61000);
     XCTAssertEqual(album.year, (unsigned int)2026);
     XCTAssertEqualObjects(album.durationString, @"01:01");

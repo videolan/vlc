@@ -908,6 +908,40 @@ static BOOL VLCLibraryDataTypesIntegrationExecuteEntityStatement(const char *sql
     return success;
 }
 
+
+BOOL VLCLibraryDataTypesIntegrationSetAlbumDuration(int64_t libraryID, int64_t duration)
+{
+    return VLCLibraryDataTypesIntegrationExecuteEntityStatement(
+        "UPDATE Album SET duration = ?2 WHERE id_album = ?1",
+        libraryID,
+        @(duration));
+}
+
+BOOL VLCLibraryDataTypesIntegrationSetAlbumYear(int64_t libraryID, unsigned int year)
+{
+    return VLCLibraryDataTypesIntegrationExecuteEntityStatement(
+        "UPDATE Album SET release_year = ?2 WHERE id_album = ?1",
+        libraryID,
+        @(year));
+}
+
+BOOL VLCLibraryDataTypesIntegrationRenameAlbumArtist(int64_t libraryID, NSString *name)
+{
+    return VLCLibraryDataTypesIntegrationExecuteEntityStatement(
+        "UPDATE Artist SET name = ?2 WHERE id_artist = (SELECT artist_id FROM Album WHERE id_album = ?1)",
+        libraryID,
+        name) &&
+        VLCLibraryDataTypesIntegrationExecuteEntityStatement(
+            "UPDATE ArtistFts SET name = ?2 WHERE rowid = (SELECT artist_id FROM Album WHERE id_album = ?1)",
+            libraryID,
+            name) &&
+        VLCLibraryDataTypesIntegrationExecuteEntityStatement(
+            "UPDATE AlbumFts SET artist = ?2 WHERE rowid IN (SELECT id_album FROM Album "
+            "WHERE artist_id = (SELECT artist_id FROM Album WHERE id_album = ?1))",
+            libraryID,
+            name);
+}
+
 BOOL VLCLibraryDataTypesIntegrationRenameAlbum(int64_t libraryID, NSString *title)
 {
     return VLCLibraryDataTypesIntegrationExecuteEntityStatement(
@@ -977,6 +1011,67 @@ BOOL VLCLibraryDataTypesIntegrationSetShowSummary(int64_t showID, NSString *summ
         "UPDATE Show SET short_summary = ?2 WHERE id_show = ?1",
         showID,
         summary);
+}
+
+
+BOOL VLCLibraryDataTypesIntegrationMoveMediaToAlbum(int64_t mediaID, int64_t albumID)
+{
+    // The real album-id trigger transfers counts and duration between albums.
+    return VLCLibraryDataTypesIntegrationExecuteEntityStatement(
+        "UPDATE Media SET album_id = ?2 WHERE id_media = ?1",
+        mediaID,
+        @(albumID));
+}
+
+BOOL VLCLibraryDataTypesIntegrationMoveMediaToArtist(int64_t mediaID, int64_t artistID)
+{
+    sqlite3 *database = NULL;
+    if (!VLCLibraryDataTypesIntegrationOpenDatabase(&database))
+        return NO;
+    BOOL success = sqlite3_exec(database, "BEGIN IMMEDIATE", NULL, NULL, NULL) == SQLITE_OK;
+    // The relation-table delete/insert triggers maintain both artists' real
+    // track counts. Keep the media's primary artist and relation consistent.
+    const char * const statements[] = {
+        "DELETE FROM MediaArtistRelation WHERE media_id = ?1",
+        "UPDATE Media SET artist_id = ?2 WHERE id_media = ?1",
+        "INSERT INTO MediaArtistRelation (media_id, artist_id) VALUES (?1, ?2)",
+    };
+    for (NSUInteger index = 0; success && index < sizeof(statements) / sizeof(statements[0]); index++) {
+        sqlite3_stmt *statement = NULL;
+        success = sqlite3_prepare_v2(database, statements[index], -1, &statement, NULL) == SQLITE_OK;
+        if (success) {
+            success = sqlite3_bind_int64(statement, 1, mediaID) == SQLITE_OK;
+            if (success && sqlite3_bind_parameter_count(statement) > 1)
+                success = sqlite3_bind_int64(statement, 2, artistID) == SQLITE_OK;
+            if (success)
+                success = sqlite3_step(statement) == SQLITE_DONE && sqlite3_changes(database) > 0;
+        }
+        sqlite3_finalize(statement);
+    }
+    if (success)
+        success = sqlite3_exec(database, "COMMIT", NULL, NULL, NULL) == SQLITE_OK;
+    if (!success) {
+        NSLog(@"Could not move fixture media %lld to artist %lld: %s", mediaID, artistID, sqlite3_errmsg(database));
+        sqlite3_exec(database, "ROLLBACK", NULL, NULL, NULL);
+    }
+    sqlite3_close(database);
+    return success;
+}
+
+BOOL VLCLibraryDataTypesIntegrationSetMovieSummary(int64_t mediaID, NSString *summary)
+{
+    return VLCLibraryDataTypesIntegrationExecuteEntityStatement(
+        "UPDATE Movie SET summary = ?2 WHERE media_id = ?1",
+        mediaID,
+        summary);
+}
+
+BOOL VLCLibraryDataTypesIntegrationSetGroupDuration(int64_t libraryID, int64_t duration)
+{
+    return VLCLibraryDataTypesIntegrationExecuteEntityStatement(
+        "UPDATE MediaGroup SET duration = ?2 WHERE id_group = ?1",
+        libraryID,
+        @(duration));
 }
 
 BOOL VLCLibraryDataTypesIntegrationSetGroupModificationDate(int64_t libraryID, NSDate *date)
