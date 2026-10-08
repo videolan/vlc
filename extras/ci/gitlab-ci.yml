@@ -361,7 +361,12 @@ debian-meson:
         - |
             echo -e "\e[0Ksection_start:$(date +%s):tests_meson_section\r\e[0KVLC tests"
             # Run tests
-            meson test -C build-meson --print-errorlogs || (echo "ERROR: Tests failed!" >&2 ; exit 3)
+            meson test -C build-meson --print-errorlogs --max-lines 1000 \
+                --wrapper "gdb -nx -batch -return-child-result \
+                    -iex 'set debuginfod enabled off' \
+                    -iex 'handle SIGALRM stop print' \
+                    -ex run -ex 'thread apply all bt' --args" \
+                || (echo "ERROR: Tests failed!" >&2 ; exit 3)
             echo -e "\e[0Ksection_end:$(date +%s):tests_meson_section\r\e[0K"
 
         - |
@@ -392,7 +397,7 @@ debian-meson:
     variables: *variables-debian
     artifacts:
         reports:
-            junit: build-meson/meson-logs/testlog.junit.xml
+            junit: build-meson/meson-logs/testlog-gdb.junit.xml
             coverage_report:
                 coverage_format: cobertura
                 path: cobertura.xml
@@ -400,7 +405,7 @@ debian-meson:
             - ${CI_PROJECT_DIR}/${CI_JOB_NAME}.cov.json
             - cobertura.xml
             - html-coverage/
-            - ${CI_PROJECT_DIR}/build-meson/meson-logs/testlog.junit.xml
+            - ${CI_PROJECT_DIR}/build-meson/meson-logs/testlog-gdb.junit.xml
 
 #
 # Snap builds
