@@ -29,7 +29,8 @@ W_MSIBUILDDIR = run_command(cygpath, '-w', meson.current_build_dir(), check: tru
 W_TOPBUILDDIR = run_command(cygpath, '-w', vlc_build_root, check: true).stdout().strip()
 W_PREFIX = run_command(cygpath, '-w', prefix_path / '', check: true).stdout().strip()
 
-wix_conf = cdata
+wix_conf = configuration_data()
+wix_conf.merge_from(cdata)
 wix_conf.set('BUILD_LUA_TRUE', lua_dep.found() and get_option('lua').allowed() ? '' : '#')
 wix_conf.set('BUILD_SKINS_TRUE', skins2_feasible ? '' : '#')
 wix_conf.set('HAVE_NLS_TRUE', wix_conf.get('ENABLE_NLS', 0) == 1 ? '' : '#')

@@ -3,7 +3,8 @@
 nsis_required = get_option('nsis').allowed() and not get_option('nsis').auto()
 makensis = find_program('makensis', required: nsis_required)
 
-nsi_conf = cdata
+nsi_conf = configuration_data()
+nsi_conf.merge_from(cdata)
 nsi_conf.set('BUILD_LUA_TRUE', lua_dep.found() and get_option('lua').allowed() ? '' : '#')
 nsi_conf.set('BUILD_SKINS_TRUE', skins2_feasible ? '' : '#')
 nsi_conf.set('HAVE_WIN64_TRUE',  have_win64 ? '' : '#')
