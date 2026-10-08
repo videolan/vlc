@@ -455,9 +455,6 @@
                 <property name="maximum">
                  <number>32768</number>
                 </property>
-                <property name="singleStep">
-                 <number>16</number>
-                </property>
                 <property name="value">
                  <number>800</number>
                 </property>

@@ -123,9 +123,6 @@
           <property name="maximum">
            <number>65535</number>
           </property>
-          <property name="singleStep">
-           <number>100</number>
-          </property>
           <property name="stepType">
            <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
           </property>
