@@ -102,7 +102,6 @@ extern "C" char **environ;
 #include "maininterface/compositor.hpp"
 #include "util/vlctick.hpp"
 #include "util/shared_input_item.hpp"
-#include "util/model_recovery_agent.hpp"
 #include "util/vlcqtmessagehandler.hpp"
 #include "network/networkmediamodel.hpp"
 #include "network/devicesourceprovider.hpp"
@@ -1291,19 +1290,6 @@ static void *Thread( void *obj )
     p_intf->p_mainPlayerController = new PlayerController(p_intf);
     p_intf->p_mainPlaylistController = new vlc::playlist::PlaylistController(p_intf->p_playlist);
 
-    std::optional playlistModelRecoveryAgent = std::unique_ptr<ModelRecoveryAgent>();
-    QMetaObject::invokeMethod(&app, [&playlistModelRecoveryAgent, settings = QPointer(p_intf->mainSettings), mpc = QPointer(p_intf->p_mainPlaylistController)]() {
-        if (Q_UNLIKELY(!playlistModelRecoveryAgent)) // std::optional is nullopt, reset() was already called
-            return;
-        if (Q_UNLIKELY(!settings || !mpc))
-            return;
-        try {
-            playlistModelRecoveryAgent = std::make_unique<ModelRecoveryAgent>(settings.get(),
-                                                                              QStringLiteral("Playlist"),
-                                                                              mpc.get());
-        } catch (...){ }
-    }, Qt::QueuedConnection);
-
     /* Create the normal interface in non-DP mode */
 #ifdef _WIN32
     p_intf->p_mi = new MainCtxWin32(p_intf);
@@ -1468,7 +1454,6 @@ static void *Thread( void *obj )
 
     msg_Dbg( p_intf, "QApp exec() finished" );
 
-    playlistModelRecoveryAgent.reset();
     return ThreadCleanup( p_intf, CLEANUP_APP_TERMINATED );
 }
 

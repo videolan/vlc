@@ -43,6 +43,7 @@
 #include "util/qt_dirs.hpp"                     // toNativeSeparators
 
 #include "util/color_scheme_model.hpp"
+#include "util/model_recovery_agent.hpp"
 
 #include "widgets/native/interface_widgets.hpp"     // bgWidget, videoWidget
 
@@ -303,6 +304,15 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
 #endif
 
     m_threadRunner = new ThreadRunner();
+
+    try {
+        m_playlistRecoveryAgent = std::make_unique<ModelRecoveryAgent>(settings,
+                                                                       QStringLiteral("Playlist"),
+                                                                       p_intf->p_mainPlaylistController);
+        QMetaObject::invokeMethod(this, [this]() {
+            m_playlistRecoveryAgent->prompt(p_intf);
+        }, Qt::QueuedConnection);
+    } catch (...) { }
 
     m_initialEffectiveMainInterfaceMode = getEffectiveMainInterfaceMode();
 }
