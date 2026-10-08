@@ -150,8 +150,7 @@ static int stream_GetDelay(vlc_aout_stream *stream, vlc_tick_t *delay)
      * coefficient is 1.0 (audio at the same speed than the monotonic
      * clock) since the calculation is done on a very small interval
      * (generally less than 2 seconds). */
-    vlc_tick_t play_date = (last_pts - audio_ts) / (double) stream->sync.rate
-                         + system_ts;
+    vlc_tick_t play_date = last_pts - audio_ts + system_ts;
     *delay = play_date - system_now;
     return 0;
 }
@@ -773,6 +772,10 @@ void vlc_aout_stream_NotifyTiming(vlc_aout_stream *stream, vlc_tick_t system_ts,
     vlc_tick_t rate_audio_ts = stream->timing.rate_audio_ts;
     vlc_tick_t rate_system_ts = stream->timing.rate_system_ts;
 
+    /* audio_ts is the output position: at rate != 1, it advances with the
+     * output samples, like played_samples, not with the stream timestamps
+     * of the clock. */
+    vlc_tick_t clock_audio_ts = audio_ts;
     if (rate_audio_ts != VLC_TICK_INVALID)
     {
         /* Drop timing updates that comes before the rate change */
@@ -783,8 +786,8 @@ void vlc_aout_stream_NotifyTiming(vlc_aout_stream *stream, vlc_tick_t system_ts,
         }
 
         /* Fix the audio timestamp with the rate */
-        audio_ts = rate_audio_ts + (system_ts - rate_system_ts)
-                   * stream->timing.rate;
+        clock_audio_ts = rate_audio_ts + (system_ts - rate_system_ts)
+                         * stream->timing.rate;
     }
 
     stream->timing.system_ts = system_ts;
@@ -792,7 +795,7 @@ void vlc_aout_stream_NotifyTiming(vlc_aout_stream *stream, vlc_tick_t system_ts,
     vlc_clock_Lock(stream->sync.clock);
     stream->timing.last_drift =
         vlc_clock_Update(stream->sync.clock, system_ts,
-                         audio_ts, stream->timing.rate);
+                         clock_audio_ts, stream->timing.rate);
     vlc_clock_Unlock(stream->sync.clock);
     vlc_mutex_unlock(&stream->timing.lock);
 }
