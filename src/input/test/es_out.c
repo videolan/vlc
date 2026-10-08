@@ -45,12 +45,14 @@
 #include "../src/input/es_out.h"
 #include "../src/input/decoder.h"
 #include "../src/input/source.h"
+#include "../src/clock/clock.h"
 
 const char vlc_module_name[] = MODULE_STRING;
 
 struct vlc_input_decoder_t {
     struct vlc_list node;
 
+    vlc_clock_t *clock;
     bool drained;
     bool started;
 };
@@ -82,12 +84,12 @@ vlc_input_decoder_t *
 vlc_input_decoder_New(vlc_object_t *parent,
                       const struct vlc_input_decoder_cfg *cfg)
 {
-    (void)cfg;
     msg_Dbg(parent, "Creating input decoder from test");
 
     struct vlc_input_decoder_t *dec = malloc(sizeof(struct vlc_input_decoder_t));
     assert(dec != NULL);
 
+    dec->clock = cfg->clock;
     dec->drained = false;
     dec->started = false;
     vlc_list_append(&dec->node, &opened_decoders);
@@ -259,10 +261,12 @@ void var_OptionParse(vlc_object_t *obj, const char *chain, bool trusted)
     (void)obj; (void)chain; (void)trusted;
 }
 
+static bool can_pace_control = false;
+
 bool input_CanPaceControl(input_thread_t *input)
 {
     (void)input;
-    return false;
+    return can_pace_control;
 }
 
 int input_GetAttachments(input_thread_t *input,
@@ -518,9 +522,63 @@ static void test_multiple_programs(void)
     test_ctx_Destroy(&ctx);
 }
 
+static void test_preroll_rate(float rate)
+{
+    /* es_out only computes a wakeup date when the input controls its pace */
+    can_pace_control = true;
+
+    /* Default file-caching */
+    const vlc_tick_t pts_delay = VLC_TICK_FROM_SEC(1);
+
+    struct test_ctx ctx;
+    test_ctx_Init(&ctx, rate, pts_delay);
+    struct vlc_input_es_out *out = ctx.out;
+
+    es_out_id_t *video_track = AddVideoTrack(out);
+    SendBlock(out, video_track);
+
+    /* Precise seek: the demuxer restarts 4s before the target */
+    const vlc_tick_t target = VLC_TICK_0 + VLC_TICK_FROM_SEC(4);
+    es_out_Control(&out->out, ES_OUT_SET_NEXT_DISPLAY_TIME, target);
+
+    const vlc_tick_t before = vlc_tick_now();
+    for (vlc_tick_t pcr = VLC_TICK_0; pcr <= target + pts_delay;
+         pcr += VLC_TICK_FROM_MS(100))
+        es_out_SetPCR(&out->out, pcr);
+
+    struct vlc_input_decoder_t *dec =
+        vlc_list_first_entry_or_null(&opened_decoders,
+                                     struct vlc_input_decoder_t, node);
+    assert(dec != NULL);
+    assert(dec->started);
+
+    /* The first frame past the preroll is due right away */
+    vlc_clock_Lock(dec->clock);
+    const vlc_tick_t now = vlc_tick_now();
+    const vlc_tick_t date =
+        vlc_clock_ConvertToSystem(dec->clock, now, target, rate, NULL);
+    vlc_clock_Unlock(dec->clock);
+    assert(date >= now);
+    assert(date < now + pts_delay);
+
+    /* The demuxer is due to read now, not more than pts_delay ago, which
+     * would make the next PCR late */
+    const vlc_tick_t wakeup = es_out_GetWakeup(out);
+    assert(wakeup <= vlc_tick_now());
+    assert(wakeup >= before - pts_delay);
+
+    es_out_Del(&out->out, video_track);
+
+    test_ctx_Destroy(&ctx);
+
+    can_pace_control = false;
+}
+
 int main(void)
 {
     test_playback();
     test_multiple_programs();
+    test_preroll_rate(0.25f);
+    test_preroll_rate(2.f);
     return 0;
 }
