@@ -349,76 +349,116 @@ static const struct vlc_logger_operations test_logger_operations = {
     .log = LogText,
 };
 
-static void test_playback(void)
+struct test_ctx
+{
+    struct vlc_logger logger;
+    vlc_object_t *root;
+    input_item_t *item;
+    input_thread_t *input;
+    input_source_t *source;
+    struct vlc_input_es_out *out;
+};
+
+static void test_ctx_Init(struct test_ctx *ctx, float rate,
+                          vlc_tick_t pts_delay)
 {
     vlc_list_init(&opened_decoders);
-    struct vlc_logger logger = { .ops = &test_logger_operations };
+    ctx->logger = (struct vlc_logger) { .ops = &test_logger_operations };
     libvlc_priv_t *libvlc = (vlc_object_create)(NULL, sizeof(*libvlc));
-    vlc_object_t *root = &libvlc->public_data.obj;
-    root->logger = &logger;
+    ctx->root = &libvlc->public_data.obj;
+    ctx->root->logger = &ctx->logger;
 
-    var_Create(root, "clock-master", VLC_VAR_STRING);
-    var_SetString(root, "clock-master", "auto");
+    var_Create(ctx->root, "clock-master", VLC_VAR_STRING);
+    var_SetString(ctx->root, "clock-master", "auto");
 
-    var_Create(root, "captions", VLC_VAR_INTEGER);
-    var_SetInteger(root, "captions", 608);
+    var_Create(ctx->root, "captions", VLC_VAR_INTEGER);
+    var_SetInteger(ctx->root, "captions", 608);
 
-    var_Create(root, "mouse-pause-policy", VLC_VAR_STRING);
-    var_SetString(root, "mouse-pause-policy", "auto");
+    var_Create(ctx->root, "mouse-pause-policy", VLC_VAR_STRING);
+    var_SetString(ctx->root, "mouse-pause-policy", "auto");
 
-    input_item_t *item = input_item_NewStream("mock://", "mock", 0);
+    ctx->item = input_item_NewStream("mock://", "mock", 0);
 
-    input_thread_private_t *priv = vlc_object_create(root, sizeof(*priv));
+    input_thread_private_t *priv = vlc_object_create(ctx->root, sizeof(*priv));
     assert(priv != NULL);
-    priv->p_item = item;
+    priv->p_item = ctx->item;
 
-    input_thread_t *input = &priv->input;
-    var_Create(input, "video", VLC_VAR_BOOL);
-    var_SetBool(input, "video", true);
-    var_Create(input, "audio", VLC_VAR_BOOL);
-    var_SetBool(input, "audio", true);
+    ctx->input = &priv->input;
+    var_Create(ctx->input, "video", VLC_VAR_BOOL);
+    var_SetBool(ctx->input, "video", true);
+    var_Create(ctx->input, "audio", VLC_VAR_BOOL);
+    var_SetBool(ctx->input, "audio", true);
 
-    input_source_t *source = InputSourceNew();
+    ctx->source = InputSourceNew();
 
-    struct vlc_input_es_out *out =
-        input_EsOutNew(input, source, 1.f, INPUT_TYPE_PLAYBACK);
-    assert(out != NULL);
+    ctx->out = input_EsOutNew(ctx->input, ctx->source, rate,
+                              INPUT_TYPE_PLAYBACK);
+    assert(ctx->out != NULL);
 
-    es_out_SetMode(out, ES_OUT_MODE_AUTO);
+    es_out_SetMode(ctx->out, ES_OUT_MODE_AUTO);
+    es_out_SetJitter(ctx->out, pts_delay, 0,
+                     40 * pts_delay / DEFAULT_PTS_DELAY);
+}
 
-    vlc_tick_t pts_delay = VLC_TICK_FROM_MS(300);
-    es_out_SetJitter(out, pts_delay, 0, 40 * pts_delay / DEFAULT_PTS_DELAY);
+static void test_ctx_Destroy(struct test_ctx *ctx)
+{
+    es_out_SetMode(ctx->out, ES_OUT_MODE_END);
+    es_out_Delete(&ctx->out->out);
 
-    es_format_t video_fmt;
-    es_format_Init(&video_fmt, VIDEO_ES, VLC_CODEC_RGBA);
-    video_fmt.i_id = 1;
-    video_fmt.i_group = 1;
-    video_format_Init(&video_fmt.video, VLC_CODEC_RGBA);
-    video_fmt.video.i_width = video_fmt.video.i_visible_width = 64;
-    video_fmt.video.i_height = video_fmt.video.i_visible_height = 64;
-    es_out_id_t *video_track = es_out_Add(&out->out, &video_fmt);
-    assert(video_track != NULL);
-    es_format_Clean(&video_fmt);
+    input_source_Release(ctx->source);
+    input_item_Release(ctx->item);
+    vlc_object_delete(&ctx->input->obj);
+    vlc_object_delete(ctx->root);
+}
 
-    es_format_t audio_fmt;
-    es_format_Init(&audio_fmt, AUDIO_ES, VLC_CODEC_F32L);
-    audio_fmt.i_id = 2;
-    video_fmt.i_group = 1;
-    audio_fmt.audio.i_format = VLC_CODEC_F32L;
-    audio_fmt.audio.i_rate = 44100;
-    audio_fmt.audio.i_physical_channels = 2;
-    audio_fmt.audio.i_channels = 2;
-    es_out_id_t *audio_track = es_out_Add(&out->out, &audio_fmt);
-    assert(audio_track != NULL);
-    es_format_Clean(&audio_fmt);
+static es_out_id_t *AddVideoTrack(struct vlc_input_es_out *out)
+{
+    es_format_t fmt;
+    es_format_Init(&fmt, VIDEO_ES, VLC_CODEC_RGBA);
+    fmt.i_id = 1;
+    fmt.i_group = 1;
+    video_format_Init(&fmt.video, VLC_CODEC_RGBA);
+    fmt.video.i_width = fmt.video.i_visible_width = 64;
+    fmt.video.i_height = fmt.video.i_visible_height = 64;
+    es_out_id_t *track = es_out_Add(&out->out, &fmt);
+    assert(track != NULL);
+    es_format_Clean(&fmt);
+    return track;
+}
 
+static es_out_id_t *AddAudioTrack(struct vlc_input_es_out *out)
+{
+    es_format_t fmt;
+    es_format_Init(&fmt, AUDIO_ES, VLC_CODEC_F32L);
+    fmt.i_id = 2;
+    fmt.audio.i_format = VLC_CODEC_F32L;
+    fmt.audio.i_rate = 44100;
+    fmt.audio.i_physical_channels = 2;
+    fmt.audio.i_channels = 2;
+    es_out_id_t *track = es_out_Add(&out->out, &fmt);
+    assert(track != NULL);
+    es_format_Clean(&fmt);
+    return track;
+}
+
+static void SendBlock(struct vlc_input_es_out *out, es_out_id_t *track)
+{
     block_t *block = block_Alloc(10);
     assert(block);
-    es_out_Send(&out->out, video_track, block);
+    es_out_Send(&out->out, track, block);
+}
 
-    block = block_Alloc(10);
-    assert(block);
-    es_out_Send(&out->out, audio_track, block);
+static void test_playback(void)
+{
+    struct test_ctx ctx;
+    test_ctx_Init(&ctx, 1.f, VLC_TICK_FROM_MS(300));
+    struct vlc_input_es_out *out = ctx.out;
+
+    es_out_id_t *video_track = AddVideoTrack(out);
+    es_out_id_t *audio_track = AddAudioTrack(out);
+
+    SendBlock(out, video_track);
+    SendBlock(out, audio_track);
 
     es_out_SetPCR(&out->out, VLC_TICK_0);
     es_out_SetPCR(&out->out, VLC_TICK_0 + VLC_TICK_FROM_MS(100));
@@ -452,86 +492,20 @@ static void test_playback(void)
     es_out_Del(&out->out, audio_track);
     es_out_Del(&out->out, video_track);
 
-    es_out_SetMode(out, ES_OUT_MODE_END);
-    es_out_Delete(&out->out);
-
-    input_source_Release(source);
-    input_item_Release(item);
-    vlc_object_delete(&input->obj);
-    vlc_object_delete(root);
-
+    test_ctx_Destroy(&ctx);
 }
 
 static void test_multiple_programs(void)
 {
-    vlc_list_init(&opened_decoders);
-    struct vlc_logger logger = { .ops = &test_logger_operations };
-    libvlc_priv_t *libvlc = (vlc_object_create)(NULL, sizeof(*libvlc));
-    vlc_object_t *root = &libvlc->public_data.obj;
-    root->logger = &logger;
+    struct test_ctx ctx;
+    test_ctx_Init(&ctx, 1.f, VLC_TICK_FROM_MS(300));
+    struct vlc_input_es_out *out = ctx.out;
 
-    var_Create(root, "clock-master", VLC_VAR_STRING);
-    var_SetString(root, "clock-master", "auto");
+    es_out_id_t *video_track = AddVideoTrack(out);
+    es_out_id_t *audio_track = AddAudioTrack(out);
 
-    var_Create(root, "captions", VLC_VAR_INTEGER);
-    var_SetInteger(root, "captions", 608);
-
-    var_Create(root, "mouse-pause-policy", VLC_VAR_STRING);
-    var_SetString(root, "mouse-pause-policy", "auto");
-
-    input_item_t *item = input_item_NewStream("mock://", "mock", 0);
-
-    input_thread_private_t *priv = vlc_object_create(root, sizeof(*priv));
-    assert(priv != NULL);
-    priv->p_item = item;
-
-    input_thread_t *input = &priv->input;
-    var_Create(input, "video", VLC_VAR_BOOL);
-    var_SetBool(input, "video", true);
-    var_Create(input, "audio", VLC_VAR_BOOL);
-    var_SetBool(input, "audio", true);
-
-    input_source_t *source = InputSourceNew();
-
-    struct vlc_input_es_out *out =
-        input_EsOutNew(input, source, 1.f, INPUT_TYPE_PLAYBACK);
-    assert(out != NULL);
-
-    es_out_SetMode(out, ES_OUT_MODE_AUTO);
-
-    vlc_tick_t pts_delay = VLC_TICK_FROM_MS(300);
-    es_out_SetJitter(out, pts_delay, 0, 40 * pts_delay / DEFAULT_PTS_DELAY);
-
-    es_format_t video_fmt;
-    es_format_Init(&video_fmt, VIDEO_ES, VLC_CODEC_RGBA);
-    video_fmt.i_id = 1;
-    video_fmt.i_group = 1;
-    video_format_Init(&video_fmt.video, VLC_CODEC_RGBA);
-    video_fmt.video.i_width = video_fmt.video.i_visible_width = 64;
-    video_fmt.video.i_height = video_fmt.video.i_visible_height = 64;
-    es_out_id_t *video_track = es_out_Add(&out->out, &video_fmt);
-    assert(video_track != NULL);
-    es_format_Clean(&video_fmt);
-
-    es_format_t audio_fmt;
-    es_format_Init(&audio_fmt, AUDIO_ES, VLC_CODEC_F32L);
-    audio_fmt.i_id = 2;
-    video_fmt.i_group = 2;
-    audio_fmt.audio.i_format = VLC_CODEC_F32L;
-    audio_fmt.audio.i_rate = 44100;
-    audio_fmt.audio.i_physical_channels = 2;
-    audio_fmt.audio.i_channels = 2;
-    es_out_id_t *audio_track = es_out_Add(&out->out, &audio_fmt);
-    assert(audio_track != NULL);
-    es_format_Clean(&audio_fmt);
-
-    block_t *block = block_Alloc(10);
-    assert(block);
-    es_out_Send(&out->out, video_track, block);
-
-    block = block_Alloc(10);
-    assert(block);
-    es_out_Send(&out->out, audio_track, block);
+    SendBlock(out, video_track);
+    SendBlock(out, audio_track);
 
     es_out_Control(&out->out, ES_OUT_SET_GROUP_PCR, 1, VLC_TICK_0);
     es_out_Control(&out->out, ES_OUT_SET_GROUP_PCR, 1, VLC_TICK_0 + VLC_TICK_FROM_MS(100));
@@ -541,13 +515,7 @@ static void test_multiple_programs(void)
     es_out_Del(&out->out, audio_track);
     es_out_Del(&out->out, video_track);
 
-    es_out_SetMode(out, ES_OUT_MODE_END);
-    es_out_Delete(&out->out);
-
-    input_source_Release(source);
-    input_item_Release(item);
-    vlc_object_delete(&input->obj);
-    vlc_object_delete(root);
+    test_ctx_Destroy(&ctx);
 }
 
 int main(void)
