@@ -1156,8 +1156,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
         vlc_ml_query_params_t queryParameters = vlc_ml_query_params_create();
         queryParameters.i_nbResults = countLimit;
+        queryParameters.b_desc = true;
         queryParameters.psz_pattern = filterString.length > 0 ? filterString.UTF8String : NULL;
-        // we don't set the sorting criteria here as they are not applicable to history
+        // Keep history sorted by last playback date, newest first, regardless of library sorting.
         vlc_ml_media_list_t *p_media_list = NULL;
         if (type == VLC_ML_MEDIA_TYPE_VIDEO)
             p_media_list = vlc_ml_list_video_history(self->_p_mediaLibrary, &queryParameters);
