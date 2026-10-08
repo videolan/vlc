@@ -161,6 +161,11 @@ struct demux_sys_t
         vlc_tick_t ps;
     } cell_ts;
 
+    /* dvd-video: presentation end of the last vobu, 90 kHz, for the
+     * continuity test of DvdReadAnchorVobu; b_vobu_e_ptm false when unknown */
+    uint32_t i_vobu_e_ptm;
+    bool b_vobu_e_ptm;
+
     /* Track */
     ps_track_t    tk[PS_TK_COUNT];
 
@@ -180,6 +185,7 @@ static inline void DvdReadResetCellTs( demux_sys_t *p_sys )
 {
     p_sys->cell_ts.dvd = VLC_TICK_INVALID;
     p_sys->cell_ts.ps = VLC_TICK_INVALID;
+    p_sys->b_vobu_e_ptm = false;
 }
 
 int OpenCommonDvdread( vlc_object_t *, dvd_type_t, const dvdread_ops_t * );

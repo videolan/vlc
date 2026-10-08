@@ -85,6 +85,17 @@ static vlc_tick_t DvdReadTitleLength( const demux_sys_t *p_sys )
     return DvdReadVideoTitleDuration( p_sys );
 }
 
+/* start of a cell on the title timeline: playback time of the cells before */
+static vlc_tick_t DvdReadCellStart( const demux_sys_t *p_sys, int i_cell )
+{
+    const cell_playback_t *cells = p_sys->p_cur_pgc->cell_playback;
+
+    vlc_tick_t t = 0;
+    for( int i = p_sys->i_title_start_cell; i < i_cell; i++ )
+        t += dvdtime_to_time( &cells[i].playback_time );
+    return t;
+}
+
 static bool DvdReadTimelineBase( const demux_sys_t *p_sys, vlc_tick_t *base )
 {
     const pgc_t *p_pgc = p_sys->p_cur_pgc;
@@ -95,9 +106,7 @@ static bool DvdReadTimelineBase( const demux_sys_t *p_sys, vlc_tick_t *base )
         p_sys->i_title_start_cell > p_sys->i_cur_cell )
         return false;
 
-    vlc_tick_t cell_dvd_time = 0;
-    for( int i = p_sys->i_title_start_cell; i < p_sys->i_cur_cell; i++ )
-        cell_dvd_time += dvdtime_to_time( &p_pgc->cell_playback[i].playback_time );
+    vlc_tick_t cell_dvd_time = DvdReadCellStart( p_sys, p_sys->i_cur_cell );
 
     const cell_playback_t *p_cell = &p_pgc->cell_playback[p_sys->i_cur_cell];
     vlc_tick_t cell_duration = dvdtime_to_time( &p_cell->playback_time );
@@ -233,6 +242,64 @@ static void DvdReadFindCell( demux_t *p_demux )
 }
 
 /*****************************************************************************
+ * DvdReadAnchorVobu: anchor the timestamps of the vobu whose NAV pack is p_data
+ *****************************************************************************/
+/* libdvdread only defines DSI_START_BYTE: pack header (14) + system header
+ * (24) + PES header (6) + substream id (1) */
+#define DVDREAD_PCI_START_BYTE 45
+
+static void DvdReadAnchorVobu( demux_t *p_demux, uint8_t *p_data )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    const bool b_in_title =
+        p_sys->i_cur_cell >= p_sys->i_title_start_cell &&
+        p_sys->i_cur_cell < p_sys->p_cur_pgc->nr_of_cells;
+
+    /* first vobu of a cell where the disc says the timestamps restart */
+    const cell_playback_t *p_cell = b_in_title ?
+        &p_sys->p_cur_pgc->cell_playback[p_sys->i_cur_cell] : NULL;
+    const bool b_restart = p_cell != NULL && p_cell->stc_discontinuity &&
+        p_sys->dsi_pack.dsi_gi.nv_pck_lbn == p_cell->first_sector;
+
+    /* where this vobu starts and ends, when its PCI tells */
+    uint32_t s_ptm = 0, e_ptm = 0;
+    const uint8_t pciheader[7] = { 0x00, 0x00, 0x01, 0xbf, 0x03, 0xd4, 0x00 };
+    if( !memcmp( &p_data[DVDREAD_PCI_START_BYTE-7], pciheader, 7 ) )
+    {
+        pci_t pci;
+        navRead_PCI( &pci, &p_data[DVDREAD_PCI_START_BYTE] );
+        s_ptm = pci.pci_gi.vobu_s_ptm;
+        e_ptm = pci.pci_gi.vobu_e_ptm;
+    }
+    const bool b_ptm = s_ptm != 0 || e_ptm != 0;
+
+    /* seamless vobus abut exactly, a few 90 kHz ticks of slack */
+    const bool b_continuous = !b_restart && b_ptm &&
+        p_sys->cell_ts.dvd != VLC_TICK_INVALID &&
+        p_sys->cell_ts.ps != VLC_TICK_INVALID &&
+        p_sys->b_vobu_e_ptm &&
+        llabs( (int64_t)s_ptm - (int64_t)p_sys->i_vobu_e_ptm ) <= 90;
+
+    /* an end left unknown makes the next vobu re-anchor */
+    p_sys->i_vobu_e_ptm = e_ptm;
+    p_sys->b_vobu_e_ptm = b_ptm;
+
+    if( b_continuous || !b_in_title )
+        return;
+    /* without timestamps, the anchor is kept, unless the disc says they
+     * restart here: the anchor comes from the DSI alone */
+    if( !b_ptm && !b_restart )
+        return;
+
+    /* offset by VLC_TICK_0: the title start, time 0, is VLC_TICK_INVALID */
+    p_sys->cell_ts.dvd = VLC_TICK_0 +
+                         DvdReadCellStart( p_sys, p_sys->i_cur_cell ) +
+                         dvdtime_to_time( &p_sys->dsi_pack.dsi_gi.c_eltm );
+    p_sys->cell_ts.ps = FROM_SCALE( p_sys->dsi_pack.dsi_gi.nv_pck_scr );
+}
+
+/*****************************************************************************
  * DvdReadHandleDSI
  *****************************************************************************/
 void DvdReadHandleDSI( demux_t *p_demux, uint8_t *p_data )
@@ -246,6 +313,9 @@ void DvdReadHandleDSI( demux_t *p_demux, uint8_t *p_data )
     if(!memcmp(&p_data[DSI_START_BYTE-7], dsiheader, 7))
     {
         navRead_DSI( &p_sys->dsi_pack, &p_data[DSI_START_BYTE] );
+
+        /* before the cell change below: the vobu belongs to i_cur_cell */
+        DvdReadAnchorVobu( p_demux, p_data );
 
         /*
          * Determine where we go next.  These values are the ones we mostly
@@ -320,8 +390,6 @@ void DvdReadHandleDSI( demux_t *p_demux, uint8_t *p_data )
     else if( p_sys->dsi_pack.vobu_sri.next_vobu == SRI_END_OF_CELL )
     {
         p_sys->i_cur_cell = p_sys->i_next_cell;
-
-        DvdReadResetCellTs( p_sys );
 
         /* End of title */
         if( p_sys->i_cur_cell >= p_sys->p_cur_pgc->nr_of_cells ) return;
