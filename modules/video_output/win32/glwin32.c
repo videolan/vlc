@@ -161,10 +161,6 @@ static int Open(vout_display_t *vd,
 {
     vout_display_sys_t *sys;
 
-    /* do not use OpenGL on XP unless forced */
-    if(!vd->obj.force && !IsWindowsVistaOrGreater())
-        return VLC_EGENERIC;
-
     /* Allocate structure */
     vd->sys = sys = calloc(1, sizeof(*sys));
     if (!sys)
