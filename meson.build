@@ -1185,6 +1185,17 @@ subdir('compat')
 subdir('include')
 
 if host_system == 'windows'
+    if host_machine.cpu_family() == 'aarch64' or host_machine.cpu() == 'arm64'
+        manifest_arch = 'arm64'
+    elif host_machine.cpu_family() == 'x86_64'
+        manifest_arch = 'amd64'
+    elif host_machine.cpu_family() == 'arm'
+        manifest_arch = 'arm'
+    else
+        manifest_arch = 'x86'
+    endif
+    cdata.set('MANIFEST_ARCH', manifest_arch)
+
     windows_rc = import('windows')
     # not quoted values
     rc_conf = configuration_data()

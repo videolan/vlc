@@ -2,7 +2,7 @@
 <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3">
     <assemblyIdentity
         version="1.0.0.0"
-        processorArchitecture="*"
+        processorArchitecture="@MANIFEST_ARCH@"
         name="VideoLAN.VLC"
         type="win32"
     />
@@ -25,7 +25,7 @@
                 type="win32"
                 name="Microsoft.Windows.Common-Controls"
                 version="6.0.0.0"
-                processorArchitecture="*"
+                processorArchitecture="@MANIFEST_ARCH@"
                 publicKeyToken="6595b64144ccf1df"
                 language="*"
             />

@@ -399,22 +399,26 @@ int foo() { return my_array[0]; }
             aarch64)
                 HAVE_WIN64="1"
                 WINDOWS_ARCH="arm64"
+                MANIFEST_ARCH="arm64"
                 PROGRAMFILES="PROGRAMFILES64"
                 LDFLAGS="${LDFLAGS} -Wl,--high-entropy-va -Wl,--image-base,0x140000000"
             ;;
             amd64|x86_64)
                 HAVE_WIN64="1"
                 WINDOWS_ARCH="x64"
+                MANIFEST_ARCH="amd64"
                 PROGRAMFILES="PROGRAMFILES64"
                 LDFLAGS="${LDFLAGS} -Wl,--high-entropy-va -Wl,--image-base,0x140000000"
                 X86ASMFLAGS="-f win64"
             ;;
             armv7)
                 WINDOWS_ARCH="arm"
+                MANIFEST_ARCH="arm"
                 PROGRAMFILES="PROGRAMFILES"
             ;;
             i?86)
                 WINDOWS_ARCH="x86"
+                MANIFEST_ARCH="x86"
                 PROGRAMFILES="PROGRAMFILES"
                 X86ASMFLAGS="-f win32"
                 X86ASMDEFS="${X86ASMDEFS} -DPREFIX"
@@ -425,6 +429,7 @@ int foo() { return my_array[0]; }
             ;;
         esac
         AC_SUBST([WINDOWS_ARCH])
+        AC_SUBST([MANIFEST_ARCH])
         AC_SUBST([PROGRAMFILES])
 
     fi
