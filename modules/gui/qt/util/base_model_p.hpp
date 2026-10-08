@@ -35,6 +35,7 @@ public:
     virtual void validateCache() const = 0;
     virtual void resetCache() = 0;
     virtual void invalidateCache() = 0;
+    virtual void updateCache() = 0;
     virtual bool loading() const = 0;
 
     virtual unsigned int getLoadedCount() const = 0;
@@ -130,6 +131,7 @@ public:
     void validateCache() const override;
     void resetCache() override;
     void invalidateCache() override;
+    void updateCache() override;
 
     bool loading() const override;
 
@@ -227,6 +229,15 @@ template<typename T>
 void BaseModelPrivateT<T>::invalidateCache()
 {
     invalidateCacheImpl(m_cache);
+}
+
+template<typename T>
+void BaseModelPrivateT<T>::updateCache()
+{
+    if (!m_cache)
+        return;
+    m_cache->setLimit(m_limit);
+    m_cache->setOffset(m_offset);
 }
 
 template<typename T>

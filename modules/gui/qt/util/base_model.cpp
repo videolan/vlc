@@ -23,8 +23,6 @@ BaseModel::BaseModel(BaseModelPrivate* priv, QObject* parent)
     : QAbstractListModel(parent)
     , d_ptr(priv)
 {
-    connect(this, &BaseModel::offsetChanged,  this, &BaseModel::resetCache);
-    connect(this, &BaseModel::limitChanged,  this, &BaseModel::resetCache);
     connect(this, &BaseModel::sortCriteriaChanged,  this, &BaseModel::resetCache);
     connect(this, &BaseModel::sortOrderChanged,  this, &BaseModel::resetCache);
     connect(this, &BaseModel::searchPatternChanged,  this, &BaseModel::resetCache);
@@ -88,6 +86,7 @@ void BaseModel::setLimit(unsigned int limit)
     if (d->m_limit == limit)
         return;
     d->m_limit = limit;
+    d->updateCache();
     emit limitChanged();
 }
 
@@ -103,6 +102,7 @@ void BaseModel::setOffset(unsigned int offset)
     if (d->m_offset == offset)
         return;
     d->m_offset = offset;
+    d->updateCache();
     emit offsetChanged();
 }
 

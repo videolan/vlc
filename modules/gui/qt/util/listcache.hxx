@@ -396,6 +396,55 @@ void  ListCache<T>::fetchMore()
 }
 
 template<typename T>
+size_t ListCache<T>::countWithLimit(size_t maximumCount) const
+{
+    if (m_limit == 0)
+        return maximumCount;
+    return std::min(m_limit, maximumCount);
+}
+
+template<typename T>
+void ListCache<T>::setLimit(size_t limit)
+{
+    m_limit = limit;
+    if (!m_cachedData || m_oldData)
+        return;
+
+    const size_t newQueryCount = countWithLimit(m_cachedData->maximumCount);
+    const size_t oldQueryCount = m_cachedData->queryCount;
+    if (newQueryCount == oldQueryCount)
+        return;
+
+    if (newQueryCount < oldQueryCount)
+    {
+        emit beginRemoveRows(newQueryCount, oldQueryCount - 1);
+        m_cachedData->queryCount = newQueryCount;
+        emit endRemoveRows();
+    }
+    else
+    {
+        emit beginInsertRows(oldQueryCount, newQueryCount - 1);
+        m_cachedData->queryCount = newQueryCount;
+        emit endInsertRows();
+    }
+    emit localSizeChanged(m_cachedData->queryCount, m_cachedData->maximumCount);
+}
+
+template<typename T>
+void ListCache<T>::setOffset(size_t offset)
+{
+    if (m_offset == offset)
+        return;
+    m_offset = offset;
+    if (m_countTask)
+    {
+        m_loader->cancelTask(m_countTask);
+        m_countTask = 0;
+    }
+    invalidate();
+}
+
+template<typename T>
 void ListCache<T>::invalidate()
 {
     if (m_cachedData)
@@ -525,6 +574,8 @@ void ListCache<T>::partialUpdate()
             emit localSizeChanged(m_cachedData->queryCount, m_cachedData->maximumCount);
         }
     }
+
+    setLimit(m_limit);
 }
 
 template<typename T>
@@ -549,9 +600,7 @@ void ListCache<T>::asyncCountAndLoad()
                 m_needReload = true;
             }
 
-            size_t queryCount = (m_limit > 0)
-                ? std::min(m_limit, maximumCount)
-                : maximumCount;
+            size_t queryCount = countWithLimit(maximumCount);
 
             //note: should we drop items past queryCount?
             m_cachedData = std::make_unique<CacheData>(std::move(list),

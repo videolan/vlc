@@ -254,6 +254,8 @@ public:
     void invalidate();
 
 
+    void setLimit(size_t limit);
+    void setOffset(size_t offset);
 
 private:
     static uint32_t cacheDataLength(const void* data);
@@ -264,6 +266,7 @@ private:
     void asyncFetchMore();
     void asyncCountAndLoad();
     void partialUpdate();
+    size_t countWithLimit(size_t maximumCount) const;
     size_t fixupIndexForMove(size_t index) const;
 
     bool m_useMove = false;
