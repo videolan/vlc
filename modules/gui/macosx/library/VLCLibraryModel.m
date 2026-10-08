@@ -1417,7 +1417,6 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             self->_cachedListOfMovies = mutableArray.copy;
             [self performAfterCacheWritesOnQueue:self->_mediaItemCacheModificationQueue block:^{
                 [self.changeDelegate notifyChange:VLCLibraryModelListOfMoviesReset withObject:self];
-                [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelListOfMoviesReset object:self];
             }];
         }];
     });
