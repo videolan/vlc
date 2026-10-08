@@ -278,6 +278,7 @@ VLCMediaLibraryMediaItem *VLCLibraryModelTestMediaItem(vlc_ml_media_type_t type,
     NSMutableSet<NSObject *> *_pendingQueries;
     dispatch_block_t _queriesFinished;
     BOOL _loadsInitialCounts;
+    BOOL _initialCountsLoaded;
     NSThread *_initialCountReadThread;
 }
 
@@ -328,15 +329,17 @@ VLCMediaLibraryMediaItem *VLCLibraryModelTestMediaItem(vlc_ml_media_type_t type,
 
 - (BOOL)initialCountsLoaded
 {
-    if (!_loadsInitialCounts)
-        return YES;
     // Read the real startup counter through its public getter, without allowing
     // a lazy cache query to satisfy the condition instead of the startup worker.
     @synchronized (self) {
+        if (!_loadsInitialCounts || _initialCountsLoaded)
+            return YES;
         _initialCountReadThread = NSThread.currentThread;
         const size_t count = [super numberOfRecentAudioMedia];
         _initialCountReadThread = nil;
-        return count > 0;
+        // Startup completes once; a later filter must not change this result.
+        _initialCountsLoaded = count > 0;
+        return _initialCountsLoaded;
     }
 }
 
@@ -806,9 +809,16 @@ VLCMediaLibraryMediaItem *VLCLibraryModelTestMediaItem(vlc_ml_media_type_t type,
 - (NSArray<id<VLCMediaLibraryItemProtocol>> *)libraryItems
 {
     vlc_medialibrary_t * const library = VLCLibraryDataTypesIntegrationMediaLibrary();
-    const vlc_ml_query_params_t params = _model == nil
+    vlc_ml_query_params_t params = _model == nil
         ? (vlc_ml_query_params_t){0}
         : [_model queryParams];
+    if (_kind == VLCLibraryModelTestRecentAudioCache || _kind == VLCLibraryModelTestRecentVideoCache) {
+        params.i_sort = VLC_ML_SORTING_DEFAULT;
+        params.b_desc = true;
+        params.i_nbResults = _kind == VLCLibraryModelTestRecentAudioCache
+            ? _model.recentAudioMediaLimit
+            : _model.recentMediaLimit;
+    }
     NSMutableArray * const items = NSMutableArray.array;
     switch (_kind) {
         case VLCLibraryModelTestAudioCache:
