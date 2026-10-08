@@ -35,9 +35,7 @@ Function RegisterExtension
   WriteRegStr HKCR "VLC$R0\DefaultIcon" "" '"$INSTDIR\vlc.exe",0'
   WriteRegStr HKCR "Applications\vlc.exe\SupportedTypes" $0 ""
 
-  ${If} ${AtLeastWinVista}
     WriteRegStr HKLM "Software\Clients\Media\VLC\Capabilities\FileAssociations" "$R0" "VLC$R0"
-  ${EndIf}
 FunctionEnd
 
 ;; Function that registers one skin extension for VLC
@@ -48,9 +46,7 @@ Function RegisterSkinExtension
   WriteRegStr HKCR "VLC$R0\shell\Open\command" "" '"$INSTDIR\vlc.exe" -Iskins --skins2-last "%1"'
   WriteRegStr HKCR "VLC$R0\DefaultIcon" "" '"$INSTDIR\vlc.exe",0'
 
-  ${If} ${AtLeastWinVista}
     WriteRegStr HKLM "Software\Clients\Media\VLC\Capabilities\FileAssociations" "$R0" "VLC$R0"
-  ${EndIf}
 FunctionEnd
 
 ;; Function that removes one extension that VLC owns.
