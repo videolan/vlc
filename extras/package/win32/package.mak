@@ -190,9 +190,9 @@ package-win32-release: package-win32-src $(win32_destdir)/NSIS/nsProcess.dll pac
 .PHONY: package-win-install package-win-common package-win-strip package-win32-src package-win32-exe package-win32-zip package-win32-debug-zip package-win32-7zip package-win32-debug-7zip package-win32-cleanup package-win32 package-win32-debug
 
 EXTRA_DIST += \
-	extras/package/win32/vlc.exe.manifest \
-	extras/package/win32/libvlc.dll.manifest \
-	extras/package/win32/libvlccore.dll.manifest \
+	extras/package/win32/vlc.exe.manifest.in \
+	extras/package/win32/libvlc.dll.manifest.in \
+	extras/package/win32/libvlccore.dll.manifest.in \
 	extras/package/win32/configure.sh \
 	extras/package/win32/NSIS/vlc.win32.nsi.in \
 	extras/package/win32/NSIS/spad.nsi.in \

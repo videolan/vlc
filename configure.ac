@@ -5306,6 +5306,9 @@ AM_COND_IF([HAVE_WIN32], [
     extras/package/win32/NSIS/spad.nsi
     extras/package/win32/NSIS/vlc.win32.nsi
     extras/package/win32/msi/config.wxi
+    extras/package/win32/libvlc.dll.manifest
+    extras/package/win32/libvlccore.dll.manifest
+    extras/package/win32/vlc.exe.manifest
   ])
 ])
 

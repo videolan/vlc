@@ -31,13 +31,19 @@ if host_system == 'windows'
         configuration: rc_conf,
         install: false,
     )
+
+    libvlc_manifest = configure_file(
+        input: files('../extras/package/win32/libvlc.dll.manifest.in'),
+        output: 'libvlc.dll.manifest',
+        configuration: rc_conf,
+    )
+
     libvlc_sources += windows_rc.compile_resources(
         libvlc_rc,
         include_directories: [
             vlc_src_root / 'share',
-            vlc_src_root / 'extras/package/win32',
         ],
-        depend_files: files('../extras/package/win32/libvlc.dll.manifest'),
+        depend_files: [libvlc_manifest],
     )
 endif
 

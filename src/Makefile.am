@@ -631,8 +631,8 @@ if HAVE_ANDROID
 libvlccore_la_LDFLAGS += -avoid-version
 endif
 
-libvlccore_win32_rc.$(OBJEXT): libvlccore_win32_rc.rc $(top_srcdir)/extras/package/win32/libvlccore.dll.manifest
-	$(WINDRES) --include-dir $(top_srcdir)/share --include-dir $(top_srcdir)/extras/package/win32 -i $< -o $@
+libvlccore_win32_rc.$(OBJEXT): libvlccore_win32_rc.rc $(top_builddir)/extras/package/win32/libvlccore.dll.manifest
+	$(WINDRES) --include-dir $(top_srcdir)/share --include-dir $(top_builddir)/extras/package/win32 -i $< -o $@
 
 # FourCC tables
 BUILT_SOURCES += fourcc_tables.h

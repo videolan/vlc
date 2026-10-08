@@ -30,13 +30,19 @@ if build_vlc and (host_system != 'darwin' or have_osx) and not have_win_store an
             configuration: rc_conf,
             install: false,
         )
+
+        vlc_manifest = configure_file(
+            input: files('../extras/package/win32/vlc.exe.manifest.in'),
+            output: 'vlc.exe.manifest',
+            configuration: rc_conf,
+        )
+
         vlc_win_extra = windows_rc.compile_resources(
             vlc_rc,
             include_directories: [
                 vlc_src_root / 'share/icons',
-                vlc_src_root / 'extras/package/win32',
             ],
-            depend_files: files('../extras/package/win32/vlc.exe.manifest'),
+            depend_files: [vlc_manifest],
         )
     endif
 

@@ -104,8 +104,8 @@ libvlc.pc: libvlc.pc.in $(top_builddir)/config.status
 	$(AM_V_GEN)cd "$(top_builddir)" && \
 	$(SHELL) ./config.status --file="lib/$@"
 
-libvlc_win32_rc.$(OBJEXT): libvlc_win32_rc.rc $(top_srcdir)/extras/package/win32/libvlc.dll.manifest
-	$(WINDRES) --include-dir $(top_srcdir)/share --include-dir $(top_srcdir)/extras/package/win32 -i $< -o $@
+libvlc_win32_rc.$(OBJEXT): libvlc_win32_rc.rc $(top_builddir)/extras/package/win32/libvlc.dll.manifest
+	$(WINDRES) --include-dir $(top_srcdir)/share --include-dir $(top_builddir)/extras/package/win32 -i $< -o $@
 
 checkheader_verbose = $(checkheader_verbose_$(V))
 checkheader_verbose_ = $(checkheader_verbose_$(AM_DEFAULT_VERBOSITY))
