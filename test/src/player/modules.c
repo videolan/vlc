@@ -51,6 +51,27 @@ static void aout_Flush(audio_output_t *aout)
     sys->first_pts = sys->first_play_date = VLC_TICK_INVALID;
 }
 
+static void aout_Stop(audio_output_t *aout)
+{
+    struct aout_sys *sys = aout->sys;
+
+    if (sys->first_play_date != VLC_TICK_INVALID)
+    {
+        /* Same dates as the timing reports from Play() */
+        struct report_aout_stop report = {
+            .date = vlc_tick_now(),
+            .end_date = sys->first_play_date + sys->pos - VLC_TICK_0,
+        };
+
+        struct ctx *ctx = sys->ctx;
+        vlc_player_Lock(ctx->player);
+        VEC_PUSH(on_aout_stop, report);
+        vlc_player_Unlock(ctx->player);
+    }
+
+    aout_Flush(aout);
+}
+
 static void aout_Pause(audio_output_t *aout, bool pause, vlc_tick_t date)
 {
     (void) date;
@@ -84,7 +105,7 @@ static int aout_Open(vlc_object_t *obj)
     aout->play = aout_Play;
     aout->pause = aout_Pause;
     aout->flush = aout_Flush;
-    aout->stop = aout_Flush;
+    aout->stop = aout_Stop;
     aout->volume_set = NULL;
     aout->mute_set = NULL;
 

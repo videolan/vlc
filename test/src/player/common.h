@@ -146,8 +146,15 @@ struct report_aout_first_pts
     vlc_tick_t first_pts;
 };
 
+struct report_aout_stop
+{
+    vlc_tick_t date;
+    vlc_tick_t end_date;
+};
+
 #define REPORT_LIST \
     X(vlc_tick_t, on_aout_first_pts) \
+    X(struct report_aout_stop, on_aout_stop) \
 
 #define X(type, name) typedef struct VLC_VECTOR(type) vec_##name;
 PLAYER_REPORT_LIST
