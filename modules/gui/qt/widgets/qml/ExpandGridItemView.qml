@@ -67,6 +67,8 @@ Widgets.ExpandGridView {
 
         availableWidth: root._availableContentWidth
 
-        maxNbItemPerRow: basePictureWidth === basePictureHeight ? 10 : 6
+        maxNbItemPerRow: basePictureWidth === basePictureHeight
+                         ? VLCStyle.gridView_maxNbItemPerRow_square
+                         : VLCStyle.gridView_maxNbItemPerRow_wide
     }
 }

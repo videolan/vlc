@@ -236,6 +236,9 @@ QtObject {
     readonly property int gridView_spacing: margin_small + margin_xxxsmall
     readonly property int tableView_spacing: gridView_spacing + margin_large
 
+    readonly property int gridView_maxNbItemPerRow_wide: 6
+    readonly property int gridView_maxNbItemPerRow_square: 10
+
     readonly property int layoutTitle_top_padding: margin_large
     readonly property int layoutTitle_bottom_padding: margin_normal + margin_xxxsmall
 
