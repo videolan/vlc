@@ -2500,7 +2500,6 @@ have_amf_scaler="no"
 AS_IF([test "$enable_amf_scaler" != "no"], [
   AC_CHECK_HEADERS([AMF/core/PropertyStorage.h AMF/components/HQScaler.h], [
     have_amf_scaler="yes"
-    AC_DEFINE(HAVE_AMF_SCALER, 1, AMD HQScaler supported)
   ])
 ])
 AM_CONDITIONAL([HAVE_AMF_SCALER], [test "${have_amf_scaler}" != "no"])

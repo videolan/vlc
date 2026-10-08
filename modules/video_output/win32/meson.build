@@ -20,10 +20,9 @@ endif
 if get_option('amf_scaler').allowed()
     if cc.check_header('AMF/core/PropertyStorage.h', args: [contrib_inc_args]) \
     and cc.check_header('AMF/components/HQScaler.h', args: [contrib_inc_args])
-        cdata.set('HAVE_AMF_SCALER', 1)
         d3d11_sources += files('../../hw/amf/amf_helper.c')
-        d3d11_cxxargs += contrib_inc_args
-        d3d11_cargs += contrib_inc_args
+        d3d11_cxxargs += [contrib_inc_args, '-DHAVE_AMF_SCALER']
+        d3d11_cargs += [contrib_inc_args, '-DHAVE_AMF_SCALER']
     endif
 endif
 
