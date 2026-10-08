@@ -361,7 +361,7 @@ debian-meson:
         - |
             echo -e "\e[0Ksection_start:$(date +%s):tests_meson_section\r\e[0KVLC tests"
             # Run tests
-            meson test -C build-meson || (echo "ERROR: Tests failed!" >&2 ; cat build-meson/meson-logs/testlog.txt >&2 ; exit 3)
+            meson test -C build-meson --print-errorlogs || (echo "ERROR: Tests failed!" >&2 ; exit 3)
             echo -e "\e[0Ksection_end:$(date +%s):tests_meson_section\r\e[0K"
 
         - |
