@@ -45,6 +45,8 @@ class BaseModel : public QAbstractListModel, public QQmlParserStatus
     //skip in N first elements
     Q_PROPERTY(unsigned int offset READ getOffset WRITE setOffset NOTIFY offsetChanged FINAL)
 
+    Q_PROPERTY(unsigned int chunkSize READ getChunkSize WRITE setChunkSize NOTIFY chunkSizeChanged FINAL)
+
     //number of elements in the model (limit is accounted)
     Q_PROPERTY(unsigned int count READ getCount NOTIFY countChanged FINAL)
 
@@ -74,6 +76,8 @@ public:
     void setLimit(unsigned int limit);
     unsigned int getOffset() const;
     void setOffset(unsigned int offset);
+    unsigned int getChunkSize() const;
+    void setChunkSize(unsigned int chunkSize);
 
     unsigned int getCount() const;
     unsigned int getLoadedCount() const;
@@ -91,6 +95,7 @@ signals:
     void searchPatternChanged();
     void limitChanged() const;
     void offsetChanged() const;
+    void chunkSizeChanged() const;
     void countChanged(unsigned int) const;
     void maximumCountChanged(unsigned int) const;
     void loadingChanged() const;

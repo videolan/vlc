@@ -106,6 +106,21 @@ void BaseModel::setOffset(unsigned int offset)
     emit offsetChanged();
 }
 
+unsigned int BaseModel::getChunkSize() const
+{
+    Q_D(const BaseModel);
+    return d->m_chunkSize;
+}
+
+void BaseModel::setChunkSize(unsigned int chunkSize)
+{
+    Q_D(BaseModel);
+    if (chunkSize == 0 || d->m_chunkSize == chunkSize)
+        return;
+    d->m_chunkSize = chunkSize;
+    emit chunkSizeChanged();
+}
+
 const QString& BaseModel::searchPattern() const
 {
     Q_D(const BaseModel);

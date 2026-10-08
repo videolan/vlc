@@ -117,6 +117,7 @@ protected:
     QString m_sortCriteria = {};
     unsigned int m_limit = 0;
     unsigned int m_offset = 0;
+    unsigned int m_chunkSize = 100;
     bool m_qmlInitializing = false;
 };
 
@@ -214,7 +215,7 @@ void BaseModelPrivateT<T>::validateCache() const
         return;
 
     auto loader = createLoader();
-    m_cache = std::make_unique<ListCache<T>>(std::move(loader), false, m_limit, m_offset);
+    m_cache = std::make_unique<ListCache<T>>(std::move(loader), false, m_limit, m_offset, m_chunkSize);
     validateCacheImpl(m_cache.get());
 }
 
