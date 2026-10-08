@@ -660,6 +660,10 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     if (cache == nil) {
         [self resetCachedListOfAudioMedia];
 
+        if (_filterString.length > 0) {
+            const vlc_ml_query_params_t queryParams = [self queryParams];
+            return vlc_ml_count_audio_media(_p_mediaLibrary, &queryParams);
+        }
         // Return initial count here, otherwise it will return 0 on the first time
         return _initialAudioCount;
     }
@@ -825,6 +829,10 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     NSArray<VLCMediaLibraryArtist *> * const cache = self.cachedArtists;
     if (cache == nil) {
         [self resetCachedListOfArtists];
+        if (_filterString.length > 0) {
+            const vlc_ml_query_params_t queryParams = [self queryParams];
+            return vlc_ml_count_artists(_p_mediaLibrary, &queryParams, true);
+        }
         // Return initial count here, otherwise it will return 0 on the first time
         return _initialArtistCount;
     }
@@ -885,6 +893,10 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     NSArray<VLCMediaLibraryAlbum *> * const cache = self.cachedAlbums;
     if (cache == nil) {
         [self resetCachedListOfAlbums];
+        if (_filterString.length > 0) {
+            const vlc_ml_query_params_t queryParams = [self queryParams];
+            return vlc_ml_count_albums(_p_mediaLibrary, &queryParams);
+        }
         // Return initial count here, otherwise it will return 0 on the first time
         return _initialAlbumCount;
     }
@@ -942,6 +954,10 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     NSArray<VLCMediaLibraryGenre *> * const cache = self.cachedGenres;
     if (cache == nil) {
         [self resetCachedListOfGenres];
+        if (_filterString.length > 0) {
+            const vlc_ml_query_params_t queryParams = [self queryParams];
+            return vlc_ml_count_genres(_p_mediaLibrary, &queryParams);
+        }
         // Return initial count here, otherwise it will return 0 on the first time
         return _initialGenreCount;
     }
@@ -1000,6 +1016,10 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     if (cache == nil) {
         [self resetCachedListOfVideoMedia];
 
+        if (_filterString.length > 0) {
+            const vlc_ml_query_params_t queryParams = [self queryParams];
+            return vlc_ml_count_video_media(_p_mediaLibrary, &queryParams);
+        }
         // Return initial count here, otherwise it will return 0 on the first time
         return _initialVideoCount;
     }
@@ -1231,6 +1251,11 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     NSArray<VLCMediaLibraryMediaItem *> * const cache = self.cachedRecentAudioMedia;
     if (cache == nil) {
         [self resetCachedListOfRecentAudioMedia];
+        if (_filterString.length > 0) {
+            vlc_ml_query_params_t queryParams = [self queryParams];
+            queryParams.i_nbResults = _recentAudioMediaLimit;
+            return vlc_ml_count_audio_history(_p_mediaLibrary, &queryParams);
+        }
         // Return initial count here, otherwise it will return 0 on the first time
         return _initialRecentAudioCount;
     }
@@ -1442,6 +1467,10 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     NSArray<VLCMediaLibraryGroup *> * const cache = self.cachedListOfGroups;
     if (cache == nil) {
         [self resetCachedListOfGroups];
+        if (_filterString.length > 0) {
+            const vlc_ml_query_params_t queryParams = [self queryParams];
+            return vlc_ml_count_groups(_p_mediaLibrary, &queryParams);
+        }
         // Return initial count here, otherwise it will return 0 on the first time
         return _initialGroupCount;
     }
