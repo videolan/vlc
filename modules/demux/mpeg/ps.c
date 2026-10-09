@@ -546,7 +546,7 @@ static int Demux( demux_t *p_demux )
             if( !tk->b_configured )
             {
                 if( !ps_track_fill( tk, &p_sys->psm, i_id,
-                                    p_pkt->p_buffer, p_pkt->i_buffer, false ) )
+                                    p_pkt->p_buffer, p_pkt->i_buffer, PS_MAP_OVERRIDE_NONE ) )
                 {
                     if( p_sys->format == IMKH_PS )
                     {

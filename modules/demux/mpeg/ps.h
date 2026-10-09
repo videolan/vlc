@@ -141,11 +141,18 @@ static inline bool ps_is_EAC3( const uint8_t *p_data, size_t i_data )
 }
 
 /* From id fill i_skip and es_format_t */
+enum ps_mapping_override_e
+{
+    PS_MAP_OVERRIDE_NONE,
+    PS_MAP_OVERRIDE_MPEG2_ONLY,
+};
+
 static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm,
                                  int i_id,
                                  const uint8_t *p_pkt, size_t i_pkt,
-                                 bool b_mpeg2only )
+                                 enum ps_mapping_override_e map_opt )
 {
+    const bool b_mpeg2only = map_opt == PS_MAP_OVERRIDE_MPEG2_ONLY;
     tk->i_skip = 0;
     tk->i_id = i_id;
 
@@ -518,7 +525,7 @@ static inline int ps_pkt_parse_system( const uint8_t *p_pkt, size_t i_pkt,
 
         unsigned i_tk = ps_id_to_tk( i_id );
         if( !tk[i_tk].b_configured )
-            ps_track_fill( &tk[i_tk], p_psm, i_id, NULL, 0, false );
+            ps_track_fill( &tk[i_tk], p_psm, i_id, NULL, 0, PS_MAP_OVERRIDE_NONE );
     }
     return VLC_SUCCESS;
 }
@@ -737,7 +744,7 @@ static inline int ps_psm_fill( ps_psm_t *p_psm,
         es_format_Init( &tk_tmp.fmt, UNKNOWN_ES, 0 );
 
         if( ps_track_fill( &tk_tmp, p_psm, tk[i].i_id,
-                           p_buffer, i_pkt, false ) != VLC_SUCCESS )
+                           p_buffer, i_pkt, PS_MAP_OVERRIDE_NONE ) != VLC_SUCCESS )
             continue;
 
         if( tk_tmp.fmt.i_codec == tk[i].fmt.i_codec )

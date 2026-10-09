@@ -923,7 +923,7 @@ void DvdReadESNew( demux_t *p_demux, int i_id, int i_lang, int i_code_ext )
 
     if( tk->b_configured ) return;
 
-    if( ps_track_fill( tk, NULL, i_id, NULL, 0, true ) )
+    if( ps_track_fill( tk, NULL, i_id, NULL, 0, PS_MAP_OVERRIDE_MPEG2_ONLY ) )
     {
         msg_Warn( p_demux, "unknown codec for id=0x%x", i_id );
         return;
