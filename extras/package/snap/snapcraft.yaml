@@ -76,7 +76,7 @@ parts:
       #kf6-core24-sdk already ships VLC, make sure that the one we're building will be used when linking vlc
       export PATH=$PWD/extras/tools/build/bin:${PATH}
       export LD_LIBRARY_PATH=$(pwd)/src/.libs/:$(pwd)/lib/.libs/:${LD_LIBRARY_PATH}
-      export VLC_CONTRIB_SHA="$(extras/ci/get-contrib-sha.sh)"
+      export VLC_CONTRIB_SHA="$(extras/ci/get-contrib-sha.sh snap)"
       export VLC_PREBUILT_CONTRIBS_URL="https://artifacts.videolan.org/vlc/snap/vlc-contrib-${CRAFT_ARCH_TRIPLET_BUILD_FOR}-${VLC_CONTRIB_SHA}.tar.zst"
       if ! extras/ci/check-url.sh "$VLC_PREBUILT_CONTRIBS_URL"; then unset VLC_PREBUILT_CONTRIBS_URL; fi
       cd contrib && mkdir linux && cd linux
