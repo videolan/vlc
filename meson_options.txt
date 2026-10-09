@@ -144,6 +144,16 @@ option('adaptive',
     value : 'auto',
     description : 'Adaptive streaming (DASH/HLS/Smooth) demux module')
 
+option('disable_modules',
+    type : 'array',
+    value : [],
+    description : 'Names of the modules to not build, or \'all\' to disable every module (see also enable_modules)')
+
+option('enable_modules',
+    type : 'array',
+    value : [],
+    description : 'Names of the modules to build even when listed in disable_modules, or when \'all\' is disabled')
+
 # Dependency options
 option('chromecast',
     type : 'feature',

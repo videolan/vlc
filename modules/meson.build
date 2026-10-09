@@ -443,6 +443,11 @@ endif
 vlc_plugins_targets = {}
 vlc_plugins_targets_array = []
 vlc_plugins_manifest = {}
+
+disabled_modules = get_option('disable_modules')
+enabled_modules = get_option('enable_modules')
+disable_all_modules = 'all' in disabled_modules
+
 foreach module : vlc_modules
     if not module.has_key('name')
         error('Got invalid vlc_modules entry without \'name\' key')
@@ -484,6 +489,14 @@ foreach module : vlc_modules
     }
 
     if not module.get('enabled', true)
+        continue
+    endif
+
+    if (disable_all_modules or module['name'] in disabled_modules) \
+       and module['name'] not in enabled_modules
+        vlc_plugins_manifest += {
+            module['name']: module + { 'enabled': false }
+        }
         continue
     endif
 
@@ -546,6 +559,13 @@ foreach module : vlc_modules
         module['name']: vlc_plugin
     }
     vlc_plugins_targets_array += vlc_plugin
+endforeach
+
+foreach name : disabled_modules + enabled_modules
+    if name != 'all' and name not in vlc_plugins_manifest
+        warning('Unknown module \'@0@\' in disable_modules/enable_modules'
+            .format(name))
+    endif
 endforeach
 
 # Rust/cargo common handling code
