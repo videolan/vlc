@@ -66,6 +66,7 @@ NSString * const VLCLibraryTableCellViewIdentifier = @"VLCLibraryTableCellViewId
 - (void)prepareForReuse
 {
     [super prepareForReuse];
+    self.detailMode = VLCLibraryTableCellDetailModePrimaryDetail;
     self.representedImageView.image = nil;
     self.primaryTitleTextField.hidden = YES;
     self.secondaryTitleTextField.hidden = YES;
@@ -94,11 +95,12 @@ NSString * const VLCLibraryTableCellViewIdentifier = @"VLCLibraryTableCellViewId
         weakSelf.representedImageView.image = thumbnail;
     }];
 
-    if(actualItem.primaryDetailString.length > 0) {
+    NSString * const primaryDetailString = [self primaryDetailStringForItem:actualItem];
+    if (primaryDetailString.length > 0) {
         self.primaryTitleTextField.hidden = NO;
         self.primaryTitleTextField.stringValue = actualItem.displayString;
         self.secondaryTitleTextField.hidden = NO;
-        self.secondaryTitleTextField.stringValue = actualItem.primaryDetailString;
+        self.secondaryTitleTextField.stringValue = primaryDetailString;
     } else {
         self.singlePrimaryTitleTextField.hidden = NO;
         self.singlePrimaryTitleTextField.stringValue = actualItem.displayString;
@@ -154,6 +156,16 @@ NSString * const VLCLibraryTableCellViewIdentifier = @"VLCLibraryTableCellViewId
     self.representedImageView.image = NSImage.VLCNoArtImage;
 
     _representedVideoLibrarySection = section;
+}
+
+- (NSString *)primaryDetailStringForItem:(id<VLCMediaLibraryItemProtocol>)item
+{
+    switch (self.detailMode) {
+        case VLCLibraryTableCellDetailModePrimaryDetail:
+            return item.primaryDetailString;
+        case VLCLibraryTableCellDetailModeDuration:
+            return item.durationString;
+    }
 }
 
 - (void)playMediaItemInstantly:(id)sender

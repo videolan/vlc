@@ -31,6 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, assign) NSString *cellViewIdentifier;
 
 - (NSView<VLCLibraryTableCellViewProtocol> *)makeCellView;
+- (void)configureCellView:(NSView<VLCLibraryTableCellViewProtocol> *)cellView;
 
 @end
 

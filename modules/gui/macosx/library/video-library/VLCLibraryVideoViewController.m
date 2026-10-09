@@ -46,6 +46,7 @@
 #import "library/playlist-library/VLCLibraryPlaylistViewController.h"
 
 #import "library/video-library/VLCLibraryMoviesDataSource.h"
+#import "library/video-library/VLCLibraryShowEpisodeTableViewDelegate.h"
 #import "library/video-library/VLCLibraryShowsDataSource.h"
 #import "library/video-library/VLCLibraryVideoDataSource.h"
 #import "library/video-library/VLCLibraryVideoTableViewDelegate.h"
@@ -60,6 +61,7 @@
 @interface VLCLibraryVideoViewController ()
 {
     VLCLibraryVideoTableViewDelegate *_videoLibraryTableViewDelegate;
+    VLCLibraryShowEpisodeTableViewDelegate *_showEpisodeTableViewDelegate;
     VLCLibraryCollectionViewDelegate *_collectionViewDelegate;
     VLCLibraryCollectionViewFlowLayout *_collectionViewLayout;
 
@@ -77,6 +79,7 @@
 
     if(self) {
         _videoLibraryTableViewDelegate = [[VLCLibraryVideoTableViewDelegate alloc] init];
+        _showEpisodeTableViewDelegate = [[VLCLibraryShowEpisodeTableViewDelegate alloc] init];
 
         [self setupPropertiesFromLibraryWindow:libraryWindow];
         [self setupTableView];
@@ -147,6 +150,9 @@
     [self.videoLibraryGroupsTableView registerNib:tableCellViewNib
                                    forIdentifier:@"VLCVideoLibraryTableViewCellIdentifier"];
     
+    [self.videoLibraryGroupSelectionTableView registerNib:tableCellViewNib
+                                            forIdentifier:_showEpisodeTableViewDelegate.cellViewIdentifier];
+
     self.videoLibraryGroupSelectionTableView.floatsGroupRows = NO;
 }
 
@@ -341,7 +347,7 @@
 
     self.videoLibraryGroupSelectionTableView.dataSource = self.libraryShowsDataSource;
     self.videoLibraryGroupSelectionTableView.target = self.libraryShowsDataSource;
-    self.videoLibraryGroupSelectionTableView.delegate = _videoLibraryTableViewDelegate;
+    self.videoLibraryGroupSelectionTableView.delegate = _showEpisodeTableViewDelegate;
 
     // Shows uses the master/detail split view, not the single sectioned table.
     // The master and detail table views are wired in setupShowsDataSource.

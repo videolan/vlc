@@ -54,6 +54,11 @@
     return [VLCLibraryTableCellView fromNibWithOwner:self];
 }
 
+- (void)configureCellView:(NSView<VLCLibraryTableCellViewProtocol> *)cellView
+{
+    // no-op
+}
+
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
     if (![tableView.dataSource conformsToProtocol:@protocol(VLCLibraryTableViewDataSource)]) {
@@ -69,6 +74,8 @@
         cellView = [self makeCellView];
         cellView.identifier = self.cellViewIdentifier;
     }
+
+    [self configureCellView:cellView];
 
     NSObject<VLCMediaLibraryItemProtocol> * const libraryItem = [vlcDataSource libraryItemAtRow:row forTableView:tableView];
     if (libraryItem != nil) {

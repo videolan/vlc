@@ -284,6 +284,8 @@ libmacosx_plugin_la_SOURCES = \
     gui/macosx/library/home-library/VLCLibraryHomeViewVideoGridContainerView.m \
 	gui/macosx/library/video-library/VLCLibraryMoviesDataSource.h \
 	gui/macosx/library/video-library/VLCLibraryMoviesDataSource.m \
+	gui/macosx/library/video-library/VLCLibraryShowEpisodeTableViewDelegate.h \
+	gui/macosx/library/video-library/VLCLibraryShowEpisodeTableViewDelegate.m \
 	gui/macosx/library/video-library/VLCLibraryShowsDataSource.h \
 	gui/macosx/library/video-library/VLCLibraryShowsDataSource.m \
 	gui/macosx/library/video-library/VLCLibraryVideoViewController.h \
