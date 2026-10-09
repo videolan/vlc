@@ -913,6 +913,10 @@ if cc.has_link_argument('-Wl,--gc-sections')
 elif cc.has_link_argument('-Wl,-dead_strip')
     gc_sections_linkargs += '-Wl,-dead_strip'
 endif
+
+add_project_arguments(cc.get_supported_arguments([
+    '-fdata-sections', '-ffunction-sections'
+]), language: ['c', 'cpp'])
 endif
 
 # Check for struct sockaddr_storage type
