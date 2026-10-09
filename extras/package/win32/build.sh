@@ -693,6 +693,8 @@ if [ -n "$BUILD_MESON" ]; then
             # generate .msi installer
             ninja -C ${BUILD_PATH}/$SHORTARCH-meson package-msi
         fi
+    elif [ -n "$INSTALL_PATH" ]; then
+        meson install -C ${BUILD_PATH}/$SHORTARCH-meson ${MINSTALLFLAGS}
     fi
 else
     info "Bootstrapping"
