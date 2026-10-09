@@ -44,6 +44,8 @@ T.Pane {
 
     property alias model: navigationModel
 
+    property alias view: listView
+
     readonly property int minimumWidth: VLCStyle.expandNavigationPaneWidth + safeAreaLeftMargin + safeAreaRightMargin
 
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
