@@ -521,6 +521,23 @@ check_exception( JNIEnv *env, audio_output_t *p_aout,
 }
 #define CHECK_AT_EXCEPTION( method ) check_exception( env, p_aout, method )
 
+/* DynamicsProcessing is optional: don't mark the AudioTrack as failed */
+static inline bool
+check_dp_exception( JNIEnv *env, audio_output_t *p_aout,
+                    const char *method )
+{
+    if( (*env)->ExceptionCheck( env ) )
+    {
+        (*env)->ExceptionDescribe( env );
+        (*env)->ExceptionClear( env );
+        msg_Err( p_aout, "DynamicsProcessing.%s triggered an exception !",
+                 method );
+        return true;
+    } else
+        return false;
+}
+#define CHECK_DP_EXCEPTION( method ) check_dp_exception( env, p_aout, method )
+
 #define JNI_CALL( what, obj, method, ... ) (*env)->what( env, obj, method, ##__VA_ARGS__ )
 
 #define JNI_CALL_INT( obj, method, ... ) JNI_CALL( CallIntMethod, obj, method, ##__VA_ARGS__ )
@@ -892,7 +909,7 @@ AudioTrack_New( JNIEnv *env, audio_output_t *p_aout, unsigned int i_rate,
             jobject dp = JNI_CALL( NewObject, jfields.DynamicsProcessing.clazz,
                                    jfields.DynamicsProcessing.ctor, session_id );
 
-            if( !CHECK_AT_EXCEPTION( "DynamicsProcessing.ctor" ) )
+            if( !CHECK_DP_EXCEPTION( "ctor" ) )
             {
                 p_sys->p_dp = (*env)->NewGlobalRef( env, dp );
                 (*env)->DeleteLocalRef( env, dp );
@@ -2099,7 +2116,7 @@ VolumeSet( audio_output_t *p_aout, float volume )
                 /* DynamicsProcessing is not needed anymore (using AudioTrack
                  * volume) */
                 JNI_CALL_INT( p_sys->p_dp, jfields.DynamicsProcessing.setEnabled, false );
-                CHECK_AT_EXCEPTION( "DynamicsProcessing.setEnabled" );
+                CHECK_DP_EXCEPTION( "setEnabled" );
             }
             else
             {
@@ -2107,9 +2124,11 @@ VolumeSet( audio_output_t *p_aout, float volume )
                 float dB = 20.0f * log10f(gain);
 
                 JNI_CALL_VOID( p_sys->p_dp, jfields.DynamicsProcessing.setInputGainAllChannelsTo, dB );
-                int ret = JNI_CALL_INT( p_sys->p_dp, jfields.DynamicsProcessing.setEnabled, true );
+                int ret = -1;
+                if( !CHECK_DP_EXCEPTION( "setInputGainAllChannelsTo" ) )
+                    ret = JNI_CALL_INT( p_sys->p_dp, jfields.DynamicsProcessing.setEnabled, true );
 
-                if( !CHECK_AT_EXCEPTION( "DynamicsProcessing.setEnabled" ) && ret == 0 )
+                if( !CHECK_DP_EXCEPTION( "setEnabled" ) && ret == 0 )
                     gain = 1.0; /* reset sw gain */
                 else
                     msg_Warn( p_aout, "failed to set gain via DynamicsProcessing, fallback to sw gain");
