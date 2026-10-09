@@ -409,10 +409,6 @@ if host_system == 'windows'
     )
     win_extra_sources += windows_rc.compile_resources(
         module_rc,
-        include_directories: [
-            vlc_src_root / 'share',
-            vlc_src_root / 'extras/package/win32',
-        ],
     )
 endif
 

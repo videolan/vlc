@@ -118,8 +118,6 @@ module.rc: module.rc.in $(top_builddir)/config.status
 
 module.rc.lo: module.rc
 	$(AM_V_GEN) $(LIBTOOL) --tag=RC --mode=compile $(WINDRES) \
-		--include-dir $(top_srcdir)/share \
-		--include-dir $(top_srcdir)/extras/package/win32 \
 		-i $< -o $@
 endif
 
