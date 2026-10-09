@@ -128,7 +128,7 @@ static void CreateOrUpdateES( demux_t*p_demux )
         if( tk->es )
             es_out_Del( p_demux->out, tk->es );
 
-        if( tk->fmt.i_cat != UNKNOWN_ES )
+        if( tk->fmt.i_cat != UNKNOWN_ES || p_sys->format == PSMF_PS )
             tk->es = es_out_Add( p_demux->out, &tk->fmt );
         tk->b_updated = false;
     }
@@ -155,6 +155,9 @@ static int Open( vlc_object_t *p_this )
     if( i_peek < 16 )
         return VLC_EGENERIC;
 
+    if(p_demux->psz_url && !strcmp(p_demux->psz_url, "psmf://")) // trigger PSMF override mode
+        format = PSMF_PS;
+    else
     if( !memcmp( p_peek, "PSMF", 4 ) &&
         (GetDWBE( &p_peek[4] ) & 0x30303030) == 0x30303030 )
     {
@@ -545,8 +548,10 @@ static int Demux( demux_t *p_demux )
 
             if( !tk->b_configured )
             {
+                enum ps_mapping_override_e opt = ( p_sys->format == PSMF_PS ) ? PS_MAP_OVERRIDE_PSMF
+                                                                              : PS_MAP_OVERRIDE_NONE;
                 if( !ps_track_fill( tk, &p_sys->psm, i_id,
-                                    p_pkt->p_buffer, p_pkt->i_buffer, PS_MAP_OVERRIDE_NONE ) )
+                                    p_pkt->p_buffer, p_pkt->i_buffer, opt ) )
                 {
                     if( p_sys->format == IMKH_PS )
                     {
@@ -557,23 +562,6 @@ static int Demux( demux_t *p_demux )
                             tk->fmt.audio.i_rate = 8000;
                         }
                     }
-                    else
-                    /* No PSM and no probing yet */
-                    if( p_sys->format == PSMF_PS )
-                    {
-                        if( tk->fmt.i_cat == VIDEO_ES )
-                            tk->fmt.i_codec = VLC_CODEC_H264;
-#if 0
-                        if( i_stream_id == PS_STREAM_ID_PRIVATE_STREAM1 )
-                        {
-                            es_format_Change( &tk->fmt, AUDIO_ES, VLC_CODEC_ATRAC3P );
-                            tk->fmt.audio.i_blockalign = 376;
-                            tk->fmt.audio.i_channels = 2;
-                            tk->fmt.audio.i_rate = 44100;
-                        }
-#endif
-                    }
-
                     b_new = true;
                     tk->b_configured = true;
                     tk->b_updated = true;

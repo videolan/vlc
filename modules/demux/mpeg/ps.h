@@ -145,6 +145,7 @@ enum ps_mapping_override_e
 {
     PS_MAP_OVERRIDE_NONE,
     PS_MAP_OVERRIDE_MPEG2_ONLY,
+    PS_MAP_OVERRIDE_PSMF,
 };
 
 static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm,
@@ -155,6 +156,13 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm,
     const bool b_mpeg2only = map_opt == PS_MAP_OVERRIDE_MPEG2_ONLY;
     tk->i_skip = 0;
     tk->i_id = i_id;
+
+    if( map_opt == PS_MAP_OVERRIDE_PSMF )
+    {
+        es_format_Change( &tk->fmt, UNKNOWN_ES, 0 );
+        tk->fmt.i_id = i_id;
+        return VLC_SUCCESS;
+    }
 
     if( ( i_id&0xff00 ) == PS_PACKET_ID_MASK_VOB ) /* 0xBD00 -> 0xBDFF, VOB Private Stream 1 */
     {
