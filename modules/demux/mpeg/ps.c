@@ -157,20 +157,6 @@ static int Open( vlc_object_t *p_this )
 
     if(p_demux->psz_url && !strcmp(p_demux->psz_url, "psmf://")) // trigger PSMF override mode
         format = PSMF_PS;
-    else
-    if( !memcmp( p_peek, "PSMF", 4 ) &&
-        (GetDWBE( &p_peek[4] ) & 0x30303030) == 0x30303030 )
-    {
-        i_peek = vlc_stream_Peek( p_demux->s, &p_peek, 100 );
-        if( i_peek < 100 )
-            return VLC_EGENERIC;
-        i_skip = i_offset = GetWBE( &p_peek[10] );
-        format = PSMF_PS;
-        msg_Info( p_demux, "Detected PSMF-PS header");
-        i_mux_rate = GetDWBE( &p_peek[96] );
-        if( GetDWBE( &p_peek[86] ) > 0 )
-            i_length = vlc_tick_from_samples( GetDWBE( &p_peek[92] ), GetDWBE( &p_peek[86] ));
-    }
     else if( !memcmp( p_peek, "IMKH", 4 ) )
     {
         msg_Info( p_demux, "Detected Hikvision PVA header");
@@ -662,13 +648,7 @@ static int Demux( demux_t *p_demux )
                     p_pkt->i_flags = tk->i_next_block_flags;
                     tk->i_next_block_flags = 0;
                 }
-#if 0
-                if( tk->fmt.i_codec == VLC_CODEC_ATRAC3P )
-                {
-                    p_pkt->p_buffer += 14;
-                    p_pkt->i_buffer -= 14;
-                }
-#endif
+
                 es_out_Send( p_demux->out, tk->es, p_pkt );
             }
             else
