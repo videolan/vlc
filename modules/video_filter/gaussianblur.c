@@ -232,7 +232,7 @@ static void Filter( filter_t *p_filter, picture_t *p_pic, picture_t *p_outpic )
                      y++ )
                 {
                     for( int x = __MAX( -i_dim, -i_col );
-                         x <= __MIN( i_dim, i_visible_pitch - i_col + 1 );
+                         x <= __MIN( i_dim, i_visible_pitch - i_col - 1 );
                          x++ )
                     {
                         t_value += pt_distribution[y+i_dim] *
@@ -265,7 +265,7 @@ static void Filter( filter_t *p_filter, picture_t *p_pic, picture_t *p_outpic )
                 type_t t_value = 0;
                 const int c = i_line*i_in_pitch+i_col;
                 for( int x = __MAX( -i_dim, -i_col*(x_factor+1) );
-                     x <= __MIN( i_dim, (i_visible_pitch - i_col)*(x_factor+1) + 1 );
+                     x <= __MIN( i_dim, (i_visible_pitch - i_col)*(x_factor+1) - 1 );
                      x++ )
                 {
                     t_value += pt_distribution[x+i_dim] *
