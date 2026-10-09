@@ -606,6 +606,8 @@ FocusScope {
 
             readonly property bool needExternalBackgroundProvider: (visible && !background?.visible)
 
+            view.fadingEdge.uniformBackdrop: useAcrylic
+
             NavigationBarContextMenu {
                 id: navigationBarContextMenu
 
@@ -788,6 +790,7 @@ FocusScope {
                 useAcrylic: !VLCStyle.isScreenSmall
 
                 view.fadingEdge.pixelAlignedForDPR: !miniPlayer.visible
+                view.fadingEdge.uniformBackdrop: useAcrylic
 
                 // Otherwise `stackViewParent`'s layer effect becomes the background provider
                 background.visible: useAcrylic || (!MainCtx.backdropBlurRequested() || (GraphicsInfo.shaderType !== GraphicsInfo.RhiShader))
