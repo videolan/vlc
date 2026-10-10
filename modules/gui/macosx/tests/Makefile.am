@@ -58,6 +58,7 @@ VLCMacOSXTests_LDFLAGS = \
 	-Wl,-framework,XCTest \
 	-Wl,-framework,Foundation \
 	-Wl,-framework,Cocoa \
+	-Wl,-framework,CoreServices \
 	-Wl,-framework,IOKit
 
 VLCMacOSXTests_LDADD = \

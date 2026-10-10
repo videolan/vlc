@@ -12,6 +12,7 @@
  *****************************************************************************/
 
 #import <XCTest/XCTest.h>
+#import <CoreServices/CoreServices.h>
 #import <vlc_tick.h>
 
 #import <string.h>
@@ -98,6 +99,28 @@
     XCTAssertEqualObjects([NSString stringWithDuration:0
                                             currentTime:VLC_TICK_FROM_SEC(60)
                                                negative:YES], @"01:00");
+}
+
+- (void)testFileTypeDescriptionWithoutExtension
+{
+    XCTAssertEqualObjects([@"" fileTypeDescription], NSTR("File"));
+    XCTAssertEqualObjects([@"/media/README" fileTypeDescription], NSTR("File"));
+    XCTAssertEqualObjects([@"file:///media/README" fileTypeDescription], NSTR("File"));
+    XCTAssertEqualObjects([@"/media/.hidden" fileTypeDescription], NSTR("File"));
+}
+
+- (void)testFileTypeDescriptionForUnknownExtension
+{
+    XCTAssertEqualObjects([@"/media/file.VLCUNKNOWNFILETYPE18436572" fileTypeDescription],
+                          @"Vlcunknownfiletype18436572 File");
+}
+
+- (void)testFileTypeDescriptionUsesSystemDescription
+{
+    NSString * const description = CFBridgingRelease(UTTypeCopyDescription(kUTTypePlainText));
+    XCTAssertNotNil(description);
+    XCTAssertEqualObjects([@"/media/file.txt" fileTypeDescription], description);
+    XCTAssertEqualObjects([@"file:///media/file.TXT" fileTypeDescription], description);
 }
 
 - (void)testExtensionsArrayFromVLCStyleString
