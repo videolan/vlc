@@ -459,7 +459,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
    viewForTableColumn:(NSTableColumn *)tableColumn
                   row:(NSInteger)row
 {
-    if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableNameColumn"]) {
+    if ([tableColumn.identifier isEqualToString:VLCMediaSourceTableNameColumnIdentifier]) {
         VLCLibraryTableCellView * const cellView =
             [tableView makeViewWithIdentifier:VLCLibraryTableCellViewIdentifier owner:self];
 
@@ -491,7 +491,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
         cellView.singlePrimaryTitleTextField.hidden = NO;
         cellView.singlePrimaryTitleTextField.stringValue = name;
         return cellView;
-    } else if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableKindColumn"]) {
+    } else if ([tableColumn.identifier isEqualToString:VLCMediaSourceTableKindColumnIdentifier]) {
         static NSString * const basicCellViewIdentifier = @"BasicTableCellViewIdentifier";
         NSTableCellView *cellView =
             [tableView makeViewWithIdentifier:basicCellViewIdentifier owner:self];
@@ -502,26 +502,10 @@ referenceSizeForHeaderInSection:(NSInteger)section
         NSAssert(cellView, @"Cell view should not be nil");
 
         if (_mediaSourceMode == VLCMediaSourceModeLAN) {
-            VLCInputItem * const currentNodeInput = _lanDeviceSnapshot[row].inputNode.inputItem;
-            if (currentNodeInput.inputType == ITEM_TYPE_DIRECTORY) {
-                cellView.textField.stringValue = _NS("Directory");
-            }
+            cellView.textField.stringValue = _tableViewDevices[row].inputNode.inputItem.inputTypeDescription;
         } else {
-            VLCMediaSource * const mediaSource = _mediaSources[row];
-            switch(mediaSource.category) {
-                case SD_CAT_DEVICES:
-                    cellView.textField.stringValue = _NS("Devices");
-                    break;
-                case SD_CAT_LAN:
-                    cellView.textField.stringValue = _NS("LAN");
-                    break;
-                case SD_CAT_INTERNET:
-                    cellView.textField.stringValue = _NS("Internet");
-                    break;
-                case SD_CAT_MYCOMPUTER:
-                    cellView.textField.stringValue = _NS("My Computer");
-                    break;
-            }
+            VLCMediaSource * const mediaSource = _tableViewSources[row];
+            cellView.textField.stringValue = mediaSource.categoryDescription;
         }
         return cellView;
     }
