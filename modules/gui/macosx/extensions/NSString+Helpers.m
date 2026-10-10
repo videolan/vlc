@@ -34,6 +34,7 @@
 #import <sys/param.h>
 #import <sys/mount.h>
 
+#import <CoreServices/CoreServices.h>
 #import <IOKit/storage/IOMedia.h>
 #import <IOKit/storage/IOCDMedia.h>
 #import <IOKit/storage/IODVDMedia.h>
@@ -276,6 +277,27 @@ NSString * flagEmojiStringForCountryCode(NSString *countryCode)
     NSMutableString * const result = self.mutableCopy;
     [result replaceCharactersInRange:numberRange withString:[NSString stringWithFormat:@"%ld", number]];
     return result.copy;
+}
+
+- (NSString *)fileTypeDescription
+{
+    NSString * const extension = self.pathExtension.lowercaseString;
+    if (extension.length == 0) {
+        return NSTR("File");
+    }
+
+    const CFStringRef uti = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension,
+                                                               (__bridge CFStringRef)extension,
+                                                               NULL);
+    if (uti != NULL) {
+        const CFStringRef description = UTTypeCopyDescription(uti);
+        CFRelease(uti);
+        if (description != NULL) {
+            return CFBridgingRelease(description);
+        }
+    }
+
+    return [NSString stringWithFormat:@"%@ File", extension.capitalizedString];
 }
 
 + (NSArray<NSString *> *)extensionsArrayFromVLCStyleString:(const char *)extensionsString

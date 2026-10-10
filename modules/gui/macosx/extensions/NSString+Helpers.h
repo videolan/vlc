@@ -184,6 +184,11 @@ bool fixIntfSettings(void);
 - (nullable NSString *)stringWithIncrementedTrailingNumber;
 
 /**
+ Returns a description of the receiver's file extension, or "File" if it has none.
+ */
+- (NSString *)fileTypeDescription;
+
+/**
  * Returns an array of file extensions from a semicolon-separated string of extensions,
  * stripping any leading "*." prefix.
  */
