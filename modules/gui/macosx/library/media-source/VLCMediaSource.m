@@ -616,6 +616,22 @@ static const char *const remoteBrowseDescription = "Remote Browse";
     return inputNode;
 }
 
+- (NSString *)categoryDescription
+{
+    switch (self.category) {
+        case SD_CAT_DEVICES:
+            return _NS("Devices");
+        case SD_CAT_LAN:
+            return _NS("LAN");
+        case SD_CAT_INTERNET:
+            return _NS("Internet");
+        case SD_CAT_MYCOMPUTER:
+            return _NS("My Computer");
+        default:
+            return @"";
+    }
+}
+
 #pragma mark - Local Media Items Methods
 - (void)volumeIsMounted:(NSNotification *)aNotification
 {
