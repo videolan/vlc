@@ -72,6 +72,7 @@ extern NSString * const VLCInputItemCommonDataDifferingFlagString;
 @property (readonly) NSString *totalNumberOfDiscs;
 @property (readonly) vlc_tick_t duration;
 @property (readonly) enum input_item_type_e inputType;
+@property (readonly) NSString *inputTypeDescription;
 @property (readonly) struct input_item_node_t *subTree;
 @property (readwrite) NSURL *artworkURL;
 @property (readonly) BOOL preparsed;

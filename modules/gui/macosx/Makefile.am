@@ -346,6 +346,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/media-source/VLCLibraryMediaSourceViewNavigationState.m \
 	gui/macosx/library/media-source/VLCMediaSourceProvider.h \
 	gui/macosx/library/media-source/VLCMediaSourceProvider.m \
+	gui/macosx/library/media-source/VLCMediaSourceTableViewSorting.h \
+	gui/macosx/library/media-source/VLCMediaSourceTableViewSorting.m \
 	gui/macosx/library/playlist-library/VLCLibraryPlaylistDataSource.h \
 	gui/macosx/library/playlist-library/VLCLibraryPlaylistDataSource.m \
 	gui/macosx/library/playlist-library/VLCLibraryPlaylistViewController.h \
