@@ -28,6 +28,7 @@
 #import "VLCMediaSourceDataSource.h"
 #import "VLCMediaSourceDeviceCollectionViewItem.h"
 #import "VLCMediaSourceProvider.h"
+#import "VLCMediaSourceTableViewSorting.h"
 
 #import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSPasteboardItem+VLCAdditions.h"
@@ -92,8 +93,13 @@ NSString * const VLCMediaSourceTableTagsSortDescriptorKey = @"tags";
 {
     NSArray<VLCMediaSource *> *_mediaSources;
     NSArray<NSString *> *_mediaSourceNotificationNames;
-    NSMapTable<VLCMediaSource *, NSArray<VLCLANDeviceRecord *> *> *_sourceRecords;
-    NSArray<VLCLANDeviceRecord *> *_lanDeviceSnapshot;
+    // LAN device records grouped by source, updated independently.
+    NSMapTable<VLCMediaSource *, NSArray<VLCLANDeviceRecord *> *> *_deviceRecordsBySource;
+    // Flattened discovery records in Browse table sort order.
+    NSArray<VLCLANDeviceRecord *> *_tableViewDevices;
+    // Internet providers in Streams table sort order; grid order remains in _mediaSources.
+    NSArray<VLCMediaSource *> *_tableViewSources;
+    BOOL _ignoringTableViewSelectionChanges;
 }
 @end
 
@@ -104,17 +110,18 @@ NSString * const VLCMediaSourceTableTagsSortDescriptorKey = @"tags";
     self = [super init];
     if (self) {
         _mediaSources = @[];
-        _lanDeviceSnapshot = @[];
+        _tableViewDevices = @[];
+        _tableViewSources = @[];
         _mediaSourceNotificationNames = @[
             VLCMediaSourceChildrenReset,
             VLCMediaSourceChildrenAdded,
             VLCMediaSourceChildrenRemoved,
             VLCMediaSourcePreparsingEnded
         ];
-        _sourceRecords = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsWeakMemory |
-                                                           NSPointerFunctionsObjectPointerPersonality
-                                              valueOptions:NSPointerFunctionsStrongMemory |
-                                                          NSPointerFunctionsObjectPersonality];
+        _deviceRecordsBySource = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsWeakMemory |
+                                                                    NSPointerFunctionsObjectPointerPersonality
+                                                       valueOptions:NSPointerFunctionsStrongMemory |
+                                                                    NSPointerFunctionsObjectPersonality];
         _mediaSourceMode = VLCMediaSourceModeLAN;
         [self loadMediaSources];
         [self returnHome];
@@ -173,8 +180,28 @@ NSString * const VLCMediaSourceTableTagsSortDescriptorKey = @"tags";
     NSNib * const tableCellViewNib = [[NSNib alloc] initWithNibNamed:NSStringFromClass(VLCLibraryTableCellView.class) bundle:nil];
     [self.tableView registerNib:tableCellViewNib forIdentifier:VLCLibraryTableCellViewIdentifier];
 
+    [self setupTableViewSorting];
     [self updateTableColumnVisibility];
     [self reloadViews];
+}
+
+- (void)setupTableViewSorting
+{
+    NSDictionary<NSString *, NSString *> * const keysByColumn = @{
+        VLCMediaSourceTableNameColumnIdentifier: VLCMediaSourceTableNameSortDescriptorKey,
+        VLCMediaSourceTableCountColumnIdentifier: VLCMediaSourceTableCountSortDescriptorKey,
+        VLCMediaSourceTableKindColumnIdentifier: VLCMediaSourceTableKindSortDescriptorKey,
+        VLCMediaSourceTableTagsColumnIdentifier: VLCMediaSourceTableTagsSortDescriptorKey
+    };
+    for (NSTableColumn * const column in self.tableView.tableColumns) {
+        NSString * const key = keysByColumn[column.identifier];
+        NSAssert(key != nil, @"Unexpected media source table column: %@", column.identifier);
+        const SEL selector = [key isEqualToString:VLCMediaSourceTableCountSortDescriptorKey]
+            ? @selector(compare:) : @selector(localizedStandardCompare:);
+        column.sortDescriptorPrototype = [NSSortDescriptor sortDescriptorWithKey:key
+                                                                       ascending:YES
+                                                                        selector:selector];
+    }
 }
 
 - (void)updateTableColumnVisibility
@@ -186,6 +213,7 @@ NSString * const VLCMediaSourceTableTagsSortDescriptorKey = @"tags";
 
 - (void)reloadViews
 {
+    [self updateTableViewItems];
     const VLCLibraryViewModeSegment viewModeSegment = self.viewMode;
     if (viewModeSegment == VLCLibraryGridViewModeSegment) {
         self.collectionViewScrollView.hidden = NO;
@@ -194,7 +222,11 @@ NSString * const VLCMediaSourceTableTagsSortDescriptorKey = @"tags";
     } else if (viewModeSegment == VLCLibraryListViewModeSegment) {
         self.collectionViewScrollView.hidden = YES;
         self.tableViewScrollView.hidden = NO;
-        [self.tableView reloadData];
+        if (self.childDataSource != nil) {
+            [self.childDataSource reloadData];
+        } else {
+            [self.tableView reloadData];
+        }
     } else {
         NSAssert(false, @"View mode must be grid or list mode");
     }
@@ -223,7 +255,7 @@ NSString * const VLCMediaSourceTableTagsSortDescriptorKey = @"tags";
     }
 
     [self setMediaSources:mediaSources];
-    _lanDeviceSnapshot = self.mediaSourceMode == VLCMediaSourceModeLAN ? [self buildMediaSourceSnapshot] : @[];
+    [self rebuildLANDeviceRecords];
     [self reloadData];
 }
 
@@ -277,7 +309,7 @@ NSString * const VLCMediaSourceTableTagsSortDescriptorKey = @"tags";
     }
 
     if (_mediaSourceMode == VLCMediaSourceModeLAN) {
-        return _lanDeviceSnapshot.count > 0;
+        return _tableViewDevices.count > 0;
     }
 
     return _mediaSources.count > 0;
@@ -449,10 +481,10 @@ referenceSizeForHeaderInSection:(NSInteger)section
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
     if (_mediaSourceMode == VLCMediaSourceModeLAN) {
-        return _lanDeviceSnapshot.count;
+        return _tableViewDevices.count;
     }
 
-    return _mediaSources.count;
+    return _tableViewSources.count;
 }
 
 - (NSView *)tableView:(NSTableView *)tableView
@@ -464,7 +496,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
             [tableView makeViewWithIdentifier:VLCLibraryTableCellViewIdentifier owner:self];
 
         if (_mediaSourceMode == VLCMediaSourceModeLAN) {
-            VLCInputItem * const currentNodeInput = _lanDeviceSnapshot[row].inputNode.inputItem;
+            VLCInputItem * const currentNodeInput = _tableViewDevices[row].inputNode.inputItem;
             NSURL * const artworkURL = currentNodeInput.artworkURL;
             NSImage * const placeholder = NSImage.VLCDefaultAppIconImage;
             if (currentNodeInput.radioCountryCodeForFlagArtwork) {
@@ -483,8 +515,8 @@ referenceSizeForHeaderInSection:(NSInteger)section
         }
 
         NSString * const name = _mediaSourceMode == VLCMediaSourceModeLAN
-            ? _lanDeviceSnapshot[row].inputNode.inputItem.name
-            : _mediaSources[row].mediaSourceDescription;
+            ? _tableViewDevices[row].inputNode.inputItem.name
+            : _tableViewSources[row].mediaSourceDescription;
 
         cellView.primaryTitleTextField.hidden = YES;
         cellView.secondaryTitleTextField.hidden = YES;
@@ -514,6 +546,9 @@ referenceSizeForHeaderInSection:(NSInteger)section
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
 {
+    if (_ignoringTableViewSelectionChanges) {
+        return;
+    }
     const NSInteger selectedRow = self.tableView.selectedRow;
     if (selectedRow < 0) {
         return;
@@ -522,11 +557,11 @@ referenceSizeForHeaderInSection:(NSInteger)section
     VLCMediaSource *mediaSource = nil;
     VLCInputNode *childNode = nil;
     if (_mediaSourceMode == VLCMediaSourceModeLAN) {
-        VLCLANDeviceRecord * const record = _lanDeviceSnapshot[selectedRow];
+        VLCLANDeviceRecord * const record = _tableViewDevices[selectedRow];
         mediaSource = record.mediaSource;
         childNode = record.inputNode;
     } else {
-        mediaSource = _mediaSources[selectedRow];
+        mediaSource = _tableViewSources[selectedRow];
         childNode = mediaSource.rootNode;
     }
     NSAssert(mediaSource != nil, @"Media source should not be nil");
@@ -539,8 +574,8 @@ referenceSizeForHeaderInSection:(NSInteger)section
 - (id<NSPasteboardWriting>)tableView:(NSTableView *)tableView pasteboardWriterForRow:(NSInteger)row
 {
     VLCInputItem * const inputItem = _mediaSourceMode == VLCMediaSourceModeLAN
-        ? _lanDeviceSnapshot[row].inputNode.inputItem
-        : _mediaSources[row].rootNode.inputItem;
+        ? _tableViewDevices[row].inputNode.inputItem
+        : _tableViewSources[row].rootNode.inputItem;
     return [self pasteboardWriterForInputItem:inputItem];
 }
 
@@ -576,44 +611,28 @@ referenceSizeForHeaderInSection:(NSInteger)section
     return [NSPasteboardItem pasteboardItemWithInputItem:inputItem];
 }
 
-#pragma mark - LAN device snapshot
+#pragma mark - LAN device records
 
-- (NSArray<VLCLANDeviceRecord *> *)buildMediaSourceSnapshot
+- (void)rebuildLANDeviceRecords
 {
-    [_sourceRecords removeAllObjects];
-    NSMutableArray<VLCLANDeviceRecord *> * const flat = [NSMutableArray array];
-    for (VLCMediaSource * const mediaSource in _mediaSources) {
-        NSMutableArray<VLCLANDeviceRecord *> * const sourceRecs = [NSMutableArray array];
-        for (VLCInputNode * const child in mediaSource.rootNode.children) {
-            VLCLANDeviceRecord * const record = [[VLCLANDeviceRecord alloc] initWithMediaSource:mediaSource
-                                                                                          inputNode:child];
-            [sourceRecs addObject:record];
-        }
-        NSArray<VLCLANDeviceRecord *> * const frozen = [sourceRecs copy];
-        [_sourceRecords setObject:frozen forKey:mediaSource];
-        [flat addObjectsFromArray:frozen];
+    [_deviceRecordsBySource removeAllObjects];
+    if (self.mediaSourceMode != VLCMediaSourceModeLAN) {
+        return;
     }
-    return [flat copy];
+    for (VLCMediaSource * const mediaSource in _mediaSources) {
+        [self updateLANDeviceRecordsForMediaSource:mediaSource];
+    }
 }
 
-- (NSArray<VLCLANDeviceRecord *> *)snapshotByUpdatingSource:(VLCMediaSource *)mediaSource
+- (void)updateLANDeviceRecordsForMediaSource:(VLCMediaSource *)mediaSource
 {
-    NSMutableArray<VLCLANDeviceRecord *> * const sourceRecs = [NSMutableArray array];
-    for (VLCInputNode * const child in mediaSource.rootNode.children) {
+    NSMutableArray<VLCLANDeviceRecord *> * const records = NSMutableArray.array;
+    for (VLCInputNode * const node in mediaSource.rootNode.children) {
         VLCLANDeviceRecord * const record = [[VLCLANDeviceRecord alloc] initWithMediaSource:mediaSource
-                                                                                      inputNode:child];
-        [sourceRecs addObject:record];
+                                                                                  inputNode:node];
+        [records addObject:record];
     }
-    [_sourceRecords setObject:[sourceRecs copy] forKey:mediaSource];
-
-    NSMutableArray<VLCLANDeviceRecord *> * const flat = [NSMutableArray array];
-    for (VLCMediaSource * const source in _mediaSources) {
-        NSArray<VLCLANDeviceRecord *> * const recs = [_sourceRecords objectForKey:source];
-        if (recs) {
-            [flat addObjectsFromArray:recs];
-        }
-    }
-    return [flat copy];
+    [_deviceRecordsBySource setObject:records.copy forKey:mediaSource];
 }
 
 #pragma mark - glue code
@@ -660,6 +679,10 @@ referenceSizeForHeaderInSection:(NSInteger)section
         return;
     }
     
+    // The shared table's old row indexes belong to the previous location.
+    _ignoringTableViewSelectionChanges = YES;
+    [self.tableView deselectAll:self];
+    _ignoringTableViewSelectionChanges = NO;
     _childDataSource = childDataSource;
 
     if (_mediaSourceMode == VLCMediaSourceModeLAN) {
@@ -792,9 +815,9 @@ referenceSizeForHeaderInSection:(NSInteger)section
     if (self.mediaSourceMode == VLCMediaSourceModeLAN) {
         VLCMediaSource * const source = aNotification.object;
         if ([aNotification.name isEqualToString:VLCMediaSourceChildrenReset]) {
-            _lanDeviceSnapshot = [self buildMediaSourceSnapshot];
+            [self rebuildLANDeviceRecords];
         } else {
-            _lanDeviceSnapshot = [self snapshotByUpdatingSource:source];
+            [self updateLANDeviceRecordsForMediaSource:source];
         }
     }
     
@@ -803,12 +826,56 @@ referenceSizeForHeaderInSection:(NSInteger)section
     });
 }
 
+- (void)updateTableViewItems
+{
+    VLCMediaSourceTableViewSorting * const sorting =
+        [[VLCMediaSourceTableViewSorting alloc] initWithSortDescriptors:self.tableView.sortDescriptors ?: @[]];
+    NSMutableArray<VLCLANDeviceRecord *> * const devices = NSMutableArray.array;
+    for (VLCMediaSource * const source in _mediaSources) {
+        NSArray<VLCLANDeviceRecord *> * const records = [_deviceRecordsBySource objectForKey:source];
+        if (records != nil) {
+            [devices addObjectsFromArray:records];
+        }
+    }
+    _tableViewDevices = [sorting sortedItems:devices
+                                valueForItem:^id(VLCLANDeviceRecord *record, NSString *key) {
+        if ([key isEqualToString:VLCMediaSourceTableNameSortDescriptorKey]) {
+            return record.inputNode.inputItem.name ?: @"";
+        }
+        if ([key isEqualToString:VLCMediaSourceTableKindSortDescriptorKey]) {
+            return record.inputNode.inputItem.inputTypeDescription;
+        }
+        return [key isEqualToString:VLCMediaSourceTableCountSortDescriptorKey] ? @(-1) : @"";
+    }];
+    _tableViewSources = [sorting sortedItems:_mediaSources
+                                valueForItem:^id(VLCMediaSource *source, NSString *key) {
+        if ([key isEqualToString:VLCMediaSourceTableNameSortDescriptorKey]) {
+            return source.mediaSourceDescription ?: @"";
+        }
+        if ([key isEqualToString:VLCMediaSourceTableKindSortDescriptorKey]) {
+            return source.categoryDescription;
+        }
+        return [key isEqualToString:VLCMediaSourceTableCountSortDescriptorKey] ? @(-1) : @"";
+    }];
+}
+
+- (void)tableView:(NSTableView *)tableView sortDescriptorsDidChange:(NSArray<NSSortDescriptor *> *)oldDescriptors
+{
+    [self reloadData];
+}
+
 - (void)reloadData
 {
+    [self updateTableViewItems];
     if (self.viewMode == VLCLibraryGridViewModeSegment) {
         [self.collectionView reloadData];
+    } else if (self.childDataSource != nil) {
+        [self.childDataSource reloadData];
     } else {
+        _ignoringTableViewSelectionChanges = YES;
+        [self.tableView deselectAll:self];
         [self.tableView reloadData];
+        _ignoringTableViewSelectionChanges = NO;
     }
 
     [NSNotificationCenter.defaultCenter postNotificationName:VLCMediaSourceBaseDataSourceNodeChanged
