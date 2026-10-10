@@ -52,6 +52,7 @@ extern NSString * const VLCMediaSourceDataSourceLoadingEnded;
 
 - (instancetype)initWithParentBaseDataSource:(VLCMediaSourceBaseDataSource *)parentBaseDataSource;
 - (void)setupViews;
+- (void)reloadData;
 - (VLCInputItem *)mediaSourceInputItemAtRow:(NSInteger)tableViewRow;
 - (NSArray<VLCInputItem *> *)mediaSourceInputItemsAtIndexPaths:(NSSet<NSIndexPath *> *const)indexPaths;
 
