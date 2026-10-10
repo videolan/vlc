@@ -363,7 +363,7 @@ static NSValue * _Nullable inputItemIdentifier(VLCInputItem * _Nullable const in
 {
     VLCInputNode * const inputNode = [self mediaSourceInputNodeAtRow:row];
 
-    if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableNameColumn"]) {
+    if ([tableColumn.identifier isEqualToString:VLCMediaSourceTableNameColumnIdentifier]) {
         VLCLibraryTableCellView * const cellView =
             [tableView makeViewWithIdentifier:VLCLibraryTableCellViewIdentifier owner:self];
         cellView.representedInputItem = inputNode.inputItem;
@@ -373,7 +373,7 @@ static NSValue * _Nullable inputItemIdentifier(VLCInputItem * _Nullable const in
     }
 
      // Only present count view for folders
-    if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableCountColumn"] &&
+    if ([tableColumn.identifier isEqualToString:VLCMediaSourceTableCountColumnIdentifier] &&
         inputNode.inputItem.inputType != ITEM_TYPE_DIRECTORY) {
         return nil;
     }
@@ -387,7 +387,7 @@ static NSValue * _Nullable inputItemIdentifier(VLCInputItem * _Nullable const in
     }
     NSAssert(cellView, @"Cell view should not be nil");
 
-    if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableCountColumn"]) {
+    if ([tableColumn.identifier isEqualToString:VLCMediaSourceTableCountColumnIdentifier]) {
         NSValue * const identifier = inputItemIdentifier(inputNode.inputItem);
         const int numberOfChildren = inputNode.numberOfChildren;
         NSNumber * const cachedChildCount = self.childCountsByInputItemIdentifier[identifier];
@@ -426,57 +426,9 @@ static NSValue * _Nullable inputItemIdentifier(VLCInputItem * _Nullable const in
                 });
             }
         }
-    } else if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableKindColumn"]) {
-        NSString *typeName = NSTR("Unknown");
-        switch (inputNode.inputItem.inputType) {
-            case ITEM_TYPE_UNKNOWN:
-                typeName = NSTR("Unknown");
-                break;
-            case ITEM_TYPE_FILE:
-            {
-                NSString * const filePath = inputNode.inputItem.MRL;
-                NSString * const extension = filePath.pathExtension.lowercaseString;
-                if (extension.length > 0) {
-                    typeName = [NSString stringWithFormat:@"%@ File", extension.capitalizedString];
-
-                    const CFStringRef extCF = (__bridge CFStringRef)extension;
-                    const CFStringRef uti = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, extCF, NULL);
-                    if (uti) {
-                        CFStringRef descriptionCF = UTTypeCopyDescription(uti);
-                        if (descriptionCF) {
-                            typeName = CFBridgingRelease(descriptionCF);
-                        }
-                        CFRelease(uti);
-                    }
-                } else {
-                    typeName = NSTR("File");
-                }
-                break;
-            }
-            case ITEM_TYPE_DIRECTORY:
-                typeName = NSTR("Directory");
-                break;
-            case ITEM_TYPE_DISC:
-                typeName = NSTR("Disc");
-                break;
-            case ITEM_TYPE_CARD:
-                typeName = NSTR("Card");
-                break;
-            case ITEM_TYPE_STREAM:
-                typeName = NSTR("Stream");
-                break;
-            case ITEM_TYPE_PLAYLIST:
-                typeName = NSTR("Playlist");
-                break;
-            case ITEM_TYPE_NODE:
-                typeName = NSTR("Node");
-                break;
-            case ITEM_TYPE_NUMBER:
-                typeName = NSTR("Undefined");
-                break;
-        }
-        cellView.textField.stringValue = typeName;
-    } else if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableTagsColumn"]) {
+    } else if ([tableColumn.identifier isEqualToString:VLCMediaSourceTableKindColumnIdentifier]) {
+        cellView.textField.stringValue = inputNode.inputItem.inputTypeDescription;
+    } else if ([tableColumn.identifier isEqualToString:VLCMediaSourceTableTagsColumnIdentifier]) {
         static NSString * const basicCellViewIdentifier = @"BasicTableCellViewIdentifier";
         NSTableCellView *cellView = [tableView makeViewWithIdentifier:basicCellViewIdentifier
                                                                 owner:self];
