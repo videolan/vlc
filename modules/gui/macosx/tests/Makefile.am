@@ -27,6 +27,7 @@ VLCMacOSXTests_SOURCES = \
 	gui/macosx/library/VLCLibraryDataTypes.m \
 	gui/macosx/library/VLCInputItem.m \
 	gui/macosx/library/VLCInputNode.m \
+	gui/macosx/library/media-source/VLCMediaSourceTableViewSorting.m \
 	gui/macosx/windows/logging/VLCLogMessage.m \
 	gui/macosx/views/VLCTimeFormatter.m
 
