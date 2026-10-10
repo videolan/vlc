@@ -54,7 +54,16 @@
 #import "views/VLCUIUnits.h"
 
 NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseDataSourceNodeChanged";
+
+NSString * const VLCMediaSourceTableNameColumnIdentifier = @"VLCMediaSourceTableNameColumn";
+NSString * const VLCMediaSourceTableCountColumnIdentifier = @"VLCMediaSourceTableCountColumn";
+NSString * const VLCMediaSourceTableKindColumnIdentifier = @"VLCMediaSourceTableKindColumn";
 NSString * const VLCMediaSourceTableTagsColumnIdentifier = @"VLCMediaSourceTableTagsColumn";
+
+NSString * const VLCMediaSourceTableNameSortDescriptorKey = @"name";
+NSString * const VLCMediaSourceTableCountSortDescriptorKey = @"childCount";
+NSString * const VLCMediaSourceTableKindSortDescriptorKey = @"kind";
+NSString * const VLCMediaSourceTableTagsSortDescriptorKey = @"tags";
 
 @interface VLCLANDeviceRecord : NSObject
 @property (readonly) VLCMediaSource *mediaSource;

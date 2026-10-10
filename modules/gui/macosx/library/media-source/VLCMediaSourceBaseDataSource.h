@@ -38,6 +38,16 @@ typedef NS_ENUM(NSInteger, VLCMediaSourceMode) {
 
 extern NSString * const VLCMediaSourceBaseDataSourceNodeChanged;
 
+extern NSString * const VLCMediaSourceTableNameColumnIdentifier;
+extern NSString * const VLCMediaSourceTableCountColumnIdentifier;
+extern NSString * const VLCMediaSourceTableKindColumnIdentifier;
+extern NSString * const VLCMediaSourceTableTagsColumnIdentifier;
+
+extern NSString * const VLCMediaSourceTableNameSortDescriptorKey;
+extern NSString * const VLCMediaSourceTableCountSortDescriptorKey;
+extern NSString * const VLCMediaSourceTableKindSortDescriptorKey;
+extern NSString * const VLCMediaSourceTableTagsSortDescriptorKey;
+
 @interface VLCMediaSourceBaseDataSource : NSObject <NSCollectionViewDataSource,
                                                     NSCollectionViewDelegate,
                                                     NSCollectionViewDelegateFlowLayout,
