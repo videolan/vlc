@@ -16,6 +16,7 @@ VLCMacOSXTests_SOURCES = \
 	gui/macosx/tests/VLCInputItemTest.m \
 	gui/macosx/tests/VLCInputItemTestSupport.m \
 	gui/macosx/tests/VLCInputNodeTest.m \
+	gui/macosx/tests/VLCMediaSourceTableViewSortingTest.m \
 	gui/macosx/tests/VLCLibraryDataTypesIntegrationTest.m \
 	gui/macosx/tests/VLCLibraryDataTypesIntegrationTestSupport.m \
 	gui/macosx/tests/VLCLogMessageTest.m \
