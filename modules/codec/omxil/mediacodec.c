@@ -2311,7 +2311,12 @@ static int VideoVC1_OnNewBlock(decoder_t *p_dec, block_t **pp_block)
 {
     block_t *p_block = *pp_block;
 
-    /* Adding frame start code */
+    /* Adding frame start code, unless the block already begins with one. */
+    static const uint8_t vc1_start_code_prefix[3] = {0x00, 0x00, 0x01};
+    if (p_block->i_buffer >= 4
+     && !memcmp(p_block->p_buffer, vc1_start_code_prefix, 3))
+        return Video_OnNewBlock(p_dec, pp_block);
+
     p_block = *pp_block = block_Realloc(p_block, 4, p_block->i_buffer);
     if (p_block == NULL)
         return VLC_ENOMEM;
