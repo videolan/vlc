@@ -318,6 +318,11 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
         return;
     }
 
+    // Music is a grouping node. Match sidebar clicks by presenting Artists.
+    if (segmentType == VLCLibraryMusicSegmentType) {
+        segmentType = VLCLibraryArtistsMusicSubSegmentType;
+    }
+
     VLCLibrarySegment * const segment = [VLCLibrarySegment segmentWithSegmentType:segmentType];
     if (segment.mediaLibraryRequired &&
         VLCMain.sharedInstance.libraryController.libraryModel == nil) {
@@ -332,10 +337,6 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
     }
 
     self.libraryWindow.librarySegmentType = segmentType;
-
-    if (segmentType == VLCLibraryMusicSegmentType) {
-        [self.outlineView expandItem:[self nodeForSegmentType:VLCLibraryMusicSegmentType]];
-    }
 
     [self expandParentsOfNode:targetNode];
     const NSInteger segmentIndex = [self.outlineView rowForItem:targetNode];
