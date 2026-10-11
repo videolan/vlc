@@ -22,11 +22,6 @@
 
 #import "VLCLibraryHomeViewBaseCarouselContainerView.h"
 
-#import "extensions/NSFont+VLCAdditions.h"
-#import "extensions/NSString+Helpers.h"
-#import "extensions/NSTextField+VLCAdditions.h"
-#import "extensions/NSView+VLCAdditions.h"
-
 #import "library/VLCLibraryCollectionView.h"
 #import "library/VLCLibraryCarouselView.h"
 #import "library/VLCLibraryCarouselCollectionViewItem.h"
@@ -89,19 +84,46 @@
 - (void)setup
 {
     [self setupView];
+    if (self.dataSource == nil) {
+        [self setupDataSource];
+    }
+    [self setupHeader];
     [self connect];
+}
+
+- (void)setupDataSource
+{
+}
+
+- (void)setupHeader
+{
+    self.headerView.libraryButton.target = self;
+    self.headerView.libraryButton.action = @selector(openLibrary:);
+}
+
+- (void)openLibrary:(id)sender
+{
+    [self doesNotRecognizeSelector:_cmd];
+}
+
+- (NSNotificationName)displayedCollectionChangedNotification
+{
+    return nil;
 }
 
 - (void)setupView
 {
-    _titleView = [NSTextField defaultLabelWithString:@""];
-    self.titleView.font = NSFont.VLClibrarySectionHeaderFont;
-    self.titleView.textColor = NSColor.headerTextColor;
-    [self addSubview:self.titleView];
+    if (self.headerView != nil) {
+        return;
+    }
+
+    _headerView = [[VLCLibraryHomeViewSectionHeaderView alloc] initWithFrame:NSZeroRect];
+    self.headerView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self addSubview:self.headerView];
     [NSLayoutConstraint activateConstraints:@[
-        [self.leadingAnchor constraintEqualToAnchor:self.titleView.leadingAnchor],
-        [self.trailingAnchor constraintEqualToAnchor:self.titleView.trailingAnchor],
-        [self.topAnchor constraintEqualToAnchor:self.titleView.topAnchor],
+        [self.headerView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor],
+        [self.headerView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor],
+        [self.headerView.topAnchor constraintEqualToAnchor:self.topAnchor],
     ]];
 
     _collectionViewLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
@@ -133,7 +155,7 @@
     [NSLayoutConstraint activateConstraints:@[
         [self.leadingAnchor constraintEqualToAnchor:self.scrollView.leadingAnchor constant:VLCUIUnits.mediumSpacing],
         [self.trailingAnchor constraintEqualToAnchor:self.scrollView.trailingAnchor constant:-VLCUIUnits.mediumSpacing],
-        [self.titleView.bottomAnchor constraintEqualToAnchor:self.scrollView.topAnchor constant:-VLCUIUnits.mediumSpacing],
+        [self.scrollView.topAnchor constraintEqualToAnchor:self.headerView.bottomAnchor constant:VLCUIUnits.mediumSpacing],
         [self.bottomAnchor constraintEqualToAnchor:self.scrollView.bottomAnchor]
     ]];
 
@@ -202,12 +224,37 @@
 
 - (void)connect
 {
+    if (self.dataSource == nil) {
+        return;
+    }
+
+    [self disconnect];
+    NSNotificationName const notificationName = self.displayedCollectionChangedNotification;
+    if (notificationName != nil) {
+        [NSNotificationCenter.defaultCenter addObserver:self
+                                               selector:@selector(displayedCollectionChanged:)
+                                                   name:notificationName
+                                                 object:self.dataSource];
+    }
     [self.dataSource connect];
+    [self displayedCollectionChanged:nil];
 }
 
 - (void)disconnect
 {
+    NSNotificationName const notificationName = self.displayedCollectionChangedNotification;
+    if (notificationName != nil && self.dataSource != nil) {
+        [NSNotificationCenter.defaultCenter removeObserver:self
+                                                     name:notificationName
+                                                   object:self.dataSource];
+    }
     [self.dataSource disconnect];
+}
+
+- (void)displayedCollectionChanged:(NSNotification *)notification
+{
+    self.headerView.itemCount = [self.dataSource collectionView:self.collectionView numberOfItemsInSection:0];
+    [self updateCarouselButtonVisibility];
 }
 
 - (void)updateCarouselViewHeight

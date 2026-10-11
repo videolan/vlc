@@ -28,6 +28,10 @@
 #import "library/VLCLibraryCarouselCollectionViewItem.h"
 #import "library/VLCLibraryCollectionView.h"
 #import "library/VLCLibraryModel.h"
+#import "library/VLCLibrarySegment.h"
+#import "library/VLCLibraryWindow.h"
+#import "library/VLCLibraryWindowSplitViewController.h"
+#import "library/VLCLibraryWindowNavigationSidebarViewController.h"
 
 #import "library/audio-library/VLCLibraryAudioDataSource.h"
 
@@ -37,10 +41,9 @@
 
 @synthesize dataSource = _dataSource;
 
-- (void)setup
+- (NSNotificationName)displayedCollectionChangedNotification
 {
-    [super setup];
-    [self setupDataSource];
+    return VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification;
 }
 
 - (void)setupDataSource
@@ -59,6 +62,60 @@
     return ((VLCLibraryAudioDataSource *)self.dataSource).audioLibrarySegment;
 }
 
+- (void)connect
+{
+    [super connect];
+    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+    for (NSString * const name in @[VLCLibraryModelRecentAudioMediaListReset,
+                                   VLCLibraryModelRecentAudioMediaItemDeleted,
+                                   VLCLibraryModelAudioMediaItemDeleted]) {
+        [notificationCenter addObserver:self selector:@selector(reloadRecentMusic:) name:name object:nil];
+    }
+}
+
+- (void)disconnect
+{
+    [super disconnect];
+    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+    for (NSString * const name in @[VLCLibraryModelRecentAudioMediaListReset,
+                                   VLCLibraryModelRecentAudioMediaItemDeleted,
+                                   VLCLibraryModelAudioMediaItemDeleted]) {
+        [notificationCenter removeObserver:self name:name object:nil];
+    }
+}
+
+- (void)reloadRecentMusic:(NSNotification *)notification
+{
+    if (self.audioLibrarySegment == VLCAudioLibraryRecentsSegment) {
+        [self.dataSource reloadData];
+    }
+}
+
+- (void)openLibrary:(id)sender
+{
+    VLCLibrarySegmentType segmentType;
+    switch (self.audioLibrarySegment) {
+        case VLCAudioLibraryRecentsSegment:
+            segmentType = VLCLibraryMusicSegmentType;
+            break;
+        case VLCAudioLibraryArtistsSegment:
+            segmentType = VLCLibraryArtistsMusicSubSegmentType;
+            break;
+        case VLCAudioLibraryAlbumsSegment:
+            segmentType = VLCLibraryAlbumsMusicSubSegmentType;
+            break;
+        case VLCAudioLibrarySongsSegment:
+            segmentType = VLCLibrarySongsMusicSubSegmentType;
+            break;
+        case VLCAudioLibraryGenresSegment:
+            segmentType = VLCLibraryGenresMusicSubSegmentType;
+            break;
+        default:
+            return;
+    }
+    [VLCMain.sharedInstance.libraryWindow.splitViewController.navSidebarViewController selectSegment:segmentType];
+}
+
 - (void)setAudioLibrarySegment:(VLCAudioLibrarySegment)audioLibrarySegment
 {
     if (audioLibrarySegment == self.audioLibrarySegment) {
@@ -67,27 +124,28 @@
 
     switch (audioLibrarySegment) {
         case VLCAudioLibraryRecentsSegment:
-            self.titleView.stringValue = _NS("Recent music");
+            self.headerView.title = _NS("Recent music");
             break;
         case VLCAudioLibraryArtistsSegment:
-            self.titleView.stringValue = _NS("Artists");
+            self.headerView.title = _NS("Artists");
             break;
         case VLCAudioLibraryAlbumsSegment:
-            self.titleView.stringValue = _NS("Albums");
+            self.headerView.title = _NS("Albums");
             break;
         case VLCAudioLibrarySongsSegment:
-            self.titleView.stringValue = _NS("Songs");
+            self.headerView.title = _NS("Songs");
             break;
         case VLCAudioLibraryGenresSegment:
-            self.titleView.stringValue = _NS("Genres");
+            self.headerView.title = _NS("Genres");
             break;
         case VLCAudioLibraryUnknownSegment:
         default:
-            self.titleView.stringValue = _NS("Unknown");
+            self.headerView.title = _NS("Unknown");
             break;
     }
 
     ((VLCLibraryAudioDataSource *)self.dataSource).audioLibrarySegment = audioLibrarySegment;
+    self.headerView.libraryButton.enabled = audioLibrarySegment != VLCAudioLibraryUnknownSegment;
     [self.collectionView reloadData];
 }
 
