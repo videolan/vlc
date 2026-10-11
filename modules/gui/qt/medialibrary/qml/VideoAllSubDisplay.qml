@@ -83,8 +83,6 @@ Widgets.PageExt {
 
         gridLabels: _meta?.gridLabels ?? videoAll.getLabel
 
-        listLabels: _meta?.listLabels ?? videoAll.getLabel
-
         showGroupCountColumn: _meta?.showGroupCountColumn ?? false
 
         sectionProperty: _meta?.sectionProperty ?? ""
@@ -138,8 +136,6 @@ Widgets.PageExt {
 
                 property var gridLabels: videoAll.getLabel
 
-                property var listLabels: videoAll.getLabel
-
                 property string sectionProperty: {
                     switch (model.sortCriteria) {
                     case "title":
@@ -187,10 +183,6 @@ Widgets.PageExt {
 
                 property var gridLabels: function (model) {
                     return videoAll.getLabelGroup(model, qsTr("%1 Videos"))
-                }
-
-                property var listLabels: function (model) {
-                    return videoAll.getLabel(model)
                 }
 
                 property bool showGroupCountColumn: true
@@ -250,10 +242,6 @@ Widgets.PageExt {
 
                 property var gridLabels: function (model) {
                     return videoAll.getLabelGroup(model, qsTr("%1 Videos"))
-                }
-
-                property var listLabels: function (model) {
-                    return videoAll.getLabel(model)
                 }
 
                 property bool showGroupCountColumn: true

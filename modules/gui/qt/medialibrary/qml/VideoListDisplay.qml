@@ -35,8 +35,6 @@ Widgets.TableViewExt {
     // NOTE: This is useful for groups because our main criteria is 'name' instead of 'title'.
     property string mainCriteria: "title"
 
-    property var coverLabels
-
     property bool showGroupCountColumn: false
 
     property real coverHeight: VLCStyle.listAlbumCover_height
@@ -137,7 +135,5 @@ Widgets.TableViewExt {
         titleCover_height: listView_id.coverHeight
         titleCover_width: listView_id.coverWidth
         titleCover_radius: listView_id.coverRadius
-
-        titlecoverLabels: listView_id.coverLabels
     }
 }
