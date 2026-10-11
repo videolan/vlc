@@ -206,6 +206,7 @@
 {
     [self.searchViewController presentInContainer:self.libraryTargetView];
     self.isShowingSearchOverlay = YES;
+    [self.libraryWindow updateGridVsListViewModeSegmentedControl];
     [self.libraryWindow updateToolbarDisplayFlags];
 }
 
@@ -277,6 +278,7 @@
     [self.searchViewController dismissFromContainer];
     self.isShowingSearchOverlay = NO;
     [VLCMain.sharedInstance.libraryController filterByString:@""];
+    [self.libraryWindow updateGridVsListViewModeSegmentedControl];
     [self.libraryWindow updateToolbarDisplayFlags];
 
     // Re-present the home content (or placeholder) in the target view.
@@ -344,6 +346,7 @@
         VLCLibraryWindowPersistentPreferences.sharedInstance;
     if (self.isShowingSearchOverlay) {
         prefs.searchLibraryViewMode = viewMode;
+        [self.searchViewController presentInContainer:self.libraryTargetView];
     } else {
         prefs.homeLibraryViewMode = viewMode;
     }
