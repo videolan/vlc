@@ -521,6 +521,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/views/VLCTrackingView.m \
 	gui/macosx/views/VLCUIUnits.h \
 	gui/macosx/views/VLCUIUnits.m \
+	gui/macosx/views/VLCVisualEffectView.h \
+	gui/macosx/views/VLCVisualEffectView.m \
 	gui/macosx/views/VLCVolumeSlider.h \
 	gui/macosx/views/VLCVolumeSlider.m \
 	gui/macosx/views/VLCVolumeSliderCell.h \
