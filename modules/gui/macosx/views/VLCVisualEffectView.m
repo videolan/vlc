@@ -23,6 +23,7 @@
 #import "VLCVisualEffectView.h"
 
 #import "extensions/NSView+VLCAdditions.h"
+#import "main/CompatibilityFixes.h"
 
 @interface VLCVisualEffectView ()
 
