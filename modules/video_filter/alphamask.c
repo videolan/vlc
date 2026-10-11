@@ -105,6 +105,7 @@ static int Create( filter_t *p_filter )
     if( p_filter->p_sys == NULL )
         return VLC_ENOMEM;
     p_sys = p_filter->p_sys;
+    p_sys->p_mask = NULL;
 
     config_ChainParse( p_filter, CFG_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
@@ -118,8 +119,6 @@ static int Create( filter_t *p_filter )
             msg_Err( p_filter, "Error while loading mask (%s).",
                      psz_string );
     }
-    else
-       p_sys->p_mask = NULL;
     free( psz_string );
 
     vlc_mutex_init( &p_sys->mask_lock );
