@@ -22,18 +22,22 @@
 
 #import "VLCLibraryHomeViewVideoGridContainerView.h"
 
-#import "extensions/NSView+VLCAdditions.h"
-
 #import "library/VLCLibraryCollectionView.h"
 #import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewItem.h"
-#import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibrarySegment.h"
+#import "library/VLCLibraryWindow.h"
+#import "library/VLCLibraryWindowNavigationSidebarViewController.h"
+#import "library/VLCLibraryWindowSplitViewController.h"
 
+#import "library/home-library/VLCLibraryHomeViewSectionHeaderView.h"
 #import "library/home-library/VLCLibraryHomeViewVideoContainerViewDataSource.h"
 
 #import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
+
+#import "main/VLCMain.h"
 
 #import "views/VLCSubScrollView.h"
 #import "views/VLCUIUnits.h"
@@ -64,8 +68,23 @@
     [self setupCollectionView];
     [self setupScrollView];
 
+    _headerView = [[VLCLibraryHomeViewSectionHeaderView alloc] initWithFrame:NSZeroRect];
+    _headerView.translatesAutoresizingMaskIntoConstraints = NO;
+    _headerView.libraryButton.target = self;
+    _headerView.libraryButton.action = @selector(openLibrary:);
+
+    [self addSubview:_headerView];
     [self addSubview:_scrollView];
-    [self.scrollView applyConstraintsToFillSuperview];
+    [NSLayoutConstraint activateConstraints:@[
+        [_headerView.topAnchor constraintEqualToAnchor:self.topAnchor],
+        [_headerView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor],
+        [_headerView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor],
+        [_scrollView.topAnchor constraintEqualToAnchor:_headerView.bottomAnchor
+                                              constant:VLCUIUnits.mediumSpacing],
+        [_scrollView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor],
+        [_scrollView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor],
+        [_scrollView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor]
+    ]];
 
     [self setContentHuggingPriority:NSLayoutPriorityDefaultLow
                      forOrientation:NSLayoutConstraintOrientationHorizontal];
@@ -81,7 +100,7 @@
 - (void)setupCollectionView
 {
     _collectionViewLayout = VLCLibraryCollectionViewFlowLayout.standardLayout;
-    _collectionViewLayout.headerReferenceSize = VLCLibraryCollectionViewSupplementaryElementView.defaultHeaderSize;
+    _collectionViewLayout.headerReferenceSize = NSZeroSize;
 
     _collectionView = [[VLCLibraryCollectionView alloc] initWithFrame:NSZeroRect];
     _collectionView.postsFrameChangedNotifications = YES;
@@ -124,12 +143,43 @@
 
 - (void)connect
 {
+    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+    [notificationCenter removeObserver:self
+                                  name:VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification
+                                object:self.dataSource];
+    [notificationCenter addObserver:self
+                           selector:@selector(displayedCollectionChanged:)
+                               name:VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification
+                             object:self.dataSource];
+    [self.dataSource disconnect];
     [self.dataSource connect];
+    [self updateHeader];
 }
 
 - (void)disconnect
 {
+    [NSNotificationCenter.defaultCenter removeObserver:self
+                                                  name:VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification
+                                                object:self.dataSource];
     [self.dataSource disconnect];
+}
+
+- (void)displayedCollectionChanged:(NSNotification *)notification
+{
+    [self updateHeader];
+    [self invalidateIntrinsicContentSize];
+}
+
+- (void)updateHeader
+{
+    _headerView.title = _groupDescriptor.name ?: @"";
+    _headerView.itemCount = [self.dataSource collectionView:_collectionView numberOfItemsInSection:0];
+}
+
+- (void)openLibrary:(id)sender
+{
+    [VLCMain.sharedInstance.libraryWindow.splitViewController.navSidebarViewController
+        selectSegment:VLCLibraryVideoSegmentType];
 }
 
 - (void)setGroupDescriptor:(VLCLibraryVideoCollectionViewGroupDescriptor *)groupDescriptor
@@ -137,6 +187,7 @@
     _groupDescriptor = groupDescriptor;
     _videoGroup = groupDescriptor.group;
     _dataSource.groupDescriptor = groupDescriptor;
+    [self updateHeader];
 
     _collectionViewLayout.scrollDirection = _groupDescriptor.isHorizontalBarCollectionView ?
                                             NSCollectionViewScrollDirectionHorizontal :
@@ -178,6 +229,7 @@
                                  collectionViewLayoutInset.top +
                                  collectionViewLayoutInset.bottom;
     const CGFloat itemHeight = _collectionViewDelegate.staticItemSize.height;
+    const CGFloat headerHeight = _headerView.fittingSize.height + VLCUIUnits.mediumSpacing;
     const CGFloat width = scrollViewInsets.left +
                           scrollViewInsets.right +
                           collectionViewLayoutInset.left +
@@ -188,12 +240,12 @@
         // If we don't return a size larger than 0 then we run into issues with the collection
         // view layout not trying to properly calculate its size. So let's return something
         NSLog(@"Unable to provide accurate height for container -- providing rough size");
-        const CGFloat roughValue = itemHeight + insetsHeight;
+        const CGFloat roughValue = itemHeight + insetsHeight + headerHeight;
         return NSMakeSize(width, roughValue);
     }
 
     if (_groupDescriptor.isHorizontalBarCollectionView) {
-        const CGFloat viewHeight = itemHeight + insetsHeight + VLCUIUnits.smallSpacing;
+        const CGFloat viewHeight = itemHeight + insetsHeight + VLCUIUnits.smallSpacing + headerHeight;
         return NSMakeSize(width, viewHeight);
     }
 
@@ -202,7 +254,7 @@
     // at all. By reducing the height of the container to below the height of the
     // collection view contents we can eliminate this, so we reduce the height
     // just enough to not be noticeable but enough for the bug to not manifest
-    return NSMakeSize(width, collectionViewContentSize.height - 15);
+    return NSMakeSize(width, collectionViewContentSize.height - 15 + headerHeight);
 }
 
 - (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem

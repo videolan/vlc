@@ -30,6 +30,7 @@
 @class VLCLibraryCollectionView;
 @class VLCLibraryCollectionViewDelegate;
 @class VLCLibraryCollectionViewFlowLayout;
+@class VLCLibraryHomeViewSectionHeaderView;
 @class VLCLibraryVideoCollectionViewGroupDescriptor;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -40,6 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) VLCLibraryCollectionViewDelegate *collectionViewDelegate;
 @property (readonly) VLCLibraryCollectionViewFlowLayout *collectionViewLayout;
 @property (readonly) VLCSubScrollView *scrollView;
+@property (readonly) VLCLibraryHomeViewSectionHeaderView *headerView;
 
 @end
 
