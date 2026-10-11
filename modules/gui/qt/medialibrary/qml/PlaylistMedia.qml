@@ -189,16 +189,6 @@ Widgets.TableViewExt {
         showCriterias: (root.sortModel === root._modelSmall)
 
         criteriaCover: "thumbnail"
-
-        //-----------------------------------------------------------------------------------------
-        // TableColumns implementation
-
-        function titlecoverLabels(model) {
-            return [
-                (model) ? model.resolution_name : "",
-                (model) ? model.channel         : ""
-            ].filter(function(a) { return a !== "" })
-        }
     }
 
     Rectangle {
