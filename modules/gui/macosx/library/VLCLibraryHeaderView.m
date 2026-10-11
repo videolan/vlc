@@ -31,6 +31,7 @@
 #import "library/VLCLibraryRepresentedItem.h"
 
 #import "views/VLCUIUnits.h"
+#import "views/VLCVisualEffectView.h"
 
 const CGFloat VLCLibraryHeaderViewHeight = 66.f;
 NSString * const VLCLibraryHeaderViewIdentifier = @"VLCLibraryHeaderView";
@@ -113,26 +114,14 @@ NSString * const VLCLibraryHeaderViewIdentifier = @"VLCLibraryHeaderView";
     self.backgroundTopInset = VLCUIUnits.largeSpacing + VLCUIUnits.mediumSpacing;
     self.backgroundBottomInset = 0.f;
 
-#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
-    if (@available(macOS 26.0, *)) {
-        NSGlassEffectView * const glassView = [[NSGlassEffectView alloc] initWithFrame:self.bounds];
-        glassView.translatesAutoresizingMaskIntoConstraints = NO;
-        NSView * const glassContentView = [[NSView alloc] initWithFrame:glassView.bounds];
-        glassContentView.translatesAutoresizingMaskIntoConstraints = NO;
-        glassView.contentView = glassContentView;
-        self.backgroundView = glassView;
-        contentHostView = glassContentView;
-        self.backgroundBottomInset = VLCUIUnits.largeSpacing + VLCUIUnits.mediumSpacing + VLCUIUnits.smallSpacing;
-    } else
-#endif
     if (@available(macOS 10.14, *)) {
-        NSVisualEffectView * const visualEffectView = [[NSVisualEffectView alloc] initWithFrame:self.bounds];
+        VLCVisualEffectView * const visualEffectView = [[VLCVisualEffectView alloc] initWithFrame:self.bounds];
         visualEffectView.translatesAutoresizingMaskIntoConstraints = NO;
-        visualEffectView.wantsLayer = YES;
-        visualEffectView.material = NSVisualEffectMaterialPopover;
-        visualEffectView.blendingMode = NSVisualEffectBlendingModeWithinWindow;
         self.backgroundView = visualEffectView;
-        contentHostView = visualEffectView;
+        contentHostView = visualEffectView.contentView;
+        if (visualEffectView.usesGlassEffect) {
+            self.backgroundBottomInset = VLCUIUnits.largeSpacing + VLCUIUnits.mediumSpacing + VLCUIUnits.smallSpacing;
+        }
     } else {
         NSView * const fallbackBackgroundView = [[NSView alloc] initWithFrame:self.bounds];
         fallbackBackgroundView.translatesAutoresizingMaskIntoConstraints = NO;
