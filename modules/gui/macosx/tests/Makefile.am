@@ -38,6 +38,7 @@ VLCMacOSXTests_SOURCES = \
 	gui/macosx/windows/logging/VLCLogMessage.m \
 	gui/macosx/views/VLCTimeFormatter.m \
 	gui/macosx/views/VLCUIUnits.m \
+	gui/macosx/views/VLCVisualEffectView.m
 
 noinst_HEADERS += \
 	gui/macosx/tests/VLCInputItemTestSupport.h \
