@@ -17,7 +17,6 @@
 #import "library/home-library/VLCLibraryHomeViewSectionHeaderView.h"
 
 @interface VLCLibraryHomeViewSectionHeaderView (TestAccess)
-@property (readonly) NSTextField *titleField;
 @property (readonly) NSTextField *countField;
 @end
 
@@ -71,30 +70,42 @@
 
 - (void)assertContentFitsHeader
 {
-    for (NSView *view in @[self.header.titleField, self.header.countField, self.header.libraryButton]) {
-        const NSRect contentRect = [view convertRect:view.bounds toView:self.header];
-        XCTAssertTrue(NSContainsRect(self.header.bounds, contentRect));
+    for (NSView *view in @[self.header.countField, self.header.libraryButton]) {
+        // Native controls include drawing margins outside their alignment rect.
+        const NSRect alignmentRect = [view alignmentRectForFrame:view.frame];
+        const NSRect contentRect = [view.superview convertRect:alignmentRect toView:self.header];
+        XCTAssertTrue(NSContainsRect(self.header.bounds, contentRect), @"%@ frame %@ in header %@",
+                      view.class, NSStringFromRect(contentRect), NSStringFromRect(self.header.bounds));
         XCTAssertFalse(view.hasAmbiguousLayout);
         XCTAssertGreaterThanOrEqual(view.frame.size.height, view.intrinsicContentSize.height);
     }
     XCTAssertFalse(self.header.hasAmbiguousLayout);
 }
 
-- (void)testTitleIsCopiedAndUpdatesLabelAndAccessibility
+- (NSData *)renderedButtonImage
+{
+    NSButton * const button = self.header.libraryButton;
+    NSView * const contentView = self.window.contentView;
+    const NSRect buttonRect = [button convertRect:button.bounds toView:contentView];
+    NSBitmapImageRep * const bitmap = [contentView bitmapImageRepForCachingDisplayInRect:buttonRect];
+    [contentView cacheDisplayInRect:buttonRect toBitmapImageRep:bitmap];
+    return [bitmap representationUsingType:NSBitmapImageFileTypePNG properties:@{}];
+}
+
+- (void)testTitleIsCopiedAndUpdatesButtonAndAccessibility
 {
     NSMutableString * const title = [@"Recent music" mutableCopy];
     self.header.title = title;
     [title appendString:@" changed after assignment"];
     XCTAssertEqualObjects(self.header.title, @"Recent music");
-    XCTAssertEqualObjects(self.header.titleField.stringValue, @"Recent music");
-    XCTAssertEqualObjects(self.header.titleField.toolTip, @"Recent music");
+    XCTAssertEqualObjects(self.header.libraryButton.title, @"Recent music");
     NSString * const accessibilityLabel =
         [NSString stringWithFormat:_NS("Open %@ in the library"), @"Recent music"];
     XCTAssertEqualObjects(self.header.libraryButton.accessibilityLabel, accessibilityLabel);
     XCTAssertEqualObjects(self.header.libraryButton.toolTip, accessibilityLabel);
 
     self.header.title = @"Library";
-    XCTAssertEqualObjects(self.header.titleField.stringValue, @"Library");
+    XCTAssertEqualObjects(self.header.libraryButton.title, @"Library");
     NSString * const libraryAccessibilityLabel =
         [NSString stringWithFormat:_NS("Open %@ in the library"), @"Library"];
     XCTAssertEqualObjects(self.header.libraryButton.accessibilityLabel, libraryAccessibilityLabel);
@@ -120,7 +131,33 @@
     XCTAssertEqual(self.actionSender, self.header.libraryButton);
 }
 
-- (void)testNarrowHeaderTruncatesTitleWithoutOverlappingButton
+- (void)testPressedTitleChangesRenderingAndRestoresOnRelease
+{
+    NSData * const normalImage = [self renderedButtonImage];
+    XCTAssertNotNil(normalImage);
+    [self.header.libraryButton highlight:YES];
+    NSData * const pressedImage = [self renderedButtonImage];
+    XCTAssertNotEqualObjects(pressedImage, normalImage);
+    [self.header.libraryButton highlight:NO];
+    XCTAssertEqualObjects([self renderedButtonImage], normalImage);
+    XCTAssertEqual(self.header.libraryButton.state, NSControlStateValueOff);
+}
+
+- (void)testTitleButtonHasTrailingChevronAndNoBackground
+{
+    XCTAssertFalse(self.header.libraryButton.bordered);
+    if (@available(macOS 10.14, *)) {
+        XCTAssertEqualObjects(self.header.libraryButton.contentTintColor, NSColor.labelColor);
+    }
+    XCTAssertNotNil(self.header.libraryButton.image);
+    XCTAssertEqual(self.header.libraryButton.imagePosition, NSImageTrailing);
+    XCTAssertEqual(self.header.subviews.count, (NSUInteger)2);
+    XCTAssertEqual(self.header.libraryButton.superview, self.header);
+    XCTAssertEqual(self.header.countField.superview, self.header);
+    XCTAssertLessThan(self.header.libraryButton.frame.size.width, self.header.frame.size.width);
+}
+
+- (void)testNarrowHeaderTruncatesTitleAndKeepsSubtitleBelow
 {
     self.header.title = @"A very long recent video collection section title";
     self.widthConstraint.constant = 320;
@@ -129,15 +166,11 @@
 
     const NSRect buttonRect = [self.header.libraryButton convertRect:self.header.libraryButton.bounds
                                                             toView:self.header];
-    for (NSTextField *label in @[self.header.titleField, self.header.countField]) {
-        const NSRect labelRect = [label convertRect:label.bounds toView:self.header];
-        XCTAssertLessThanOrEqual(NSMaxX(labelRect), NSMinX(buttonRect));
-    }
-    XCTAssertLessThan(self.header.titleField.frame.size.width,
-                      self.header.titleField.intrinsicContentSize.width);
-    XCTAssertEqual(self.header.titleField.lineBreakMode, NSLineBreakByTruncatingTail);
-    XCTAssertGreaterThanOrEqual(self.header.libraryButton.frame.size.width,
-                                self.header.libraryButton.intrinsicContentSize.width);
+    const NSRect countRect = [self.header.countField convertRect:self.header.countField.bounds toView:self.header];
+    XCTAssertLessThanOrEqual(NSMaxY(countRect), NSMinY(buttonRect));
+    XCTAssertLessThan(self.header.libraryButton.frame.size.width,
+                      self.header.libraryButton.intrinsicContentSize.width);
+    XCTAssertEqual(self.header.libraryButton.lineBreakMode, NSLineBreakByTruncatingTail);
 
     self.widthConstraint.constant = 800;
     [self.window.contentView layoutSubtreeIfNeeded];
@@ -150,14 +183,14 @@
     XCTAssertGreaterThan(originalHeight, 0);
     XCTAssertEqualWithAccuracy(originalHeight, self.header.fittingSize.height, 0.5);
 
-    NSFont * const originalFont = self.header.titleField.font;
-    self.header.titleField.font = [NSFont boldSystemFontOfSize:originalFont.pointSize + 12];
+    NSFont * const originalFont = self.header.libraryButton.font;
+    self.header.libraryButton.font = [NSFont boldSystemFontOfSize:originalFont.pointSize + 12];
     [self.window.contentView layoutSubtreeIfNeeded];
     XCTAssertGreaterThan(self.header.frame.size.height, originalHeight);
     XCTAssertEqualWithAccuracy(self.header.frame.size.height, self.header.fittingSize.height, 0.5);
     [self assertContentFitsHeader];
 
-    self.header.titleField.font = originalFont;
+    self.header.libraryButton.font = originalFont;
     [self.window.contentView layoutSubtreeIfNeeded];
     XCTAssertEqualWithAccuracy(self.header.frame.size.height, originalHeight, 0.5);
 }

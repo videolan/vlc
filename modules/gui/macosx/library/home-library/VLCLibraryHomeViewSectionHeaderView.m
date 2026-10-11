@@ -24,14 +24,24 @@
 
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
-#import "extensions/NSView+VLCAdditions.h"
 
 #import "views/VLCUIUnits.h"
-#import "views/VLCVisualEffectView.h"
+
+@interface VLCLibraryHomeViewSectionHeaderButtonCell : NSButtonCell
+@end
+
+@implementation VLCLibraryHomeViewSectionHeaderButtonCell
+
+- (void)setHighlighted:(BOOL)highlighted
+{
+    [super setHighlighted:highlighted];
+    self.controlView.alphaValue = highlighted ? 0.5 : 1.0;
+}
+
+@end
 
 @interface VLCLibraryHomeViewSectionHeaderView ()
 
-@property (readonly) NSTextField *titleField;
 @property (readonly) NSTextField *countField;
 
 @end
@@ -58,46 +68,44 @@
 
 - (void)setupView
 {
-    VLCVisualEffectView * const backgroundView = [[VLCVisualEffectView alloc] initWithFrame:self.bounds];
-    if (!backgroundView.usesGlassEffect) {
-        backgroundView.cornerRadius = VLCUIUnits.cornerRadius;
-    }
-    backgroundView.translatesAutoresizingMaskIntoConstraints = NO;
-    [self addSubview:backgroundView];
-    [backgroundView applyConstraintsToFillSuperview];
-    NSView * const contentView = backgroundView.contentView;
-
-    _titleField = [self labelWithFont:NSFont.VLClibrarySectionHeaderFont textColor:NSColor.labelColor];
     _countField = [self labelWithFont:NSFont.VLCLibrarySubsectionSubheaderFont textColor:NSColor.secondaryLabelColor];
-    _libraryButton = [NSButton buttonWithTitle:_NS("Show all") target:nil action:nil];
+    _libraryButton = [NSButton buttonWithTitle:@"" target:nil action:nil];
+    self.libraryButton.cell = [[VLCLibraryHomeViewSectionHeaderButtonCell alloc] initTextCell:@""];
+    [self.libraryButton setButtonType:NSButtonTypeMomentaryPushIn];
     self.libraryButton.translatesAutoresizingMaskIntoConstraints = NO;
-    self.libraryButton.bezelStyle = NSBezelStyleRounded;
-    [self.libraryButton setContentHuggingPriority:NSLayoutPriorityRequired
+    self.libraryButton.bordered = NO;
+    if (@available(macOS 10.14, *)) {
+        self.libraryButton.contentTintColor = NSColor.labelColor;
+    }
+    self.libraryButton.font = NSFont.VLClibrarySectionHeaderFont;
+    self.libraryButton.alignment = NSTextAlignmentNatural;
+    self.libraryButton.lineBreakMode = NSLineBreakByTruncatingTail;
+    self.libraryButton.imagePosition = NSImageTrailing;
+    self.libraryButton.imageScaling = NSImageScaleProportionallyDown;
+    NSImage *chevron = nil;
+    if (@available(macOS 11.0, *)) {
+        chevron = [NSImage imageWithSystemSymbolName:@"chevron.forward" accessibilityDescription:nil];
+    }
+    if (chevron == nil) {
+        chevron = [NSImage imageNamed:self.userInterfaceLayoutDirection == NSUserInterfaceLayoutDirectionRightToLeft
+                    ? NSImageNameGoLeftTemplate : NSImageNameGoRightTemplate];
+    }
+    self.libraryButton.image = chevron;
+    [self.libraryButton setContentHuggingPriority:NSLayoutPriorityDefaultHigh
                                  forOrientation:NSLayoutConstraintOrientationHorizontal];
-    [self.libraryButton setContentCompressionResistancePriority:NSLayoutPriorityRequired
+    [self.libraryButton setContentCompressionResistancePriority:NSLayoutPriorityDefaultLow
                                                forOrientation:NSLayoutConstraintOrientationHorizontal];
-
-    NSStackView * const labelsView = [NSStackView stackViewWithViews:@[self.titleField, self.countField]];
-    labelsView.translatesAutoresizingMaskIntoConstraints = NO;
-    labelsView.orientation = NSUserInterfaceLayoutOrientationVertical;
-    labelsView.alignment = NSLayoutAttributeLeading;
-    labelsView.spacing = VLCUIUnits.smallSpacing;
-    [labelsView setContentHuggingPriority:NSLayoutPriorityDefaultLow
-                         forOrientation:NSLayoutConstraintOrientationHorizontal];
-    [labelsView setContentCompressionResistancePriority:NSLayoutPriorityDefaultLow
-                                       forOrientation:NSLayoutConstraintOrientationHorizontal];
-    [contentView addSubview:labelsView];
-    [contentView addSubview:self.libraryButton];
+    [self addSubview:self.libraryButton];
+    [self addSubview:self.countField];
 
     [NSLayoutConstraint activateConstraints:@[
-        [labelsView.leadingAnchor constraintEqualToAnchor:contentView.leadingAnchor constant:VLCUIUnits.mediumSpacing],
-        [labelsView.topAnchor constraintEqualToAnchor:contentView.topAnchor constant:VLCUIUnits.smallSpacing],
-        [labelsView.bottomAnchor constraintEqualToAnchor:contentView.bottomAnchor constant:-VLCUIUnits.smallSpacing],
-        [self.libraryButton.leadingAnchor constraintGreaterThanOrEqualToAnchor:labelsView.trailingAnchor constant:VLCUIUnits.largeSpacing],
-        [self.libraryButton.trailingAnchor constraintEqualToAnchor:contentView.trailingAnchor constant:-VLCUIUnits.mediumSpacing],
-        [self.libraryButton.centerYAnchor constraintEqualToAnchor:contentView.centerYAnchor],
-        [self.libraryButton.topAnchor constraintGreaterThanOrEqualToAnchor:contentView.topAnchor constant:VLCUIUnits.smallSpacing],
-        [self.libraryButton.bottomAnchor constraintLessThanOrEqualToAnchor:contentView.bottomAnchor constant:-VLCUIUnits.smallSpacing],
+        [self.libraryButton.leadingAnchor constraintEqualToAnchor:self.leadingAnchor],
+        [self.libraryButton.trailingAnchor constraintLessThanOrEqualToAnchor:self.trailingAnchor],
+        [self.libraryButton.topAnchor constraintEqualToAnchor:self.topAnchor],
+        [self.countField.leadingAnchor constraintEqualToAnchor:self.leadingAnchor],
+        [self.countField.trailingAnchor constraintLessThanOrEqualToAnchor:self.trailingAnchor],
+        [self.countField.topAnchor constraintEqualToAnchor:self.libraryButton.bottomAnchor constant:VLCUIUnits.smallSpacing],
+        [self.countField.bottomAnchor constraintEqualToAnchor:self.bottomAnchor],
     ]];
 }
 
@@ -117,8 +125,7 @@
 - (void)setTitle:(NSString *)title
 {
     _title = [title copy];
-    self.titleField.stringValue = title;
-    self.titleField.toolTip = title;
+    self.libraryButton.title = title;
     self.libraryButton.accessibilityLabel = [NSString stringWithFormat:_NS("Open %@ in the library"), title];
     self.libraryButton.toolTip = self.libraryButton.accessibilityLabel;
 }
