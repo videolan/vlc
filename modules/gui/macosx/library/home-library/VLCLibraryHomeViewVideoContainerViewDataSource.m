@@ -27,7 +27,6 @@
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
-#import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryImageCache.h"
@@ -267,10 +266,6 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
     [self.collectionView registerClass:VLCLibraryCollectionViewItem.class
                  forItemWithIdentifier:VLCLibraryCollectionViewItemIdentifier];
 
-    [self.collectionView registerClass:[VLCLibraryCollectionViewSupplementaryElementView class]
-        forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader
-                    withIdentifier:VLCLibrarySupplementaryElementViewIdentifier];
-
     NSNib * const mediaItemSupplementaryDetailView = [[NSNib alloc] initWithNibNamed:@"VLCLibraryCollectionViewMediaItemSupplementaryDetailView" bundle:nil];
     [self.collectionView registerNib:mediaItemSupplementaryDetailView
           forSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind
@@ -310,15 +305,7 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
 viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
                atIndexPath:(NSIndexPath *)indexPath
 {
-    if([kind isEqualToString:NSCollectionElementKindSectionHeader]) {
-        VLCLibraryCollectionViewSupplementaryElementView *sectionHeadingView = [collectionView makeSupplementaryViewOfKind:kind
-                                                                                                            withIdentifier:VLCLibrarySupplementaryElementViewIdentifier
-                                                                                                              forIndexPath:indexPath];
-
-        sectionHeadingView.stringValue = _groupDescriptor.name;
-        return sectionHeadingView;
-
-    } else if ([kind isEqualToString:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind]) {
+    if ([kind isEqualToString:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind]) {
         VLCLibraryCollectionViewMediaItemSupplementaryDetailView * const mediaItemSupplementaryDetailView = [collectionView makeSupplementaryViewOfKind:kind withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind forIndexPath:indexPath];
 
         const id<VLCMediaLibraryItemProtocol> item = self.collectionArray[indexPath.item];
