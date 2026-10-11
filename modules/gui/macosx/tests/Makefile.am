@@ -22,15 +22,22 @@ VLCMacOSXTests_SOURCES = \
 	gui/macosx/tests/VLCLogMessageTest.m \
 	gui/macosx/tests/VLCPositionFormatterTest.m \
 	gui/macosx/tests/VLCTimeFormatterTest.m \
+	gui/macosx/tests/VLCLibraryHomeViewSectionHeaderViewTest.m \
+	gui/macosx/tests/VLCVisualEffectViewTest.m \
 	gui/macosx/extensions/VLCHexNumberFormatter.m \
 	gui/macosx/extensions/VLCPositionFormatter.m \
 	gui/macosx/extensions/NSString+Helpers.m \
+	gui/macosx/extensions/NSAppearance+VLCAdditions.m \
+	gui/macosx/extensions/NSFont+VLCAdditions.m \
+	gui/macosx/extensions/NSView+VLCAdditions.m \
+	gui/macosx/library/home-library/VLCLibraryHomeViewSectionHeaderView.m \
 	gui/macosx/library/VLCLibraryDataTypes.m \
 	gui/macosx/library/VLCInputItem.m \
 	gui/macosx/library/VLCInputNode.m \
 	gui/macosx/library/media-source/VLCMediaSourceTableViewSorting.m \
 	gui/macosx/windows/logging/VLCLogMessage.m \
-	gui/macosx/views/VLCTimeFormatter.m
+	gui/macosx/views/VLCTimeFormatter.m \
+	gui/macosx/views/VLCUIUnits.m \
 
 noinst_HEADERS += \
 	gui/macosx/tests/VLCInputItemTestSupport.h \
