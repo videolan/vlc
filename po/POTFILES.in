@@ -474,6 +474,7 @@ modules/gui/macosx/library/audio-library/VLCLibraryAlbumTableCellView.h
 modules/gui/macosx/library/audio-library/VLCLibraryAlbumTableCellView.m
 modules/gui/macosx/library/audio-library/VLCLibraryAudioDataSource.h
 modules/gui/macosx/library/audio-library/VLCLibraryAudioDataSource.m
+modules/gui/macosx/library/home-library/VLCLibraryHomeViewSectionHeaderView.m
 modules/gui/macosx/library/media-source/VLCMediaSource.h
 modules/gui/macosx/library/media-source/VLCMediaSource.m
 modules/gui/macosx/library/media-source/VLCMediaSourceBaseDataSource.h
