@@ -10,6 +10,7 @@ TESTS += $(macosx_gui_xctest_bundles)
 
 VLCMacOSXTests_SOURCES = \
 	gui/macosx/tests/VLCAppKitMockingTestCase.m \
+	gui/macosx/tests/VLCCarouselViewTest.m \
 	gui/macosx/tests/VLCHexNumberFormatterTest.m \
 	gui/macosx/tests/NSStringHelpersTest.m \
 	gui/macosx/tests/VLCLibraryDataTypesTest.m \
