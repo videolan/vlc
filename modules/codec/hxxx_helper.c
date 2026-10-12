@@ -696,24 +696,24 @@ static block_t *
 h264_helper_get_avcc_config(const struct hxxx_helper *hh)
 {
     const struct hxxx_helper_nal *p_nal;
-    const uint8_t *pp_sps_bufs[hh->h264.i_sps_count];
-    size_t p_sps_sizes[hh->h264.i_sps_count];
+    const uint8_t *pp_sps_bufs[ARRAY_SIZE(hh->h264.sps_list)];
+    size_t p_sps_sizes[ARRAY_SIZE(hh->h264.sps_list)];
     HELPER_FOREACH_NAL_LIST(p_nal, hh->h264.sps_list, hh->h264.i_sps_count)
     {
         pp_sps_bufs[i_nal_found - 1] = p_nal->b->p_buffer;
         p_sps_sizes[i_nal_found - 1] = p_nal->b->i_buffer;
     }
 
-    const uint8_t *pp_pps_bufs[hh->h264.i_pps_count];
-    size_t p_pps_sizes[hh->h264.i_pps_count];
+    const uint8_t *pp_pps_bufs[ARRAY_SIZE(hh->h264.pps_list)];
+    size_t p_pps_sizes[ARRAY_SIZE(hh->h264.pps_list)];
     HELPER_FOREACH_NAL_LIST(p_nal, hh->h264.pps_list, hh->h264.i_pps_count)
     {
         pp_pps_bufs[i_nal_found - 1] = p_nal->b->p_buffer;
         p_pps_sizes[i_nal_found - 1] = p_nal->b->i_buffer;
     }
 
-    const uint8_t *pp_spsext_bufs[hh->h264.i_spsext_count];
-    size_t p_spsext_sizes[hh->h264.i_spsext_count];
+    const uint8_t *pp_spsext_bufs[ARRAY_SIZE(hh->h264.spsext_list)];
+    size_t p_spsext_sizes[ARRAY_SIZE(hh->h264.spsext_list)];
     HELPER_FOREACH_NAL_LIST(p_nal, hh->h264.spsext_list, hh->h264.i_spsext_count)
     {
         pp_spsext_bufs[i_nal_found - 1] = p_nal->b->p_buffer;
