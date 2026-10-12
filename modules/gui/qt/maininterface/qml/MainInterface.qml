@@ -23,6 +23,7 @@ import QtQml
 import QtQml.Models
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Controls.Basic
 import QtQuick.Templates
 import QtQuick.Window
 
