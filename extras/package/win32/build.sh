@@ -511,13 +511,13 @@ MCONFIGFLAGS="-Dlua=enabled -Dflac=enabled -Dtheoradec=enabled -Dtheoraenc=enabl
 MCONFIGFLAGS="$MCONFIGFLAGS --prefer-static"
 if [ "$RELEASE" != "yes" ]; then
      CONFIGFLAGS="$CONFIGFLAGS --enable-debug"
-     MCONFIGFLAGS="$MCONFIGFLAGS --buildtype debugoptimized"
+     MCONFIGFLAGS="$MCONFIGFLAGS --buildtype debugoptimized -Doptimization=g"
 else
     if [ -z "$WITH_LTO" ]; then
         info "Warning: Link Time Optimization not used in Release mode (missing --enable-lto)"
     fi
      CONFIGFLAGS="$CONFIGFLAGS --disable-debug"
-     MCONFIGFLAGS="$MCONFIGFLAGS --buildtype release"
+     MCONFIGFLAGS="$MCONFIGFLAGS --buildtype release -Doptimization=3"
 fi
 if [ "$I18N" != "yes" ]; then
      CONFIGFLAGS="$CONFIGFLAGS --disable-nls"
