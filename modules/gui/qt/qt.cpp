@@ -1445,6 +1445,7 @@ static void *Thread( void *obj )
 
     /* Last settings */
     app.setQuitOnLastWindowClosed( false );
+    app.setQuitLockEnabled( false );
 
     /* Loads and tries to apply the preferred QStyle */
 #define QTSTYLE_KEY "MainWindow/QtStyle"
