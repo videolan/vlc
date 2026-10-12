@@ -592,7 +592,7 @@ MESONFLAGS = $(BUILD_DIR) $< --default-library static --prefix "$(PREFIX)" \
 ifndef WITH_OPTIMIZATION
 MESONFLAGS += --buildtype debug
 else
-MESONFLAGS += --buildtype debugoptimized
+MESONFLAGS += --buildtype debugoptimized -Db_ndebug=true
 endif
 ifdef ENABLE_LTO
 MESONFLAGS += -Db_lto=true
