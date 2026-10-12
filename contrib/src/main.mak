@@ -508,7 +508,7 @@ MESONFLAGS = $</build $< --default-library static --prefix "$(PREFIX)" \
 ifndef WITH_OPTIMIZATION
 MESONFLAGS += --buildtype debug
 else
-MESONFLAGS += --buildtype debugoptimized
+MESONFLAGS += --buildtype debugoptimized -Db_ndebug=true
 endif
 ifdef HAVE_BITCODE_ENABLED
 MESONFLAGS += -Db_bitcode=true
