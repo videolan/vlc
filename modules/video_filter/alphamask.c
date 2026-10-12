@@ -147,6 +147,11 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     filter_sys_t *p_sys = p_filter->p_sys;
 
     vlc_mutex_lock( &p_sys->mask_lock );
+    if( p_sys->p_mask == NULL )
+    {
+        vlc_mutex_unlock( &p_sys->mask_lock );
+        return p_pic;
+    }
     plane_t *p_mask = p_sys->p_mask->p+A_PLANE;
     plane_t *p_apic = p_pic->p+A_PLANE;
     if(    p_mask->i_visible_pitch
