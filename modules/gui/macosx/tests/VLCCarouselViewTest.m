@@ -148,6 +148,8 @@
 {
     [self configureWithItemCount:10 leadingInset:200. trailingInset:0.];
     XCTAssertEqualWithAccuracy(NSMinX(self.scrollView.documentVisibleRect), -200., .01);
+    XCTAssertFalse(self.carouselView.canScrollBackward);
+    XCTAssertTrue(self.carouselView.canScrollForward);
 
     [self.carouselView scrollByOneItemForward:YES];
     const CGFloat offset = NSMinX(self.scrollView.documentVisibleRect);
@@ -156,9 +158,11 @@
     XCTAssertEqualWithAccuracy(offset, -12., .01);
     XCTAssertEqualWithAccuracy(NSMinX(secondFrame) - offset, 208., .01);
     XCTAssertEqualWithAccuracy(NSMinX(firstFrame) - offset, 20., .01);
+    XCTAssertTrue(self.carouselView.canScrollBackward);
 
     [self.carouselView scrollByOneItemForward:NO];
     XCTAssertEqualWithAccuracy(NSMinX(self.scrollView.documentVisibleRect), -200., .01);
+    XCTAssertFalse(self.carouselView.canScrollBackward);
 }
 
 - (void)testScrollingHonorsLeadingAndTrailingNativeBounds
@@ -169,9 +173,13 @@
     const NSRect lastFrame = [self.layout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:9 inSection:0]].frame;
     XCTAssertEqualWithAccuracy(offset, 1208., .01);
     XCTAssertEqualWithAccuracy(NSMaxX(lastFrame) - offset, 672., .01);
+    XCTAssertTrue(self.carouselView.canScrollBackward);
+    XCTAssertFalse(self.carouselView.canScrollForward);
 
     [self.carouselView scrollToHorizontalOffset:-100000. animated:NO duration:0.];
     XCTAssertEqualWithAccuracy(NSMinX(self.scrollView.documentVisibleRect), -200., .01);
+    XCTAssertFalse(self.carouselView.canScrollBackward);
+    XCTAssertTrue(self.carouselView.canScrollForward);
 }
 
 - (void)testArrowNavigationWithoutSidebarInsets
@@ -179,13 +187,17 @@
     [self configureWithItemCount:10 leadingInset:0. trailingInset:0.];
     [self.carouselView scrollByOneItemForward:YES];
     XCTAssertEqualWithAccuracy(NSMinX(self.scrollView.documentVisibleRect), 188., .01);
+    XCTAssertTrue(self.carouselView.canScrollBackward);
     [self.carouselView scrollByOneItemForward:NO];
     XCTAssertEqualWithAccuracy(NSMinX(self.scrollView.documentVisibleRect), 0., .01);
+    XCTAssertFalse(self.carouselView.canScrollBackward);
 }
 
 - (void)testShortDocumentCannotScroll
 {
     [self configureWithItemCount:1 leadingInset:200. trailingInset:120.];
+    XCTAssertFalse(self.carouselView.canScrollBackward);
+    XCTAssertFalse(self.carouselView.canScrollForward);
     [self.carouselView scrollByOneItemForward:YES];
     XCTAssertEqualWithAccuracy(NSMinX(self.scrollView.documentVisibleRect), -200., .01);
 }
@@ -194,9 +206,17 @@
 {
     [self configureWithItemCount:0 leadingInset:200. trailingInset:120.];
     self.carouselView.frame = NSMakeRect(0., 0., 1888., 180.);
+    XCTAssertFalse(self.carouselView.canScrollBackward);
+    XCTAssertFalse(self.carouselView.canScrollForward);
     [self.carouselView scrollByOneItemForward:YES];
     XCTAssertEqualWithAccuracy(NSMinX(self.scrollView.documentVisibleRect), -200., .01);
 }
 
+- (void)testDetachedCarouselCannotScroll
+{
+    VLCCarouselView * const carouselView = [[VLCCarouselView alloc] initWithFrame:NSZeroRect];
+    XCTAssertFalse(carouselView.canScrollBackward);
+    XCTAssertFalse(carouselView.canScrollForward);
+}
 
 @end
