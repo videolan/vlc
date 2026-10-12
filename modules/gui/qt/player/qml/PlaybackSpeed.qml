@@ -256,7 +256,7 @@ ColumnLayout {
         rowSpacing: VLCStyle.margin_small
         columnSpacing: VLCStyle.margin_small
 
-        ButtonGroup {
+        T.ButtonGroup {
             id: buttonGroup
 
             onClicked: function(button /* : AbstractButton */) {
@@ -281,7 +281,7 @@ ColumnLayout {
 
                 padding: 0 // we use spacing instead of paddings here
 
-                ButtonGroup.group: buttonGroup
+                T.ButtonGroup.group: buttonGroup
             }
         }
     }
