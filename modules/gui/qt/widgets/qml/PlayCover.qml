@@ -35,6 +35,8 @@ Item {
     //       Maybe we could crank this to 1.1.
     scale: (hoverHandler.hovered && !tapHandler.pressed) ? 1.05 : 1.0
 
+    property real _hoverProgress: hoverHandler.hovered ? 1.0 : 0.0
+
     activeFocusOnTab: false
 
     signal tapped(var point)
@@ -54,6 +56,14 @@ Item {
             duration: VLCStyle.duration_short
 
             easing.type: Easing.OutQuad
+        }
+    }
+
+    Behavior on _hoverProgress {
+        NumberAnimation {
+            duration: VLCStyle.duration_short
+
+            easing.type: Easing.InOutSine
         }
     }
 
@@ -92,7 +102,11 @@ Item {
 
         text: VLCIcons.play_filled
 
-        color: (root.hovered) ? theme.accent : "black"
+        color: {
+            const accent = theme.accent
+            const t = root._hoverProgress
+            return Qt.rgba(accent.r * t, accent.g * t, accent.b * t, 1)
+        }
 
         font.pixelSize: Math.round(parent.width / 2)
     }
