@@ -283,10 +283,8 @@
 
 - (void)updateCarouselButtonVisibility
 {
-    const NSRect visibleRect = self.scrollView.documentVisibleRect;
-    const NSRect documentRect = self.collectionView.frame;
-    self.leftButton.hidden = NSMinX(visibleRect) <= NSMinX(documentRect);
-    self.rightButton.hidden = NSMaxX(visibleRect) >= NSMaxX(documentRect);
+    self.leftButton.hidden = !self.collectionView.canScrollBackward;
+    self.rightButton.hidden = !self.collectionView.canScrollForward;
 }
 
 - (void)scrollViewBoundsChanged:(NSNotification *)notification

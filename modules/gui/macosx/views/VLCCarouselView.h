@@ -27,6 +27,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface VLCCarouselView : NSCollectionView
 
 @property (nonatomic) CGFloat leadingItemInset;
+@property (nonatomic, readonly) BOOL canScrollBackward;
+@property (nonatomic, readonly) BOOL canScrollForward;
 
 - (void)scrollByOneItemForward:(BOOL)forward;
 // Tracks carousel dragging and inertia, returning the release event only for a click.

@@ -45,10 +45,24 @@ static const CGFloat VLCCarouselDragVelocitySmoothingFactor = .75;
 static const CGFloat VLCCarouselMinimumScrollWheelDelta = .1;
 // Minimum vertical scroll delta forwarded to the enclosing scroll view.
 static const CGFloat VLCCarouselMinimumVerticalScrollDelta = .5;
-// Distance, in points, used when choosing the next item to navigate to.
-static const CGFloat VLCCarouselItemNavigationTolerance = 1.;
 // Minimum movement, in points, before deceleration stops at a content edge.
 static const CGFloat VLCCarouselDecelerationEdgeTolerance = .01;
+// Ignore sub-point differences when navigating or checking scrollability.
+static const CGFloat VLCCarouselScrollPositionTolerance = 1.;
+
+@interface VLCCarouselView ()
+
+- (void)scrollByHorizontalDelta:(CGFloat)delta;
+- (void)scrollToHorizontalOffset:(CGFloat)offset
+                        animated:(BOOL)animated
+                        duration:(NSTimeInterval)duration;
+- (void)startDeceleratingWithVelocity:(CGFloat)velocity;
+- (void)decelerate;
+- (void)stopDecelerating;
+- (BOOL)canScrollInDirection:(BOOL)forward;
+- (NSArray<NSCollectionViewLayoutAttributes *> *)itemLayoutAttributes;
+
+@end
 
 @implementation VLCCarouselView
 {
@@ -66,6 +80,16 @@ static const CGFloat VLCCarouselDecelerationEdgeTolerance = .01;
 
 #pragma mark - Public methods
 
+- (BOOL)canScrollBackward
+{
+    return [self canScrollInDirection:NO];
+}
+
+- (BOOL)canScrollForward
+{
+    return [self canScrollInDirection:YES];
+}
+
 - (void)scrollByOneItemForward:(BOOL)forward
 {
     [self stopDecelerating];
@@ -82,8 +106,7 @@ static const CGFloat VLCCarouselDecelerationEdgeTolerance = .01;
     NSEnumerator * const enumerator = forward ? attributes.objectEnumerator : attributes.reverseObjectEnumerator;
     for (NSCollectionViewLayoutAttributes * const attributes in enumerator) {
         const CGFloat itemOffset = NSMinX(attributes.frame) - leadingInset;
-        if ((forward && itemOffset > visibleOffset + VLCCarouselItemNavigationTolerance) ||
-            (!forward && itemOffset < visibleOffset - VLCCarouselItemNavigationTolerance)) {
+        if ((forward && itemOffset > visibleOffset + VLCCarouselScrollPositionTolerance) || (!forward && itemOffset < visibleOffset - VLCCarouselScrollPositionTolerance)) {
             targetAttributes = attributes;
             break;
         }
@@ -267,6 +290,38 @@ static const CGFloat VLCCarouselDecelerationEdgeTolerance = .01;
 }
 
 #pragma mark - Scrolling helpers
+
+- (BOOL)canScrollInDirection:(BOOL)forward
+{
+    NSScrollView * const scrollView = self.enclosingScrollView;
+    if (scrollView == nil || self.collectionViewLayout == nil) {
+        return NO;
+    }
+
+    BOOL hasItems = NO;
+    for (NSInteger section = 0; section < self.numberOfSections; ++section) {
+        if ([self numberOfItemsInSection:section] > 0) {
+            hasItems = YES;
+            break;
+        }
+    }
+    if (!hasItems) {
+        return NO;
+    }
+
+    NSClipView * const clipView = scrollView.contentView;
+    const NSRect bounds = clipView.bounds;
+    if (NSWidth(bounds) <= 0.) {
+        return NO;
+    }
+
+    NSRect proposedBounds = bounds;
+    proposedBounds.origin.x = forward ? NSMaxX(self.frame) + fabs(scrollView.contentInsets.right) :
+                                       NSMinX(self.frame) - NSWidth(bounds) - fabs(scrollView.contentInsets.left);
+    const CGFloat endpoint = NSMinX([clipView constrainBoundsRect:proposedBounds]);
+    const CGFloat distance = forward ? endpoint - NSMinX(bounds) : NSMinX(bounds) - endpoint;
+    return distance > VLCCarouselScrollPositionTolerance;
+}
 
 - (void)scrollByHorizontalDelta:(CGFloat)delta
 {
