@@ -177,8 +177,8 @@
     // This prevents situations where the mouseEntered/mouseExited is not called because the view
     // itself has moved but the cursor has not (e.g. when this view is inside a scrollview and the
     // user scrolls)
-    const NSPoint mouseLocation = [self convertPoint:self.window.mouseLocationOutsideOfEventStream fromView:self.window.contentView];
-    const BOOL mouseInsideView = [self mouse:mouseLocation inRect:self.frame];
+    const NSPoint mouseLocation = [self convertPoint:self.window.mouseLocationOutsideOfEventStream fromView:nil];
+    const BOOL mouseInsideView = [self mouse:mouseLocation inRect:self.bounds];
     if (mouseInsideView && !_mouseIn) {
         [self handleMouseEnter];
     } else if (!mouseInsideView && _mouseIn) {
