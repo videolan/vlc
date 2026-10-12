@@ -670,6 +670,7 @@ static void *ThreadPlatform( void *obj, char *platform_name )
 
     /* Last settings */
     app.setQuitOnLastWindowClosed( false );
+    app.setQuitLockEnabled( false );
 
     /* Retrieve last known path used in file browsing */
     const QUrl homeUrl = QUrl::fromLocalFile(QVLCUserDir( VLC_HOME_DIR ));
