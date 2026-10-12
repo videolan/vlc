@@ -1200,7 +1200,11 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
             mime = "video/mpeg2";
             break;
         case VLC_CODEC_WMV3: mime = "video/x-ms-wmv"; break;
-        case VLC_CODEC_VC1:  mime = "video/wvc1"; break;
+        case VLC_CODEC_VC1:
+            /* Android has no VC-1 profiles */
+            i_profile = -1;
+            mime = "video/wvc1";
+            break;
         case VLC_CODEC_VP8:
             if (es_format_HasVpxAlpha(p_dec->fmt_in)) // contains alpha extradata
                 return VLC_ENOTSUP;
