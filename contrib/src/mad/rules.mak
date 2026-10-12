@@ -1,6 +1,6 @@
 # mad
 
-MAD_VERSION := 0.16.4
+MAD_VERSION := 0.16.5
 MAD_URL := https://codeberg.org/tenacityteam/libmad/archive/$(MAD_VERSION).tar.gz
 
 ifdef GPL
@@ -10,7 +10,7 @@ ifeq ($(call need_pkg,"mad"),)
 PKGS_FOUND += mad
 endif
 
-MAD_CONF := -DEXAMPLE=OFF -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+MAD_CONF := -DEXAMPLE=OFF
 ifdef HAVE_WIN32
 ifeq ($(ARCH),arm)
 MAD_CONF += -DASO:BOOL=OFF
@@ -25,6 +25,7 @@ $(TARBALLS)/libmad-$(MAD_VERSION).tar.gz:
 libmad: UNPACK_DIR=libmad
 libmad: libmad-$(MAD_VERSION).tar.gz .sum-mad
 	$(UNPACK)
+	$(APPLY) $(SRC)/mad/0001-CMake-case-of-AND-test.patch
 ifdef HAVE_IOS
 	$(APPLY) $(SRC)/mad/mad-ios-asm.patch
 endif

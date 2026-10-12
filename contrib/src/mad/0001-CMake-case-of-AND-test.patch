@@ -1,0 +1,32 @@
+From 9dd96b40c5caf76fd1c6ef9dcc80ba330eb57a79 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Mon, 12 Oct 2026 12:50:15 +0200
+Subject: [PATCH] CMake: case of AND test
+
+Older cmake (3.17) reports an error:
+
+```
+CMake Error at CMakeLists.txt:86 (if):
+  if given arguments:
+    "ASO" "and" "FALSE"
+```
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 3c4bf9f..4655feb 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -83,7 +83,7 @@ elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "(x|i[3456])86")
+ elseif(CMAKE_SYSTEM_PROCESSOR MATCHES ".*(arm|ARM).*")
+   message(STATUS "Using ARM fixed point math")
+   option (FPM_ARM "ARM fixed point math" ON)
+-  if(ASO and FALSE)
++  if(ASO AND FALSE)
+     enable_language(ASM)
+     list(APPEND MAD_CONFIG_DEFS ASO_INTERLEAVE1 ASO_IMDCT)
+     if (BUILD_SHARED_LIBS)
+-- 
+2.52.0.windows.1
+
