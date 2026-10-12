@@ -290,11 +290,9 @@ static const CGFloat VLCCarouselDecelerationEdgeTolerance = .01;
     }
 
     NSClipView * const clipView = scrollView.contentView;
-    const NSRect visibleRect = scrollView.documentVisibleRect;
-    const CGFloat minimumOffset = NSMinX(self.frame);
-    const CGFloat maximumOffset = MAX(NSMaxX(self.frame) - NSWidth(visibleRect), minimumOffset);
-    offset = MIN(MAX(offset, minimumOffset), maximumOffset);
-    const NSPoint point = NSMakePoint(offset, NSMinY(visibleRect));
+    NSRect proposedBounds = clipView.bounds;
+    proposedBounds.origin.x = offset;
+    const NSPoint point = [clipView constrainBoundsRect:proposedBounds].origin;
 
     if (!animated) {
         [clipView scrollToPoint:point];
