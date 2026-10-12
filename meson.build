@@ -457,6 +457,15 @@ ucrt_version_test = '''
         # DEP, ASLR, NO SEH
         add_project_link_arguments('-Wl,--nxcompat', '-Wl,--no-seh', '-Wl,--dynamicbase',
             language: ['c', 'cpp'])
+
+        if host_machine.cpu_family() == 'x86_64' or host_machine.cpu_family() == 'aarch64' or host_machine.cpu() == 'arm64'
+            if cc.has_link_argument('-Wl,--high-entropy-va')
+                add_project_link_arguments('-Wl,--high-entropy-va', language: ['c', 'cpp'])
+            endif
+            if cc.has_link_argument('-Wl,--image-base,0x140000000')
+                add_project_link_arguments('-Wl,--image-base,0x140000000', language: ['c', 'cpp'])
+            endif
+        endif
     endif
 
     # Check if we are building for Windows Store
