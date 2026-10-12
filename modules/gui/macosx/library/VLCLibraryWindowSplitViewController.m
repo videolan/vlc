@@ -35,9 +35,61 @@
 
 #import "windows/video/VLCMainVideoViewController.h"
 
+@interface VLCLibraryPresentationView : NSView
+@property (nonatomic) BOOL underlapsNavigationSidebar;
+@property (readonly, strong) NSView *contentView;
+- (instancetype)initWithContentView:(NSView *)contentView;
+@end
+
+@implementation VLCLibraryPresentationView
+
+- (instancetype)initWithContentView:(NSView *)contentView
+{
+    self = [super initWithFrame:contentView.frame];
+    if (self) {
+        _contentView = contentView;
+        self.autoresizesSubviews = NO;
+        contentView.translatesAutoresizingMaskIntoConstraints = YES;
+        contentView.autoresizingMask = NSViewNotSizable;
+        contentView.clipsToBounds = YES;
+        [self addSubview:contentView];
+    }
+    return self;
+}
+
+- (void)setUnderlapsNavigationSidebar:(BOOL)underlaps
+{
+    if (_underlapsNavigationSidebar == underlaps) {
+        return;
+    }
+    _underlapsNavigationSidebar = underlaps;
+    self.needsLayout = YES;
+}
+
+- (void)layout
+{
+    [super layout];
+    NSRect frame = self.bounds;
+    if (@available(macOS 26.0, *)) {
+        if (!self.underlapsNavigationSidebar) {
+            const NSRect safeArea = self.safeAreaRect;
+            frame.origin.x = NSMinX(safeArea);
+            frame.size.width = NSWidth(safeArea);
+        }
+    }
+    // Keep legacy split and scroll view sizing independent of the window's
+    // constraint graph while switching between full-width and inset content.
+    if (!NSEqualRects(self.contentView.frame, frame)) {
+        self.contentView.frame = frame;
+    }
+}
+
+@end
+
 @interface VLCLibraryWindowSplitViewController ()
 
 @property (readwrite) BOOL priorNavSidebarCollapsedState;
+@property (strong) VLCLibraryPresentationView *libraryPresentationView;
 
 @end
 
@@ -62,9 +114,25 @@
         [[VLCLibraryWindowSidebarRootViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
 
     self.libraryTargetViewController.view = self.libraryWindow.libraryTargetView;
+    if (@available(macOS 26.0, *)) {
+        self.libraryPresentationView =
+            [[VLCLibraryPresentationView alloc] initWithContentView:self.libraryWindow.libraryTargetView];
+        self.libraryTargetViewController.view = self.libraryPresentationView;
+        [NSNotificationCenter.defaultCenter addObserver:self
+                                               selector:@selector(splitViewLayoutChanged:)
+                                                   name:NSSplitViewDidResizeSubviewsNotification
+                                                 object:self.splitView];
+    }
 
     _navSidebarItem = [NSSplitViewItem sidebarWithViewController:self.navSidebarViewController];
     _libraryTargetViewItem = [NSSplitViewItem splitViewItemWithViewController:self.libraryTargetViewController];
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
+    if (@available(macOS 26.0, *)) {
+        // AppKit retains the expanded frame after this flag is turned off.
+        // Configure it once and let the presentation view control underlap.
+        self.libraryTargetViewItem.automaticallyAdjustsSafeAreaInsets = YES;
+    }
+#endif
     [self updateLibraryContentUnderlap];
 
     _multifunctionSidebarItem = [NSSplitViewItem splitViewItemWithViewController:self.multifunctionSidebarViewController];
@@ -111,12 +179,13 @@
 
 - (void)updateLibraryContentUnderlap
 {
-#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
-    if (@available(macOS 26.0, *)) {
-        self.libraryTargetViewItem.automaticallyAdjustsSafeAreaInsets =
-            self.libraryContentUnderlapsNavigationSidebar;
-    }
-#endif
+    self.libraryPresentationView.underlapsNavigationSidebar =
+        self.libraryContentUnderlapsNavigationSidebar;
+}
+
+- (void)splitViewLayoutChanged:(NSNotification *)notification
+{
+    self.libraryPresentationView.needsLayout = YES;
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
