@@ -76,12 +76,12 @@ static const CGFloat VLCCarouselDecelerationEdgeTolerance = .01;
     }
 
     const CGFloat visibleOffset = NSMinX(scrollView.documentVisibleRect);
+    const CGFloat leadingInset = self.leadingItemInset + scrollView.contentInsets.left;
     NSArray<NSCollectionViewLayoutAttributes *> * const attributes = self.itemLayoutAttributes;
     NSCollectionViewLayoutAttributes *targetAttributes = nil;
     NSEnumerator * const enumerator = forward ? attributes.objectEnumerator : attributes.reverseObjectEnumerator;
     for (NSCollectionViewLayoutAttributes * const attributes in enumerator) {
-        const CGFloat itemOffset = MAX(NSMinX(attributes.frame) - self.leadingItemInset,
-                                       NSMinX(self.frame));
+        const CGFloat itemOffset = NSMinX(attributes.frame) - leadingInset;
         if ((forward && itemOffset > visibleOffset + VLCCarouselItemNavigationTolerance) ||
             (!forward && itemOffset < visibleOffset - VLCCarouselItemNavigationTolerance)) {
             targetAttributes = attributes;
@@ -90,8 +90,7 @@ static const CGFloat VLCCarouselDecelerationEdgeTolerance = .01;
     }
 
     if (targetAttributes != nil) {
-        const CGFloat targetOffset = MAX(NSMinX(targetAttributes.frame) - self.leadingItemInset,
-                                         NSMinX(self.frame));
+        const CGFloat targetOffset = NSMinX(targetAttributes.frame) - leadingInset;
         [self scrollToHorizontalOffset:targetOffset
                               animated:YES
                               duration:VLCCarouselItemScrollDuration];
