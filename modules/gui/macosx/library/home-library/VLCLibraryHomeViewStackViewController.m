@@ -242,6 +242,17 @@
 
     view.translatesAutoresizingMaskIntoConstraints = NO;
 
+    if (@available(macOS 26.0, *)) {
+        if (![view isKindOfClass:VLCLibraryHomeViewBaseCarouselContainerView.class]) {
+            NSArray<NSLayoutConstraint *> * const constraints = @[
+                [view.leadingAnchor constraintEqualToAnchor:stackView.safeAreaLayoutGuide.leadingAnchor],
+                [view.trailingAnchor constraintEqualToAnchor:stackView.safeAreaLayoutGuide.trailingAnchor],
+            ];
+            [NSLayoutConstraint activateConstraints:constraints];
+            return constraints;
+        }
+    }
+
     NSArray<NSLayoutConstraint*> * const constraintsWithSuperview = @[
         [NSLayoutConstraint constraintWithItem:view
                                      attribute:NSLayoutAttributeLeft

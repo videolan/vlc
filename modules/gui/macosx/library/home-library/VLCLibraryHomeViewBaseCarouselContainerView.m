@@ -120,15 +120,27 @@
     _headerView = [[VLCLibraryHomeViewSectionHeaderView alloc] initWithFrame:NSZeroRect];
     self.headerView.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:self.headerView];
+    NSLayoutXAxisAnchor *leadingAnchor = self.leadingAnchor;
+    NSLayoutXAxisAnchor *trailingAnchor = self.trailingAnchor;
+    if (@available(macOS 26.0, *)) {
+        leadingAnchor = self.safeAreaLayoutGuide.leadingAnchor;
+        trailingAnchor = self.safeAreaLayoutGuide.trailingAnchor;
+    }
     [NSLayoutConstraint activateConstraints:@[
-        [self.headerView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor],
-        [self.headerView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor],
+        [self.headerView.leadingAnchor constraintEqualToAnchor:leadingAnchor],
+        [self.headerView.trailingAnchor constraintEqualToAnchor:trailingAnchor],
         [self.headerView.topAnchor constraintEqualToAnchor:self.topAnchor],
     ]];
 
     _collectionViewLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
     _collectionViewLayout.scrollDirection = NSCollectionViewScrollDirectionHorizontal;
-    _collectionViewLayout.sectionInset = NSEdgeInsetsMake(0., VLCUIUnits.mediumSpacing, 0., VLCUIUnits.mediumSpacing);
+    CGFloat itemInset = VLCUIUnits.mediumSpacing;
+    if (@available(macOS 26.0, *)) {
+        // The viewport extends beyond the row by mediumSpacing. Match the grid's
+        // item inset inside the row while leaving that viewport beneath the sidebar.
+        itemInset += VLCUIUnits.collectionViewSectionInsets.left;
+    }
+    _collectionViewLayout.sectionInset = NSEdgeInsetsMake(0., itemInset, 0., itemInset);
     _collectionViewLayout.minimumLineSpacing = VLCUIUnits.mediumSpacing;
     _collectionViewLayout.minimumInteritemSpacing = VLCUIUnits.mediumSpacing;
 
@@ -148,6 +160,9 @@
     _scrollView.scrollParentY = YES;
     _scrollView.forceHideVerticalScroller = YES;
     _scrollView.forceHideHorizontalScroller = YES;
+    // Keep the viewport beneath the sidebar; automatic content insets position
+    // the resting items within the unobscured area.
+    _scrollView.automaticallyAdjustsContentInsets = YES;
     _scrollView.drawsBackground = NO;
     _scrollView.translatesAutoresizingMaskIntoConstraints = NO;
     _scrollView.documentView = _collectionView;
@@ -168,8 +183,14 @@
     self.leftButton.target = self;
     self.leftButton.action = @selector(scrollLeft:);
     [self addSubview:self.leftButton];
+    NSLayoutXAxisAnchor *leftButtonAnchor = self.scrollView.leadingAnchor;
+    NSLayoutXAxisAnchor *rightButtonAnchor = self.scrollView.trailingAnchor;
+    if (@available(macOS 26.0, *)) {
+        leftButtonAnchor = leadingAnchor;
+        rightButtonAnchor = trailingAnchor;
+    }
     [NSLayoutConstraint activateConstraints:@[
-        [self.leftButton.leadingAnchor constraintEqualToAnchor:self.scrollView.leadingAnchor],
+        [self.leftButton.leadingAnchor constraintEqualToAnchor:leftButtonAnchor],
         [self.leftButton.centerYAnchor constraintEqualToAnchor:self.scrollView.centerYAnchor],
         [self.leftButton.widthAnchor constraintEqualToConstant:buttonSize],
         [self.leftButton.heightAnchor constraintEqualToConstant:buttonSize],
@@ -183,7 +204,7 @@
     self.rightButton.action = @selector(scrollRight:);
     [self addSubview:self.rightButton];
     [NSLayoutConstraint activateConstraints:@[
-        [self.rightButton.trailingAnchor constraintEqualToAnchor:self.scrollView.trailingAnchor],
+        [self.rightButton.trailingAnchor constraintEqualToAnchor:rightButtonAnchor],
         [self.rightButton.centerYAnchor constraintEqualToAnchor:self.scrollView.centerYAnchor],
         [self.rightButton.widthAnchor constraintEqualToConstant:buttonSize],
         [self.rightButton.heightAnchor constraintEqualToConstant:buttonSize],

@@ -65,6 +65,7 @@
 
     _navSidebarItem = [NSSplitViewItem sidebarWithViewController:self.navSidebarViewController];
     _libraryTargetViewItem = [NSSplitViewItem splitViewItemWithViewController:self.libraryTargetViewController];
+    [self updateLibraryContentUnderlap];
 
     _multifunctionSidebarItem = [NSSplitViewItem splitViewItemWithViewController:self.multifunctionSidebarViewController];
 
@@ -88,12 +89,34 @@
     VLCMainWindowControlsBar * const controlsBar = libraryWindow.controlsBar;
     VLCBottomBarView * const bottomBarView = controlsBar.bottomBarView;
     bottomBarView.translatesAutoresizingMaskIntoConstraints = NO;
+    NSLayoutXAxisAnchor *leadingAnchor = self.libraryTargetViewController.view.leadingAnchor;
+    NSLayoutXAxisAnchor *trailingAnchor = self.libraryTargetViewController.view.trailingAnchor;
+    if (@available(macOS 26.0, *)) {
+        leadingAnchor = self.libraryTargetViewController.view.safeAreaLayoutGuide.leadingAnchor;
+        trailingAnchor = self.libraryTargetViewController.view.safeAreaLayoutGuide.trailingAnchor;
+    }
     [NSLayoutConstraint activateConstraints:@[
-        [bottomBarView.leadingAnchor constraintEqualToAnchor:self.libraryTargetViewController.view.leadingAnchor
+        [bottomBarView.leadingAnchor constraintEqualToAnchor:leadingAnchor
                                                     constant:VLCUIUnits.largeSpacing * 2],
-        [bottomBarView.trailingAnchor constraintEqualToAnchor:self.libraryTargetViewController.view.trailingAnchor
+        [bottomBarView.trailingAnchor constraintEqualToAnchor:trailingAnchor
                                                      constant:-(VLCUIUnits.largeSpacing * 2)],
     ]];
+}
+
+- (void)setLibraryContentUnderlapsNavigationSidebar:(BOOL)underlaps
+{
+    _libraryContentUnderlapsNavigationSidebar = underlaps;
+    [self updateLibraryContentUnderlap];
+}
+
+- (void)updateLibraryContentUnderlap
+{
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
+    if (@available(macOS 26.0, *)) {
+        self.libraryTargetViewItem.automaticallyAdjustsSafeAreaInsets =
+            self.libraryContentUnderlapsNavigationSidebar;
+    }
+#endif
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath

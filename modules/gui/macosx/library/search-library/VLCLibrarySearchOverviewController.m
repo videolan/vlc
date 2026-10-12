@@ -26,6 +26,7 @@
 
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
+#import "library/VLCLibraryWindowSplitViewController.h"
 
 @implementation VLCLibrarySearchOverviewController
 {
@@ -74,6 +75,7 @@
         if (_searchViewController == nil) {
             _searchViewController = [self newSearchViewController];
         }
+        self.libraryWindow.splitViewController.libraryContentUnderlapsNavigationSidebar = NO;
         [_searchViewController presentInContainer:self.libraryTargetView];
         _isShowingSearchOverlay = YES;
         [_searchViewController searchForString:query];

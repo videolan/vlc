@@ -61,8 +61,12 @@
     self.indicator.indeterminate = YES;
     self.indicator.style = NSProgressIndicatorStyleSpinning;
     [self addSubview:self.indicator];
+    NSLayoutXAxisAnchor *centerXAnchor = self.centerXAnchor;
+    if (@available(macOS 26.0, *)) {
+        centerXAnchor = self.safeAreaLayoutGuide.centerXAnchor;
+    }
     [self addConstraints:@[
-        [self.indicator.centerXAnchor constraintEqualToAnchor:self.centerXAnchor],
+        [self.indicator.centerXAnchor constraintEqualToAnchor:centerXAnchor],
         [self.indicator.centerYAnchor constraintEqualToAnchor:self.centerYAnchor],
     ]];
 }

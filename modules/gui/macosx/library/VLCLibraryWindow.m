@@ -339,6 +339,7 @@ static int ShowController(vlc_object_t * __unused p_this,
 
 - (void)displayLibraryView:(NSView *)view
 {
+    self.splitViewController.libraryContentUnderlapsNavigationSidebar = view == self.homeLibraryView;
     view.translatesAutoresizingMaskIntoConstraints = NO;
     if ([self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
         self.libraryTargetView.subviews = @[view, self.loadingOverlayView];
@@ -383,6 +384,7 @@ static int ShowController(vlc_object_t * __unused p_this,
 
 - (void)displayNoResultsMessage
 {
+    self.splitViewController.libraryContentUnderlapsNavigationSidebar = NO;
     if (self.noResultsLabel == nil) {
         _noResultsLabel = [[VLCNoResultsLabel alloc] init];
         _noResultsLabel.translatesAutoresizingMaskIntoConstraints = NO;
@@ -630,6 +632,7 @@ static int ShowController(vlc_object_t * __unused p_this,
 
 - (void)presentVideoView
 {
+    self.splitViewController.libraryContentUnderlapsNavigationSidebar = NO;
     for (NSView *subview in _libraryTargetView.subviews) {
         [subview removeFromSuperview];
     }

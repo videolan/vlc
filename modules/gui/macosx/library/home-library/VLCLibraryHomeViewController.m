@@ -148,6 +148,11 @@
     const NSEdgeInsets defaultInsets = VLCUIUnits.libraryViewScrollViewContentInsets;
     const NSEdgeInsets scrollerInsets = VLCUIUnits.libraryViewScrollViewScrollerInsets;
 
+    if (@available(macOS 26.0, *)) {
+        // Preserve the Home gutters when the safe area starts at the sidebar edge.
+        self.homeLibraryView.additionalSafeAreaInsets = NSEdgeInsetsMake(0., defaultInsets.left, 0., defaultInsets.right);
+    }
+
     self.homeLibraryStackViewScrollView.automaticallyAdjustsContentInsets = NO;
     self.homeLibraryStackViewScrollView.contentInsets = defaultInsets;
     self.homeLibraryStackViewScrollView.scrollerInsets = scrollerInsets;
