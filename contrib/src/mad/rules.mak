@@ -28,8 +28,6 @@ libmad: libmad-$(MAD_VERSION).tar.gz .sum-mad
 ifdef HAVE_IOS
 	$(APPLY) $(SRC)/mad/mad-ios-asm.patch
 endif
-	# old patch seem to solve buffer overflow a different way
-	# $(APPLY) $(SRC)/mad/check-bitstream-length.patch
 	# get a tarball with a folder name $(MOVE)
 	touch $@
 
