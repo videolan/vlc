@@ -164,7 +164,8 @@ int ListCache<T>::updateItem(ItemType&& newItem)
 
     int pos = std::distance(m_cachedData->list.begin(), it);
     *it = std::move(newItem);
-    emit localDataChanged(pos, pos);
+    if (static_cast<size_t>(pos) < m_cachedData->queryCount)
+        emit localDataChanged(pos, pos);
     return pos;
 }
 
@@ -708,7 +709,9 @@ void ListCache<T>::asyncFetchMore()
                 int updatedOffset = m_cachedData->loadedCount;
                 std::move(list.begin(), list.end(), std::back_inserter(m_cachedData->list));
                 m_cachedData->loadedCount += updatedCount;
-                emit localDataChanged(updatedOffset, updatedOffset + updatedCount - 1);
+                const int visibleEnd = static_cast<int>(std::min(m_cachedData->loadedCount, m_cachedData->queryCount));
+                if (updatedOffset < visibleEnd)
+                    emit localDataChanged(updatedOffset, visibleEnd - 1);
             }
 
             m_appendTask = 0;
