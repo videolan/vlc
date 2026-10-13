@@ -27,136 +27,158 @@
 
 #import "views/VLCUIUnits.h"
 
-@interface VLCLibraryHomeViewActionButtonCell ()
-
-@property NSImage *cachedImage;
-@property BOOL prevIsHighlighted;
-@property NSRect prevFrame;
-
-@property (readonly) NSDictionary<NSAttributedStringKey, id> *cachedTitleAttributes;
-@property (readonly) CGFloat cachedTitleHeight;
-
-@end
-
 @implementation VLCLibraryHomeViewActionButtonCell
 
-- (NSRect)titleRectForBounds:(NSRect)bounds
+- (CGFloat)contentPaddingForBounds:(NSRect)bounds
 {
-    return bounds;
+    return NSWidth(bounds) < VLCUIUnits.actionButtonNarrowWidthThreshold
+        ? VLCUIUnits.mediumSpacing
+        : VLCUIUnits.mediumSpacing + VLCUIUnits.smallSpacing;
 }
 
 - (NSRect)imageRectForBounds:(NSRect)bounds
 {
-    return bounds;
+    return [self imageRectForBounds:bounds flipped:self.controlView.isFlipped];
 }
 
-- (NSDictionary<NSAttributedStringKey, id> *)titleAttributes
+- (NSRect)imageRectForBounds:(NSRect)bounds flipped:(BOOL)flipped
 {
-    if (_cachedTitleAttributes) {
-        return _cachedTitleAttributes;
+    if (NSWidth(bounds) < VLCUIUnits.actionButtonCompactWidthThreshold) {
+        const CGFloat side = MIN(VLCUIUnits.smallIconSize,
+                                 MAX(0., NSHeight(bounds) - VLCUIUnits.mediumSpacing));
+        const CGFloat originY = flipped
+            ? NSMinY(bounds) + VLCUIUnits.smallSpacing
+            : NSMaxY(bounds) - VLCUIUnits.smallSpacing - side;
+        return NSMakeRect(NSMidX(bounds) - side / 2., originY, side, side);
     }
-    NSMutableParagraphStyle * const titleParagraphStyle = [[NSMutableParagraphStyle alloc] init];
-    titleParagraphStyle.alignment = NSTextAlignmentCenter;
-    _cachedTitleAttributes = @{
-        NSForegroundColorAttributeName: NSColor.controlTextColor,
-        NSFontAttributeName: NSFont.VLCLibrarySubsectionSubheaderFont,
-        NSParagraphStyleAttributeName: titleParagraphStyle
-    };
-    return _cachedTitleAttributes;
+
+    const CGFloat padding = [self contentPaddingForBounds:bounds];
+    const CGFloat preferredSide = NSWidth(bounds) < VLCUIUnits.actionButtonNarrowWidthThreshold
+        ? VLCUIUnits.mediumIconSize
+        : VLCUIUnits.largeIconSize;
+    const CGFloat side = MIN(preferredSide, MAX(0., NSHeight(bounds) - 2. * padding));
+    const BOOL rightToLeft = self.userInterfaceLayoutDirection == NSUserInterfaceLayoutDirectionRightToLeft;
+    const CGFloat originX = rightToLeft ? NSMaxX(bounds) - padding - side : NSMinX(bounds) + padding;
+    return NSMakeRect(originX, NSMidY(bounds) - side / 2., side, side);
 }
 
-- (CGFloat)titleHeightWithAttributes:(NSDictionary<NSAttributedStringKey, id> *)attributes
+- (NSRect)titleRectForBounds:(NSRect)bounds
 {
-    if (_cachedTitleHeight) {
-        return _cachedTitleHeight;
+    return [self titleRectForBounds:bounds flipped:self.controlView.isFlipped];
+}
+
+- (NSRect)titleRectForBounds:(NSRect)bounds flipped:(BOOL)flipped
+{
+    if (NSWidth(bounds) < VLCUIUnits.actionButtonCompactWidthThreshold) {
+        const NSRect imageRect = [self imageRectForBounds:bounds flipped:flipped];
+        const CGFloat originY = flipped
+            ? NSMaxY(imageRect) + VLCUIUnits.smallSpacing / 2.
+            : NSMinY(bounds) + VLCUIUnits.smallSpacing;
+        return NSMakeRect(NSMinX(bounds) + VLCUIUnits.compactControlPadding, originY,
+                          MAX(0., NSWidth(bounds) - VLCUIUnits.compactControlPadding * 2.),
+                          MAX(0., NSHeight(bounds) - NSHeight(imageRect) - 2. * VLCUIUnits.smallSpacing - VLCUIUnits.smallSpacing / 2.));
     }
-    const NSSize titleSize = [self.title sizeWithAttributes:attributes];
-    _cachedTitleHeight = titleSize.height + VLCUIUnits.smallSpacing;
-    return _cachedTitleHeight;
+
+    const CGFloat padding = [self contentPaddingForBounds:bounds];
+    const CGFloat gap = VLCUIUnits.mediumSpacing;
+    const NSRect imageRect = [self imageRectForBounds:bounds flipped:flipped];
+    const BOOL rightToLeft = self.userInterfaceLayoutDirection == NSUserInterfaceLayoutDirectionRightToLeft;
+    const CGFloat originX = rightToLeft ? NSMinX(bounds) + padding : NSMaxX(imageRect) + gap;
+    const CGFloat width = MAX(0., NSWidth(bounds) - 2. * padding - NSWidth(imageRect) - gap);
+    return NSMakeRect(originX, NSMinY(bounds) + VLCUIUnits.mediumSpacing,
+                      width, MAX(0., NSHeight(bounds) - 2. * VLCUIUnits.mediumSpacing));
 }
 
 - (void)drawImage:(NSImage *)image withFrame:(NSRect)frame inView:(NSView *)controlView
 {
-    const CGSize cellSize = frame.size;
-    const CGFloat cellWidth = cellSize.width;
-    const CGFloat cellHeight = cellSize.height;
-    const CGFloat titleHeight = [self titleHeightWithAttributes:[self titleAttributes]];
-
-    const CGSize imageSize = self.image.size;
-
-    if (self.cachedImage != self.image ||
-        self.prevIsHighlighted != self.isHighlighted ||
-        !NSEqualRects(self.prevFrame, frame)) {
-
-        self.cachedImage = [NSImage imageWithSize:imageSize
-                                          flipped:NO
-                                   drawingHandler:^BOOL(NSRect __unused dstRect) {
-            if (self.isHighlighted) {
-                [NSColor.VLCSubtleBorderColor set];
-            } else {
-                [NSColor.VLCSubtlerAccentColor set];
-            }
-            const NSRect imageRect = {NSZeroPoint, imageSize};
-            [self.image drawInRect:imageRect];
-            NSRectFillUsingOperation(imageRect, NSCompositingOperationSourceIn);
-            return YES;
-        }];
-
-        self.prevIsHighlighted = self.isHighlighted;
-        self.prevFrame = frame;
-    } 
-
-    const CGFloat originalImageAspectRatio = imageSize.width / imageSize.height;
-    const CGFloat imageAvailableVerticalSpace =
-        cellHeight - titleHeight - VLCUIUnits.largeSpacing * 2;
-    CGFloat imageWidth, imageHeight;
-
-    // Try to scale focusing on width first, if this yields a height that is too large, switch
-    if (cellWidth / originalImageAspectRatio > imageAvailableVerticalSpace) {
-        imageHeight = imageAvailableVerticalSpace;
-        imageWidth = imageHeight * originalImageAspectRatio;
-    } else {
-        imageWidth = cellWidth;
-        imageHeight = imageWidth / originalImageAspectRatio;
+    if (image.size.width <= 0. || image.size.height <= 0. || NSIsEmptyRect(frame)) {
+        return;
     }
 
-    const CGPoint cellOrigin = frame.origin;
-    const NSRect imageRect = NSMakeRect(cellOrigin.x + (cellWidth - imageWidth) / 2,
-                                        cellOrigin.y + (cellHeight - imageHeight) / 2,
-                                        imageWidth,
-                                        imageHeight);
-    [self.cachedImage drawInRect:imageRect];
+    NSColor * const tint = self.isEnabled ? NSColor.VLCSubtlerAccentColor : NSColor.disabledControlTextColor;
+    NSImage * const tintedImage = [NSImage imageWithSize:image.size
+                                                 flipped:NO
+                                          drawingHandler:^BOOL(NSRect destinationRect) {
+        [image drawInRect:destinationRect];
+        [tint setFill];
+        NSRectFillUsingOperation(destinationRect, NSCompositingOperationSourceIn);
+        return YES;
+    }];
+
+    const CGFloat scale = MIN(NSWidth(frame) / image.size.width, NSHeight(frame) / image.size.height);
+    const NSSize scaledSize = NSMakeSize(image.size.width * scale, image.size.height * scale);
+    const NSRect imageRect = NSMakeRect(NSMidX(frame) - scaledSize.width / 2.,
+                                        NSMidY(frame) - scaledSize.height / 2.,
+                                        scaledSize.width,
+                                        scaledSize.height);
+    [tintedImage drawInRect:imageRect
+                   fromRect:NSZeroRect
+                  operation:NSCompositingOperationSourceOver
+                   fraction:1.
+             respectFlipped:YES
+                      hints:nil];
 }
 
-- (NSRect)drawTitle:(NSAttributedString *)title withFrame:(NSRect)cellFrame inView:(NSView *)controlView
+- (void)drawInteriorWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
 {
-    const CGFloat cellMinX = NSMinX(cellFrame);
-    const CGFloat cellMaxY = NSMaxY(cellFrame);
-    const CGSize cellSize = cellFrame.size;
-    const CGFloat cellWidth = cellSize.width;
+    [self drawImage:self.image
+          withFrame:[self imageRectForBounds:cellFrame flipped:controlView.isFlipped]
+             inView:controlView];
 
-    NSDictionary<NSAttributedStringKey, id> * const titleAttributes = [self titleAttributes];
-    const CGFloat titleHeight = [self titleHeightWithAttributes:titleAttributes];
-    const NSRect titleRect = CGRectMake(cellMinX + VLCUIUnits.smallSpacing,
-                                      cellMaxY - titleHeight,
-                                      cellWidth - VLCUIUnits.smallSpacing * 2,
-                                      titleHeight);
-    [self.title drawInRect:titleRect withAttributes:titleAttributes];
-    return titleRect;
+    const NSRect textRect = [self titleRectForBounds:cellFrame flipped:controlView.isFlipped];
+    if (NSIsEmptyRect(textRect)) {
+        return;
+    }
+
+    const BOOL compact = NSWidth(cellFrame) < VLCUIUnits.actionButtonCompactWidthThreshold;
+    const BOOL rightToLeft = self.userInterfaceLayoutDirection == NSUserInterfaceLayoutDirectionRightToLeft;
+    NSMutableParagraphStyle * const paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+    paragraphStyle.alignment = compact ? NSTextAlignmentCenter : rightToLeft ? NSTextAlignmentRight : NSTextAlignmentLeft;
+    paragraphStyle.baseWritingDirection = rightToLeft ? NSWritingDirectionRightToLeft : NSWritingDirectionLeftToRight;
+    paragraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
+    NSFont * const titleFont = NSWidth(cellFrame) < VLCUIUnits.actionButtonNarrowWidthThreshold
+        ? (compact ? NSFont.VLCLibrarySmallSubsectionSubheaderFont
+                   : NSFont.VLCLibraryCompactSubsectionSubheaderFont)
+        : NSFont.VLCLibrarySubsectionSubheaderFont;
+    NSColor * const titleColor = self.isEnabled ? NSColor.controlTextColor : NSColor.disabledControlTextColor;
+    NSDictionary<NSAttributedStringKey, id> * const titleAttributes = @{
+        NSFontAttributeName: titleFont,
+        NSForegroundColorAttributeName: titleColor,
+        NSParagraphStyleAttributeName: paragraphStyle
+    };
+
+    const NSStringDrawingOptions options = NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingTruncatesLastVisibleLine;
+    const NSSize measurementSize = NSMakeSize(CGFLOAT_MAX, CGFLOAT_MAX);
+    const CGFloat titleLineHeight = ceil(NSHeight([@" " boundingRectWithSize:measurementSize
+                                                                     options:NSStringDrawingUsesLineFragmentOrigin
+                                                                  attributes:titleAttributes]));
+    const CGFloat maximumTitleHeight = MIN(titleLineHeight * VLCUIUnits.actionButtonMaximumTitleLines, NSHeight(textRect));
+    const NSRect measuredTitleRect = [self.title boundingRectWithSize:NSMakeSize(NSWidth(textRect), maximumTitleHeight)
+                                                              options:options
+                                                           attributes:titleAttributes];
+    const CGFloat titleHeight = MIN(ceil(NSHeight(measuredTitleRect)), maximumTitleHeight);
+    const CGFloat titleMinY = NSMidY(textRect) - titleHeight / 2.;
+    const NSRect titleRect = NSMakeRect(NSMinX(textRect), titleMinY, NSWidth(textRect), titleHeight);
+    [self.title drawWithRect:titleRect options:options attributes:titleAttributes];
 }
 
 - (void)drawBezelWithFrame:(NSRect)frame inView:(NSView *)controlView
 {
-    [NSColor.VLCSubtleBorderColor setStroke];
-    [NSColor.windowBackgroundColor setFill];
-
-    NSBezierPath * const separatorPath =
-        [NSBezierPath bezierPathWithRoundedRect:frame
-                                        xRadius:VLCUIUnits.cornerRadius
-                                        yRadius:VLCUIUnits.cornerRadius];
-    separatorPath.lineWidth = VLCUIUnits.borderThickness;
-    [separatorPath stroke];
-    [separatorPath fill];
+    const BOOL pressed = self.isEnabled && self.isHighlighted;
+    const CGFloat halfBorder = VLCUIUnits.borderThickness / 2.;
+    NSBezierPath * const bezelPath =
+        [NSBezierPath bezierPathWithRoundedRect:NSInsetRect(frame, halfBorder, halfBorder)
+                                        xRadius:VLCUIUnits.mediumSpacing
+                                        yRadius:VLCUIUnits.mediumSpacing];
+    bezelPath.lineWidth = VLCUIUnits.borderThickness;
+    [NSColor.controlBackgroundColor setFill];
+    [bezelPath fill];
+    [(pressed ? NSColor.VLCActionButtonPressedBackgroundColor
+              : NSColor.VLCActionButtonBackgroundColor) setFill];
+    [bezelPath fill];
+    [(pressed ? NSColor.VLCActionButtonPressedBorderColor
+              : NSColor.VLCSubtleBorderColor) setStroke];
+    [bezelPath stroke];
 }
 
 @end

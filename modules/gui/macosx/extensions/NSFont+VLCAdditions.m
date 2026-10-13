@@ -47,4 +47,14 @@
     return [NSFont systemFontOfSize:10 weight:NSFontWeightRegular];
 }
 
++ (NSFont *)VLCLibraryCompactSubsectionSubheaderFont
+{
+    return [NSFont systemFontOfSize:NSFont.systemFontSize weight:NSFontWeightMedium];
+}
+
++ (NSFont *)VLCLibrarySmallSubsectionSubheaderFont
+{
+    return [NSFont systemFontOfSize:12. weight:NSFontWeightMedium];
+}
+
 @end

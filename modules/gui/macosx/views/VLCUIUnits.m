@@ -66,6 +66,46 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
     return 1.;
 }
 
++ (const CGFloat)compactControlPadding
+{
+    return self.smallSpacing + self.smallSpacing / 2.;
+}
+
++ (const CGFloat)smallIconSize
+{
+    return self.largeSpacing;
+}
+
++ (const CGFloat)mediumIconSize
+{
+    return self.largeSpacing + self.smallSpacing;
+}
+
++ (const CGFloat)largeIconSize
+{
+    return 26.;
+}
+
++ (const CGFloat)largeActionButtonHeight
+{
+    return 56.;
+}
+
++ (const CGFloat)actionButtonCompactWidthThreshold
+{
+    return 130.;
+}
+
++ (const CGFloat)actionButtonNarrowWidthThreshold
+{
+    return 160.;
+}
+
++ (const NSUInteger)actionButtonMaximumTitleLines
+{
+    return 2;
+}
+
 + (const CGFloat)scrollBarSmallSideSize
 {
     return 16;

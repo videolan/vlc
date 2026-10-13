@@ -55,10 +55,20 @@ extern NSString * const VLCLibraryCollectionViewItemAdjustmentKey;
 @property (class, readonly) const CGFloat largeSpacing;
 @property (class, readonly) const CGFloat mediumSpacing;
 @property (class, readonly) const CGFloat smallSpacing;
+@property (class, readonly) const CGFloat compactControlPadding;
 
 @property (class, readonly) const CGFloat cornerRadius;
 
 @property (class, readonly) const CGFloat borderThickness;
+
+// Common icon and action-button sizes.
+@property (class, readonly) const CGFloat smallIconSize;
+@property (class, readonly) const CGFloat mediumIconSize;
+@property (class, readonly) const CGFloat largeIconSize;
+@property (class, readonly) const CGFloat largeActionButtonHeight;
+@property (class, readonly) const CGFloat actionButtonCompactWidthThreshold;
+@property (class, readonly) const CGFloat actionButtonNarrowWidthThreshold;
+@property (class, readonly) const NSUInteger actionButtonMaximumTitleLines;
 
 @property (class, readonly) const CGFloat scrollBarSmallSideSize;
 
