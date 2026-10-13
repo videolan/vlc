@@ -398,9 +398,10 @@ void  ListCache<T>::fetchMore()
 template<typename T>
 size_t ListCache<T>::countWithLimit(size_t maximumCount) const
 {
+    const size_t count = (maximumCount > m_offset) ? maximumCount - m_offset : 0;
     if (m_limit == 0)
-        return maximumCount;
-    return std::min(m_limit, maximumCount);
+        return count;
+    return std::min(m_limit, count);
 }
 
 template<typename T>
@@ -435,6 +436,39 @@ void ListCache<T>::setOffset(size_t offset)
 {
     if (m_offset == offset)
         return;
+
+    if (m_cachedData && !m_oldData && !m_countTask && offset > m_offset)
+    {
+        const size_t delta = offset - m_offset;
+        const size_t droppedItems = std::min(delta, m_cachedData->loadedCount);
+        const size_t removedRows = std::min(delta, m_cachedData->queryCount);
+        m_offset = offset;
+
+        //a pending append still targets m_offset + loadedCount, unless we skipped past it
+        if (m_appendTask && delta > m_cachedData->loadedCount)
+        {
+            m_loader->cancelTask(m_appendTask);
+            m_appendTask = 0;
+        }
+
+        if (removedRows > 0)
+            emit beginRemoveRows(0, removedRows - 1);
+        m_cachedData->list.erase(m_cachedData->list.begin(), m_cachedData->list.begin() + droppedItems);
+        m_cachedData->loadedCount -= droppedItems;
+        m_cachedData->queryCount -= removedRows;
+        if (removedRows > 0)
+            emit endRemoveRows();
+
+        m_maxReferedIndex = (m_maxReferedIndex > delta) ? m_maxReferedIndex - delta : 0;
+        const size_t shiftedQueryCount = m_cachedData->queryCount;
+        setLimit(m_limit);
+        if (removedRows > 0 && m_cachedData->queryCount == shiftedQueryCount)
+            emit localSizeChanged(m_cachedData->queryCount, m_cachedData->maximumCount);
+        if (!m_appendTask)
+            asyncFetchMore();
+        return;
+    }
+
     m_offset = offset;
     if (m_countTask)
     {

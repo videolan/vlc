@@ -597,7 +597,7 @@ private slots:
     void testOffsetChangeDuringLoad()
     {
         ManualModel m;
-        QVERIFY(initModel(m, 50, 20, 0));
+        QVERIFY(initModel(m, 50, 20, 0, 30));
 
         m.setOffset(10);
         QCOMPARE(m.backend().pending.size(), 1u);
