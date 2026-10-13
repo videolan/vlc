@@ -1741,18 +1741,8 @@ endif
 endif
 endif
 
-base_model_test_SOURCES = tests/test_base_model.cpp \
-        util/base_model.cpp util/base_model.hpp util/base_model_p.hpp
-
-nodist_base_model_test_SOURCES = util/base_model.moc.cpp \
-        util/listcache.moc.cpp \
-        util/locallistcacheloader.moc.cpp
-
-base_model_test_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) -fPIC $(CXXFLAGS_qt)
-base_model_test_LDADD = $(QT_LIBS) $(LIBS_qt)
-base_model_test_LDFLAGS = $(AM_LDFLAGS) $(QT_LDFLAGS)
-check_PROGRAMS = base_model_test
-TESTS = base_model_test
+check_PROGRAMS =
+TESTS =
 
 if HAVE_QT_QTEST
 
@@ -1761,6 +1751,25 @@ QT_QTEST_COMMON_cppflags = $(libqt_plugin_la_CPPFLAGS) -I$(builddir)/tests -DTOP
 QT_QTEST_COMMON_cxxflags = $(AM_CXXFLAGS) $(QT_CFLAGS) $(QT_QTEST_CFLAGS) -fPIC $(CXXFLAGS_qt)
 QT_QTEST_COMMON_ldadd = $(QT_LIBS) $(LIBS_qt) $(QT_QTEST_LIBS) $(LIBVLCCORE) $(LIBVLC)
 QT_QTEST_COMMON_ldflags = $(AM_LDFLAGS) $(QT_LDFLAGS) $(QT_QTEST_LDFLAGS)
+
+# base_model_test
+
+base_model_test_SOURCES = tests/test_base_model.cpp \
+        util/base_model.cpp util/base_model.hpp util/base_model_p.hpp
+
+nodist_base_model_test_SOURCES = tests/test_base_model.moc \
+        util/base_model.moc.cpp \
+        util/listcache.moc.cpp \
+        util/locallistcacheloader.moc.cpp
+
+BUILT_SOURCES += tests/test_base_model.moc
+CLEANFILES += tests/test_base_model.moc
+base_model_test_CPPFLAGS = $(QT_QTEST_COMMON_cppflags)
+base_model_test_CXXFLAGS = $(QT_QTEST_COMMON_cxxflags)
+base_model_test_LDADD = $(QT_QTEST_COMMON_ldadd)
+base_model_test_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
+check_PROGRAMS += base_model_test
+TESTS += base_model_test
 
 
 # test_ml_model
