@@ -287,7 +287,11 @@ static void stream_Reset(vlc_aout_stream *stream)
         vlc_audio_meter_Flush(&owner->meter);
 
         if (stream->filters)
+        {
             aout_FiltersFlush (stream->filters);
+            aout_FiltersAdjustResampling (stream->filters, 0);
+        }
+        stream->sync.resamp_type = AOUT_RESAMPLING_NONE;
 
         vlc_clock_Lock(stream->sync.clock);
         vlc_clock_Reset(stream->sync.clock);
