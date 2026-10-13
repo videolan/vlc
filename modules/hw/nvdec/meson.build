@@ -21,7 +21,7 @@ vlc_modules += {
 vlc_modules += {
     'name' : 'glinterop_nvdec',
     'sources' : files('nvdec_gl.c'),
-    'dependencies' : [ nvdec_dep, gl_common_dep, dl_lib ],
+    'dependencies' : [ nvdec_dep, opengl_dep, dl_lib ],
     'plugin_dir' : 'codec',
-    'enabled' : nvdec_dep.found() and gl_common_dep.found(),
+    'enabled' : nvdec_dep.found() and opengl_dep.found(),
 }

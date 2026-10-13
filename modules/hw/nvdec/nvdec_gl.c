@@ -34,7 +34,9 @@
 #include "nvdec_fmt.h"
 #include "nvdec_priv.h"
 
-#include "../../video_output/opengl/interop.h"
+#include <vlc_opengl.h>
+#include <vlc_opengl_interop.h>
+#include "../../video_output/opengl/gl_common.h"
 
 // glew.h conflicts with glext.h, but also makes glext.h unnecessary.
 #ifndef __GLEW_H__
