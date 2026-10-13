@@ -54,6 +54,13 @@
     if (@available(macOS 10.14, *)) {
         self.playButton.contentTintColor = NSColor.VLCAccentColor;
     }
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
+    if (@available(macOS 26.0, *)) {
+        self.playButton.bordered = YES;
+        self.playButton.bezelStyle = NSBezelStyleGlass;
+        self.playButton.borderShape = NSControlBorderShapeCapsule;
+    }
+#endif
     self.titleTextField.font = NSFont.VLCLibrarySubsectionHeaderFont;
     self.titleTextField.maximumNumberOfLines = 3;
     self.detailTextField.font = NSFont.VLCLibrarySubsectionSubheaderFont;
