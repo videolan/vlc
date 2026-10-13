@@ -601,13 +601,13 @@ template<typename T>
 void ListCache<T>::asyncFetchMore()
 {
     assert(m_cachedData);
+    m_maxReferedIndex = std::min(m_cachedData->queryCount, m_maxReferedIndex);
     if (m_maxReferedIndex <= m_cachedData->loadedCount)
         return;
 
     if (m_appendTask)
         m_loader->cancelTask(m_appendTask);
 
-    m_maxReferedIndex = std::min(m_cachedData->queryCount, m_maxReferedIndex);
     size_t count = ((m_maxReferedIndex - m_cachedData->loadedCount) / m_chunkSize + 1 ) * m_chunkSize;
 
     m_appendTask = m_loader->loadTask(
