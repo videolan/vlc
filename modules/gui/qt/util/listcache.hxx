@@ -188,14 +188,19 @@ int ListCache<T>::deleteItem(const std::function<bool (const ItemType&)>&& f)
         return -1;
 
     int pos = std::distance(m_cachedData->list.begin(), it);
+    const bool visible = static_cast<size_t>(pos) < m_cachedData->queryCount;
 
-    emit beginRemoveRows(pos, pos);
+    if (visible)
+        emit beginRemoveRows(pos, pos);
     m_cachedData->list.erase(it, it+1);
     size_t delta = m_cachedData->loadedCount - m_cachedData->list.size();
     m_cachedData->loadedCount -= delta;
     m_cachedData->maximumCount -= delta;
-    m_cachedData->queryCount -= delta;
-    emit endRemoveRows();
+    if (visible)
+    {
+        m_cachedData->queryCount -= delta;
+        emit endRemoveRows();
+    }
     emit localSizeChanged(m_cachedData->queryCount, m_cachedData->maximumCount);
 
     return pos;
