@@ -45,8 +45,7 @@ vlc_modules += {
     'name' : 'demux_chromecast',
     'sources' : files(
         'chromecast_demux.cpp',
-        'chromecast.h',
-        'chromecast_common.h') + chromecast_proto,
+        'chromecast_common.h'),
     'dependencies' : [protobuf_dep],
     'plugin_dir' : 'demux',
     'enabled': get_option('stream_outputs') and protoc.found() and protobuf_dep.found(),
