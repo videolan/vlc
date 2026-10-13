@@ -39,6 +39,7 @@ fontconfig_dep = dependency('fontconfig', version: '>= 2.11',
 if fontconfig_dep.found()
     freetype_srcs += files('freetype/fonts/fontconfig.c')
     freetype_cargs += '-DHAVE_FONTCONFIG'
+    freetype_cppargs += '-DHAVE_FONTCONFIG'
     freetype_deps += fontconfig_dep
 endif
 
@@ -46,6 +47,7 @@ fribidi_dep = dependency('fribidi', required: get_option('fribidi'))
 
 if fribidi_dep.found()
     freetype_cargs += '-DHAVE_FRIBIDI'
+    freetype_cppargs += '-DHAVE_FRIBIDI'
     freetype_deps += fribidi_dep
 endif
 
@@ -53,6 +55,7 @@ harfbuzz_dep = dependency('harfbuzz', required: get_option('harfbuzz'))
 
 if harfbuzz_dep.found()
     freetype_cargs += '-DHAVE_HARFBUZZ'
+    freetype_cppargs += '-DHAVE_HARFBUZZ'
     freetype_deps += harfbuzz_dep
 endif
 
