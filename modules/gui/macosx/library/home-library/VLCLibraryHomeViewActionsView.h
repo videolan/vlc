@@ -20,23 +20,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "views/VLCStackView.h"
+#import "views/VLCFileDragRecognisingView.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryHomeViewActionsView : VLCStackView
+@interface VLCLibraryHomeViewActionsView : VLCFileDragRecognisingView <VLCDragDropTarget>
+
+@property (readwrite, weak) IBOutlet NSImageView *logoImageView;
+@property (readwrite, weak) IBOutlet NSTextField *dropTitleTextField;
+@property (readwrite, weak) IBOutlet NSTextField *dropDetailTextField;
+@property (readwrite, weak) IBOutlet NSTextField *dropHintTextField;
 
 @property (readwrite, weak) IBOutlet NSButton *openFileButton;
 @property (readwrite, weak) IBOutlet NSButton *openDiscButton;
 @property (readwrite, weak) IBOutlet NSButton *openUrlButton;
 @property (readwrite, weak) IBOutlet NSButton *openCaptureDeviceButton;
-@property (readwrite, weak) IBOutlet NSButton *openBrowseButton;
 
 - (IBAction)openFileAction:(id)sender;
 - (IBAction)openDiscAction:(id)sender;
 - (IBAction)openUrlAction:(id)sender;
 - (IBAction)openCaptureDeviceAction:(id)sender;
-- (IBAction)openBrowseAction:(id)sender;
 
 @end
 

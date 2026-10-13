@@ -66,9 +66,24 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
     return 1.;
 }
 
++ (const CGFloat)extraLargeSpacing
+{
+    return self.largeSpacing + self.mediumSpacing;
+}
+
 + (const CGFloat)compactControlPadding
 {
     return self.smallSpacing + self.smallSpacing / 2.;
+}
+
++ (const CGFloat)dashedBorderDashLength
+{
+    return self.smallSpacing + self.smallSpacing / 2.;
+}
+
++ (const CGFloat)dashedBorderDashSpacing
+{
+    return self.smallSpacing + self.borderThickness;
 }
 
 + (const CGFloat)smallIconSize
@@ -84,6 +99,11 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
 + (const CGFloat)largeIconSize
 {
     return 26.;
+}
+
++ (const CGFloat)largeIllustrationSize
+{
+    return self.largeSpacing * 4.;
 }
 
 + (const CGFloat)largeActionButtonHeight
@@ -213,6 +233,26 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
 {
     const CGFloat inset = [self largeSpacing];
     return NSEdgeInsetsMake(inset, inset, inset, inset);
+}
+
++ (const CGFloat)libraryHomeActionsMinimumHeight
+{
+    return self.largeActionButtonHeight * 2. + self.mediumSpacing + self.largeSpacing * 2.;
+}
+
++ (const CGFloat)libraryHomeActionsNarrowWidthThreshold
+{
+    return 600.;
+}
+
++ (const CGFloat)libraryHomeActionsGridWidthMultiplier
+{
+    return 0.52;
+}
+
++ (const CGFloat)libraryHomeActionsLogoWidthMultiplier
+{
+    return 0.22;
 }
 
 + (const NSSize)adjustedCollectionViewItemSizeForCollectionView:(NSCollectionView *)collectionView
