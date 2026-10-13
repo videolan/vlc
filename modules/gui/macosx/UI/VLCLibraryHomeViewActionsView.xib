@@ -62,6 +62,16 @@
                                     <integer key="value" value="1" />
                                 </userDefinedRuntimeAttribute>
                             </userDefinedRuntimeAttributes>
+                            <visibilityPriorities>
+                                <integer value="1000" />
+                                <integer value="1000" />
+                                <integer value="1000" />
+                            </visibilityPriorities>
+                            <customSpacing>
+                                <real value="3.4028234663852886e+38" />
+                                <real value="3.4028234663852886e+38" />
+                                <real value="3.4028234663852886e+38" />
+                            </customSpacing>
                         </stackView>
                     </subviews>
                     <constraints>
@@ -71,6 +81,14 @@
                             <integer key="value" value="3" />
                         </userDefinedRuntimeAttribute>
                     </userDefinedRuntimeAttributes>
+                    <visibilityPriorities>
+                        <integer value="1000" />
+                        <integer value="1000" />
+                    </visibilityPriorities>
+                    <customSpacing>
+                        <real value="3.4028234663852886e+38" />
+                        <real value="3.4028234663852886e+38" />
+                    </customSpacing>
                 </stackView>
                 <stackView distribution="fillEqually" orientation="vertical" alignment="leading" spacing="8" horizontalStackHuggingPriority="249" verticalStackHuggingPriority="750" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="act-gr-001" customClass="VLCStackView">
                     <rect key="frame" x="432" y="16" width="444" height="120" />
@@ -100,6 +118,14 @@
                                     </connections>
                                 </button>
                             </subviews>
+                            <visibilityPriorities>
+                                <integer value="1000" />
+                                <integer value="1000" />
+                            </visibilityPriorities>
+                            <customSpacing>
+                                <real value="3.4028234663852886e+38" />
+                                <real value="3.4028234663852886e+38" />
+                            </customSpacing>
                         </stackView>
                         <stackView distribution="fillEqually" orientation="horizontal" alignment="centerY" spacing="0" horizontalStackHuggingPriority="249" verticalStackHuggingPriority="750" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="act-ro-002">
                             <rect key="frame" x="0" y="0" width="444" height="56" />
@@ -125,6 +151,14 @@
                                     </connections>
                                 </button>
                             </subviews>
+                            <visibilityPriorities>
+                                <integer value="1000" />
+                                <integer value="1000" />
+                            </visibilityPriorities>
+                            <customSpacing>
+                                <real value="3.4028234663852886e+38" />
+                                <real value="3.4028234663852886e+38" />
+                            </customSpacing>
                         </stackView>
                     </subviews>
                     <constraints>
@@ -136,6 +170,14 @@
                             <integer key="value" value="2" />
                         </userDefinedRuntimeAttribute>
                     </userDefinedRuntimeAttributes>
+                    <visibilityPriorities>
+                        <integer value="1000" />
+                        <integer value="1000" />
+                    </visibilityPriorities>
+                    <customSpacing>
+                        <real value="3.4028234663852886e+38" />
+                        <real value="3.4028234663852886e+38" />
+                    </customSpacing>
                 </stackView>
             </subviews>
             <connections>
