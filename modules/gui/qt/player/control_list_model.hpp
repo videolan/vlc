@@ -82,7 +82,7 @@ public:
         NAVIGATION_BUTTONS,
         PROGRAM_BUTTON,
         NAVIGATION_BOX,
-        RESERVED_0X2B,
+        VOLUME_LEGACY,
         RESERVED_0X2C,
         RESERVED_0X2D,
         RESERVED_0X2E,
@@ -111,7 +111,7 @@ public:
     Q_ENUM(ControlType)
 
     static_assert(RESERVED_0X1F == 0x1F, "missaligned");
-    static_assert(RESERVED_0X2B == 0x2B, "missaligned");
+    static_assert(RESERVED_0X2C == 0x2C, "missaligned");
     static_assert(RESERVED_0X3F == 0x3F, "missaligned");
 
     // Basic functionality:

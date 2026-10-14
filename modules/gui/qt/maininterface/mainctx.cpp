@@ -1073,6 +1073,16 @@ void MainCtx::setAttachedToolTip(QObject *toolTip)
 #endif
 }
 
+QString MainCtx::volumeSliderColors() const
+{
+    const auto sliderColors = var_InheritString(p_intf, "qt-slider-colours");
+
+    if (Q_UNLIKELY(!sliderColors))
+        return {};
+
+    return QString::fromUtf8(vlc::wrap_cptr(sliderColors).get());
+}
+
 MainCtx::MainInterfaceMode MainCtx::getEffectiveMainInterfaceMode() const {
     //priority applies across modes
     if (m_mainInterfaceModes & MainCtx::MAININTERFACE_MODE_MINIMAL)

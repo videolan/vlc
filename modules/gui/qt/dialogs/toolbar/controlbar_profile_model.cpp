@@ -396,7 +396,7 @@ decltype (ControlbarProfileModel::m_defaults)
                                 },
                                 {},
                                 {
-                                    ControlListModel::VOLUME
+                                    ControlListModel::VOLUME_LEGACY
                                 }
                             }
                         }
@@ -421,7 +421,7 @@ decltype (ControlbarProfileModel::m_defaults)
                                 },
                                 {},
                                 {
-                                    ControlListModel::VOLUME
+                                    ControlListModel::VOLUME_LEGACY
                                 }
                             }
                         }
@@ -448,7 +448,7 @@ decltype (ControlbarProfileModel::m_defaults)
                                     ControlListModel::RANDOM_BUTTON
                                 },
                                 {
-                                    ControlListModel::VOLUME
+                                    ControlListModel::VOLUME_LEGACY
                                 }
                             }
                         }
