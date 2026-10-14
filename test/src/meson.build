@@ -46,6 +46,26 @@ vlc_tests += {
 }
 
 vlc_tests += {
+    'name' : 'test_src_audio_output_dec',
+    'sources' : files(
+        'audio_output/dec.c',
+        '../../src/audio_output/dec.c',
+        '../../src/audio_output/output.c',
+        '../../src/audio_output/common.c',
+        '../../src/audio_output/filters.c',
+        '../../src/audio_output/volume.c',
+        '../../src/audio_output/meter.c',
+        '../../src/input/replay_gain.c',
+        '../../src/misc/objects.c',
+        '../../src/misc/variables.c',
+        '../../src/clock/clock.c',
+        '../../src/clock/clock_internal.c'),
+    'suite' : ['src', 'test_src'],
+    'link_with' : [libvlc, libvlccore],
+    'include_directories' : include_directories('../../src'),
+}
+
+vlc_tests += {
     'name' : 'test_src_misc_variables',
     'sources' : files('misc/variables.c'),
     'suite' : ['src', 'test_src'],
