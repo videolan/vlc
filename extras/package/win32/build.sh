@@ -663,22 +663,20 @@ if [ -n "$BUILD_MESON" ]; then
     MINSTALLFLAGS="--strip --no-rebuild $MINSTALLFLAGS"
 
     if [ "$INSTALLER" = "n" ]; then
-        VLC_GIT_TAG="$(git describe --tags --long --match '?.*.*' --always)"
-
         meson install -C ${BUILD_PATH}/$SHORTARCH-meson ${MINSTALLFLAGS}
+        ninja -C ${BUILD_PATH}/$SHORTARCH-meson package-win32-7zip
+
         if [ -z "$WINSTORE" ]; then
             # generate .exe installer
             ninja -C ${BUILD_PATH}/$SHORTARCH-meson package-win32-exe
             # generate .msi installer
             ninja -C ${BUILD_PATH}/$SHORTARCH-meson package-msi
         fi
-
-        rm -rf ${BUILD_PATH}/$SHORTARCH-meson/vlc-$SHORTARCH-$VLC_GIT_TAG-debug.7z
-        cd ${BUILD_PATH}/$SHORTARCH-meson && \
-            7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on vlc-$SHORTARCH-$VLC_GIT_TAG-debug.7z vlc-$SHORTARCH
     elif [ "$INSTALLER" = "r" ]; then
         meson dist -C ${BUILD_PATH}/$SHORTARCH-meson -j$JOBS --no-tests
         meson install -C ${BUILD_PATH}/$SHORTARCH-meson ${MINSTALLFLAGS}
+        ninja -C ${BUILD_PATH}/$SHORTARCH-meson package-win32-7zip
+
         if [ -z "$WINSTORE" ]; then
             # generate .exe installer
             ninja -C ${BUILD_PATH}/$SHORTARCH-meson package-win32-exe
@@ -687,6 +685,8 @@ if [ -n "$BUILD_MESON" ]; then
         fi
     elif [ "$INSTALLER" = "u" ]; then
         meson install -C ${BUILD_PATH}/$SHORTARCH-meson ${MINSTALLFLAGS}
+        ninja -C ${BUILD_PATH}/$SHORTARCH-meson package-win32-7zip
+
         if [ -z "$WINSTORE" ]; then
             # generate .exe installer
             ninja -C ${BUILD_PATH}/$SHORTARCH-meson package-win32-exe
