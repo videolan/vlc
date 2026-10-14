@@ -75,6 +75,7 @@ struct PS_INPUT\n\
 #define SAMPLE_AYUV_TO_YUVA          5\n\
 #define SAMPLE_RGBA_TO_RGBA          6\n\
 #define SAMPLE_TRIPLANAR_TO_YUVA     7\n\
+#define SAMPLE_TRIPLANARVU_TO_YUVA  18\n\
 #define SAMPLE_TRIPLANAR10_TO_YUVA   8\n\
 #define SAMPLE_PLANAR_YUVA_TO_YUVA   9\n\
 #define SAMPLE_BGRX_TO_RGBA         17\n\
@@ -206,6 +207,11 @@ inline float4 sampleTexture(SamplerState samplerState, float2 coords) {\n\
     sample.x  = shaderTexture[0].Sample(samplerState, coords).x;\n\
     sample.y  = shaderTexture[1].Sample(samplerState, coords).x;\n\
     sample.z  = shaderTexture[2].Sample(samplerState, coords).x;\n\
+    sample.a  = 1;\n\
+#elif (SAMPLE_TEXTURES==SAMPLE_TRIPLANARVU_TO_YUVA)\n\
+    sample.x  = shaderTexture[0].Sample(samplerState, coords).x;\n\
+    sample.y  = shaderTexture[2].Sample(samplerState, coords).x;\n\
+    sample.z  = shaderTexture[1].Sample(samplerState, coords).x;\n\
     sample.a  = 1;\n\
 #elif (SAMPLE_TEXTURES==SAMPLE_TRIPLANAR10_TO_YUVA)\n\
     sample.x  = shaderTexture[0].Sample(samplerState, coords).x;\n\
@@ -537,6 +543,10 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o,
             case VLC_CODEC_I422_10L:
             case VLC_CODEC_I420:
                 psz_sampler[0] = "SAMPLE_TRIPLANAR_TO_YUVA";
+                psz_shader_resource_views[0] = "3"; shader_views[0] = 3;
+                break;
+            case VLC_CODEC_YV12:
+                psz_sampler[0] = "SAMPLE_TRIPLANARVU_TO_YUVA";
                 psz_shader_resource_views[0] = "3"; shader_views[0] = 3;
                 break;
             case VLC_CODEC_YUVA:
