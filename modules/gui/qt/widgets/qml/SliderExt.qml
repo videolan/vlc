@@ -139,9 +139,6 @@ T.Slider {
     Widgets.PointingToolTipAttached.pos: Qt.point(control._tooltipX, (control.handle?.height ?? 0) / 2)
     Widgets.PointingToolTipAttached.visible: (hoverHandler.hovered || control.visualFocus || control.pressed)
     Widgets.PointingToolTipAttached.text: {
-        if (!Widgets.PointingToolTipAttached.instance?.visible)
-            return ""
-
         // position is only measured till half of handle width
         // pos.x may go beyond the position at the edges
         const p = Helpers.clamp(control.positionAt(Widgets.PointingToolTipAttached.instance.pos.x), 0.0, 1.0)
