@@ -362,6 +362,7 @@ debian-meson:
             echo -e "\e[0Ksection_start:$(date +%s):tests_meson_section\r\e[0KVLC tests"
             # Run tests
             meson test -C build-meson --print-errorlogs --max-lines 1000 \
+                --timeout-multiplier $((VLC_TEST_TIMEOUT / 30 + 1)) \
                 --wrapper "gdb -nx -batch -return-child-result \
                     -iex 'set debuginfod enabled off' \
                     -iex 'handle SIGALRM stop print' \
