@@ -695,6 +695,9 @@ if [ -n "$BUILD_MESON" ]; then
             sha512sum vlc-*-*.exe
             sha512sum vlc-*-*.msi
         fi
+    elif [ "$INSTALLER" = "m" ]; then
+        meson install -C ${BUILD_PATH}/$SHORTARCH-meson ${MINSTALLFLAGS}
+        ninja -C ${BUILD_PATH}/$SHORTARCH-meson package-msi
     elif [ -n "$INSTALL_PATH" ]; then
         meson install -C ${BUILD_PATH}/$SHORTARCH-meson ${MINSTALLFLAGS}
     fi
