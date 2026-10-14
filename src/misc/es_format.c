@@ -468,7 +468,7 @@ void es_format_LogDifferences(struct vlc_logger *log,
     if (a->i_codec != b->i_codec)
     {
         vlc_fourcc_t a_codec = vlc_fourcc_GetCodec(a->i_cat, a->i_codec);
-        vlc_fourcc_t b_codec = vlc_fourcc_GetCodec(a->i_cat, a->i_codec);
+        vlc_fourcc_t b_codec = vlc_fourcc_GetCodec(b->i_cat, b->i_codec);
         vlc_debug(log, "'%s/%s' codec %4.4s(%4.4s) / %4.4s(%4.4s)",
                   name_a, name_b, (char*)&a_codec, (char*)&a->i_codec, (char*)&b_codec, (char*)&b->i_codec);
     }
