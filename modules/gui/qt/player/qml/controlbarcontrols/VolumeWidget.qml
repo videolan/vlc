@@ -40,6 +40,15 @@ T.Pane {
     readonly property real _fullvolpos: 100 / _maxvol
     readonly property real _maxvolpos: _maxvol / 100
 
+    property alias slider: volControl
+    property alias button: volumeBtn
+    property alias tickMark: tickmark
+    property alias mouseArea: sliderMouseArea
+    property alias toolTipVisibilityBinding: toolTipVisibilityBinding
+
+    // TODO: Check if with Qt 7, it is access it via `slider.PointingToolTipAttached`:
+    readonly property Widgets.PointingToolTipAttached sliderPointingToolTip: volControl.Widgets.PointingToolTipAttached
+
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
                             implicitContentWidth + leftPadding + rightPadding)
     implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
@@ -202,6 +211,8 @@ T.Pane {
             }
 
             Binding on Widgets.PointingToolTipAttached.visible {
+                id: toolTipVisibilityBinding
+
                 when: sliderMouseArea.pressed
                 value: true
             }
