@@ -30,3 +30,27 @@ if get_option('wix').disable_auto_if(
     host_system != 'windows' or have_win_store).allowed()
     subdir('msi')
 endif
+
+sevenz = find_program('7z', required: false)
+if sevenz.found()
+    sevenz_opts = ['-t7z', '-m0=lzma', '-mx=9', '-mfb=64', '-md=32m', '-ms=on']
+    release_7z = 'vlc-' + vlc_version + '-' + winstaller_suffix + '.7z'
+    debug_7z   = 'vlc-' + vlc_version + '-' + winstaller_suffix + '-debug.7z'
+
+    # generate a 7z from the "installed" and stripped folder
+    package_win32_7zip = custom_target(
+        output: release_7z, # real name but located in root build folder
+        command: [sevenz, 'a', sevenz_opts, release_7z, prefix_path],
+        console: true,
+    )
+    alias_target('package-win32-7zip', package_win32_7zip)
+
+    # generate a 7z from the "installed" folder with debug symbols
+    package_win32_debug_7zip = custom_target(
+        output: debug_7z, # real name but located in root build folder
+        command: [sevenz, 'a', sevenz_opts, debug_7z, prefix_path],
+        console: true,
+    )
+    # disabled for now as meson doesn't understand we are building with .pdb files
+    # alias_target('package-win32-debug-7zip', package_win32_debug_7zip)
+endif
