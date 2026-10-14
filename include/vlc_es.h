@@ -518,8 +518,11 @@ VLC_API video_transform_t video_format_GetTransform(video_orientation_t src, vid
  */
 VLC_API bool video_format_IsSimilar( const video_format_t *, const video_format_t * );
 
-/** Checks whether the video formats have the same chroma and mask */
-VLC_API bool video_format_IsSameChroma( const video_format_t *, const video_format_t * );
+/** Checks whether the video formats have the same chroma */
+static inline bool video_format_IsSameChroma( const video_format_t *f1, const video_format_t *f2 )
+{
+    return f1->i_chroma == f2->i_chroma;
+}
 
 /**
  * It prints details about the given video_format_t

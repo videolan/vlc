@@ -206,15 +206,6 @@ void video_format_ApplyRotation( video_format_t *restrict out,
     video_format_TransformTo(out, ORIENT_NORMAL);
 }
 
-bool video_format_IsSameChroma( const video_format_t *f1,
-                                const video_format_t *f2 )
-{
-    if( f1->i_chroma != f2->i_chroma )
-        return false;
-
-    return true;
-}
-
 bool video_format_IsSimilar( const video_format_t *f1,
                              const video_format_t *f2 )
 {
