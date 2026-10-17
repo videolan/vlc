@@ -95,14 +95,24 @@
     const CGFloat minimumHeight = VLCUIUnits.libraryHomeActionsMinimumHeight;
     NSLayoutConstraint * const preferredHeight = [self.heightAnchor constraintEqualToConstant:minimumHeight];
     preferredHeight.priority = NSLayoutPriorityDefaultLow;
-    NSLayoutConstraint * const logoWidth =
-        [self.logoImageView.widthAnchor constraintEqualToConstant:VLCUIUnits.largeIllustrationSize];
-    logoWidth.priority = NSLayoutPriorityDefaultHigh;
+
+    // Prefer the logo's natural size without allowing it to enlarge the window.
+    [self.logoImageView setContentCompressionResistancePriority:NSLayoutPriorityDragThatCannotResizeWindow
+                                                 forOrientation:NSLayoutConstraintOrientationHorizontal];
+    [self.logoImageView setContentCompressionResistancePriority:NSLayoutPriorityDragThatCannotResizeWindow
+                                                 forOrientation:NSLayoutConstraintOrientationVertical];
+
+    // Wrapped text can grow taller than the square logo.
+    [self.introductionStackView setHuggingPriority:NSLayoutPriorityDefaultLow
+                                    forOrientation:NSLayoutConstraintOrientationVertical];
+
+    NSLayoutConstraint * const logoMaximumWidth =
+        [self.logoImageView.widthAnchor constraintLessThanOrEqualToConstant:VLCUIUnits.largeIllustrationSize];
 
     [NSLayoutConstraint activateConstraints:@[
         [self.heightAnchor constraintGreaterThanOrEqualToConstant:minimumHeight],
         preferredHeight,
-        logoWidth,
+        logoMaximumWidth,
         [self.logoImageView.widthAnchor constraintLessThanOrEqualToAnchor:self.introductionStackView.widthAnchor
                                                                multiplier:VLCUIUnits.libraryHomeActionsLogoWidthMultiplier],
         [self.introductionStackView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:horizontalInset],
@@ -145,7 +155,7 @@
 
     // Ancestor stack layout can resize labels without laying out this view again.
     NSTextField * const textField = notification.object;
-    const CGFloat width = NSWidth(textField.bounds);
+    const CGFloat width = NSWidth([textField alignmentRectForFrame:textField.frame]);
     if (width > 0 && textField.preferredMaxLayoutWidth != width) {
         textField.preferredMaxLayoutWidth = width;
         [textField invalidateIntrinsicContentSize];
