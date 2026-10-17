@@ -60,15 +60,23 @@ extern NSString * const VLCLibraryCollectionViewItemAdjustmentKey;
 @property (class, readonly) const CGFloat compactControlPadding;
 
 @property (class, readonly) const CGFloat cornerRadius;
+@property (class, readonly) const CGFloat mediumCornerRadius;
+@property (class, readonly) const CGFloat largeCornerRadius;
 
 @property (class, readonly) const CGFloat borderThickness;
 @property (class, readonly) const CGFloat dashedBorderDashLength;
 @property (class, readonly) const CGFloat dashedBorderDashSpacing;
 
+@property (class, readonly) const CGFloat librarySurfaceBlendFraction;
+@property (class, readonly) const CGFloat subtleTintOpacity;
+@property (class, readonly) const CGFloat highlightedTintOpacity;
+@property (class, readonly) const CGFloat disabledOpacity;
+
 // Common icon, illustration and action-button sizes.
 @property (class, readonly) const CGFloat smallIconSize;
 @property (class, readonly) const CGFloat mediumIconSize;
 @property (class, readonly) const CGFloat largeIconSize;
+@property (class, readonly) const CGFloat largeIconContainerSize;
 @property (class, readonly) const CGFloat largeIllustrationSize;
 @property (class, readonly) const CGFloat largeActionButtonHeight;
 @property (class, readonly) const CGFloat actionButtonCompactWidthThreshold;
@@ -92,6 +100,8 @@ extern NSString * const VLCLibraryCollectionViewItemAdjustmentKey;
 @property (class, readonly) const CGFloat defaultMediaItemCollectionViewItemWidth;
 @property (class, readonly) const NSSize defaultMediaItemCollectionViewItemSize;
 @property (class, readonly) const NSSize defaultVideoItemCollectionViewItemSize;
+
+@property (class, readonly) const NSSize libraryCompactCardSize;
 
 @property (class, readonly) const CGFloat dynamicCollectionViewItemMinimumWidth;
 @property (class, readonly) const CGFloat dynamicCollectionViewItemMaximumWidth;

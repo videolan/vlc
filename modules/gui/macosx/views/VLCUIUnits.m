@@ -76,6 +76,16 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
     return 4.;
 }
 
++ (const CGFloat)mediumCornerRadius
+{
+    return 10.;
+}
+
++ (const CGFloat)largeCornerRadius
+{
+    return 12.;
+}
+
 + (const CGFloat)borderThickness
 {
     return 1.;
@@ -91,6 +101,26 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
     return self.smallSpacing + self.borderThickness;
 }
 
++ (const CGFloat)librarySurfaceBlendFraction
+{
+    return .04;
+}
+
++ (const CGFloat)subtleTintOpacity
+{
+    return .15;
+}
+
++ (const CGFloat)highlightedTintOpacity
+{
+    return .25;
+}
+
++ (const CGFloat)disabledOpacity
+{
+    return .5;
+}
+
 + (const CGFloat)smallIconSize
 {
     return self.largeSpacing;
@@ -104,6 +134,11 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
 + (const CGFloat)largeIconSize
 {
     return 26.;
+}
+
++ (const CGFloat)largeIconContainerSize
+{
+    return 40.;
 }
 
 + (const CGFloat)largeIllustrationSize
@@ -201,6 +236,11 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
     const CGFloat width = VLCUIUnits.defaultMediaItemCollectionViewItemWidth;
     const CGFloat imageViewHeight = width * VLCUIUnits.videoItemCollectionViewImageViewAspectRatioMultiplier;
     return CGSizeMake(width, imageViewHeight + VLCUIUnits.mediaItemCollectionViewItemFooterTextHeight);
+}
+
++ (const NSSize)libraryCompactCardSize
+{
+    return NSMakeSize(200., 72.);
 }
 
 + (const CGFloat)videoItemCollectionViewImageViewAspectRatioMultiplier
