@@ -53,6 +53,18 @@ struct frame_info_t
     uint8_t i_max_latency_pics;
     uint8_t i_latency;
     unsigned i_length;
+    struct
+    {
+        uint16_t primaries[3*2];
+        uint16_t white_point[2];
+        uint32_t max_luminance;
+        uint32_t min_luminance;
+    } mastering;
+    struct
+    {
+        uint16_t MaxCLL;
+        uint16_t MaxFALL;
+    } lighting;
     frame_info_t *p_next;
 };
 
