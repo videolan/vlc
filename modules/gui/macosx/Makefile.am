@@ -272,6 +272,10 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/home-library/VLCLibraryHomeViewBaseCarouselContainerView.m \
 	gui/macosx/library/home-library/VLCLibraryHomeViewSectionHeaderView.h \
 	gui/macosx/library/home-library/VLCLibraryHomeViewSectionHeaderView.m \
+	gui/macosx/library/home-library/VLCLibraryHomeViewBrowseCarouselItemView.h \
+	gui/macosx/library/home-library/VLCLibraryHomeViewBrowseCarouselItemView.m \
+	gui/macosx/library/home-library/VLCLibraryHomeViewBrowseCarouselItemCell.h \
+	gui/macosx/library/home-library/VLCLibraryHomeViewBrowseCarouselItemCell.m \
 	gui/macosx/library/home-library/VLCLibraryHomeViewStackViewController.h \
 	gui/macosx/library/home-library/VLCLibraryHomeViewStackViewController.m \
 	gui/macosx/library/home-library/VLCLibraryHomeViewContainerView.h \
