@@ -1078,12 +1078,13 @@ static void RenderPicture(vout_display_t *vd, picture_t *pic, vlc_tick_t date) {
         sys.rotationContext.rotation = kVLCSampleBufferPixelRotation_90CCW;
         break;
     case ORIENT_TRANSPOSED:
-        sys.rotationContext.flip = kVLCSampleBufferPixelFlip_V;
+        sys.rotationContext.flip = kVLCSampleBufferPixelFlip_H;
         sys.rotationContext.rotation = kVLCSampleBufferPixelRotation_90CW;
         break;
     case ORIENT_ANTI_TRANSPOSED:
-        sys.rotationContext.flip = kVLCSampleBufferPixelFlip_H;
+        sys.rotationContext.flip = kVLCSampleBufferPixelFlip_V;
         sys.rotationContext.rotation = kVLCSampleBufferPixelRotation_90CW;
+        break;
     case ORIENT_NORMAL:
     default:
         sys.rotationContext = nil;
