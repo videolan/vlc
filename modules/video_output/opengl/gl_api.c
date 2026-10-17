@@ -177,7 +177,7 @@ vlc_gl_api_Init(struct vlc_gl_api *api, vlc_gl_t *gl)
     GET_PROC_ADDR_OPTIONAL(ClientWaitSync);
 
     GL_ASSERT_NOERROR(&api->vt);
-    GLint version;
+    GLint version = 0;
     GLchar *glsl_version;
     api->vt.GetIntegerv(GL_MAJOR_VERSION, &version);
     glsl_version = (GLchar *) api->vt.GetString(GL_SHADING_LANGUAGE_VERSION);
