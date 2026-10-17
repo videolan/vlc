@@ -39,6 +39,7 @@ static NSString * const VLCLibraryHomeBrowseItemIdentifier = @"VLCLibraryHomeBro
 @interface VLCLibraryHomeViewBrowseCarouselContainerView () <NSCollectionViewDataSource, NSCollectionViewDelegateFlowLayout>
 
 @property (copy) NSArray<NSString *> *bookmarkedLocations;
+@property BOOL observingBookmarks;
 
 @end
 
@@ -68,7 +69,25 @@ static NSString * const VLCLibraryHomeBrowseItemIdentifier = @"VLCLibraryHomeBro
 
 - (void)connect
 {
+    if (!self.observingBookmarks) {
+        NSNotificationCenter * const center = NSNotificationCenter.defaultCenter;
+        [center addObserver:self selector:@selector(bookmarksChanged:)
+                       name:VLCLibraryBookmarkedLocationsChanged object:nil];
+        // Sidebar rename observation also updates defaults without posting the
+        // bookmark notification. Compare the saved array before refreshing.
+        [center addObserver:self selector:@selector(bookmarksChanged:)
+                       name:NSUserDefaultsDidChangeNotification object:nil];
+        self.observingBookmarks = YES;
+    }
     [self reloadData];
+}
+
+- (void)disconnect
+{
+    NSNotificationCenter * const center = NSNotificationCenter.defaultCenter;
+    [center removeObserver:self name:VLCLibraryBookmarkedLocationsChanged object:nil];
+    [center removeObserver:self name:NSUserDefaultsDidChangeNotification object:nil];
+    self.observingBookmarks = NO;
 }
 
 - (void)reloadData
@@ -77,6 +96,23 @@ static NSString * const VLCLibraryHomeBrowseItemIdentifier = @"VLCLibraryHomeBro
     self.headerView.itemCount = self.bookmarkedLocations.count;
     self.collectionView.selectionIndexPaths = NSSet.set;
     [self.collectionView reloadData];
+}
+
+- (void)bookmarksChanged:(__unused NSNotification *)notification
+{
+    if (!NSThread.isMainThread) {
+        __weak typeof(self) weakSelf = self;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [weakSelf bookmarksChanged:nil];
+        });
+        return;
+    }
+
+    NSArray<NSString *> * const locations =
+        [NSUserDefaults.standardUserDefaults stringArrayForKey:VLCLibraryBookmarkedLocationsKey] ?: @[];
+    if (self.observingBookmarks && ![locations isEqualToArray:self.bookmarkedLocations]) {
+        [self reloadData];
+    }
 }
 
 - (NSInteger)collectionView:(__unused NSCollectionView *)collectionView
