@@ -26,6 +26,7 @@
 #import "library/VLCLibraryWindowNavigationSidebarViewController.h"
 #import "library/VLCLibraryWindowSidebarRootViewController.h"
 
+#import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
 
 #import "views/VLCBottomBarView.h"
