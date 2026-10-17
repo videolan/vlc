@@ -41,6 +41,11 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
 
 @implementation VLCUIUnits
 
++ (const CGFloat)extraLargeSpacing
+{
+    return self.largeSpacing + self.mediumSpacing;
+}
+
 + (const CGFloat)largeSpacing
 {
     return 16;
@@ -56,6 +61,16 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
     return 4;
 }
 
++ (const CGFloat)extraSmallSpacing
+{
+    return self.smallSpacing / 2.;
+}
+
++ (const CGFloat)compactControlPadding
+{
+    return self.smallSpacing + self.extraSmallSpacing;
+}
+
 + (const CGFloat)cornerRadius
 {
     return 4.;
@@ -66,19 +81,9 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
     return 1.;
 }
 
-+ (const CGFloat)extraLargeSpacing
-{
-    return self.largeSpacing + self.mediumSpacing;
-}
-
-+ (const CGFloat)compactControlPadding
-{
-    return self.smallSpacing + self.smallSpacing / 2.;
-}
-
 + (const CGFloat)dashedBorderDashLength
 {
-    return self.smallSpacing + self.smallSpacing / 2.;
+    return self.smallSpacing + self.extraSmallSpacing;
 }
 
 + (const CGFloat)dashedBorderDashSpacing

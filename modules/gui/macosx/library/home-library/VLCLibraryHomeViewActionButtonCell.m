@@ -72,11 +72,11 @@
     if (NSWidth(bounds) < VLCUIUnits.actionButtonCompactWidthThreshold) {
         const NSRect imageRect = [self imageRectForBounds:bounds flipped:flipped];
         const CGFloat originY = flipped
-            ? NSMaxY(imageRect) + VLCUIUnits.smallSpacing / 2.
+            ? NSMaxY(imageRect) + VLCUIUnits.extraSmallSpacing
             : NSMinY(bounds) + VLCUIUnits.smallSpacing;
         return NSMakeRect(NSMinX(bounds) + VLCUIUnits.compactControlPadding, originY,
                           MAX(0., NSWidth(bounds) - VLCUIUnits.compactControlPadding * 2.),
-                          MAX(0., NSHeight(bounds) - NSHeight(imageRect) - 2. * VLCUIUnits.smallSpacing - VLCUIUnits.smallSpacing / 2.));
+                          MAX(0., NSHeight(bounds) - NSHeight(imageRect) - 2. * VLCUIUnits.smallSpacing - VLCUIUnits.extraSmallSpacing));
     }
 
     const CGFloat padding = [self contentPaddingForBounds:bounds];

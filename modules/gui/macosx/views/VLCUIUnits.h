@@ -52,10 +52,11 @@ extern NSString * const VLCLibraryCollectionViewItemAdjustmentKey;
 
 // Note that these values are not necessarily linked to the layout defined in the .xib files.
 // If the spacing in the layout is changed you will want to change these values too.
+@property (class, readonly) const CGFloat extraLargeSpacing;
 @property (class, readonly) const CGFloat largeSpacing;
 @property (class, readonly) const CGFloat mediumSpacing;
 @property (class, readonly) const CGFloat smallSpacing;
-@property (class, readonly) const CGFloat extraLargeSpacing;
+@property (class, readonly) const CGFloat extraSmallSpacing;
 @property (class, readonly) const CGFloat compactControlPadding;
 
 @property (class, readonly) const CGFloat cornerRadius;
