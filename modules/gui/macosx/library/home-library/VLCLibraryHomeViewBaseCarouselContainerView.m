@@ -132,7 +132,7 @@
     _collectionViewLayout.minimumLineSpacing = VLCUIUnits.mediumSpacing;
     _collectionViewLayout.minimumInteritemSpacing = VLCUIUnits.mediumSpacing;
 
-    _collectionView = [[VLCLibraryCarouselView alloc] initWithFrame:NSZeroRect];
+    _collectionView = [self newCollectionView];
     _collectionView.postsFrameChangedNotifications = YES;
     _collectionView.collectionViewLayout = _collectionViewLayout;
     [_collectionView registerClass:VLCLibraryCarouselCollectionViewItem.class
@@ -220,6 +220,11 @@
                                            selector:@selector(scrollViewBoundsChanged:)
                                                name:NSViewFrameDidChangeNotification
                                              object:self.collectionView];
+}
+
+- (VLCLibraryCarouselView *)newCollectionView
+{
+    return [[VLCLibraryCarouselView alloc] initWithFrame:NSZeroRect];
 }
 
 - (void)connect

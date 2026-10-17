@@ -51,6 +51,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setupDataSource;
 - (void)openLibrary:(id)sender;
 
+/**
+ * Creates the collection view configured by the shared carousel setup.
+ * Subclasses can override this to customize item activation and context menus.
+ */
+- (VLCLibraryCarouselView *)newCollectionView;
+
 @end
 
 NS_ASSUME_NONNULL_END

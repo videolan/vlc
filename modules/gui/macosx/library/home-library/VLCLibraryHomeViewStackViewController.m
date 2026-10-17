@@ -34,6 +34,7 @@
 
 #import "library/home-library/VLCLibraryHomeViewActionsView.h"
 #import "library/home-library/VLCLibraryHomeViewAudioCarouselContainerView.h"
+#import "library/home-library/VLCLibraryHomeViewBrowseCarouselContainerView.h"
 #import "library/home-library/VLCLibraryHomeViewContainerView.h"
 #import "library/home-library/VLCLibraryHomeViewVideoCarouselContainerView.h"
 #import "library/home-library/VLCLibraryHomeViewVideoContainerView.h"
@@ -112,6 +113,9 @@
     [self addCustomContainerViews];
     [self recentsChanged:nil];
     [self audioRecentsChanged:nil];
+    _browseView = [[VLCLibraryHomeViewBrowseCarouselContainerView alloc] init];
+    [_containers addObject:self.browseView];
+    [self addContainerView:self.browseView toStackView:self.collectionsStackView];
 }
 
 - (void)addCustomContainerViews
@@ -137,7 +141,7 @@
 - (void)insertRecentItemsContainer:(NSView<VLCLibraryHomeViewContainerView> *)container
                           atIndex:(NSUInteger)index
 {
-    // Actions and Hero precede the ordered video and music rows.
+    // Actions and Hero precede the ordered video, music, and Browse rows.
     [self.collectionsStackView insertArrangedSubview:container atIndex:_leadingViews.count + index];
     [self setupContainerView:container withStackView:_collectionsStackView];
     [_containers insertObject:container atIndex:index];
@@ -201,6 +205,7 @@
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.heroView setOptimalRepresentedItem];
+        [self.browseView reloadData];
 
         for (NSView<VLCLibraryHomeViewContainerView> * const containerView in self->_containers) {
             if ([containerView isKindOfClass:VLCLibraryHomeViewBaseCarouselContainerView.class]) {
