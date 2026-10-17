@@ -863,6 +863,9 @@ API_AVAILABLE(tvos(17.0), visionos(1.0))
     + (instancetype)new NS_UNAVAILABLE;
     - (instancetype)initWithVoutDisplay:(vout_display_t *)vd;
     - (void)placeVideo:(vout_display_place_t)newPlace;
+    - (void)attachHDRMetadataFromFormat:(const video_format_t *)format
+                          toPixelBuffer:(CVPixelBufferRef)pixelBuffer
+                          API_AVAILABLE(ios(11.0));
 @end
 
 @implementation VLCSampleBufferDisplay
@@ -1024,6 +1027,52 @@ API_AVAILABLE(tvos(17.0), visionos(1.0))
     self.displayView.frame = [self frameForPlace:&newPlace];
 }
 
+- (void)attachHDRMetadataFromFormat:(const video_format_t *)format
+                      toPixelBuffer:(CVPixelBufferRef)pixelBuffer {
+    if (format->mastering.max_luminance) {
+        struct {
+            uint16_t primaries[6];
+            uint16_t white_point[2];
+            uint32_t max_luminance;
+            uint32_t min_luminance;
+        } __attribute__((packed)) mastering;
+        _Static_assert(sizeof(mastering) == 24,
+            "Mismatch with the mastering display color volume size");
+        for (size_t i = 0; i < ARRAY_SIZE(mastering.primaries); i++)
+            mastering.primaries[i] = hton16(format->mastering.primaries[i]);
+        for (size_t i = 0; i < ARRAY_SIZE(mastering.white_point); i++)
+            mastering.white_point[i] = hton16(format->mastering.white_point[i]);
+        mastering.max_luminance = hton32(format->mastering.max_luminance);
+        mastering.min_luminance = hton32(format->mastering.min_luminance);
+
+        NSData *data = [[NSData alloc] initWithBytes:&mastering
+                                              length:sizeof(mastering)];
+        CVBufferSetAttachment(pixelBuffer,
+                              kCVImageBufferMasteringDisplayColorVolumeKey,
+                              (__bridge CFDataRef)data,
+                              kCVAttachmentMode_ShouldPropagate);
+    }
+
+    if (format->lighting.MaxCLL || format->lighting.MaxFALL) {
+        struct {
+            uint16_t max_cll;
+            uint16_t max_fall;
+        } __attribute__((packed)) lighting = {
+            hton16(format->lighting.MaxCLL),
+            hton16(format->lighting.MaxFALL),
+        };
+        _Static_assert(sizeof(lighting) == 4,
+            "Mismatch with the content light level info size");
+
+        NSData *data = [[NSData alloc] initWithBytes:&lighting
+                                              length:sizeof(lighting)];
+        CVBufferSetAttachment(pixelBuffer,
+                              kCVImageBufferContentLightLevelInfoKey,
+                              (__bridge CFDataRef)data,
+                              kCVAttachmentMode_ShouldPropagate);
+    }
+}
+
 - (void)close {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [self.displayModeMatcher close];
@@ -1135,6 +1184,9 @@ static void RenderPicture(vout_display_t *vd, picture_t *pic, vlc_tick_t date) {
         (__bridge CFDictionaryRef)aspectRatio,
         kCVAttachmentMode_ShouldPropagate
     );
+
+    if (@available(iOS 11.0, *))
+        [sys attachHDRMetadataFromFormat:&pic->format toPixelBuffer:pixelBuffer];
 
     CMSampleBufferRef sampleBuffer = NULL;
     CMVideoFormatDescriptionRef formatDesc = NULL;
