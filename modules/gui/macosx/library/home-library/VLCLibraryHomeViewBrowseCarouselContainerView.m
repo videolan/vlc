@@ -94,6 +94,7 @@ static NSString * const VLCLibraryHomeBrowseItemIdentifier = @"VLCLibraryHomeBro
 {
     self.bookmarkedLocations = [NSUserDefaults.standardUserDefaults stringArrayForKey:VLCLibraryBookmarkedLocationsKey] ?: @[];
     self.headerView.itemCount = self.bookmarkedLocations.count;
+    self.hidden = self.bookmarkedLocations.count == 0;
     self.collectionView.selectionIndexPaths = NSSet.set;
     [self.collectionView reloadData];
 }
