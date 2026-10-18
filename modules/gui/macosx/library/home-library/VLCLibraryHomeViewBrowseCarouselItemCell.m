@@ -47,11 +47,7 @@
         : NSColor.VLCLibraryCardBackgroundColor;
     [fillColor setFill];
     [cardPath fill];
-    NSColor *borderColor = NSColor.gridColor;
-    if (@available(macOS 10.14, *)) {
-        borderColor = NSColor.separatorColor;
-    }
-    [borderColor setStroke];
+    [NSColor.VLCSubtleBorderColor setStroke];
     cardPath.lineWidth = borderThickness;
     [cardPath stroke];
 
