@@ -288,7 +288,8 @@ set_build_triplet()
 # on the SDK and calls the set_deployment_target
 # function with the rigth target version
 # Globals:
-#   VLC_DEPLOYMENT_TARGET_IOS
+#   VLC_DEPLOYMENT_TARGET_IOS_arm64
+#   VLC_DEPLOYMENT_TARGET_IOS_armv7
 #   VLC_DEPLOYMENT_TARGET_TVOS
 #   VLC_DEPLOYMENT_TARGET_MACOSX
 # Arguments:
@@ -310,6 +311,7 @@ validate_sdk_name()
         iphoneos*)
             VLC_HOST_PLATFORM="iOS"
             VLC_HOST_OS="ios"
+            eval "VLC_DEPLOYMENT_TARGET_IOS=\$VLC_DEPLOYMENT_TARGET_IOS_$VLC_HOST_ARCH"
             set_deployment_target "$VLC_DEPLOYMENT_TARGET_IOS"
             ;;
         iphonesimulator*)
@@ -584,11 +586,11 @@ check_tool xcrun
 # Aditionally a lot more is reported by this command, so this needs some more
 # awk parsing or something to get other values with just one query.
 
-# Validate given SDK name
-validate_sdk_name "$VLC_APPLE_SDK_NAME"
-
 # Validate architecture argument
 validate_architecture "$VLC_HOST_ARCH"
+
+# Validate given SDK name
+validate_sdk_name "$VLC_APPLE_SDK_NAME"
 
 # Set triplet (needs to be called after validating the arch)
 set_host_triplet "$VLC_HOST_ARCH"
