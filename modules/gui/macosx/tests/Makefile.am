@@ -21,6 +21,8 @@ VLCMacOSXTests_SOURCES = \
 	gui/macosx/tests/VLCLibraryDataTypesIntegrationTest.m \
 	gui/macosx/tests/VLCLibraryDataTypesIntegrationTestSupport.m \
 	gui/macosx/tests/VLCLibraryHomeBrowseCardTest.m \
+	gui/macosx/tests/VLCLibraryHomeBrowseCarouselTest.m \
+	gui/macosx/tests/VLCLibraryHomeTestSupport.m \
 	gui/macosx/tests/VLCLogMessageTest.m \
 	gui/macosx/tests/VLCMacOSXTestDefaults.m \
 	gui/macosx/tests/VLCPositionFormatterTest.m \
@@ -29,6 +31,7 @@ VLCMacOSXTests_SOURCES = \
 	gui/macosx/tests/VLCVisualEffectViewTest.m \
 	gui/macosx/extensions/NSAnimationContext+VLCAdditions.m \
 	gui/macosx/extensions/NSColor+VLCAdditions.m \
+	gui/macosx/extensions/NSTextField+VLCAdditions.m \
 	gui/macosx/extensions/VLCHexNumberFormatter.m \
 	gui/macosx/extensions/VLCPositionFormatter.m \
 	gui/macosx/extensions/NSString+Helpers.m \
@@ -36,15 +39,22 @@ VLCMacOSXTests_SOURCES = \
 	gui/macosx/extensions/NSFont+VLCAdditions.m \
 	gui/macosx/extensions/NSView+VLCAdditions.m \
 	gui/macosx/library/home-library/VLCLibraryHomeViewSectionHeaderView.m \
+	gui/macosx/library/VLCLibraryCarouselView.m \
+	gui/macosx/library/VLCLibraryCollectionViewDelegate.m \
+	gui/macosx/library/VLCLibraryCollectionViewFlowLayout.m \
 	gui/macosx/library/VLCLibraryDataTypes.m \
 	gui/macosx/library/VLCInputItem.m \
 	gui/macosx/library/VLCInputNode.m \
+	gui/macosx/library/home-library/VLCLibraryHomeBrowseCarouselView.m \
 	gui/macosx/library/home-library/VLCLibraryHomeBrowseCollectionViewItem.m \
+	gui/macosx/library/home-library/VLCLibraryHomeViewBaseCarouselContainerView.m \
+	gui/macosx/library/home-library/VLCLibraryHomeViewBrowseCarouselContainerView.m \
 	gui/macosx/library/home-library/VLCLibraryHomeViewBrowseCarouselItemCell.m \
 	gui/macosx/library/home-library/VLCLibraryHomeViewBrowseCarouselItemView.m \
 	gui/macosx/library/media-source/VLCMediaSourceTableViewSorting.m \
 	gui/macosx/windows/logging/VLCLogMessage.m \
 	gui/macosx/views/VLCCarouselView.m \
+	gui/macosx/views/VLCSubScrollView.m \
 	gui/macosx/views/VLCTimeFormatter.m \
 	gui/macosx/views/VLCUIUnits.m \
 	gui/macosx/views/VLCVisualEffectView.m
@@ -80,6 +90,7 @@ VLCMacOSXTests_LDFLAGS = \
 	-Wl,-framework,Foundation \
 	-Wl,-framework,Cocoa \
 	-Wl,-framework,CoreServices \
+	-Wl,-framework,CoreVideo \
 	-Wl,-framework,IOKit \
 	-Wl,-framework,QuartzCore
 
