@@ -1,0 +1,25 @@
+From 688c9a6c683d3baad796c73024c200db0e99662c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Felix=20Paul=20K=C3=BChne?= <fkuehne@videolan.org>
+Date: Sun, 18 Oct 2026 10:03:40 +0200
+Subject: [PATCH] libmpg123: select the NEON64 dct36 on aarch64
+
+INT123_dct36_choose() matched the neon decoder type under OPT_NEON64,
+but the aarch64 decoder type is neon64, so OPT_MULTI builds always fell
+back to the generic INT123_dct36().
+---
+ src/libmpg123/layer3.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/libmpg123/layer3.c b/src/libmpg123/layer3.c
+index e8059c4..eb93059 100644
+--- a/src/libmpg123/layer3.c
++++ b/src/libmpg123/layer3.c
+@@ -1543,7 +1543,7 @@ void INT123_dct36_choose(mpg123_handle *fr)
+ 	break;
+ #endif
+ #ifdef OPT_NEON64
+-	case neon:
++	case neon64:
+ 		fr->cpu_opts.the_dct36 = INT123_dct36_neon64_wrap;
+ 	break;
+ #endif

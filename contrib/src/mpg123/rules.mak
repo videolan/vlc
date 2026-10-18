@@ -21,6 +21,8 @@ mpg123: mpg123-$(MPG123_VERSION).tar.bz2 .sum-mpg123
 	# fix llvm-mingw ARM/AArch64 build
 	$(APPLY) $(SRC)/mpg123/0001-ports-cmake-Fix-detecting-asm-align-directives-in-cm.patch
 	$(APPLY) $(SRC)/mpg123/0002-ports-cmake-Fix-building-ARM-assembly-for-Windows-fo.patch
+	# use the NEON64 dct36 on aarch64
+	$(APPLY) $(SRC)/mpg123/0003-libmpg123-select-the-NEON64-dct36-on-aarch64.patch
 	$(MOVE)
 
 .mpg123: mpg123 toolchain.cmake
