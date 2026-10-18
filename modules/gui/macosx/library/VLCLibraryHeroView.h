@@ -36,7 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak) IBOutlet NSTextField *detailTextField;
 @property (readwrite, weak) IBOutlet NSButton *playButton;
 
-@property (readwrite, nonatomic) VLCLibraryRepresentedItem *representedItem;
+@property (readwrite, nonatomic, nullable) VLCLibraryRepresentedItem *representedItem;
 
 - (IBAction)playRepresentedItem:(id)sender;
 - (void)setOptimalRepresentedItem;
