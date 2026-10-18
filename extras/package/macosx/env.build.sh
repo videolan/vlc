@@ -107,6 +107,13 @@ vlcSetSymbolEnvironment() {
     # write the variables into a config.mak file for the contribs.
     local cmd="${1:-export}"; [ "$#" -ge 1 ] && shift
 
+    if [ "$VLC_HOST_OS" = "ios" ] && [ "${VLC_DEPLOYMENT_TARGET%%.*}" -lt 10 ]; then
+        set -- "$@" \
+            ac_cv_func_clock_getres=no \
+            ac_cv_func_clock_gettime=no \
+            ac_cv_func_clock_settime=no
+    fi
+
     # The following symbols do not exist on the minimal macOS / iOS, so they are disabled
     # here. This allows compilation also with newer macOS SDKs.
     # List assumes macOS 10.10 / iOS 8 at minimum.
@@ -126,9 +133,6 @@ vlcSetSymbolEnvironment() {
     ac_cv_prog_cc_c23=no \
     \
     ac_cv_func_basename_r=no \
-    ac_cv_func_clock_getres=no \
-    ac_cv_func_clock_gettime=no \
-    ac_cv_func_clock_settime=no \
     ac_cv_func_dirname_r=no \
     ac_cv_func_getentropy=no \
     ac_cv_func_mkostemp=no \
