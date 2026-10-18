@@ -227,6 +227,11 @@
     return [[VLCLibraryCarouselView alloc] initWithFrame:NSZeroRect];
 }
 
+- (void)reloadData
+{
+    [self.dataSource reloadData];
+}
+
 - (void)connect
 {
     if (self.dataSource == nil) {

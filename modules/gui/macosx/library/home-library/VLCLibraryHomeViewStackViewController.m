@@ -205,12 +205,11 @@
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.heroView setOptimalRepresentedItem];
-        [self.browseView reloadData];
 
         for (NSView<VLCLibraryHomeViewContainerView> * const containerView in self->_containers) {
             if ([containerView isKindOfClass:VLCLibraryHomeViewBaseCarouselContainerView.class]) {
                 VLCLibraryHomeViewBaseCarouselContainerView * const baseContainerView = (VLCLibraryHomeViewBaseCarouselContainerView *)containerView;
-                [baseContainerView.dataSource reloadData];
+                [baseContainerView reloadData];
             }
         }
     });

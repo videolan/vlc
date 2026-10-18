@@ -56,6 +56,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Subclasses can override this to customize item activation and context menus.
  */
 - (VLCLibraryCarouselView *)newCollectionView;
+- (void)reloadData;
 
 @end
 
