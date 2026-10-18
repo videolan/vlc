@@ -27,6 +27,13 @@
 #import "views/VLCCarouselView.h"
 #import "views/VLCUIUnits.h"
 
+@interface VLCLibraryHomeViewBrowseCarouselItemView ()
+{
+    NSUInteger _resourceValuesRequest;
+}
+
+@end
+
 @implementation VLCLibraryHomeViewBrowseCarouselItemView
 
 + (Class)cellClass
@@ -81,22 +88,17 @@
 - (void)setMrl:(NSString *)mrl
 {
     _mrl = [mrl copy];
-    VLCLibraryHomeViewBrowseCarouselItemCell * const cell =
-        (VLCLibraryHomeViewBrowseCarouselItemCell *)self.cell;
-
+    const NSUInteger request = ++_resourceValuesRequest;
     NSURL * const url = [mrl hasPrefix:@"/"]
-        ? [NSURL fileURLWithPath:mrl]
+        ? [NSURL fileURLWithPath:mrl isDirectory:[mrl hasSuffix:@"/"]]
         : [NSURL URLWithString:mrl];
-    NSString * const scheme = url.scheme.lowercaseString;
-    NSString *symbolName = @"folder";
-    NSImageName fallbackImageName = NSImageNameFolder;
-    cell.iconTint = NSColor.secondaryLabelColor;
-    cell.subtitle = _NS("Folder");
-    self.title = url.lastPathComponent.length > 0
-        ? url.lastPathComponent
-        : (url.host.length > 0 ? url.host : mrl);
+    [self updateContentWithURL:url resourceValues:nil];
+    if (!url.isFileURL) {
+        return;
+    }
 
-    if (url.isFileURL) {
+    __weak typeof(self) weakSelf = self;
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
         NSDictionary<NSURLResourceKey, id> * const resourceValues =
             [url resourceValuesForKeys:@[NSURLLocalizedNameKey,
                                          NSURLIsVolumeKey,
@@ -106,6 +108,34 @@
                                          NSURLVolumeIsInternalKey,
                                          NSURLVolumeLocalizedNameKey]
                                  error:nil];
+        if (resourceValues == nil) {
+            return;
+        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            typeof(self) strongSelf = weakSelf;
+            if (strongSelf == nil || strongSelf->_resourceValuesRequest != request) {
+                return;
+            }
+            [strongSelf updateContentWithURL:url resourceValues:resourceValues];
+        });
+    });
+}
+
+- (void)updateContentWithURL:(NSURL *)url
+              resourceValues:(NSDictionary<NSURLResourceKey, id> *)resourceValues
+{
+    VLCLibraryHomeViewBrowseCarouselItemCell * const cell =
+        (VLCLibraryHomeViewBrowseCarouselItemCell *)self.cell;
+    NSString * const scheme = url.scheme.lowercaseString;
+    NSString *symbolName = @"folder";
+    NSImageName fallbackImageName = NSImageNameFolder;
+    cell.iconTint = NSColor.secondaryLabelColor;
+    cell.subtitle = _NS("Folder");
+    self.title = url.lastPathComponent.length > 0
+        ? url.lastPathComponent
+        : (url.host.length > 0 ? url.host : self.mrl);
+
+    if (url.isFileURL) {
         NSString * const localizedName = resourceValues[NSURLLocalizedNameKey];
         if (localizedName.length > 0) {
             self.title = localizedName;
@@ -167,7 +197,7 @@
         icon = [NSImage imageWithSystemSymbolName:symbolName accessibilityDescription:nil];
     }
     self.image = icon ?: [NSImage imageNamed:fallbackImageName];
-    self.toolTip = url.isFileURL ? url.path : mrl;
+    self.toolTip = url.isFileURL ? url.path : self.mrl;
     self.accessibilityLabel = self.title;
     self.accessibilityHelp = [NSString stringWithFormat:@"%@ — %@", self.subtitle, self.toolTip];
     self.needsDisplay = YES;

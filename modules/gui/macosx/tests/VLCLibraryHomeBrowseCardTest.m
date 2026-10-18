@@ -23,12 +23,15 @@
 #import "VLCAppKitMockingTestCase.h"
 
 #import <vlc_common.h>
+#import <objc/runtime.h>
 
 #import "library/home-library/VLCLibraryHomeBrowseCollectionViewItem.h"
 #import "library/home-library/VLCLibraryHomeViewBrowseCarouselItemCell.h"
 #import "library/home-library/VLCLibraryHomeViewBrowseCarouselItemView.h"
 #import "views/VLCCarouselView.h"
 #import "views/VLCUIUnits.h"
+
+static const NSTimeInterval VLCHomeBrowseAsyncTimeout = 5.;
 
 static NSString *VLCHomeBrowseLocalized(const char *message)
 {
@@ -140,6 +143,35 @@ static NSRect VLCHomeBrowseOpaqueRedBounds(NSBitmapImageRep *bitmap, NSRect tile
         initWithFrame:(NSRect){NSZeroPoint, VLCUIUnits.libraryCompactCardSize}];
 }
 
+- (XCTestExpectation *)expectationForCard:(VLCLibraryHomeViewBrowseCarouselItemView *)card
+                                 withName:(NSString *)name
+                                 subtitle:(NSString *)subtitle
+{
+    NSPredicate * const predicate = [NSPredicate predicateWithBlock:^BOOL(id object, NSDictionary * __unused bindings) {
+        VLCLibraryHomeViewBrowseCarouselItemView * const observedCard = object;
+        return [observedCard.title.precomposedStringWithCanonicalMapping
+                    isEqualToString:name.precomposedStringWithCanonicalMapping] &&
+               [observedCard.subtitle isEqualToString:subtitle];
+    }];
+    return [self expectationForPredicate:predicate evaluatedWithObject:card handler:nil];
+}
+
+- (void)mockResourceValuesForURL:(NSURL *)url
+                       withBlock:(NSDictionary<NSURLResourceKey, id> *(^)(void))block
+{
+    const SEL selector = @selector(resourceValuesForKeys:error:);
+    const Class urlClass = url.class;
+    const IMP original = class_getMethodImplementation(urlClass, selector);
+    [self replaceInstanceMethod:selector
+                        onClass:urlClass
+                      withBlock:^NSDictionary *(NSURL *queriedURL, NSArray *keys, NSError **error) {
+        if ([queriedURL isEqual:url]) {
+            return block();
+        }
+        return ((NSDictionary *(*)(id, SEL, NSArray *, NSError **))original)(queriedURL, selector, keys, error);
+    }];
+}
+
 - (void)assertCard:(VLCLibraryHomeViewBrowseCarouselItemView *)card
            hasName:(NSString *)name
           subtitle:(NSString *)subtitle
@@ -195,7 +227,8 @@ static NSRect VLCHomeBrowseOpaqueRedBounds(NSBitmapImageRep *bitmap, NSRect tile
 - (void)testLocalFolderAcceptsRawAndEscapedPaths
 {
     NSString * const name = @"Música & Cinema";
-    NSURL * const directory = [self.temporaryDirectory URLByAppendingPathComponent:name isDirectory:YES];
+    NSURL * const directory =
+        [self.temporaryDirectory URLByAppendingPathComponent:name isDirectory:YES];
     NSError *error = nil;
     XCTAssertTrue([NSFileManager.defaultManager createDirectoryAtURL:directory
                                          withIntermediateDirectories:NO
@@ -219,7 +252,12 @@ static NSRect VLCHomeBrowseOpaqueRedBounds(NSBitmapImageRep *bitmap, NSRect tile
     NSError *error = nil;
     XCTAssertTrue([NSData.data writeToURL:file options:0 error:&error], @"%@", error);
     VLCLibraryHomeViewBrowseCarouselItemView * const card = [self newCard];
+    XCTestExpectation * const metadataApplied = [self expectationForCard:card
+                                                                withName:name
+                                                                subtitle:VLCHomeBrowseLocalized("File")];
     card.mrl = file.absoluteString;
+    [self assertCard:card hasName:name subtitle:VLCHomeBrowseLocalized("Folder") tooltip:file.path];
+    [self waitForExpectations:@[metadataApplied] timeout:VLCHomeBrowseAsyncTimeout];
     [self assertCard:card hasName:name subtitle:VLCHomeBrowseLocalized("File") tooltip:file.path];
 }
 
@@ -228,7 +266,15 @@ static NSRect VLCHomeBrowseOpaqueRedBounds(NSBitmapImageRep *bitmap, NSRect tile
     NSURL * const missing =
         [self.temporaryDirectory URLByAppendingPathComponent:@"Unavailable Music" isDirectory:YES];
     VLCLibraryHomeViewBrowseCarouselItemView * const card = [self newCard];
+    XCTestExpectation * const lookupReturned =
+        [self expectationWithDescription:@"unavailable metadata lookup returned"];
+    [self mockResourceValuesForURL:missing withBlock:^NSDictionary *{
+        [lookupReturned fulfill];
+        return nil;
+    }];
     card.mrl = missing.absoluteString;
+    [self waitForExpectations:@[lookupReturned] timeout:VLCHomeBrowseAsyncTimeout];
+    [self drainMainQueue];
     [self assertCard:card
              hasName:@"Unavailable Music"
             subtitle:VLCHomeBrowseLocalized("Folder")
@@ -251,6 +297,176 @@ static NSRect VLCHomeBrowseOpaqueRedBounds(NSBitmapImageRep *bitmap, NSRect tile
              hasName:name
             subtitle:VLCHomeBrowseLocalized("Folder")
              tooltip:directory.path];
+}
+
+- (void)testLocalMetadataLookupDoesNotBlockTheMainThread
+{
+    NSURL * const url =
+        [self.temporaryDirectory URLByAppendingPathComponent:@"Media" isDirectory:YES];
+    VLCLibraryHomeViewBrowseCarouselItemView * const card = [self newCard];
+    XCTestExpectation * const lookupStarted =
+        [self expectationWithDescription:@"background metadata lookup started"];
+    XCTestExpectation * const metadataApplied = [self expectationForCard:card
+                                                                withName:@"Localized Media"
+                                                                subtitle:VLCHomeBrowseLocalized("Folder")];
+    dispatch_semaphore_t const lookupGate = dispatch_semaphore_create(0);
+    dispatch_semaphore_t const lookupFinished = dispatch_semaphore_create(0);
+    __weak typeof(self) weakSelf = self;
+    [self addTeardownBlock:^{
+        dispatch_semaphore_signal(lookupGate);
+        XCTAssertEqual(dispatch_semaphore_wait(lookupFinished, dispatch_time(DISPATCH_TIME_NOW, VLCHomeBrowseAsyncTimeout * NSEC_PER_SEC)), 0l);
+        [weakSelf drainMainQueue];
+    }];
+    __block BOOL lookupOnMainThread = NO;
+    [self mockResourceValuesForURL:url withBlock:^NSDictionary *{
+        lookupOnMainThread = NSThread.isMainThread;
+        [lookupStarted fulfill];
+        // A synchronous regression must fail without deadlocking the test.
+        if (!lookupOnMainThread) {
+            dispatch_semaphore_wait(lookupGate, dispatch_time(DISPATCH_TIME_NOW, VLCHomeBrowseAsyncTimeout * NSEC_PER_SEC));
+        }
+        NSDictionary * const values =
+            @{NSURLLocalizedNameKey: @"Localized Media", NSURLIsDirectoryKey: @YES};
+        dispatch_semaphore_signal(lookupFinished);
+        return values;
+    }];
+
+    card.mrl = url.absoluteString;
+    [self assertCard:card
+             hasName:@"Media"
+            subtitle:VLCHomeBrowseLocalized("Folder")
+             tooltip:url.path];
+    [self waitForExpectations:@[lookupStarted] timeout:VLCHomeBrowseAsyncTimeout];
+    XCTAssertFalse(lookupOnMainThread);
+    dispatch_semaphore_signal(lookupGate);
+    [self waitForExpectations:@[metadataApplied] timeout:VLCHomeBrowseAsyncTimeout];
+    [self assertCard:card
+             hasName:@"Localized Media"
+            subtitle:VLCHomeBrowseLocalized("Folder")
+             tooltip:url.path];
+    [self drainMainQueue];
+}
+
+- (void)testChangingLocationRejectsOldMetadata
+{
+    NSURL * const url =
+        [self.temporaryDirectory URLByAppendingPathComponent:@"Media.mov" isDirectory:NO];
+    VLCLibraryHomeViewBrowseCarouselItemView * const card = [self newCard];
+    XCTestExpectation * const lookupStarted =
+        [self expectationWithDescription:@"old location lookup started"];
+    XCTestExpectation * const lookupReturned =
+        [self expectationWithDescription:@"old location lookup returned"];
+    dispatch_semaphore_t const lookupGate = dispatch_semaphore_create(0);
+    dispatch_semaphore_t const lookupFinished = dispatch_semaphore_create(0);
+    __weak typeof(self) weakSelf = self;
+    [self addTeardownBlock:^{
+        dispatch_semaphore_signal(lookupGate);
+        XCTAssertEqual(dispatch_semaphore_wait(lookupFinished, dispatch_time(DISPATCH_TIME_NOW, VLCHomeBrowseAsyncTimeout * NSEC_PER_SEC)), 0l);
+        [weakSelf drainMainQueue];
+    }];
+    __block BOOL lookupOnMainThread = NO;
+    [self mockResourceValuesForURL:url withBlock:^NSDictionary *{
+        lookupOnMainThread = NSThread.isMainThread;
+        [lookupStarted fulfill];
+        if (!lookupOnMainThread) {
+            dispatch_semaphore_wait(lookupGate, dispatch_time(DISPATCH_TIME_NOW, VLCHomeBrowseAsyncTimeout * NSEC_PER_SEC));
+        }
+        NSDictionary * const values =
+            @{NSURLLocalizedNameKey: @"Outdated Media", NSURLIsDirectoryKey: @NO};
+        [lookupReturned fulfill];
+        dispatch_semaphore_signal(lookupFinished);
+        return values;
+    }];
+    card.mrl = url.absoluteString;
+    [self waitForExpectations:@[lookupStarted] timeout:VLCHomeBrowseAsyncTimeout];
+    XCTAssertFalse(lookupOnMainThread);
+
+    NSString * const replacement = @"smb://replacement.invalid/Current%20Library/";
+    card.mrl = replacement;
+    XCTestExpectation * const staleMetadataApplied =
+        [self keyValueObservingExpectationForObject:card
+                                            keyPath:@"title"
+                                            handler:^BOOL(id __unused object, NSDictionary * __unused change) {
+        return [card.title isEqualToString:@"Outdated Media"];
+    }];
+    staleMetadataApplied.inverted = YES;
+    dispatch_semaphore_signal(lookupGate);
+    [self waitForExpectations:@[lookupReturned, staleMetadataApplied]
+                      timeout:VLCHomeBrowseAsyncTimeout];
+    [self drainMainQueue];
+    [self assertCard:card
+             hasName:@"Current Library"
+            subtitle:VLCHomeBrowseLocalized("Network location")
+             tooltip:replacement];
+}
+
+- (void)testCollectionItemReuseRejectsOldMetadataForTheSameLocation
+{
+    NSURL * const url =
+        [self.temporaryDirectory URLByAppendingPathComponent:@"Media.mov" isDirectory:NO];
+    VLCLibraryHomeBrowseCollectionViewItem * const item =
+        [[VLCLibraryHomeBrowseCollectionViewItem alloc] init];
+    VLCLibraryHomeViewBrowseCarouselItemView * const card = (id)item.view;
+    XCTestExpectation * const oldLookupStarted =
+        [self expectationWithDescription:@"old metadata lookup started"];
+    XCTestExpectation * const oldLookupReturned =
+        [self expectationWithDescription:@"old metadata lookup returned"];
+    dispatch_semaphore_t const oldLookupGate = dispatch_semaphore_create(0);
+    dispatch_semaphore_t const oldLookupFinished = dispatch_semaphore_create(0);
+    __weak typeof(self) weakSelf = self;
+    [self addTeardownBlock:^{
+        dispatch_semaphore_signal(oldLookupGate);
+        XCTAssertEqual(dispatch_semaphore_wait(oldLookupFinished, dispatch_time(DISPATCH_TIME_NOW, VLCHomeBrowseAsyncTimeout * NSEC_PER_SEC)), 0l);
+        [weakSelf drainMainQueue];
+    }];
+    __block NSUInteger lookupCount = 0;
+    __block BOOL oldLookupOnMainThread = NO;
+    [self mockResourceValuesForURL:url withBlock:^NSDictionary *{
+        const NSUInteger lookup = ++lookupCount;
+        if (lookup == 1) {
+            oldLookupOnMainThread = NSThread.isMainThread;
+            [oldLookupStarted fulfill];
+            if (!oldLookupOnMainThread) {
+                dispatch_semaphore_wait(oldLookupGate, dispatch_time(DISPATCH_TIME_NOW, VLCHomeBrowseAsyncTimeout * NSEC_PER_SEC));
+            }
+            NSDictionary * const values =
+                @{NSURLLocalizedNameKey: @"Outdated Media", NSURLIsDirectoryKey: @NO};
+            [oldLookupReturned fulfill];
+            dispatch_semaphore_signal(oldLookupFinished);
+            return values;
+        }
+        return @{NSURLLocalizedNameKey: @"Current Media", NSURLIsDirectoryKey: @NO};
+    }];
+
+    card.mrl = url.absoluteString;
+    [self waitForExpectations:@[oldLookupStarted] timeout:VLCHomeBrowseAsyncTimeout];
+    XCTAssertFalse(oldLookupOnMainThread);
+    [item prepareForReuse];
+    // Reusing the same MRL must invalidate the first request too (A -> empty -> A).
+    XCTestExpectation * const currentMetadataApplied = [self expectationForCard:card
+                                                                       withName:@"Current Media"
+                                                                       subtitle:VLCHomeBrowseLocalized("File")];
+    card.mrl = url.absoluteString;
+    [self waitForExpectations:@[currentMetadataApplied] timeout:VLCHomeBrowseAsyncTimeout];
+    [self assertCard:card
+             hasName:@"Current Media"
+            subtitle:VLCHomeBrowseLocalized("File")
+             tooltip:url.path];
+
+    XCTestExpectation * const staleMetadataApplied =
+        [self keyValueObservingExpectationForObject:card
+                                            keyPath:@"title"
+                                            handler:^BOOL(id __unused object, NSDictionary * __unused change) {
+        return [card.title isEqualToString:@"Outdated Media"];
+    }];
+    staleMetadataApplied.inverted = YES;
+    dispatch_semaphore_signal(oldLookupGate);
+    [self waitForExpectations:@[oldLookupReturned, staleMetadataApplied] timeout:VLCHomeBrowseAsyncTimeout];
+    [self drainMainQueue];
+    [self assertCard:card
+             hasName:@"Current Media"
+            subtitle:VLCHomeBrowseLocalized("File")
+             tooltip:url.path];
 }
 
 - (void)testRemoteURLsUseDecodedNamesAndKeepExactLocation
