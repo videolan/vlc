@@ -27,12 +27,6 @@
 #import "views/VLCCarouselView.h"
 #import "views/VLCUIUnits.h"
 
-@interface VLCLibraryHomeViewBrowseCarouselItemView ()
-
-@property (nonatomic, readwrite, copy) NSString *subtitle;
-
-@end
-
 @implementation VLCLibraryHomeViewBrowseCarouselItemView
 
 + (Class)cellClass
@@ -77,12 +71,11 @@
     [self highlight:NO];
 }
 
-- (void)setSubtitle:(NSString *)subtitle
+- (NSString *)subtitle
 {
-    _subtitle = [subtitle copy];
     VLCLibraryHomeViewBrowseCarouselItemCell * const cell =
         (VLCLibraryHomeViewBrowseCarouselItemCell *)self.cell;
-    cell.subtitle = _subtitle;
+    return cell.subtitle;
 }
 
 - (void)setMrl:(NSString *)mrl
@@ -98,7 +91,7 @@
     NSString *symbolName = @"folder";
     NSImageName fallbackImageName = NSImageNameFolder;
     cell.iconTint = NSColor.secondaryLabelColor;
-    self.subtitle = _NS("Folder");
+    cell.subtitle = _NS("Folder");
     self.title = url.lastPathComponent.length > 0
         ? url.lastPathComponent
         : (url.host.length > 0 ? url.host : mrl);
@@ -118,7 +111,7 @@
             self.title = localizedName;
         }
         if ([resourceValues[NSURLIsUbiquitousItemKey] boolValue]) {
-            self.subtitle = _NS("Cloud");
+            cell.subtitle = _NS("Cloud");
             symbolName = @"cloud";
             cell.iconTint = NSColor.systemBlueColor;
         } else if ([resourceValues[NSURLIsVolumeKey] boolValue]) {
@@ -128,24 +121,24 @@
             }
             if (resourceValues[NSURLVolumeIsLocalKey] &&
                 ![resourceValues[NSURLVolumeIsLocalKey] boolValue]) {
-                self.subtitle = _NS("Network location");
+                cell.subtitle = _NS("Network location");
                 symbolName = @"server.rack";
                 fallbackImageName = NSImageNameNetwork;
                 cell.iconTint = NSColor.systemGreenColor;
             } else if (resourceValues[NSURLVolumeIsInternalKey] &&
                        ![resourceValues[NSURLVolumeIsInternalKey] boolValue]) {
-                self.subtitle = _NS("External drive");
+                cell.subtitle = _NS("External drive");
                 symbolName = @"externaldrive";
                 fallbackImageName = NSImageNameComputer;
                 cell.iconTint = NSColor.systemBlueColor;
             } else {
-                self.subtitle = _NS("Local disk");
+                cell.subtitle = _NS("Local disk");
                 symbolName = @"internaldrive";
                 fallbackImageName = NSImageNameComputer;
             }
         } else if (resourceValues[NSURLIsDirectoryKey] &&
                    ![resourceValues[NSURLIsDirectoryKey] boolValue]) {
-            self.subtitle = _NS("File");
+            cell.subtitle = _NS("File");
             symbolName = @"doc";
             fallbackImageName = NSImageNameMultipleDocuments;
         }
@@ -154,7 +147,7 @@
                [scheme isEqualToString:@"cdda"] ||
                [scheme isEqualToString:@"vcd"] ||
                [scheme isEqualToString:@"bluray"]) {
-        self.subtitle = [scheme isEqualToString:@"cdda"]
+        cell.subtitle = [scheme isEqualToString:@"cdda"]
             ? _NS("Audio CD")
             : ([scheme isEqualToString:@"dvd"] || [scheme isEqualToString:@"dvdnav"]
                 ? _NS("DVD")
@@ -163,7 +156,7 @@
         fallbackImageName = NSImageNameFolderBurnable;
         cell.iconTint = NSColor.systemOrangeColor;
     } else if (url.scheme.length > 0) {
-        self.subtitle = _NS("Network location");
+        cell.subtitle = _NS("Network location");
         symbolName = @"server.rack";
         fallbackImageName = NSImageNameNetwork;
         cell.iconTint = NSColor.systemGreenColor;
