@@ -111,7 +111,7 @@
     XCTAssertEqualObjects(self.header.libraryButton.accessibilityLabel, libraryAccessibilityLabel);
 }
 
-- (void)testCountUpdatesSubtitleIncludingZeroAndSingular
+- (void)testCountUpdatesIncludingZeroAndSingular
 {
     for (NSNumber *count in @[@0, @1, @2, @123, @1, @0]) {
         const NSUInteger itemCount = count.unsignedIntegerValue;
@@ -157,7 +157,7 @@
     XCTAssertLessThan(self.header.libraryButton.frame.size.width, self.header.frame.size.width);
 }
 
-- (void)testNarrowHeaderTruncatesTitleAndKeepsSubtitleBelow
+- (void)testNarrowHeaderTruncatesTitleAndKeepsCountAtTrailingEdge
 {
     self.header.title = @"A very long recent video collection section title";
     self.widthConstraint.constant = 320;
@@ -166,8 +166,11 @@
 
     const NSRect buttonRect = [self.header.libraryButton convertRect:self.header.libraryButton.bounds
                                                             toView:self.header];
-    const NSRect countRect = [self.header.countField convertRect:self.header.countField.bounds toView:self.header];
-    XCTAssertLessThanOrEqual(NSMaxY(countRect), NSMinY(buttonRect));
+    const NSRect countRect = [self.header.countField alignmentRectForFrame:self.header.countField.frame];
+    XCTAssertLessThanOrEqual(NSMaxX(buttonRect), NSMinX(countRect));
+    XCTAssertEqualWithAccuracy(NSMidY(countRect), NSMidY(buttonRect), 0.5);
+    XCTAssertEqualWithAccuracy(NSMaxX(countRect), NSMaxX(self.header.bounds), 0.5);
+    XCTAssertGreaterThanOrEqual(countRect.size.width, self.header.countField.intrinsicContentSize.width);
     XCTAssertLessThan(self.header.libraryButton.frame.size.width,
                       self.header.libraryButton.intrinsicContentSize.width);
     XCTAssertEqual(self.header.libraryButton.lineBreakMode, NSLineBreakByTruncatingTail);
@@ -175,6 +178,21 @@
     self.widthConstraint.constant = 800;
     [self.window.contentView layoutSubtreeIfNeeded];
     [self assertContentFitsHeader];
+}
+
+- (void)testCountRemainsVisibleWhenItsWidthChanges
+{
+    self.header.title = @"A very long recent video collection section title";
+    self.widthConstraint.constant = 320;
+    for (NSNumber *count in @[@0, @1, @(NSUIntegerMax), @2]) {
+        self.header.itemCount = count.unsignedIntegerValue;
+        [self.window.contentView layoutSubtreeIfNeeded];
+        [self assertContentFitsHeader];
+        const NSRect countRect = [self.header.countField alignmentRectForFrame:self.header.countField.frame];
+        XCTAssertEqualWithAccuracy(NSMaxX(countRect), NSMaxX(self.header.bounds), 0.5);
+        XCTAssertGreaterThanOrEqual(countRect.size.width, self.header.countField.intrinsicContentSize.width);
+        XCTAssertLessThanOrEqual(NSMaxX(self.header.libraryButton.frame), NSMinX(countRect));
+    }
 }
 
 - (void)testHeightFollowsContentAndLargerFonts

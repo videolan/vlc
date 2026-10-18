@@ -95,17 +95,20 @@
                                  forOrientation:NSLayoutConstraintOrientationHorizontal];
     [self.libraryButton setContentCompressionResistancePriority:NSLayoutPriorityDefaultLow
                                                forOrientation:NSLayoutConstraintOrientationHorizontal];
+    [self.countField setContentCompressionResistancePriority:NSLayoutPriorityRequired
+                                             forOrientation:NSLayoutConstraintOrientationHorizontal];
     [self addSubview:self.libraryButton];
     [self addSubview:self.countField];
 
     [NSLayoutConstraint activateConstraints:@[
         [self.libraryButton.leadingAnchor constraintEqualToAnchor:self.leadingAnchor],
-        [self.libraryButton.trailingAnchor constraintLessThanOrEqualToAnchor:self.trailingAnchor],
+        [self.libraryButton.trailingAnchor constraintLessThanOrEqualToAnchor:self.countField.leadingAnchor constant:-VLCUIUnits.largeSpacing],
         [self.libraryButton.topAnchor constraintEqualToAnchor:self.topAnchor],
-        [self.countField.leadingAnchor constraintEqualToAnchor:self.leadingAnchor],
-        [self.countField.trailingAnchor constraintLessThanOrEqualToAnchor:self.trailingAnchor],
-        [self.countField.topAnchor constraintEqualToAnchor:self.libraryButton.bottomAnchor constant:VLCUIUnits.smallSpacing],
-        [self.countField.bottomAnchor constraintEqualToAnchor:self.bottomAnchor],
+        [self.libraryButton.bottomAnchor constraintEqualToAnchor:self.bottomAnchor],
+        [self.countField.trailingAnchor constraintEqualToAnchor:self.trailingAnchor],
+        [self.countField.centerYAnchor constraintEqualToAnchor:self.libraryButton.centerYAnchor],
+        [self.countField.topAnchor constraintGreaterThanOrEqualToAnchor:self.topAnchor],
+        [self.countField.bottomAnchor constraintLessThanOrEqualToAnchor:self.bottomAnchor],
     ]];
 }
 
