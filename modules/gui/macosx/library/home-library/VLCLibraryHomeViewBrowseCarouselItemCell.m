@@ -22,6 +22,7 @@
 
 #import "VLCLibraryHomeViewBrowseCarouselItemCell.h"
 
+#import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSFont+VLCAdditions.h"
 #import "views/VLCUIUnits.h"
 
@@ -43,8 +44,7 @@
                                         yRadius:cardCornerRadius];
     NSColor * const fillColor = self.isHighlighted
         ? NSColor.selectedControlColor
-        : [NSColor.controlBackgroundColor blendedColorWithFraction:VLCUIUnits.librarySurfaceBlendFraction
-                                                           ofColor:NSColor.labelColor];
+        : NSColor.VLCLibraryCardBackgroundColor;
     [fillColor setFill];
     [cardPath fill];
     NSColor *borderColor = NSColor.gridColor;
@@ -62,10 +62,10 @@
     NSBezierPath * const tilePath = [NSBezierPath bezierPathWithRoundedRect:tileRect
                                                                     xRadius:tileCornerRadius
                                                                     yRadius:tileCornerRadius];
-    const CGFloat tileOpacity = self.isHighlighted
-        ? VLCUIUnits.highlightedTintOpacity
-        : VLCUIUnits.subtleTintOpacity;
-    [[self.iconTint colorWithAlphaComponent:tileOpacity] setFill];
+    NSColor * const tileColor = self.isHighlighted
+        ? self.iconTint.VLCHighlightedTintColor
+        : self.iconTint.VLCSubtleTintColor;
+    [tileColor setFill];
     [tilePath fill];
 
     const CGFloat iconSize = VLCUIUnits.mediumIconSize;

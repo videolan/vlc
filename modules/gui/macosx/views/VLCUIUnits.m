@@ -101,21 +101,6 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
     return self.smallSpacing + self.borderThickness;
 }
 
-+ (const CGFloat)librarySurfaceBlendFraction
-{
-    return .04;
-}
-
-+ (const CGFloat)subtleTintOpacity
-{
-    return .15;
-}
-
-+ (const CGFloat)highlightedTintOpacity
-{
-    return .25;
-}
-
 + (const CGFloat)disabledOpacity
 {
     return .5;

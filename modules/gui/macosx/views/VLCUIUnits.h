@@ -67,9 +67,6 @@ extern NSString * const VLCLibraryCollectionViewItemAdjustmentKey;
 @property (class, readonly) const CGFloat dashedBorderDashLength;
 @property (class, readonly) const CGFloat dashedBorderDashSpacing;
 
-@property (class, readonly) const CGFloat librarySurfaceBlendFraction;
-@property (class, readonly) const CGFloat subtleTintOpacity;
-@property (class, readonly) const CGFloat highlightedTintOpacity;
 @property (class, readonly) const CGFloat disabledOpacity;
 
 // Common icon, illustration and action-button sizes.
