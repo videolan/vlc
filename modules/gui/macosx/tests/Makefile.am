@@ -9,6 +9,7 @@ check_PROGRAMS += VLCMacOSXTests
 TESTS += $(macosx_gui_xctest_bundles)
 
 VLCMacOSXTests_SOURCES = \
+	gui/macosx/tests/VLCAppKitMockingTestCase.m \
 	gui/macosx/tests/VLCHexNumberFormatterTest.m \
 	gui/macosx/tests/NSStringHelpersTest.m \
 	gui/macosx/tests/VLCLibraryDataTypesTest.m \
@@ -20,6 +21,7 @@ VLCMacOSXTests_SOURCES = \
 	gui/macosx/tests/VLCLibraryDataTypesIntegrationTest.m \
 	gui/macosx/tests/VLCLibraryDataTypesIntegrationTestSupport.m \
 	gui/macosx/tests/VLCLogMessageTest.m \
+	gui/macosx/tests/VLCMacOSXTestDefaults.m \
 	gui/macosx/tests/VLCPositionFormatterTest.m \
 	gui/macosx/tests/VLCTimeFormatterTest.m \
 	gui/macosx/tests/VLCLibraryHomeViewSectionHeaderViewTest.m \
@@ -41,9 +43,11 @@ VLCMacOSXTests_SOURCES = \
 	gui/macosx/views/VLCVisualEffectView.m
 
 noinst_HEADERS += \
+	gui/macosx/tests/VLCAppKitMockingTestCase.h \
 	gui/macosx/tests/VLCInputItemTestSupport.h \
 	gui/macosx/tests/VLCLibraryDataTypesTestSupport.h \
-	gui/macosx/tests/VLCLibraryDataTypesIntegrationTestSupport.h
+	gui/macosx/tests/VLCLibraryDataTypesIntegrationTestSupport.h \
+	gui/macosx/tests/VLCMacOSXTestDefaults.h
 
 VLCMacOSXTests_CPPFLAGS = \
 	$(AM_CPPFLAGS) \
