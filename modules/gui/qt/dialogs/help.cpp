@@ -91,8 +91,8 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf)
         ui.footer->setStyleSheet("background-color: rgb(25, 25, 25);");
         linkColor = "#ffa851";
     } else {
-        ui.horizontalFrame->setStyleSheet("background-color: rgb(230, 230, 230);");
-        ui.footer->setStyleSheet("background-color: rgb(245, 245, 245);");
+        ui.horizontalFrame->setStyleSheet("background-color: rgb(230, 230, 230); color: rgb(0, 0, 0);");
+        ui.footer->setStyleSheet("background-color: rgb(245, 245, 245); color: rgb(0, 0, 0);");
         linkColor = "#0057ae";
     }
 
