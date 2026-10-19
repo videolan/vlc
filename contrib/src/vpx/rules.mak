@@ -38,6 +38,8 @@ endif
 	$(APPLY) $(SRC)/vpx/0001-fix-compilation-with-Apple-Clang-13.patch
 	# make sure we can build when targetting Windows XP
 	$(APPLY) $(SRC)/vpx/0001-force-detection-of-pthread-on-Windows.patch
+	# _mm512_reduce_add_epi32 is missing before GCC 7, skip sad_avx512.c in that case
+	$(APPLY) $(SRC)/vpx/0001-only-build-sad_avx512.c-when-_mm512_reduce_add_epi32-is-available.patch
 	# do not force C++17, it's not supported by older compilers we support
 	sed -i.orig 's,++17,++14,g' $(UNPACK_DIR)/configure
 	$(MOVE)

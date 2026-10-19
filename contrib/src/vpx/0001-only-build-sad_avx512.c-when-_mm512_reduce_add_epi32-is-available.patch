@@ -1,0 +1,137 @@
+From 4deb35008852f9bfd8c4d0b526170b0c89e416aa Mon Sep 17 00:00:00 2001
+From: Mohak Malviya <mohakmalviya2000@gmail.com>
+Date: Thu, 22 Oct 2026 21:17:25 +0530
+Subject: [PATCH] Only build sad_avx512.c when _mm512_reduce_add_epi32 is
+ available
+
+It was only added in GCC 7. With older GCC the file still compiles with an
+implicit declaration warning and anything linking libvpx then fails with an
+undefined reference to _mm512_reduce_add_epi32.
+
+Check for it in configure and drop only the functions from sad_avx512.c when
+it's missing. The rest of the AVX512 code builds fine with these compilers.
+---
+ build/make/configure.sh      | 21 +++++++++++++++++++++
+ vpx_dsp/vpx_dsp.mk           |  2 ++
+ vpx_dsp/vpx_dsp_rtcd_defs.pl | 18 ++++++++++++------
+ 3 files changed, 35 insertions(+), 6 deletions(-)
+
+diff --git a/build/make/configure.sh b/build/make/configure.sh
+index 21407f3..fd9100c 100644
+--- a/build/make/configure.sh
++++ b/build/make/configure.sh
+@@ -470,6 +470,7 @@ EOF
+ 
+ check_gcc_avx512_compiles() {
+   if disabled gcc; then
++    enable_feature mm512_reduce_add_epi32
+     return
+   fi
+ 
+@@ -485,6 +486,25 @@ EOF
+     log_echo "    disabling avx512: not supported by compiler"
+     disable_feature avx512
+     RTCD_OPTIONS="${RTCD_OPTIONS}--disable-avx512 "
++    return
++  fi
++
++  # vpx_dsp/x86/sad_avx512.c uses _mm512_reduce_add_epi32, which was only
++  # added in GCC 7. Older GCC only warn about the implicit declaration and
++  # linking libvpx fails later with an undefined reference, so skip that file
++  # (the other AVX512 code is fine).
++  check_cc -mavx512f -Werror=implicit-function-declaration <<EOF
++#include <immintrin.h>
++int f(void) {
++  __m512i x = _mm512_set1_epi32(0);
++  return _mm512_reduce_add_epi32(x);
++}
++EOF
++  compile_result=$?
++  if [ ${compile_result} -eq 0 ]; then
++    enable_feature mm512_reduce_add_epi32
++  else
++    log_echo "    disabling sad_avx512: _mm512_reduce_add_epi32 not supported by compiler"
+   fi
+ }
+ 
+@@ -575,6 +595,7 @@ EOF
+   print_config_mk HAVE     "${1}" ${HAVE_LIST}
+   print_config_mk CONFIG   "${1}" ${CONFIG_LIST}
+   print_config_mk HAVE     "${1}" gnu_strip
++  print_config_mk HAVE     "${1}" mm512_reduce_add_epi32
+ 
+   enabled msvs && echo "CONFIG_VS_VERSION=${vs_version}" >> "${1}"
+ 
+diff --git a/vpx_dsp/vpx_dsp.mk b/vpx_dsp/vpx_dsp.mk
+index 357ad08..1fb1c6a 100644
+--- a/vpx_dsp/vpx_dsp.mk
++++ b/vpx_dsp/vpx_dsp.mk
+@@ -395,7 +395,9 @@ DSP_SRCS-$(HAVE_AVX2)   += x86/sad4d_avx2.c
+ DSP_SRCS-$(HAVE_AVX2)   += x86/sad_avx2.c
+ DSP_SRCS-$(HAVE_AVX2)   += x86/subtract_avx2.c
+ DSP_SRCS-$(HAVE_AVX512) += x86/sad4d_avx512.c
++ifeq ($(HAVE_MM512_REDUCE_ADD_EPI32),yes)
+ DSP_SRCS-$(HAVE_AVX512) += x86/sad_avx512.c
++endif
+ 
+ DSP_SRCS-$(HAVE_SSE2)   += x86/sad4d_sse2.asm
+ DSP_SRCS-$(HAVE_SSE2)   += x86/sad_sse2.asm
+diff --git a/vpx_dsp/vpx_dsp_rtcd_defs.pl b/vpx_dsp/vpx_dsp_rtcd_defs.pl
+index db508e9..9643bb6 100644
+--- a/vpx_dsp/vpx_dsp_rtcd_defs.pl
++++ b/vpx_dsp/vpx_dsp_rtcd_defs.pl
+@@ -37,6 +37,12 @@ if ($opts{arch} eq "x86_64") {
+   $avx512_x86_64 = 'avx512';
+ }
+ 
++# sad_avx512.c is only built when the compiler has _mm512_reduce_add_epi32.
++$sad_avx512 = '';
++if (vpx_config("HAVE_MM512_REDUCE_ADD_EPI32") eq "yes") {
++  $sad_avx512 = 'avx512';
++}
++
+ #
+ # Intra prediction
+ #
+@@ -755,10 +761,10 @@ specialize qw/vpx_sse sse4_1 avx2 neon neon_dotprod/;
+ # Single block SAD
+ #
+ add_proto qw/unsigned int vpx_sad64x64/, "const uint8_t *src_ptr, int src_stride, const uint8_t *ref_ptr, int ref_stride";
+-specialize qw/vpx_sad64x64 neon neon_dotprod avx512 avx2 msa sse2 vsx mmi lsx/;
++specialize qw/vpx_sad64x64 neon neon_dotprod avx2 msa sse2 vsx mmi lsx/, "$sad_avx512";
+ 
+ add_proto qw/unsigned int vpx_sad64x32/, "const uint8_t *src_ptr, int src_stride, const uint8_t *ref_ptr, int ref_stride";
+-specialize qw/vpx_sad64x32 neon neon_dotprod avx512 avx2 msa sse2 vsx mmi/;
++specialize qw/vpx_sad64x32 neon neon_dotprod avx2 msa sse2 vsx mmi/, "$sad_avx512";
+ 
+ add_proto qw/unsigned int vpx_sad32x64/, "const uint8_t *src_ptr, int src_stride, const uint8_t *ref_ptr, int ref_stride";
+ specialize qw/vpx_sad32x64 neon neon_dotprod avx2 msa sse2 vsx mmi/;
+@@ -794,10 +800,10 @@ add_proto qw/unsigned int vpx_sad4x4/, "const uint8_t *src_ptr, int src_stride,
+ specialize qw/vpx_sad4x4 neon msa sse2 mmi/;
+ 
+ add_proto qw/unsigned int vpx_sad_skip_64x64/, "const uint8_t *src_ptr, int src_stride, const uint8_t *ref_ptr, int ref_stride";
+-specialize qw/vpx_sad_skip_64x64 neon neon_dotprod avx512 avx2 sse2/;
++specialize qw/vpx_sad_skip_64x64 neon neon_dotprod avx2 sse2/, "$sad_avx512";
+ 
+ add_proto qw/unsigned int vpx_sad_skip_64x32/, "const uint8_t *src_ptr, int src_stride, const uint8_t *ref_ptr, int ref_stride";
+-specialize qw/vpx_sad_skip_64x32 neon neon_dotprod avx512 avx2 sse2/;
++specialize qw/vpx_sad_skip_64x32 neon neon_dotprod avx2 sse2/, "$sad_avx512";
+ 
+ add_proto qw/unsigned int vpx_sad_skip_32x64/, "const uint8_t *src_ptr, int src_stride, const uint8_t *ref_ptr, int ref_stride";
+ specialize qw/vpx_sad_skip_32x64 neon neon_dotprod avx2 sse2/;
+@@ -893,10 +899,10 @@ if (vpx_config("CONFIG_VP9_ENCODER") eq "yes") {
+ }  # CONFIG_VP9_ENCODER
+ 
+ add_proto qw/unsigned int vpx_sad64x64_avg/, "const uint8_t *src_ptr, int src_stride, const uint8_t *ref_ptr, int ref_stride, const uint8_t *second_pred";
+-specialize qw/vpx_sad64x64_avg neon neon_dotprod avx512 avx2 msa sse2 vsx mmi lsx/;
++specialize qw/vpx_sad64x64_avg neon neon_dotprod avx2 msa sse2 vsx mmi lsx/, "$sad_avx512";
+ 
+ add_proto qw/unsigned int vpx_sad64x32_avg/, "const uint8_t *src_ptr, int src_stride, const uint8_t *ref_ptr, int ref_stride, const uint8_t *second_pred";
+-specialize qw/vpx_sad64x32_avg neon neon_dotprod avx512 avx2 msa sse2 vsx mmi/;
++specialize qw/vpx_sad64x32_avg neon neon_dotprod avx2 msa sse2 vsx mmi/, "$sad_avx512";
+ 
+ add_proto qw/unsigned int vpx_sad32x64_avg/, "const uint8_t *src_ptr, int src_stride, const uint8_t *ref_ptr, int ref_stride, const uint8_t *second_pred";
+ specialize qw/vpx_sad32x64_avg neon neon_dotprod avx2 msa sse2 vsx mmi/;
+-- 
+2.51.0.windows.2
+
