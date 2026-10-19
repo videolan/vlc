@@ -57,6 +57,14 @@ static vlc_tick_t dvdtime_to_time( const dvd_time_t *dtime )
     return vlc_tick_from_sec(sec) + VLC_TICK_FROM_MS(f_ms);
 }
 
+/* the cells of an angle block are one stretch of time, one per angle: the
+ * block counts once in the title's times, by its first cell */
+static bool DvdReadCellTimed( const cell_playback_t *cell )
+{
+    return cell->block_type != BLOCK_TYPE_ANGLE_BLOCK ||
+           cell->block_mode == BLOCK_MODE_FIRST_CELL;
+}
+
 /* total playback duration of the current title in vlc_tick_t
  * for dvd-video sums per-cell playback_time across the active cell range
  * so angle-restricted titles report the correct length
@@ -70,7 +78,9 @@ static vlc_tick_t DvdReadVideoTitleDuration( const demux_sys_t *p_sys )
         vlc_tick_t dur = 0;
         for( int ci = p_sys->i_title_start_cell; ci <= p_sys->i_title_end_cell; ci++ )
         {
-            dur += dvdtime_to_time( &p_sys->p_cur_pgc->cell_playback[ci].playback_time );
+            const cell_playback_t *cell = &p_sys->p_cur_pgc->cell_playback[ci];
+            if( DvdReadCellTimed( cell ) )
+                dur += dvdtime_to_time( &cell->playback_time );
         }
         return dur;
     }
@@ -90,9 +100,16 @@ static vlc_tick_t DvdReadCellStart( const demux_sys_t *p_sys, int i_cell )
 {
     const cell_playback_t *cells = p_sys->p_cur_pgc->cell_playback;
 
+    /* a cell inside an angle block starts with the block */
+    int i_end = i_cell;
+    while( i_end > p_sys->i_title_start_cell &&
+           !DvdReadCellTimed( &cells[i_end] ) )
+        i_end--;
+
     vlc_tick_t t = 0;
-    for( int i = p_sys->i_title_start_cell; i < i_cell; i++ )
-        t += dvdtime_to_time( &cells[i].playback_time );
+    for( int i = p_sys->i_title_start_cell; i < i_end; i++ )
+        if( DvdReadCellTimed( &cells[i] ) )
+            t += dvdtime_to_time( &cells[i].playback_time );
     return t;
 }
 
@@ -158,10 +175,20 @@ static uint32_t DvdReadCellAwareBlock( const demux_sys_t *p_sys,
     for( int ci = p_sys->i_title_start_cell; ci <= p_sys->i_title_end_cell; ci++ )
     {
         const cell_playback_t *cell = &p_pgc->cell_playback[ci];
+        const uint32_t blocks = cell->last_sector - cell->first_sector + 1;
+
+        /* the other angles of a block: no time of their own, but their
+         * sectors are in the offset DvdReadSeek() reads */
+        if( !DvdReadCellTimed( cell ) )
+        {
+            if( ckd_add( &block_acc, block_acc, blocks ) )
+                return i_block_offset;
+            continue;
+        }
+
         const vlc_tick_t dur = dvdtime_to_time( &cell->playback_time );
         if( dur == 0 )
             continue;
-        const uint32_t blocks = cell->last_sector - cell->first_sector + 1;
 
         vlc_tick_t next_acc;
         uint32_t next_block_acc;
@@ -920,7 +947,8 @@ static void DvdReadFillTitleTimes( const ifo_handle_t *p_vts, int i_ttn,
 
     vlc_tick_t length = 0;
     for( int ci = start_cell; ci <= end_cell; ci++ )
-        length += dvdtime_to_time( &p_pgc->cell_playback[ci].playback_time );
+        if( DvdReadCellTimed( &p_pgc->cell_playback[ci] ) )
+            length += dvdtime_to_time( &p_pgc->cell_playback[ci].playback_time );
     t->i_length = length;
 
     const int max_sp = __MIN( t->i_seekpoint, ptt->nr_of_ptts );
@@ -936,7 +964,8 @@ static void DvdReadFillTitleTimes( const ifo_handle_t *p_vts, int i_ttn,
         const int chapter_cell = p_pgc->program_map[sj_pgn - 1] - 1;
         while( cell < chapter_cell && cell <= end_cell )
         {
-            offset += dvdtime_to_time( &p_pgc->cell_playback[cell].playback_time );
+            if( DvdReadCellTimed( &p_pgc->cell_playback[cell] ) )
+                offset += dvdtime_to_time( &p_pgc->cell_playback[cell].playback_time );
             cell++;
         }
         t->seekpoint[sj]->i_time_offset = offset;
