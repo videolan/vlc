@@ -1911,7 +1911,7 @@ int MediaLibrary::controlMedia( int query, va_list args )
         {
             auto mrl = va_arg( args, const char* );
             auto sizeType = va_arg( args, int );
-            m->setThumbnail( mrl, static_cast<medialibrary::ThumbnailSizeType>( sizeType ) );
+            m->setThumbnail( mrl, static_cast<medialibrary::ThumbnailSizeType>( sizeType ), false );
             return VLC_SUCCESS;
         }
         case VLC_ML_MEDIA_ADD_EXTERNAL_MRL:
