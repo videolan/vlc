@@ -84,17 +84,24 @@ T.ToolTip {
         property QtWindow _lastWindowForNoRedirectionSurface
 
         Component.onCompleted: {
-            if (MainCtx.createWindowWithoutRedirectionSurface) { // Win32
-                Window.windowChanged.connect(this, () => {
-                    if (Window.window && (Window.window !== MainCtx.intfMainWindow)) { // Only relevant when `popupType` is `Popup.Window`
+            Window.windowChanged.connect(this, () => {
+                if (Window.window && (Window.window !== MainCtx.intfMainWindow)) { // Only relevant when `popupType` is `Popup.Window`
+
+                    // Although Qt uses `Qt.ToolTip` window type, the platform plugins (or the platforms themselves) do not treat it
+                    // implicitly as transparent for input. For that reason, we manually set it here. This fixes flickering when the
+                    // cursor hovers the tool tip because the window being bounded by the screen (which
+                    // is mainly relevant when the interface is maximized).
+                    Window.window.flags |= Qt.WindowTransparentForInput
+
+                    if (MainCtx.createWindowWithoutRedirectionSurface) { // Win32
                         if (Window.window !== contentText._lastWindowForNoRedirectionSurface) {
                             const ret = MainCtx.createWindowWithoutRedirectionSurface(Window.window)
                             console.debug("MainCtx::createWindowWithoutRedirectionSurface(): returned %1 for window %2.".arg(ret).arg(Window.window))
                             contentText._lastWindowForNoRedirectionSurface = Window.window
                         }
                     }
-                })
-            }
+                }
+            })
         }
 
         readonly property real maxContentWidth: (control.popupType === 1 /* Popup.Window */)
