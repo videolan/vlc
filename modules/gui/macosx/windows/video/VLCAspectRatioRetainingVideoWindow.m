@@ -48,9 +48,7 @@
         f_height = VLCVideoWindowCommonMinimalHeight;
 
     /* Calculate the window's new size */
-    NSRect new_frame;
-    new_frame.size.width = [self frame].size.width - [self.videoViewController.view frame].size.width + f_width;
-    new_frame.size.height = [self frame].size.height - [self.videoViewController.view frame].size.height + f_height;
+    NSRect new_frame = [self frameRectForContentRect:NSMakeRect(0., 0., f_width, f_height)];
     new_frame.origin.x = topleftscreen.x;
     new_frame.origin.y = topleftscreen.y - new_frame.size.height;
 
