@@ -184,6 +184,7 @@ Item {
             opacity: 0.0
 
             Behavior on opacity {
+                // NOTE: Do not use `OpacityAnimator` here, interrupting the fade stalls the UI (QTBUG-151700).
                 NumberAnimation {
                     duration: VLCStyle.duration_short
 

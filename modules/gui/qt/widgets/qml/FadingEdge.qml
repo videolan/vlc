@@ -117,7 +117,6 @@ Item {
         implicitHeight: root.fadeSize
         implicitWidth: root.fadeSize
 
-        // NOTE: `OpacityAnimator` updates the opacity once the animation finishes.
         visible: (opacity > 0.0 || enabled) && !root.useLayering
 
         opacity: enabled ? 1.0 : 0.0
@@ -128,7 +127,8 @@ Item {
 
             enabled: false
 
-            OpacityAnimator {
+            // NOTE: Do not use `OpacityAnimator` here, interrupting the fade stalls the UI (QTBUG-151700).
+            NumberAnimation {
                 duration: VLCStyle.duration_short
                 easing.type: Easing.InOutSine
             }

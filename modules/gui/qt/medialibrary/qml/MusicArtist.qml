@@ -617,7 +617,8 @@ FocusScope {
                 }
 
                 Behavior on opacity {
-                    OpacityAnimator {
+                    // NOTE: Do not use `OpacityAnimator` here, interrupting the fade stalls the UI (QTBUG-151700).
+                    NumberAnimation {
                         duration: VLCStyle.duration_short
                     }
                 }
