@@ -188,6 +188,17 @@ void VideoSurface::mouseMoveEvent(QMouseEvent* event)
     event->accept();
 }
 
+void VideoSurface::hoverEnterEvent(QHoverEvent *event)
+{
+    if (!m_hovered)
+    {
+        m_hovered = true;
+        emit hoveredChanged(true);
+    }
+
+    event->accept();
+}
+
 void VideoSurface::hoverMoveEvent(QHoverEvent* event)
 {
     QPointF current_pos = event->position();
@@ -200,6 +211,17 @@ void VideoSurface::hoverMoveEvent(QHoverEvent* event)
         emit mouseMoved(current_pos.x() * dpr, current_pos.y()  * dpr);
         m_oldHoverPos = current_pos;
     }
+    event->accept();
+}
+
+void VideoSurface::hoverLeaveEvent(QHoverEvent *event)
+{
+    if (m_hovered)
+    {
+        m_hovered = false;
+        emit hoveredChanged(false);
+    }
+
     event->accept();
 }
 
