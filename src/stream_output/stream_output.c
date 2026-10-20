@@ -817,6 +817,7 @@ void sout_ClockMainDelete(struct vlc_sout_clock_bus *bus)
 {
     vlc_clock_Delete(bus->clocks.input);
     vlc_clock_main_Delete(bus->clocks.bus);
+    free(bus);
 }
 
 void sout_ClockMainSetFirstPcr(struct vlc_sout_clock_bus *bus, vlc_tick_t pcr )
