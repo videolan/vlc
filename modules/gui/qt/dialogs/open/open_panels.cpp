@@ -534,17 +534,27 @@ void DiscOpenPanel::updateButtons()
     }
     else if ( ui.bdRadioButton->isChecked() )
     {
+        bool dvdsimpleEnable = true;
         if( m_discType != BRD )
         {
             setDrive( psz_dvddiscpath );
             m_discType = BRD;
-            ui.dvdsimple->setChecked( !var_InheritBool( p_intf, "bluray-menu" ) );
+            const auto bm = "bluray-menu";
+            if( var_Type( p_intf, bm ) )
+            {
+                ui.dvdsimple->setChecked( !var_InheritBool( p_intf, bm ) );
+            }
+            else
+            {
+                ui.dvdsimple->setChecked( true ); // No menus
+                dvdsimpleEnable = false;
+            }
         }
         ui.titleLabel->setText( qtr("Title") );
         ui.chapterLabel->hide();
         ui.chapterSpin->hide();
         ui.diskOptionBox_2->hide();
-        ui.dvdsimple->setEnabled( true );
+        ui.dvdsimple->setEnabled( dvdsimpleEnable );
     }
     else if ( ui.vcdRadioButton->isChecked() )
     {
