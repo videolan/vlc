@@ -1116,10 +1116,12 @@ static int LoadGlyphs( filter_t *p_filter, paragraph_t *p_paragraph,
                     {
                         FT_Matrix matrix = { .xx = 0x10000L, .xy = 0.12 * 0x10000L,
                                              .yy = 0x10000L, .yx = 0 };
-                        FT_Glyph_Transform( transformed, &matrix, 0 );
+                        if( !FT_Glyph_Transform( transformed, &matrix, 0 ) )
+                            style_flags |= FT_STYLE_FLAG_ITALIC;
                     }
-                    if( b_embolden )
-                        FT_Outline_Embolden( &((FT_OutlineGlyph)transformed)->outline, 1<<6 );
+                    if( b_embolden &&
+                        !FT_Outline_Embolden( &((FT_OutlineGlyph)transformed)->outline, 1<<6 ) )
+                        style_flags |= FT_STYLE_FLAG_BOLD;
                     vlc_ftcache_Glyph_Release( p_sys->ftcache, &p_bitmaps->cglyph );
                     p_bitmaps->cglyph.p_glyph = transformed;
                 }
