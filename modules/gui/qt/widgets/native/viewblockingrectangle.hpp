@@ -32,11 +32,8 @@ public:
     explicit MatrixChangeObserverNode(const std::function<void(const QMatrix4x4&)>& callback)
         : m_callback(callback) { }
 
-    // Use prepare(), because matrix() returns dangling pointer when render() is called from Qt 6.2 to 6.5 (QTBUG-97589):
-    void prepare() override
+    void render(const RenderState *) override
     {
-        QSGRenderNode::prepare(); // The documentation says that the default implementation is empty, but still call it just in case.
-
         assert(matrix());
         const QMatrix4x4 m = *matrix(); // matrix() is the combined matrix here
         if (m_lastCombinedMatrix != m)
@@ -44,11 +41,6 @@ public:
             m_callback(m);
             m_lastCombinedMatrix = m;
         }
-    }
-
-    void render(const RenderState *) override
-    {
-        // We do not render anything in this node.
     }
 
     RenderingFlags flags() const override
