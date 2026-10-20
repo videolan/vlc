@@ -614,7 +614,10 @@ static bool ParseHEVCSEI(const hxxx_sei_data_t *p_sei_data, void *priv)
     {
         struct hevc_sei_callback_s *s = priv;
         if (likely(s->p_sps))
+        {
+            hevc_release_sei_pic_timing(s->p_timing);
             s->p_timing = hevc_decode_sei_pic_timing(p_sei_data->p_bs, s->p_sps);
+        }
         return false;
     }
     return true;
