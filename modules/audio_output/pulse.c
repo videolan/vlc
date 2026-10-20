@@ -1257,6 +1257,7 @@ static int Open(vlc_object_t *obj)
                 pa_threaded_mainloop_wait(sys->mainloop);
             if (sys->is_pipewire && module_exists("aout_pipewire")) {
                 msg_Dbg(aout, "refusing to use PipeWire");
+                pa_operation_unref(op);
                 pa_threaded_mainloop_unlock(sys->mainloop);
                 vlc_pa_disconnect(obj, sys->context, sys->mainloop);
                 free(sys);
