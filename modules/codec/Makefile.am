@@ -351,7 +351,9 @@ libvideotoolbox_plugin_la_SOURCES = codec/videotoolbox/decoder.c \
                                     codec/videotoolbox/vp9_repack.c \
                                     codec/videotoolbox/vp9_repack.h \
                                     packetizer/vp9_frame.c \
-                                    packetizer/vp9_frame.h
+                                    packetizer/vp9_frame.h \
+                                    packetizer/av1_obu.c \
+                                    packetizer/av1_obu.h
 libvideotoolbox_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) # Trigger MODULE_NAME declaration
 libvideotoolbox_plugin_la_LIBADD = libchroma_copy.la libvlc_hxxxhelper.la libvlc_vtutils.la
 libvideotoolbox_plugin_la_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,CoreFoundation -Wl,-framework,VideoToolbox -Wl,-framework,CoreMedia -Wl,-framework,CoreVideo -Wl,-framework,Metal
