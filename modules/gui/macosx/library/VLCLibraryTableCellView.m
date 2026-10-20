@@ -45,6 +45,12 @@
 
 NSString * const VLCLibraryTableCellViewIdentifier = @"VLCLibraryTableCellViewIdentifier";
 
+@interface VLCLibraryTableCellView ()
+
+@property (readwrite, strong) IBOutlet NSLayoutConstraint *representedImageAspectRatioConstraint;
+
+@end
+
 @implementation VLCLibraryTableCellView
 
 - (void)awakeFromNib
@@ -67,12 +73,47 @@ NSString * const VLCLibraryTableCellViewIdentifier = @"VLCLibraryTableCellViewId
 {
     [super prepareForReuse];
     self.detailMode = VLCLibraryTableCellDetailModePrimaryDetail;
+    self.representedImageAspectRatio = VLCLibraryTableCellImageAspectRatioSquare;
     self.representedImageView.image = nil;
     self.primaryTitleTextField.hidden = YES;
     self.secondaryTitleTextField.hidden = YES;
     self.singlePrimaryTitleTextField.hidden = YES;
     self.trackingView.viewToHide = nil;
     self.playInstantlyButton.hidden = YES;
+}
+
+- (void)setRepresentedImageAspectRatio:(VLCLibraryTableCellImageAspectRatio)representedImageAspectRatio
+{
+    if (_representedImageAspectRatio == representedImageAspectRatio) {
+        return;
+    }
+
+    _representedImageAspectRatio = representedImageAspectRatio;
+    if (self.representedImageAspectRatioConstraint == nil) {
+        return;
+    }
+
+    CGFloat multiplier = 1.;
+    switch (representedImageAspectRatio) {
+        case VLCLibraryTableCellImageAspectRatioSquare:
+            multiplier = 1.;
+            break;
+        case VLCLibraryTableCellImageAspectRatioVideo:
+            multiplier = 16. / 9.;
+            break;
+    }
+
+    NSLayoutConstraint * const previousConstraint = self.representedImageAspectRatioConstraint;
+    NSLayoutConstraint * const newConstraint =
+        [self.representedImageView.widthAnchor
+            constraintEqualToAnchor:self.representedImageView.heightAnchor
+                        multiplier:multiplier];
+    newConstraint.priority = previousConstraint.priority;
+    newConstraint.identifier = previousConstraint.identifier;
+
+    previousConstraint.active = NO;
+    newConstraint.active = YES;
+    self.representedImageAspectRatioConstraint = newConstraint;
 }
 
 - (void)setRepresentedItem:(VLCLibraryRepresentedItem *)representedItem

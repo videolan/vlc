@@ -47,6 +47,7 @@
 
 #import "library/video-library/VLCLibraryMoviesDataSource.h"
 #import "library/video-library/VLCLibraryShowEpisodeTableViewDelegate.h"
+#import "library/video-library/VLCLibraryShowsMasterTableViewDelegate.h"
 #import "library/video-library/VLCLibraryShowsDataSource.h"
 #import "library/video-library/VLCLibraryVideoDataSource.h"
 #import "library/video-library/VLCLibraryVideoTableViewDelegate.h"
@@ -61,6 +62,7 @@
 @interface VLCLibraryVideoViewController ()
 {
     VLCLibraryVideoTableViewDelegate *_videoLibraryTableViewDelegate;
+    VLCLibraryShowsMasterTableViewDelegate *_showsMasterTableViewDelegate;
     VLCLibraryShowEpisodeTableViewDelegate *_showEpisodeTableViewDelegate;
     VLCLibraryCollectionViewDelegate *_collectionViewDelegate;
     VLCLibraryCollectionViewFlowLayout *_collectionViewLayout;
@@ -79,6 +81,7 @@
 
     if(self) {
         _videoLibraryTableViewDelegate = [[VLCLibraryVideoTableViewDelegate alloc] init];
+        _showsMasterTableViewDelegate = [[VLCLibraryShowsMasterTableViewDelegate alloc] init];
         _showEpisodeTableViewDelegate = [[VLCLibraryShowEpisodeTableViewDelegate alloc] init];
 
         [self setupPropertiesFromLibraryWindow:libraryWindow];
@@ -145,10 +148,15 @@
     NSNib * const tableCellViewNib =
         [[NSNib alloc] initWithNibNamed:@"VLCLibraryVideoTableCellView"
                                  bundle:nil];
+    NSNib * const showTableCellViewNib =
+        [[NSNib alloc] initWithNibNamed:NSStringFromClass(VLCLibraryTableCellView.class)
+                                 bundle:nil];
     [self.videoLibraryGroupSelectionTableView registerNib:tableCellViewNib
                                            forIdentifier:@"VLCVideoLibraryTableViewCellIdentifier"];
     [self.videoLibraryGroupsTableView registerNib:tableCellViewNib
                                    forIdentifier:@"VLCVideoLibraryTableViewCellIdentifier"];
+    [self.videoLibraryGroupsTableView registerNib:showTableCellViewNib
+                                    forIdentifier:_showsMasterTableViewDelegate.cellViewIdentifier];
     
     [self.videoLibraryGroupSelectionTableView registerNib:tableCellViewNib
                                             forIdentifier:_showEpisodeTableViewDelegate.cellViewIdentifier];
@@ -343,7 +351,7 @@
 
     self.videoLibraryGroupsTableView.dataSource = self.libraryShowsDataSource;
     self.videoLibraryGroupsTableView.target = self.libraryShowsDataSource;
-    self.videoLibraryGroupsTableView.delegate = _videoLibraryTableViewDelegate;
+    self.videoLibraryGroupsTableView.delegate = _showsMasterTableViewDelegate;
 
     self.videoLibraryGroupSelectionTableView.dataSource = self.libraryShowsDataSource;
     self.videoLibraryGroupSelectionTableView.target = self.libraryShowsDataSource;

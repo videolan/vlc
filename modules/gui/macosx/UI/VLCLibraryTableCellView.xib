@@ -138,6 +138,7 @@
             <connections>
                 <outlet property="playInstantlyButton" destination="NFZ-x0-t5c" id="suD-1u-UrY"/>
                 <outlet property="primaryTitleTextField" destination="xJW-ps-ycn" id="5Vl-3a-J2T"/>
+                <outlet property="representedImageAspectRatioConstraint" destination="4aB-rs-m22" id="QmB-dC-16R"/>
                 <outlet property="representedImageView" destination="Ydb-7n-5Cd" id="qBu-r5-jIY"/>
                 <outlet property="secondaryTitleTextField" destination="TPv-k2-6XS" id="rRg-vu-a7j"/>
                 <outlet property="singlePrimaryTitleTextField" destination="ohB-P0-nCv" id="gBJ-WZ-6pB"/>

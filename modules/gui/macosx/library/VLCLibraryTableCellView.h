@@ -39,6 +39,11 @@ typedef NS_ENUM(NSUInteger, VLCLibraryTableCellDetailMode) {
     VLCLibraryTableCellDetailModeDuration,
 };
 
+typedef NS_ENUM(NSUInteger, VLCLibraryTableCellImageAspectRatio) {
+    VLCLibraryTableCellImageAspectRatioSquare,
+    VLCLibraryTableCellImageAspectRatioVideo,
+};
+
 @interface VLCLibraryTableCellView : NSTableCellView<VLCLibraryTableCellViewProtocol>
 
 @property (readwrite, weak) IBOutlet VLCTrackingView *trackingView;
@@ -49,6 +54,7 @@ typedef NS_ENUM(NSUInteger, VLCLibraryTableCellDetailMode) {
 @property (readwrite, weak) IBOutlet NSButton *playInstantlyButton;
 
 @property (readwrite, nonatomic) VLCLibraryTableCellDetailMode detailMode;
+@property (readwrite, nonatomic) VLCLibraryTableCellImageAspectRatio representedImageAspectRatio;
 @property (readwrite, strong, nonatomic) VLCLibraryRepresentedItem *representedItem;
 @property (readwrite, strong, nonatomic) VLCInputItem *representedInputItem;
 @property (readwrite, nonatomic) NSUInteger representedVideoLibrarySection;
