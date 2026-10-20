@@ -286,12 +286,6 @@ ListViewExt {
                         required property var modelData
                         property TableHeaderDelegate _item: null
 
-                        TableHeaderDelegate.CellModel {
-                            id: cellModel
-                            colorContext:  root.colorContext
-                            colModel: modelData.model
-                        }
-
                         height: VLCStyle.tableHeaderText_height
                         width: {
                             if (!!modelData.size)
@@ -310,7 +304,8 @@ ListViewExt {
                             headerCell._item = comp.createObject(headerCell, {
                                 width:  Qt.binding(() => headerCell.width),
                                 height:  Qt.binding(() => headerCell.height),
-                                cellModel: cellModel,
+                                colorContext:  Qt.binding(() => root.colorContext),
+                                colModel: Qt.binding(() => modelData.model)
                             })
                         }
 

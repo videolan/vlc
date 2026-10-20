@@ -236,23 +236,18 @@ T.Control {
                 }
                 height: parent.height
 
-                TableRowDelegate.CellModel {
-                    id: cellModel
-                    rowModel: delegate.rowModel
-                    colModel: loader.modelData.model
-                    index: delegate.index
-                    currentlyFocused: delegate.visualFocus
-                    selected: delegate.selected
-                    containsMouse: delegate.hovered
-                    colorContext: theme
-                    delegateItem: delegate
-                }
-
                 Component.onCompleted: {
                     const del = modelData.model.colDelegate || delegate.defaultDelegate
                     // https://doc.qt.io/qt-6/qqmlincubator.html#details
                     const incubator = del.incubateObject(loader, {
-                            cellModel: cellModel,
+                            rowModel: Qt.binding(() => delegate.rowModel),
+                            colModel: Qt.binding(() => loader.modelData.model),
+                            index: Qt.binding(() => delegate.index),
+                            currentlyFocused: Qt.binding(() => delegate.visualFocus),
+                            selected: Qt.binding(() => delegate.selected),
+                            containsMouse: Qt.binding(() => delegate.hovered),
+                            colorContext: theme,
+                            delegate: delegate,
                             width: Qt.binding(() => loader.width),
                             height: Qt.binding(() => loader.height),
                         }, 1 /* QQmlIncubator::AsynchronousIfNested */
