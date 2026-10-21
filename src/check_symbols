@@ -26,3 +26,16 @@ cat libvlccore.sym | grep -v \
 		&& exit 1
 
 echo "None found."
+
+echo "Looking for VLC_API symbols missing from libvlccore.sym..."
+# Drop preprocessor lines, then put each VLC_API declaration on one line
+sed -n -e '/^[[:space:]]*#/d' -e '/VLC_API/!d' \
+	-e ':a' -e '/[([;]/!{' -e 'N' -e 'ba' -e '}' -e 's/\n/ /g' -e 's/^/ /p' \
+	../include/*.h |
+# Keep what follows VLC_API, up to the parameter list or array size
+sed -n 's/.*[^A-Za-z0-9_]VLC_API[^A-Za-z0-9_]\([^([;]*\).*/\1/p' |
+# The symbol is the last identifier left
+sed 's/[[:space:]]*$//; s/.*[^A-Za-z0-9_]//' |
+sort -u | grep -vxF -f libvlccore.sym && exit 1
+
+echo "None found."
