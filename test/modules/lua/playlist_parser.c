@@ -78,6 +78,7 @@ static int OpenIntf(vlc_object_t *root) {
   assert(strcmp(test_title, test_parsed_value) == 0);
 
   input_item_node_Delete(p_node);
+  input_item_Release(p_item);
 
   // cleanup
   // this calls demux_DestroyDemux(p_d) callback unloading the module and
