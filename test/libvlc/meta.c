@@ -40,7 +40,10 @@ static int test_meta (const char ** argv, int argc)
     assert (vlc != NULL);
 
     if (!module_exists("taglib"))
+    {
+        libvlc_release (vlc);
         return 77;
+    }
 
     media = libvlc_media_new_path(SRCDIR "/samples/meta.mp3");
     assert( media );
