@@ -41,6 +41,7 @@ libplacebo: $(PLACEBO_ARCHIVE) .sum-libplacebo
 	$(APPLY) $(SRC)/libplacebo/0001-meson-allow-overriding-python3-path.patch
 	$(APPLY) $(SRC)/libplacebo/0001-meson-allow-forcing-the-path-to-look-for-libraries.patch
 	$(APPLY) $(SRC)/libplacebo/0001-vulkan-utils_gen-fix-for-python-3.14.patch
+	$(APPLY) $(SRC)/libplacebo/0001-meson-add-glslang-lib-for-15.0.0-linking.patch
 	$(MOVE)
 
 .libplacebo: libplacebo crossfile.meson .python-venv
