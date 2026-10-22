@@ -408,6 +408,7 @@ static int OpenDecoder(vlc_object_t *p_this)
 
     dec->fmt_out.video.i_width = dec->fmt_in->video.i_width;
     dec->fmt_out.video.i_height = dec->fmt_in->video.i_height;
+    dec->fmt_out.video.orientation = dec->fmt_in->video.orientation;
     dec->fmt_out.i_codec = VLC_CODEC_I420;
 
     if (dec->fmt_in->video.i_sar_num > 0 && dec->fmt_in->video.i_sar_den > 0) {
