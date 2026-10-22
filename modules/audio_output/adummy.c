@@ -82,7 +82,9 @@ static void Pause(audio_output_t *aout, bool paused, vlc_tick_t date)
         sys->paused_date = date;
     else
     {
-        sys->first_play_date -= sys->paused_date - date;
+        if (sys->first_play_date != VLC_TICK_INVALID
+         && sys->paused_date != VLC_TICK_INVALID)
+            sys->first_play_date -= sys->paused_date - date;
         sys->paused_date = VLC_TICK_INVALID;
     }
 }
