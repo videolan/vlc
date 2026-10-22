@@ -568,6 +568,8 @@ modules/gui/macosx/playqueue/VLCPlayQueueTableView.h
 modules/gui/macosx/playqueue/VLCPlayQueueTableView.m
 modules/gui/macosx/preferences/VLCHotkeyChangeWindow.h
 modules/gui/macosx/preferences/VLCHotkeyChangeWindow.m
+modules/gui/macosx/preferences/VLCMediaLibraryFolderManagementController.h
+modules/gui/macosx/preferences/VLCMediaLibraryFolderManagementController.m
 modules/gui/macosx/preferences/VLCSimplePrefsController.h
 modules/gui/macosx/preferences/VLCSimplePrefsController.m
 modules/gui/macosx/preferences/VLCSimplePrefsWindow.h
