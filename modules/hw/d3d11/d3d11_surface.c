@@ -295,27 +295,8 @@ static void D3D11_YUY2(filter_t *p_filter, picture_t *src, picture_t *dst)
 
     ID3D11Texture2D_GetDesc(sys->staging, &desc);
 
-    if (desc.Format == DXGI_FORMAT_YUY2) {
-        size_t chroma_pitch = (lock.RowPitch / 2);
-
-        const size_t pitch[3] = {
-            lock.RowPitch,
-            chroma_pitch,
-            chroma_pitch,
-        };
-
-        const uint8_t *plane[3] = {
-            (uint8_t*)lock.pData,
-            (uint8_t*)lock.pData + pitch[0] * desc.Height,
-            (uint8_t*)lock.pData + pitch[0] * desc.Height
-                                 + pitch[1] * desc.Height / 2,
-        };
-
-        Copy420_P_to_P(dst, plane, pitch,
-                       src->format.i_visible_height + src->format.i_y_offset,
-                       &sys->cache);
-    } else if (desc.Format == DXGI_FORMAT_NV12 ||
-               desc.Format == DXGI_FORMAT_P010) {
+    if (desc.Format == DXGI_FORMAT_NV12 ||
+        desc.Format == DXGI_FORMAT_P010) {
         const uint8_t *plane[2] = {
             lock.pData,
             (uint8_t*)lock.pData + lock.RowPitch * desc.Height
