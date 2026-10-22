@@ -1438,7 +1438,9 @@ static int ID3TAG_Parse_Handler( uint32_t i_tag, const uint8_t *p_payload, size_
     }
     else if ( i_tag == VLC_FOURCC('C', 'H', 'A', 'P') && i_payload >= 17 )
     {
-        char *psz_title = strndup( (const char *)p_payload, i_payload - 16 );
+        /* The element ID and its terminator are followed by 16 bytes of
+         * start/end times and offsets */
+        char *psz_title = strndup( (const char *)p_payload, i_payload - 17 );
         size_t i_offset = psz_title ? strlen( psz_title ) : 0;
         if( p_payload[i_offset] != 0 )
         {
