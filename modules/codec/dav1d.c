@@ -484,6 +484,7 @@ static int OpenDecoder(vlc_object_t *p_this)
 
     dec->fmt_out.video.i_frame_rate = dec->fmt_in->video.i_frame_rate;
     dec->fmt_out.video.i_frame_rate_base = dec->fmt_in->video.i_frame_rate_base;
+    dec->fmt_out.video.orientation = dec->fmt_in->video.orientation;
 
     bool super_res = false;
     if (!sequence_hdr)
