@@ -898,8 +898,10 @@ FocusScope {
 
         function dismiss() {
             // This could be also be an assertion:
-            if (updateModelIsAvailable)
+            if (updateModelIsAvailable) {
                 _updateStatusOnDismissal = UpdateModel.updateStatus
+                UpdateModel.explicitCheck = undefined // Resets the property
+            }
 
             height = 0.0
         }
@@ -907,12 +909,6 @@ FocusScope {
         onShouldShowChanged: {
             if (shouldShow)
                 height = Qt.binding(() => { return implicitHeight })
-        }
-
-        onActiveChanged: {
-            if (updateModelIsAvailable && !active) {
-                UpdateModel.explicitCheck = undefined // Resets the property
-            }
         }
 
         clip: (height < implicitHeight)
