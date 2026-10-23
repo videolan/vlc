@@ -1,5 +1,5 @@
 GNU=https://ftpmirror.gnu.org/gnu
-APACHE=https://downloads.apache.org/
+APACHE=https://downloads.apache.org
 SF=https://downloads.sourceforge.net/project
 VIDEOLAN=https://downloads.videolan.org/pub/contrib
 
