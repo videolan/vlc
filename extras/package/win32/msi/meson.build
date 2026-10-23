@@ -81,6 +81,7 @@ endforeach
 
 compiled_wxs = []
 compiled_winpath = []
+if x86_runner.found() and candlex86.found() and lightx86.found()
 foreach wxsobj : wxs_files
     outfile = fs.replace_suffix(wxsobj[0], '.wixobj')
     outname = fs.name(outfile)
@@ -116,3 +117,4 @@ msi_output = custom_target(
 )
 
 alias_target('package-msi', msi_output)
+endif
