@@ -103,7 +103,7 @@
 
     NSString *labelString = [NSString stringWithFormat:_NS("Playback of \"%@\" will continue at %@"), _inputItem.title, [NSString stringWithTime:_lastPosition]];
     [_descriptionLabel setStringValue:labelString];
-    [_alwaysResumeCheckbox setState:NSOffState];
+    [_alwaysResumeCheckbox setState:NSControlStateValueOff];
 }
 
 - (void)updateAlertWindow:(NSTimer *)timer
@@ -140,7 +140,7 @@
 
 - (IBAction)resumeSettingChanged:(id)sender
 {
-    int newState = [sender state] == NSOnState ? 1 : 0;
+    int newState = [sender state] == NSControlStateValueOn ? 1 : 0;
     msg_Dbg(getIntf(), "Changing resume setting to %i", newState);
     config_PutInt("macosx-continue-playback", newState);
 }

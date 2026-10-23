@@ -159,7 +159,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     self.audioMenu.delegate = self;
     self.videoMenu.delegate = self;
     self.subtitlesMenu.delegate = self;
-    [_rendererNoneItem setState:NSOnState];
+    [_rendererNoneItem setState:NSControlStateValueOn];
     _rendererMenuController = [[VLCRendererMenuController alloc] init];
     _rendererMenuController.rendererNoneItem = _rendererNoneItem;
     _rendererMenuController.rendererMenu = _rendererMenu;
@@ -273,12 +273,12 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     char *psz_config = config_GetPsz("video-filter");
     if (psz_config) {
         if (!strstr(psz_config, "postproc"))
-            [[_postprocessingMenu itemAtIndex:0] setState:NSOnState];
+            [[_postprocessingMenu itemAtIndex:0] setState:NSControlStateValueOn];
         else
-            [[_postprocessingMenu itemWithTag:config_GetInt("postproc-q")] setState:NSOnState];
+            [[_postprocessingMenu itemWithTag:config_GetInt("postproc-q")] setState:NSControlStateValueOn];
         free(psz_config);
     } else
-        [[_postprocessingMenu itemAtIndex:0] setState:NSOnState];
+        [[_postprocessingMenu itemAtIndex:0] setState:NSControlStateValueOn];
     [_postprocessing setEnabled: NO];
 
     [self refreshAudioDeviceList];
@@ -334,7 +334,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         [mi setRepresentedObject:toNSStr(psz_name)];
         [menu addItem:mi];
         if (p_item->value.i == p_item->list.i[i])
-            [mi setState:NSOnState];
+            [mi setState:NSControlStateValueOn];
     }
 }
 
@@ -846,7 +846,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         [menuItem setEnabled: YES];
         [menuItem setTarget: self];
     }
-    [[submenu itemWithTag: var_InheritInteger(getIntf(), "macosx-vdev")] setState: NSOnState];
+    [[submenu itemWithTag: var_InheritInteger(getIntf(), "macosx-vdev")] setState: NSControlStateValueOn];
     [self updateVideoSubmenuEnablement];
 }
 
@@ -990,7 +990,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (void)updateRecordState
 {
-    NSControlStateValue state = _playerController.enableRecording ? NSOnState : NSOffState;
+    NSControlStateValue state = _playerController.enableRecording ? NSControlStateValueOn : NSControlStateValueOff;
     [_record setState:state];
     [_voutMenuRecord setState:state];
 }
@@ -1128,16 +1128,16 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         [menuItem setEnabled:YES];
         if (metaDataItem.selected) {
             itemSelected = YES;
-            [menuItem setState:NSOnState];
+            [menuItem setState:NSControlStateValueOn];
         } else {
-            [menuItem setState:NSOffState];
+            [menuItem setState:NSControlStateValueOff];
         }
         [menu addItem:menuItem];
     }
 
     /* select the "Disabled" item in case no track is selected */
     if (!itemSelected) {
-        [menu.itemArray.firstObject setState:NSOnState];
+        [menu.itemArray.firstObject setState:NSControlStateValueOn];
     }
 }
 
@@ -1171,7 +1171,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         [menuItem setTarget:self];
         [menuItem setTag:x];
         [menuItem setEnabled:YES];
-        [menuItem setState: x == selectedIndex ? NSOnState : NSOffState];
+        [menuItem setState: x == selectedIndex ? NSControlStateValueOn : NSControlStateValueOff];
         [_titleMenu addItem:menuItem];
     }
     _title.enabled = count > 0 ? YES : NO;
@@ -1189,7 +1189,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         [menuItem setTarget:self];
         [menuItem setTag:x];
         [menuItem setEnabled:YES];
-        [menuItem setState: x == selectedIndex ? NSOnState : NSOffState];
+        [menuItem setState: x == selectedIndex ? NSControlStateValueOn : NSControlStateValueOff];
         [_chapterMenu addItem:menuItem];
     }
     _chapter.enabled = count > 0 ? YES : NO;
@@ -1222,7 +1222,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         [menuItem setTarget:self];
         [menuItem setRepresentedObject:program];
         [menuItem setEnabled:YES];
-        [menuItem setState:program.selected ? NSOnState : NSOffState];
+        [menuItem setState:program.selected ? NSControlStateValueOn : NSControlStateValueOff];
         [_programMenu addItem:menuItem];
     }
     _program.enabled = count > 0 ? YES : NO;
@@ -1262,7 +1262,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     }
     aout_Release(p_aout);
 
-    [[_audioDeviceMenu itemWithTag:[[NSString stringWithFormat:@"%s", currentDevice] intValue]] setState:NSOnState];
+    [[_audioDeviceMenu itemWithTag:[[NSString stringWithFormat:@"%s", currentDevice] intValue]] setState:NSControlStateValueOn];
 
     free(currentDevice);
 
@@ -1350,14 +1350,14 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 {
     NSInteger count = [_postprocessingMenu numberOfItems];
     for (NSUInteger x = 0; x < (NSUInteger)count; x++)
-        [[_postprocessingMenu itemAtIndex:x] setState:NSOffState];
+        [[_postprocessingMenu itemAtIndex:x] setState:NSControlStateValueOff];
 
     if ([sender tag] == -1) {
         [self _disablePostProcessing];
-        [sender setState:NSOnState];
+        [sender setState:NSControlStateValueOn];
     } else {
         [self _enablePostProcessing];
-        [sender setState:NSOnState];
+        [sender setState:NSControlStateValueOn];
 
         [_playerController setVideoFilterProperty:@"postproc-q" forFilter:@"postproc" withValue:(vlc_value_t){ .i_int = [sender tag] }];
     }
@@ -1420,9 +1420,9 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     NSMenu * const menu = menuItem.menu;
     const NSUInteger count = (NSUInteger)menu.numberOfItems;
     for (NSUInteger x = 0; x < count; x++) {
-        [menu itemAtIndex:x].state = NSOffState;
+        [menu itemAtIndex:x].state = NSControlStateValueOff;
     }
-    [menu itemWithTag:intValue].state = NSOnState;
+    [menu itemWithTag:intValue].state = NSControlStateValueOn;
 }
 
 - (IBAction)switchSubtitleBackgroundOpacity:(id)sender
@@ -1733,19 +1733,19 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (void)setRepeatOne
 {
-    [_repeat setState: NSOnState];
+    [_repeat setState: NSControlStateValueOn];
     [_repeat setTitle: _NS("Repeat One")];
 }
 
 - (void)setRepeatAll
 {
-    [_repeat setState: NSOnState];
+    [_repeat setState: NSControlStateValueOn];
     [_repeat setTitle: _NS("Repeat All")];
 }
 
 - (void)setRepeatOff
 {
-    [_repeat setState: NSOffState];
+    [_repeat setState: NSControlStateValueOff];
     [_repeat setTitle: _NS("Repeat")];
 }
 
@@ -1814,7 +1814,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
                                                               ofVariableType:i_type];
             [menuItem setRepresentedObject:data];
             if (!(i_type & VLC_VAR_ISCOMMAND))
-                [menuItem setState:val.b_bool ? NSOnState : NSOffState];
+                [menuItem setState:val.b_bool ? NSControlStateValueOn : NSControlStateValueOff];
             break;
 
         default:
@@ -1917,7 +1917,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
                 [lmi setTarget:self];
 
                 if (!strcmp(val.psz_string, val_list[i].psz_string) && !(i_type & VLC_VAR_ISCOMMAND))
-                    [lmi setState:NSOnState];
+                    [lmi setState:NSControlStateValueOn];
 
                 free(text_list[i]);
                 free(val_list[i].psz_string);
@@ -1938,7 +1938,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
                 [lmi setTarget:self];
 
                 if (val_list[i].i_int == val.i_int && !(i_type & VLC_VAR_ISCOMMAND))
-                    [lmi setState:NSOnState];
+                    [lmi setState:NSControlStateValueOn];
 
                 free(text_list[i]);
                 break;
@@ -2104,17 +2104,17 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         return _playerController.currentMedia != nil && _playerController.recordable;
     } else if (mi == self.random) {
         const enum vlc_playlist_playback_order playbackOrder = _playQueueController.playbackOrder;
-        mi.state = playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM ? NSOnState : NSOffState;
+        mi.state = playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM ? NSControlStateValueOn : NSControlStateValueOff;
     } else if (mi == self.quitAfterPB) {
         const BOOL state = _playQueueController.actionAfterStop == VLC_PLAYLIST_MEDIA_STOPPED_EXIT;
-        mi.state = state ? NSOnState : NSOffState;
+        mi.state = state ? NSControlStateValueOn : NSControlStateValueOff;
     } else if (mi == self.fwd || mi == self.bwd || mi == self.jumpToTime) {
         return _playerController.currentMedia != nil && _playerController.seekable;
     } else if (mi == self.lyrics) {
-        mi.state = _playerController.showLyrics ? NSOnState : NSOffState;
+        mi.state = _playerController.showLyrics ? NSControlStateValueOn : NSControlStateValueOff;
         return _playerController.lyricsAvailable;
     } else if (mi == self.mute || mi == self.dockMenumute || mi == self.voutMenumute) {
-        mi.state = _playerController.mute ? NSOnState : NSOffState;
+        mi.state = _playerController.mute ? NSControlStateValueOn : NSControlStateValueOff;
         [self refreshAudioDeviceList];
     } else if (mi == self.half_window               ||
                mi == self.normal_window             ||
@@ -2134,13 +2134,13 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         vout_thread_t * const p_vout = _playerController.videoOutputThreadForKeyWindow;
         if (p_vout != NULL) {
             if (mi == self.floatontop) {
-                mi.state = var_GetBool(p_vout, "video-on-top") ? NSOnState : NSOffState;
+                mi.state = var_GetBool(p_vout, "video-on-top") ? NSControlStateValueOn : NSControlStateValueOff;
                 if (_playerController.fullscreen) {
                     vout_Release(p_vout);
                     return NO;
                 }
             } else if (mi == self.fullscreenItem || mi == self.voutMenufullscreen) {
-                mi.state = _playerController.fullscreen ? NSOnState : NSOffState;
+                mi.state = _playerController.fullscreen ? NSControlStateValueOn : NSControlStateValueOff;
             }
             vout_Release(p_vout);
         }

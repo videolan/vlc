@@ -179,9 +179,9 @@ static const struct vlc_logger_operations log_ops = { MsgCallback, NULL };
 - (void)splitViewDidResizeSubviews:(NSNotification *)notification
 {
     if ([_splitView isSubviewCollapsed:_detailView]) {
-        [_toggleDetailsButton setState:NSOffState];
+        [_toggleDetailsButton setState:NSControlStateValueOff];
     } else {
-        [_toggleDetailsButton setState:NSOnState];
+        [_toggleDetailsButton setState:NSControlStateValueOn];
     }
 }
 

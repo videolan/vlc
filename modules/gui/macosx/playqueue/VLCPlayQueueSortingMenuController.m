@@ -90,14 +90,14 @@
     NSInteger count = _playQueueSortingMenu.numberOfItems;
     for (NSInteger x = 0; x < count; x++) {
         NSMenuItem *menuItem = [_playQueueSortingMenu itemAtIndex:x];
-        menuItem.state = NSOffState;
+        menuItem.state = NSControlStateValueOff;
     }
 
     NSMenuItem *menuItem = [_playQueueSortingMenu itemWithTag:_playQueueController.lastSortKey];
-    menuItem.state = NSOnState;
+    menuItem.state = NSControlStateValueOn;
 
     menuItem = [_playQueueSortingMenu itemWithTag:_playQueueController.lastSortOrder + 100];
-    menuItem.state = NSOnState;
+    menuItem.state = NSControlStateValueOn;
 }
 
 - (void)selectSortKey:(id)sender

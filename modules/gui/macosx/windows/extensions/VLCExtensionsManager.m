@@ -148,7 +148,7 @@
 
             if (!extension_TriggerOnly(p_extensions_manager, p_ext)) {
                 if (b_Active)
-                    [menuItem setState:NSOnState];
+                    [menuItem setState:NSControlStateValueOn];
             }
             menuItem.tag = MENU_MAP(0, i_ext);
         }

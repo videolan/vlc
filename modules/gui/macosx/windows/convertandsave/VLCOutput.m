@@ -281,7 +281,7 @@
     NSMutableString *mrl_string = [NSMutableString stringWithString:@":sout=#"];
 
     [mrl_string appendString: _transcode];
-    if ([self.displayOnLocalScreenCheckbox state] == NSOnState)
+    if ([self.displayOnLocalScreenCheckbox state] == NSControlStateValueOn)
         [mrl_string appendString: @"duplicate{dst=display,dst="];
 
     mode = [[self.outputMethodMatrix selectedCell] title];
@@ -301,7 +301,7 @@
             [[self.fileTextField stringValue] stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""];
 
     if ([mode isEqualToString: _NS("File")]) {
-        if ([self.dumpCheckbox state] == NSOnState) {
+        if ([self.dumpCheckbox state] == NSControlStateValueOn) {
             _soutMRL = [NSArray arrayWithObjects:@":demux=dump",
                         [NSString stringWithFormat:
                         @":demuxdump-file=\"%@\"",
@@ -323,7 +323,7 @@
             mode = @"mmsh";
         } else if ([mode isEqualToString: @"UDP"]) {
             mode = @"udp";
-            if ([self.sapCheckbox state] == NSOnState) {
+            if ([self.sapCheckbox state] == NSControlStateValueOn) {
                 if (![[self.channelNameTextField stringValue] isEqualToString: @""])
                     [announce appendFormat:@",sap,name=%@", [self.channelNameTextField stringValue]];
                 else
@@ -357,16 +357,16 @@
             else
                 stream_name = @"";
 
-            if ([self.sapCheckbox state] == NSOnState)
+            if ([self.sapCheckbox state] == NSControlStateValueOn)
                 [announce appendString: @",sdp=sap"];
 
-            if ([self.rtspCheckbox state] == NSOnState)
+            if ([self.rtspCheckbox state] == NSControlStateValueOn)
                 [announce appendFormat:@",sdp=\"rtsp://%@\"",[self.sdpURLTextField stringValue]];
 
-            if ([self.httpCheckbox state] == NSOnState)
+            if ([self.httpCheckbox state] == NSControlStateValueOn)
                 [announce appendFormat:@",sdp=\"http://%@\"",[self.sdpURLTextField stringValue]];
 
-            if ([self.fileCheckbox state] == NSOnState)
+            if ([self.fileCheckbox state] == NSControlStateValueOn)
                 [announce appendFormat:@",sdp=\"file://%@\"",[self.sdpURLTextField stringValue]];
 
             [mrl_string appendFormat:
@@ -375,7 +375,7 @@
         }
 
     }
-    if ([self.displayOnLocalScreenCheckbox state] == NSOnState)
+    if ([self.displayOnLocalScreenCheckbox state] == NSControlStateValueOn)
         [mrl_string appendString: @"}"];
 
     _soutMRL = [NSArray arrayWithObject:mrl_string];
@@ -435,7 +435,7 @@
 
 - (IBAction)transcodeChanged:(id)sender
 {
-    if ([self.transcodeVideoCheckbox state] == NSOnState) {
+    if ([self.transcodeVideoCheckbox state] == NSControlStateValueOn) {
         [self.transcodeVideoSelectorPopup setEnabled: YES];
         [self.transcodeVideoBitrateComboBox setEnabled: YES];
         [self.transcodeVideoScaleComboBox setEnabled: YES];
@@ -444,7 +444,7 @@
         [self.transcodeVideoBitrateComboBox setEnabled: NO];
         [self.transcodeVideoScaleComboBox setEnabled: NO];
     }
-    if ([self.transcodeAudioCheckbox state] == NSOnState) {
+    if ([self.transcodeAudioCheckbox state] == NSControlStateValueOn) {
         [self.transcodeAudioSelectorPopup setEnabled: YES];
         [self.transcodeAudioBitrateComboBox setEnabled: YES];
         [self.transcodeAudioChannelsComboBox setEnabled: YES];
@@ -461,19 +461,19 @@
 {
     NSMutableString *transcode_string = [NSMutableString stringWithCapacity:200];
 
-    if ([self.transcodeVideoCheckbox state] == NSOnState ||
-        [self.transcodeAudioCheckbox state] == NSOnState) {
+    if ([self.transcodeVideoCheckbox state] == NSControlStateValueOn ||
+        [self.transcodeAudioCheckbox state] == NSControlStateValueOn) {
         [transcode_string appendString:@"transcode{"];
-        if ([self.transcodeVideoCheckbox state] == NSOnState) {
+        if ([self.transcodeVideoCheckbox state] == NSControlStateValueOn) {
             [transcode_string appendFormat: @"vcodec=\"%@\",vb=\"%@\"" \
                                                             ",scale=\"%@\"",
                 [self.transcodeVideoSelectorPopup titleOfSelectedItem],
                 [self.transcodeVideoBitrateComboBox stringValue],
                 [self.transcodeVideoScaleComboBox stringValue]];
-            if ([self.transcodeAudioCheckbox state] == NSOnState)
+            if ([self.transcodeAudioCheckbox state] == NSControlStateValueOn)
                 [transcode_string appendString: @","];
         }
-        if ([self.transcodeAudioCheckbox state] == NSOnState) {
+        if ([self.transcodeAudioCheckbox state] == NSControlStateValueOn) {
             [transcode_string appendFormat: @"acodec=\"%@\",ab=\"%@\"",
                 [self.transcodeAudioSelectorPopup titleOfSelectedItem],
                 [self.transcodeAudioBitrateComboBox stringValue]];
@@ -497,25 +497,25 @@
 
     if ([mode isEqualToString: @"RTP"]) {
 /*        if ([[sender title] isEqualToString: _NS("SAP Announcement")]) {
-            [self.rtspCheckbox setState:NSOffState];
-            [self.httpCheckbox setState:NSOffState];
+            [self.rtspCheckbox setState:NSControlStateValueOff];
+            [self.httpCheckbox setState:NSControlStateValueOff];
         }*/
         if ([[sender title] isEqualToString:_NS("RTSP Announcement")]) {
-//            [self.sapCheckbox setState:NSOffState];
-            [self.httpCheckbox setState:NSOffState];
-            [self.fileCheckbox setState:NSOffState];
+//            [self.sapCheckbox setState:NSControlStateValueOff];
+            [self.httpCheckbox setState:NSControlStateValueOff];
+            [self.fileCheckbox setState:NSControlStateValueOff];
         } else if ([[sender title] isEqualToString:_NS("HTTP Announcement")]) {
-//            [self.sapCheckbox setState:NSOffState];
-            [self.rtspCheckbox setState:NSOffState];
-            [self.fileCheckbox setState:NSOffState];
+//            [self.sapCheckbox setState:NSControlStateValueOff];
+            [self.rtspCheckbox setState:NSControlStateValueOff];
+            [self.fileCheckbox setState:NSControlStateValueOff];
         } else if ([[sender title] isEqualToString:_NS("Export SDP as file")]) {
-            [self.rtspCheckbox setState:NSOffState];
-            [self.httpCheckbox setState:NSOffState];
+            [self.rtspCheckbox setState:NSControlStateValueOff];
+            [self.httpCheckbox setState:NSControlStateValueOff];
         }
 
-        if ([self.rtspCheckbox state] == NSOnState ||
-            [self.httpCheckbox state] == NSOnState ||
-            [self.fileCheckbox state] == NSOnState)
+        if ([self.rtspCheckbox state] == NSControlStateValueOn ||
+            [self.httpCheckbox state] == NSControlStateValueOn ||
+            [self.fileCheckbox state] == NSControlStateValueOn)
             [self.sdpURLTextField setEnabled: YES];
         else
             [self.sdpURLTextField setEnabled: NO];

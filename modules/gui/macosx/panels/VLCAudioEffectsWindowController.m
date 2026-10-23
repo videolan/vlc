@@ -443,7 +443,7 @@ static inline void enableTextField(NSTextField *const __unsafe_unretained textFi
         return;
     }
 
-    if (_applyProfileCheckbox.state == NSOffState)
+    if (_applyProfileCheckbox.state == NSControlStateValueOff)
         return;
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -974,7 +974,7 @@ static bool GetEqualizerStatus(intf_thread_t *__unused p_custom_intf,
     }
 
     [_compressorView enableSubviews:bEnable_compressor];
-    [_compressorEnableCheckbox setState:(bEnable_compressor ? NSOnState : NSOffState)];
+    [_compressorEnableCheckbox setState:(bEnable_compressor ? NSControlStateValueOn : NSControlStateValueOff)];
 
     [_compressorBand1Slider setFloatValue: var_CreateGetFloat(p_aout, "compressor-rms-peak")];
     [_compressorBand1TextField setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [_compressorBand1Slider floatValue]]];
@@ -1077,7 +1077,7 @@ static bool GetEqualizerStatus(intf_thread_t *__unused p_custom_intf,
     }
 
     [_spatializerView enableSubviews:bEnable_spatializer];
-    [_spatializerEnableCheckbox setState:(bEnable_spatializer ? NSOnState : NSOffState)];
+    [_spatializerEnableCheckbox setState:(bEnable_spatializer ? NSControlStateValueOn : NSControlStateValueOff)];
 
 
 #define setSlider(bandsld, bandfld, var) \
@@ -1169,15 +1169,15 @@ static bool GetEqualizerStatus(intf_thread_t *__unused p_custom_intf,
         bEnable_normvol = strstr(psz_afilters, "normvol") != NULL;
         free(psz_afilters);
     } else {
-        [_filterHeadPhoneCheckbox setState: NSOffState];
-        [_filterKaraokeCheckbox setState: NSOffState];
-        [_filterScaleTempoCheckbox setState: NSOffState];
-        [_filterStereoEnhancerCheckbox setState: NSOffState];
+        [_filterHeadPhoneCheckbox setState: NSControlStateValueOff];
+        [_filterKaraokeCheckbox setState: NSControlStateValueOff];
+        [_filterScaleTempoCheckbox setState: NSControlStateValueOff];
+        [_filterStereoEnhancerCheckbox setState: NSControlStateValueOff];
     }
 
     [_filterNormLevelSlider setEnabled:bEnable_normvol];
     [_filterNormLevelLabel setEnabled:bEnable_normvol];
-    [_filterNormLevelCheckbox setState:(bEnable_normvol ? NSOnState : NSOffState)];
+    [_filterNormLevelCheckbox setState:(bEnable_normvol ? NSControlStateValueOn : NSControlStateValueOff)];
 
     [_filterNormLevelSlider setFloatValue: var_CreateGetFloat(p_aout, "norm-max-level")];
     aout_Release(p_aout);

@@ -94,14 +94,14 @@
     NSInteger count = _librarySortingMenu.numberOfItems;
     for (NSInteger x = 0; x < count; x++) {
         NSMenuItem *menuItem = [_librarySortingMenu itemAtIndex:x];
-        menuItem.state = NSOffState;
+        menuItem.state = NSControlStateValueOff;
     }
 
     NSMenuItem *menuItem = [_librarySortingMenu itemWithTag:_libraryController.lastSortingCriteria];
-    menuItem.state = NSOnState;
+    menuItem.state = NSControlStateValueOn;
 
     menuItem = [_librarySortingMenu itemWithTag:_libraryController.descendingLibrarySorting + 100];
-    menuItem.state = NSOnState;
+    menuItem.state = NSControlStateValueOn;
 }
 
 - (void)selectSortKey:(id)sender

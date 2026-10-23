@@ -381,7 +381,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
     // Delay this to allow the full animation to run inside the modal event loop
     dispatch_async(dispatch_get_main_queue(), ^{
         [_tabView selectTabViewItemWithIdentifier:identifier];
-        [_fileSubCheckbox setState: NSOffState];
+        [_fileSubCheckbox setState: NSControlStateValueOff];
     });
 
     NSModalResponse i_result = [NSApp runModalForWindow: self.window];
@@ -400,13 +400,13 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
     VLCOpenInputMetadata *inputMetadata = [[VLCOpenInputMetadata alloc] init];
     inputMetadata.MRLString = [self MRL];
 
-    if ([_fileSubCheckbox state] == NSOnState) {
+    if ([_fileSubCheckbox state] == NSControlStateValueOn) {
         [self addSubtitleOptionsToArray:options];
     }
-    if ([_fileCustomTimingCheckbox state] == NSOnState) {
+    if ([_fileCustomTimingCheckbox state] == NSControlStateValueOn) {
         [self addTimingOptionsToArray:options];
     }
-    if ([_outputCheckbox state] == NSOnState) {
+    if ([_outputCheckbox state] == NSControlStateValueOn) {
         [self addStreamOutputOptionsToArray:options];
     }
     if ([_fileSlaveCheckbox state] && _fileSlavePath)
@@ -429,7 +429,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
 - (void)addSubtitleOptionsToArray:(NSMutableArray *)options
 {
     [options addObject: [NSString stringWithFormat: @"sub-file=%@", _subPath]];
-    if ([_fileSubOverrideCheckbox state] == NSOnState) {
+    if ([_fileSubOverrideCheckbox state] == NSControlStateValueOn) {
         [options addObject: [NSString stringWithFormat: @"sub-delay=%f", ([self fileSubDelay] * 10)]];
         [options addObject: [NSString stringWithFormat: @"sub-fps=%f", [self fileSubFps]]];
     }
@@ -505,7 +505,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
 - (IBAction)expandMRLfieldAction:(id)sender
 {
     [NSAnimationContext runAnimationRespectingPreferencesWithChanges:^(NSAnimationContext * const __unused context) {
-        if ([_mrlButton state] == NSOffState) {
+        if ([_mrlButton state] == NSControlStateValueOff) {
             self.mrlViewHeightConstraint.animator.constant = 0;
             self.mrlBox.hidden = YES;
         } else {
@@ -662,7 +662,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
             _fileSlavePath = [[[openPanel URLs] firstObject] path];
         }
     }
-    if (_fileSlavePath && [_fileSlaveCheckbox state] == NSOnState) {
+    if (_fileSlavePath && [_fileSlaveCheckbox state] == NSControlStateValueOn) {
         [_fileSlaveFilenameLabel setStringValue: [[NSFileManager defaultManager] displayNameAtPath:_fileSlavePath]];
         [_fileSlaveIconWell setImage: [NSWorkspace.sharedWorkspace iconForFile: _fileSlavePath]];
     } else {
@@ -1241,7 +1241,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
 
 - (IBAction)subsChanged:(id)sender
 {
-    if ([_fileSubCheckbox state] == NSOnState) {
+    if ([_fileSubCheckbox state] == NSControlStateValueOn) {
         [_fileSubSettingsButton setEnabled:YES];
         if (_subPath) {
             [_fileSubtitlesFilenameLabel setStringValue: [[NSFileManager defaultManager] displayNameAtPath:_subPath]];

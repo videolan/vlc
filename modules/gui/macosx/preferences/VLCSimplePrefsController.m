@@ -204,7 +204,7 @@ static NSString* VLCHotkeysSettingToolbarIdentifier = @"Hotkeys Settings Item Id
                 withKeyPath:@"automaticallyChecksForUpdates"
                     options:nil];
 #else
-    [_intf_updateCheckbox setState:NSOffState];
+    [_intf_updateCheckbox setState:NSControlStateValueOff];
     [_intf_updateCheckbox setEnabled:NO];
 #endif
 
@@ -663,10 +663,10 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
 #endif
 
     BOOL growlEnabled = [self hasModule:@"growl" inConfig:@"control"];
-    [_intf_enableNotificationsCheckbox setState: growlEnabled ? NSOnState : NSOffState];
+    [_intf_enableNotificationsCheckbox setState: growlEnabled ? NSControlStateValueOn : NSControlStateValueOff];
 
     BOOL httpEnabled = [self hasModule:@"http" inConfig:@"extraintf"];
-    [_intf_enableluahttpCheckbox setState: httpEnabled ? NSOnState : NSOffState];
+    [_intf_enableluahttpCheckbox setState: httpEnabled ? NSControlStateValueOn : NSControlStateValueOff];
     _intf_luahttppwdTextField.enabled = httpEnabled;
 
     [self setupField:_intf_luahttppwdTextField forOption: "http-password"];
@@ -677,16 +677,16 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     [self setupButton:_audio_enableCheckbox forBoolValue: "audio"];
 
     if (config_GetInt("volume-save")) {
-        [_audio_autosavevol_yesButtonCell setState: NSOnState];
-        [_audio_autosavevol_noButtonCell setState: NSOffState];
+        [_audio_autosavevol_yesButtonCell setState: NSControlStateValueOn];
+        [_audio_autosavevol_noButtonCell setState: NSControlStateValueOff];
         [_audio_volTextField setEnabled: NO];
         [_audio_volSlider setEnabled: NO];
 
         [_audio_volSlider setIntValue: 100];
         [_audio_volTextField setIntValue: 100];
     } else {
-        [_audio_autosavevol_yesButtonCell setState: NSOffState];
-        [_audio_autosavevol_noButtonCell setState: NSOnState];
+        [_audio_autosavevol_yesButtonCell setState: NSControlStateValueOff];
+        [_audio_autosavevol_noButtonCell setState: NSControlStateValueOn];
         [_audio_volTextField setEnabled: YES];
         [_audio_volSlider setEnabled: YES];
 
@@ -706,11 +706,11 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
         [self setupField:_audio_lastpwdSecureTextField forOption:"lastfm-password"];
 
         if (config_ExistIntf("audioscrobbler")) {
-            [_audio_lastCheckbox setState: NSOnState];
+            [_audio_lastCheckbox setState: NSControlStateValueOn];
             [_audio_lastuserTextField setEnabled: YES];
             [_audio_lastpwdSecureTextField setEnabled: YES];
         } else {
-            [_audio_lastCheckbox setState: NSOffState];
+            [_audio_lastCheckbox setState: NSControlStateValueOff];
             [_audio_lastuserTextField setEnabled: NO];
             [_audio_lastpwdSecureTextField setEnabled: NO];
         }
@@ -988,9 +988,9 @@ static inline void save_string_list(intf_thread_t * __unused p_intf, id object, 
 
         config_PutInt("macosx-statusicon", [_intf_statusIconCheckbox state]);
 
-        [self changeModule:@"growl" inConfig:@"control" enable:[_intf_enableNotificationsCheckbox state] == NSOnState];
+        [self changeModule:@"growl" inConfig:@"control" enable:[_intf_enableNotificationsCheckbox state] == NSControlStateValueOn];
 
-        [self changeModule:@"http" inConfig:@"extraintf" enable:[_intf_enableluahttpCheckbox state] == NSOnState];
+        [self changeModule:@"http" inConfig:@"extraintf" enable:[_intf_enableluahttpCheckbox state] == NSControlStateValueOn];
         config_PutPsz("http-password", [[_intf_luahttppwdTextField stringValue] UTF8String]);
 
         SaveIntList(_intf_pauseitunesPopup, "macosx-control-itunes");
@@ -1015,7 +1015,7 @@ static inline void save_string_list(intf_thread_t * __unused p_intf, id object, 
         /* Last.FM is optional */
         if (module_exists("audioscrobbler")) {
             [_audio_lastCheckbox setEnabled: YES];
-            if ([_audio_lastCheckbox state] == NSOnState)
+            if ([_audio_lastCheckbox state] == NSControlStateValueOn)
                 config_AddIntf("audioscrobbler");
             else
                 config_RemoveIntf("audioscrobbler");
@@ -1152,8 +1152,8 @@ static inline void save_string_list(intf_thread_t * __unused p_intf, id object, 
     [_video_devicePopup setEnabled: !_value];
 
     if (_value) {
-        [_video_videodecoCheckbox setState: NSOnState];
-        [_video_blackScreenCheckbox setState: NSOffState];
+        [_video_videodecoCheckbox setState: NSControlStateValueOn];
+        [_video_blackScreenCheckbox setState: NSControlStateValueOff];
 
         NSString *tooltipText = _NS("This setting cannot be changed because the native fullscreen mode is enabled.");
         [_video_videodecoCheckbox setToolTip:tooltipText];
@@ -1171,7 +1171,7 @@ static inline void save_string_list(intf_thread_t * __unused p_intf, id object, 
 - (IBAction)interfaceSettingChanged:(id)sender
 {
     if (sender == _intf_enableluahttpCheckbox) {
-        _intf_luahttppwdTextField.enabled = [sender state] == NSOnState;
+        _intf_luahttppwdTextField.enabled = [sender state] == NSControlStateValueOn;
     }
 
     _intfSettingChanged = YES;
@@ -1191,7 +1191,7 @@ static inline void save_string_list(intf_thread_t * __unused p_intf, id object, 
         [_audio_volSlider setIntValue: [_audio_volTextField intValue]];
 
     if (sender == _audio_lastCheckbox) {
-        if ([_audio_lastCheckbox state] == NSOnState) {
+        if ([_audio_lastCheckbox state] == NSControlStateValueOn) {
             [_audio_lastpwdSecureTextField setEnabled: YES];
             [_audio_lastuserTextField setEnabled: YES];
         } else {

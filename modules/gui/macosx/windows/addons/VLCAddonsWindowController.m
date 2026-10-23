@@ -114,7 +114,7 @@ static void addonChangedCallback( addons_manager_t *manager,
     [[_typeSwitcher lastItem] setTag:ADDON_EXTENSION];
 
     [_localAddonsOnlyCheckbox setTitle:_NS("Show Installed Only")];
-    [_localAddonsOnlyCheckbox setState:NSOffState];
+    [_localAddonsOnlyCheckbox setState:NSControlStateValueOff];
     [_downloadCatalogButton setTitle:_NS("Find more addons online")];
     [_spinner setUsesThreadedAnimation:YES];
 
@@ -270,7 +270,7 @@ static void addonChangedCallback( addons_manager_t *manager,
 
 - (void)_refactorDataModel
 {
-    BOOL installedOnly = _localAddonsOnlyCheckbox.state == NSOnState;
+    BOOL installedOnly = _localAddonsOnlyCheckbox.state == NSControlStateValueOn;
     int type = (int)[[_typeSwitcher selectedItem] tag];
 
     NSMutableArray *filteredItems = [[NSMutableArray alloc] initWithCapacity:_addons.count];

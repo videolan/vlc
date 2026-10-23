@@ -513,7 +513,7 @@ static NSString * const VLCVideoEffectsDefaultProfileString = @";;;0;1.000000;1.
             [widget setToolTip: [NSString stringWithFormat:@"%lli", val.i_int]];
         }
         else if ([widget isKindOfClass: [NSButton class]])
-            [widget setState: val.i_int ? NSOnState : NSOffState];
+            [widget setState: val.i_int ? NSControlStateValueOn : NSControlStateValueOff];
         else if ([widget isKindOfClass: [NSTextField class]])
             [widget setIntValue: (int)val.i_int];
         else if ([widget isKindOfClass: [NSStepper class]])
@@ -587,25 +587,25 @@ static NSString * const VLCVideoEffectsDefaultProfileString = @";;;0;1.000000;1.
         [_anaglyphCheckbox setState: (NSInteger)strstr(psz_vfilters, "anaglyph")];
         free(psz_vfilters);
     } else {
-        [_adjustCheckbox setState: NSOffState];
-        [_sharpenCheckbox setState: NSOffState];
-        [_bandingCheckbox setState: NSOffState];
-        [_grainCheckbox setState: NSOffState];
-        [_transformCheckbox setState: NSOffState];
-        [_zoomCheckbox setState: NSOffState];
-        [_puzzleCheckbox setState: NSOffState];
-        [_thresholdCheckbox setState: NSOffState];
-        [_sepiaCheckbox setState: NSOffState];
-        [_gradientCheckbox setState: NSOffState];
-        [_extractCheckbox setState: NSOffState];
-        [_invertCheckbox setState: NSOffState];
-        [_posterizeCheckbox setState: NSOffState];
-        [_blurCheckbox setState: NSOffState];
-        [_motiondetectCheckbox setState: NSOffState];
-        [_watereffectCheckbox setState: NSOffState];
-        [_wavesCheckbox setState: NSOffState];
-        [_psychedelicCheckbox setState: NSOffState];
-        [_anaglyphCheckbox setState: NSOffState];
+        [_adjustCheckbox setState: NSControlStateValueOff];
+        [_sharpenCheckbox setState: NSControlStateValueOff];
+        [_bandingCheckbox setState: NSControlStateValueOff];
+        [_grainCheckbox setState: NSControlStateValueOff];
+        [_transformCheckbox setState: NSControlStateValueOff];
+        [_zoomCheckbox setState: NSControlStateValueOff];
+        [_puzzleCheckbox setState: NSControlStateValueOff];
+        [_thresholdCheckbox setState: NSControlStateValueOff];
+        [_sepiaCheckbox setState: NSControlStateValueOff];
+        [_gradientCheckbox setState: NSControlStateValueOff];
+        [_extractCheckbox setState: NSControlStateValueOff];
+        [_invertCheckbox setState: NSControlStateValueOff];
+        [_posterizeCheckbox setState: NSControlStateValueOff];
+        [_blurCheckbox setState: NSControlStateValueOff];
+        [_motiondetectCheckbox setState: NSControlStateValueOff];
+        [_watereffectCheckbox setState: NSControlStateValueOff];
+        [_wavesCheckbox setState: NSControlStateValueOff];
+        [_psychedelicCheckbox setState: NSControlStateValueOff];
+        [_anaglyphCheckbox setState: NSControlStateValueOff];
     }
 
     psz_vfilters = var_InheritString(vout, "sub-source");
@@ -614,8 +614,8 @@ static NSString * const VLCVideoEffectsDefaultProfileString = @";;;0;1.000000;1.
         [_addLogoCheckbox setState: (NSInteger)strstr(psz_vfilters, "logo")];
         free(psz_vfilters);
     } else {
-        [_addTextCheckbox setState: NSOffState];
-        [_addLogoCheckbox setState: NSOffState];
+        [_addTextCheckbox setState: NSControlStateValueOff];
+        [_addLogoCheckbox setState: NSControlStateValueOff];
     }
 
     psz_vfilters = var_InheritString(vout, "video-splitter");
@@ -624,8 +624,8 @@ static NSString * const VLCVideoEffectsDefaultProfileString = @";;;0;1.000000;1.
         [_wallCheckbox setState: (NSInteger)strstr(psz_vfilters, "wall")];
         free(psz_vfilters);
     } else {
-        [_cloneCheckbox setState: NSOffState];
-        [_wallCheckbox setState: NSOffState];
+        [_cloneCheckbox setState: NSControlStateValueOff];
+        [_wallCheckbox setState: NSControlStateValueOff];
     }
 
     cropLeft = var_GetInteger(vout, "crop-left");
@@ -662,8 +662,8 @@ static NSString * const VLCVideoEffectsDefaultProfileString = @";;;0;1.000000;1.
     [self setCropTopValue: cropTop];
     [self setCropRightValue: cropRight];
     [self setCropBottomValue: cropBottom];
-    [_cropSyncTopBottomCheckbox setState: NSOffState];
-    [_cropSyncLeftRightCheckbox setState: NSOffState];
+    [_cropSyncTopBottomCheckbox setState: NSControlStateValueOff];
+    [_cropSyncLeftRightCheckbox setState: NSControlStateValueOff];
 
     [self setWidgetValue: _transformPopup forOption: "transform-type" enabled: [_transformCheckbox state]];
 
@@ -818,7 +818,7 @@ static NSString * const VLCVideoEffectsDefaultProfileString = @";;;0;1.000000;1.
     }
 
     // A new "Custom profile" is only created if the user wants to load this as new profile at startup ...
-    if (_applyProfileCheckbox.state == NSOffState)
+    if (_applyProfileCheckbox.state == NSControlStateValueOff)
         return;
 
     // ... and some settings are changed
@@ -1157,7 +1157,7 @@ static NSString * const VLCVideoEffectsDefaultProfileString = @";;;0;1.000000;1.
     BOOL b_state = [_cloneCheckbox state];
 
     if (b_state && [_wallCheckbox state]) {
-        [_wallCheckbox setState: NSOffState];
+        [_wallCheckbox setState: NSControlStateValueOff];
         [self enableWall:_wallCheckbox];
     }
 
@@ -1177,7 +1177,7 @@ static NSString * const VLCVideoEffectsDefaultProfileString = @";;;0;1.000000;1.
     BOOL b_state = [_wallCheckbox state];
 
     if (b_state && [_cloneCheckbox state]) {
-        [_cloneCheckbox setState: NSOffState];
+        [_cloneCheckbox setState: NSControlStateValueOff];
         [self enableClone:_cloneCheckbox];
     }
 

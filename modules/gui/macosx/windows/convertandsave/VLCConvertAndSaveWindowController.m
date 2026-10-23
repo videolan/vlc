@@ -231,7 +231,7 @@ NSString *VLCConvertAndSaveProfileNamesKey = @"CASProfileNames";
     [[_streamSDPMatrix cellWithTag:1] setTitle:_NS("HTTP Announcement")];
     [[_streamSDPMatrix cellWithTag:2] setTitle:_NS("RTSP Announcement")];
     [[_streamSDPMatrix cellWithTag:3] setTitle:_NS("Export SDP as file")];
-    [_streamSAPCheckbox setState:NSOffState];
+    [_streamSAPCheckbox setState:NSControlStateValueOff];
     [_streamSDPMatrix setEnabled:NO];
     [_streamSDPFileBrowseButton setStringValue:_NS("Browse...")];
     [_streamChannelLabel setStringValue:_NS("Channel Name")];
@@ -475,21 +475,21 @@ NSString *VLCConvertAndSaveProfileNamesKey = @"CASProfileNames";
 
 - (IBAction)videoSettingsChanged:(id)sender
 {
-    bool enableSettings = [_customizeVidCheckbox state] == NSOnState && [_customizeVidKeepCheckbox state] == NSOffState;
+    bool enableSettings = [_customizeVidCheckbox state] == NSControlStateValueOn && [_customizeVidKeepCheckbox state] == NSControlStateValueOff;
     [_customizeVidSettingsBox enableSubviews:enableSettings];
-    [_customizeVidKeepCheckbox setEnabled:[_customizeVidCheckbox state] == NSOnState];
+    [_customizeVidKeepCheckbox setEnabled:[_customizeVidCheckbox state] == NSControlStateValueOn];
 }
 
 - (IBAction)audioSettingsChanged:(id)sender
 {
-    bool enableSettings = [_customizeAudCheckbox state] == NSOnState && [_customizeAudKeepCheckbox state] == NSOffState;
+    bool enableSettings = [_customizeAudCheckbox state] == NSControlStateValueOn && [_customizeAudKeepCheckbox state] == NSControlStateValueOff;
     [_customizeAudSettingsBox enableSubviews:enableSettings];
-    [_customizeAudKeepCheckbox setEnabled:[_customizeAudCheckbox state] == NSOnState];
+    [_customizeAudKeepCheckbox setEnabled:[_customizeAudCheckbox state] == NSControlStateValueOn];
 }
 
 - (IBAction)subSettingsChanged:(id)sender
 {
-    bool enableSettings = [_customizeSubsCheckbox state] == NSOnState;
+    bool enableSettings = [_customizeSubsCheckbox state] == NSControlStateValueOn;
     [_customizeSubsOverlayCheckbox setEnabled:enableSettings];
     [_customizeSubsPopup setEnabled:enableSettings];
 }
@@ -1001,7 +1001,7 @@ NSString *VLCConvertAndSaveProfileNamesKey = @"CASProfileNames";
     [self.currentProfile addObject: [NSString stringWithFormat:@"%li", [_customizeSubsCheckbox state]]];
     
     NSString *videoCodec;
-    if([_customizeVidKeepCheckbox state] == NSOnState)
+    if([_customizeVidKeepCheckbox state] == NSControlStateValueOn)
         videoCodec = @"copy";
     else {
         i = [_customizeVidCodecPopup indexOfSelectedItem];
@@ -1019,7 +1019,7 @@ NSString *VLCConvertAndSaveProfileNamesKey = @"CASProfileNames";
     [self.currentProfile addObject: [NSString stringWithFormat:@"%i", [_customizeVidHeightField intValue]]];
 
     NSString *audioCodec;
-    if([_customizeAudKeepCheckbox state] == NSOnState)
+    if([_customizeAudKeepCheckbox state] == NSControlStateValueOn)
         audioCodec = @"copy";
     else {
         i = [_customizeAudCodecPopup indexOfSelectedItem];

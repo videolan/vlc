@@ -188,10 +188,10 @@
 
 - (void)selectRenderer:(NSMenuItem *)sender
 {
-    [_rendererNoneItem setState:NSOffState];
+    [_rendererNoneItem setState:NSControlStateValueOff];
 
-    [_selectedItem setState:NSOffState];
-    [sender setState:NSOnState];
+    [_selectedItem setState:NSControlStateValueOff];
+    [sender setState:NSControlStateValueOn];
     _selectedItem = sender;
 
     VLCRendererItem *item = [sender representedObject];
