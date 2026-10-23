@@ -907,6 +907,10 @@ if vpx_dep.found()
     if cc.has_function('vpx_codec_vp9_cx', dependencies: [vpx_dep])
         vpx_c_args += '-DENABLE_VP9_ENCODER'
     endif
+
+    if get_option('vpx').enabled() and vpx_c_args.length() == 0
+        error('libvpx does not link with any feature.')
+    endif
 endif
 
 vlc_modules += {
