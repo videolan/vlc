@@ -14,6 +14,7 @@ OPTIONS="
         --enable-ncurses
         --enable-twolame
         --enable-libass
+        --enable-vpx
         --enable-macosx-avfoundation
         --disable-xcb
         --disable-caca
