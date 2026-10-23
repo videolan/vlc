@@ -506,7 +506,7 @@ cd ../..
 MCONFIGFLAGS="-Dlua=enabled -Dflac=enabled -Dtheoradec=enabled -Dtheoraenc=enabled \
     -Davcodec=enabled -Dmerge-ffmpeg=true \
     -Dlibass=enabled -Dshout=enabled -Dgoom2=enabled \
-    -Dsse=enabled -Dzvbi=enabled -Dtelx=disabled $MCONFIGFLAGS"
+    -Dsse=enabled -Dvpx=enabled -Dzvbi=enabled -Dtelx=disabled $MCONFIGFLAGS"
 
 MCONFIGFLAGS="$MCONFIGFLAGS --prefer-static"
 if [ "$RELEASE" != "yes" ]; then

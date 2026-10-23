@@ -9,6 +9,7 @@ OPTIONS="
       --enable-shout
       --enable-goom
       --enable-sse
+      --enable-vpx
       --enable-zvbi --disable-telx"
 
 sh "$(dirname $0)"/../../../configure ${OPTIONS}  "$@"
