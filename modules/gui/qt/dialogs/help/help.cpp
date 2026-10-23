@@ -478,7 +478,7 @@ void UpdateDialog::checkOrDownload()
     case UpdateModel::CheckFailed:
     {
         ui.stackedWidget->setCurrentWidget( ui.updateRequestPage );
-        m_model->checkUpdate();
+        m_model->checkUpdate(true);
         break;
     }
     case UpdateModel::NeedUpdate:
