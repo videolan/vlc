@@ -18,6 +18,7 @@ breakpad: breakpad-$(BREAKPAD_VERSION).tar.gz .sum-breakpad
 	# $(call update_autoconfig,autotools)
 	$(APPLY) $(SRC)/breakpad/0001-mac-client-Upgrade-Breakpad.xib-to-new-format.patch
 	$(APPLY) $(SRC)/breakpad/windows-arm64.patch
+	$(APPLY) $(SRC)/breakpad/0001-Fix-memset-on-C-object.patch
 	sed -i.orig -e "s/GCC_TREAT_WARNINGS_AS_ERRORS = YES/GCC_TREAT_WARNINGS_AS_ERRORS = NO/" "$(UNPACK_DIR)/src/common/mac/Breakpad.xcconfig"
 	$(MOVE)
 
