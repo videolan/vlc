@@ -138,6 +138,52 @@ static block_t *Load(demux_t *demux)
     return block;
 }
 
+/* Size in bytes of a GIF color table described by a packed field, or 0 */
+static size_t GifColorTableSize(uint8_t packed)
+{
+    return (packed & 0x80) ? 3u << ((packed & 0x07) + 1) : 0;
+}
+
+/* Skip GIF data sub-blocks up to and including the block terminator */
+static size_t GifSkipSubBlocks(const uint8_t *data, size_t size, size_t pos)
+{
+    while (pos < size && data[pos] != 0)
+        pos += 1 + data[pos];
+    return pos + 1;
+}
+
+/* Walk the GIF block structure and report whether it holds more than one
+ * image (i.e. an animation). A truncated or corrupt stream is reported as a
+ * still image. */
+static bool IsAnimatedGif(const uint8_t *data, size_t size)
+{
+    /* Header (6) + Logical Screen Descriptor (7) + Global Color Table */
+    if (size < 13)
+        return false;
+
+    size_t pos = 13 + GifColorTableSize(data[10]);
+    unsigned images = 0;
+    while (pos < size) {
+        switch (data[pos++]) {
+            case 0x21: /* Extension: skip the label */
+                pos++;
+                break;
+            case 0x2C: /* Image Descriptor */
+                if (++images > 1)
+                    return true;
+                if (size - pos < 9)
+                    return false;
+                /* Descriptor, Local Color Table, LZW minimum code size */
+                pos += 9 + GifColorTableSize(data[pos + 8]) + 1;
+                break;
+            default: /* Trailer or unknown block */
+                return false;
+        }
+        pos = GifSkipSubBlocks(data, size, pos);
+    }
+    return false;
+}
+
 static block_t *Decode(demux_t *demux,
                        es_format_t *fmt, vlc_fourcc_t chroma, block_t *data)
 {
@@ -771,6 +817,13 @@ static int Open(vlc_object_t *object)
     }
 
     block_t *data = Load(demux);
+    if (data && codec == VLC_CODEC_GIF &&
+        IsAnimatedGif(data->p_buffer, data->i_buffer)) {
+        msg_Dbg(demux, "animated GIF, letting avformat demux it");
+        block_Release(data);
+        es_format_Clean(&fmt);
+        return VLC_EGENERIC;
+    }
     if (data && var_InheritBool(demux, "image-decode")) {
         char *string = var_InheritString(demux, "image-chroma");
         vlc_fourcc_t chroma = vlc_fourcc_GetCodecFromString(VIDEO_ES, string);
