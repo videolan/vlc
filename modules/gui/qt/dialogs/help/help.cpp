@@ -194,6 +194,7 @@ public:
 
     const update_release_t* m_release = nullptr;
     UpdateModel::Status m_status = UpdateModel::Unchecked;
+    UpdateModel::Status m_updateStatusOnAcknowledgment = UpdateModel::Unchecked;
     bool m_explicitCheck = false;
 
     UpdateModel* q_ptr = nullptr;
@@ -385,6 +386,23 @@ void UpdateModel::resetExplicitCheck()
     emit explicitCheckChanged();
 }
 
+UpdateModel::Status UpdateModel::updateStatusOnAcknowledgment() const
+{
+    Q_D(const UpdateModel);
+    return d->m_updateStatusOnAcknowledgment;
+}
+
+void UpdateModel::setUpdateStatusOnAcknowledgment(UpdateModel::Status status)
+{
+    Q_D(UpdateModel);
+
+    if (d->m_updateStatusOnAcknowledgment == status)
+        return;
+
+    d->m_updateStatusOnAcknowledgment = status;
+    emit updateStatusOnAcknowledgmentChanged(status);
+}
+
 /*****************************************************************************
  * UpdateDialog
  *****************************************************************************/
@@ -441,6 +459,7 @@ bool UpdateDialog::event(QEvent* event)
         case QEvent::Close:
         case QEvent::Destroy:
             m_model->resetExplicitCheck();
+            m_model->setUpdateStatusOnAcknowledgment(m_model->updateStatus());
             break;
         default:
             break;
@@ -534,6 +553,8 @@ void UpdateDialog::updateUI( )
 
     if (isVisible())
     {
+        m_model->setUpdateStatusOnAcknowledgment(m_model->updateStatus());
+
         if (const auto w = windowHandle())
         {
             w->alert(0);

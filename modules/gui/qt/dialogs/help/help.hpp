@@ -88,6 +88,7 @@ public:
     Q_ENUM(Status)
 
     Q_PROPERTY(Status updateStatus READ updateStatus RESET resetStatus NOTIFY updateStatusChanged FINAL)
+    Q_PROPERTY(Status updateStatusOnAcknowledgment READ updateStatusOnAcknowledgment WRITE setUpdateStatusOnAcknowledgment NOTIFY updateStatusOnAcknowledgmentChanged FINAL)
     Q_PROPERTY(int major READ getMajor NOTIFY updateStatusChanged FINAL)
     Q_PROPERTY(int minor READ getMinor NOTIFY updateStatusChanged FINAL)
     Q_PROPERTY(int revision READ getRevision NOTIFY updateStatusChanged FINAL)
@@ -118,11 +119,14 @@ public:
     double getProgress() const;
     bool explicitCheck() const;
     void resetExplicitCheck();
+    Status updateStatusOnAcknowledgment() const;
+    void setUpdateStatusOnAcknowledgment(Status status);
 
 signals:
     void updateStatusChanged();
     void progressChanged();
     void explicitCheckChanged();
+    void updateStatusOnAcknowledgmentChanged(UpdateModel::Status);
 
 private:
     void _setExplicitCheck(bool) const
