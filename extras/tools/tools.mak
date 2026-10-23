@@ -276,7 +276,7 @@ DISTCLEAN_PKG += m4-$(M4_VERSION).tar.gz
 pkg-config-$(PKGCONFIG_VERSION).tar.gz:
 	$(call download_pkg,$(PKGCONFIG_URL),pkgconfiglite)
 
-.getpkgconfig: pkg-config-$(PKGCFG_VERSION).tar.gz
+.getpkg-config: pkg-config-$(PKGCFG_VERSION).tar.gz
 pkgconfig: pkg-config-$(PKGCONFIG_VERSION).tar.gz
 	$(UNPACK)
 	mv pkg-config-lite-$(PKGCONFIG_VERSION) pkg-config-$(PKGCONFIG_VERSION)
