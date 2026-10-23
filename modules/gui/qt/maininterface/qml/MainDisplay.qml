@@ -874,6 +874,9 @@ FocusScope {
             if (!updateModelIsAvailable)
                 return false
 
+            if (DialogsProvider.updateDialogVisible)
+                return false
+
             if (UpdateModel.explicitCheck) {
                 return (UpdateModel.updateStatus !== UpdateModel.Unchecked)
             } else {
