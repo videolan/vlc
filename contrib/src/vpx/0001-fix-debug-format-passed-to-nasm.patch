@@ -1,0 +1,33 @@
+From 1c114478a95ba87bc1039f9593141bc599aba2a3 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 23 Oct 2026 14:15:32 +0200
+Subject: [PATCH] fix debug format passed to nasm
+
+nasm doesn't support the debug format passed with -g
+---
+ build/make/configure.sh | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/build/make/configure.sh b/build/make/configure.sh
+index 5aebd03ed..1f97939f0 100644
+--- a/build/make/configure.sh
++++ b/build/make/configure.sh
+@@ -1479,12 +1479,14 @@ EOF
+       case  ${tgt_os} in
+         win32)
+           add_asflags -f win32
+-          enabled debug && add_asflags -g cv8
++          enabled debug && [ "${AS}" = yasm ] && add_asflags -g cv8
++          enabled debug && [ "${AS}" = nasm ] && add_asflags -g -F cv8
+           EXE_SFX=.exe
+           ;;
+         win64)
+           add_asflags -f win64
+-          enabled debug && add_asflags -g cv8
++          enabled debug && [ "${AS}" = yasm ] && add_asflags -g cv8
++          enabled debug && [ "${AS}" = nasm ] && add_asflags -g -F cv8
+           EXE_SFX=.exe
+           ;;
+         linux*|solaris*|android*)
+--
+2.55.0.windows.3

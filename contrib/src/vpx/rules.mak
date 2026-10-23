@@ -35,6 +35,7 @@ endif
 	# as it is enabled through --extra-cflags if necessary.
 	$(APPLY) $(SRC)/vpx/libvpx-remove-bitcode.patch
 	$(APPLY) $(SRC)/vpx/0001-fix-compilation-with-Apple-Clang-13.patch
+	$(APPLY) $(SRC)/vpx/0001-fix-debug-format-passed-to-nasm.patch
 	$(MOVE)
 
 DEPS_vpx =
