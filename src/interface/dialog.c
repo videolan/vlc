@@ -392,7 +392,13 @@ vlc_dialog_display_error_va(vlc_object_t *p_obj, const char *psz_title,
     vlc_dialog_provider *p_provider = get_interactive_dialog_provider(p_obj);
 
     if (p_provider != NULL)
-        i_ret = dialog_display_error_va(p_provider, psz_title, psz_fmt, ap);
+    {
+        va_list ap_dialog;
+        va_copy(ap_dialog, ap);
+        i_ret = dialog_display_error_va(p_provider, psz_title, psz_fmt,
+                                        ap_dialog);
+        va_end(ap_dialog);
+    }
     else
         i_ret = VLC_EGENERIC;
 
