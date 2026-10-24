@@ -37,6 +37,7 @@
 #import "library/VLCLibraryHeaderView.h"
 #import "library/VLCLibraryMasterDetailViewTableViewDelegate.h"
 #import "library/VLCLibraryModel.h"
+#import "library/VLCLibrarySegment.h"
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryTableView.h"
 #import "library/VLCLibraryTwoPaneSplitViewDelegate.h"
@@ -65,8 +66,24 @@
         [self setupGridViewModeViews];
         [self setupListViewModeViews];
         [self setupPlaceholderView];
+
+        [NSNotificationCenter.defaultCenter addObserver:self
+                                               selector:@selector(libraryModelGroupsListReset:)
+                                                   name:VLCLibraryModelListOfGroupsReset
+                                                 object:nil];
     }
     return self;
+}
+
+- (void)libraryModelGroupsListReset:(NSNotification *)notification
+{
+    const VLCLibrarySegmentType segmentType = self.libraryWindow.librarySegmentType;
+    const BOOL groupsSegmentActive = segmentType == VLCLibraryGroupsSegmentType ||
+                                     segmentType == VLCLibraryGroupsGroupSubSegmentType;
+
+    if (groupsSegmentActive && !self.libraryWindow.embeddedVideoPlaybackActive) {
+        [self presentGroupsView];
+    }
 }
 
 - (void)setupDataSource
