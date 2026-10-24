@@ -37,6 +37,7 @@ extern NSString *VLCMediaSourceChildrenAdded;
 extern NSString *VLCMediaSourceChildrenRemoved;
 extern NSString *VLCMediaSourcePreparsingStarted;
 extern NSString *VLCMediaSourcePreparsingEnded;
+extern NSString * const VLCMediaSourceChildrenParentInputItemKey;
 extern NSString * const VLCMediaSourcePreparseInputItemKey;
 extern NSString * const VLCMediaSourcePreparseStatusKey;
 

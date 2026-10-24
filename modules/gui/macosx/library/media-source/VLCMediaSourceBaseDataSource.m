@@ -820,6 +820,10 @@ referenceSizeForHeaderInSection:(NSInteger)section
             [self updateLANDeviceRecordsForMediaSource:source];
         }
     }
+
+    if (self.childDataSource != nil) {
+        return;
+    }
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [self reloadData];

@@ -41,43 +41,62 @@ NSString *VLCMediaSourceChildrenAdded = @"VLCMediaSourceChildrenAdded";
 NSString *VLCMediaSourceChildrenRemoved = @"VLCMediaSourceChildrenRemoved";
 NSString *VLCMediaSourcePreparsingStarted = @"VLCMediaSourcePreparsingStarted";
 NSString *VLCMediaSourcePreparsingEnded = @"VLCMediaSourcePreparsingEnded";
+NSString * const VLCMediaSourceChildrenParentInputItemKey = @"VLCMediaSourceChildrenParentInputItemKey";
 NSString * const VLCMediaSourcePreparseInputItemKey = @"VLCMediaSourcePreparseInputItemKey";
 NSString * const VLCMediaSourcePreparseStatusKey = @"VLCMediaSourcePreparseStatusKey";
 
 static void cb_children_reset(vlc_media_tree_t * __unused p_tree,
-                              input_item_node_t * __unused p_node,
+                              input_item_node_t *p_node,
                               void *p_data)
 {
+    VLCInputItem * const parentInputItem =
+        [[VLCInputItem alloc] initWithInputItem:p_node->p_item];
+    NSDictionary * const userInfo = parentInputItem == nil ? nil : @{
+        VLCMediaSourceChildrenParentInputItemKey: parentInputItem
+    };
     dispatch_async(dispatch_get_main_queue(), ^{
         VLCMediaSource *mediaSource = (__bridge VLCMediaSource *)p_data;
         [NSNotificationCenter.defaultCenter postNotificationName:VLCMediaSourceChildrenReset
-                                                            object:mediaSource];
+                                                          object:mediaSource
+                                                        userInfo:userInfo];
     });
 }
 
 static void cb_children_added(vlc_media_tree_t * __unused p_tree,
-                              input_item_node_t * __unused p_node,
+                              input_item_node_t *p_node,
                               input_item_node_t *const __unused p_children[],
                               size_t __unused count,
                               void *p_data)
 {
+    VLCInputItem * const parentInputItem =
+        [[VLCInputItem alloc] initWithInputItem:p_node->p_item];
+    NSDictionary * const userInfo = parentInputItem == nil ? nil : @{
+        VLCMediaSourceChildrenParentInputItemKey: parentInputItem
+    };
     dispatch_async(dispatch_get_main_queue(), ^{
         VLCMediaSource *mediaSource = (__bridge VLCMediaSource *)p_data;
         [NSNotificationCenter.defaultCenter postNotificationName:VLCMediaSourceChildrenAdded
-                                                            object:mediaSource];
+                                                          object:mediaSource
+                                                        userInfo:userInfo];
     });
 }
 
 static void cb_children_removed(vlc_media_tree_t * __unused p_tree,
-                                input_item_node_t * __unused p_node,
+                                input_item_node_t *p_node,
                                 input_item_node_t *const __unused p_children[],
                                 size_t __unused count,
                                 void *p_data)
 {
+    VLCInputItem * const parentInputItem =
+        [[VLCInputItem alloc] initWithInputItem:p_node->p_item];
+    NSDictionary * const userInfo = parentInputItem == nil ? nil : @{
+        VLCMediaSourceChildrenParentInputItemKey: parentInputItem
+    };
     dispatch_async(dispatch_get_main_queue(), ^{
         VLCMediaSource *mediaSource = (__bridge VLCMediaSource *)p_data;
         [NSNotificationCenter.defaultCenter postNotificationName:VLCMediaSourceChildrenRemoved
-                                                            object:mediaSource];
+                                                          object:mediaSource
+                                                        userInfo:userInfo];
     });
 }
 

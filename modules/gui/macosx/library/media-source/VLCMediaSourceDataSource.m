@@ -244,6 +244,15 @@ static NSValue * _Nullable inputItemIdentifier(VLCInputItem * _Nullable const in
 {
     if (notification.object != self.displayedMediaSource)
         return;
+
+    VLCInputItem * const changedParentInputItem =
+        notification.userInfo[VLCMediaSourceChildrenParentInputItemKey];
+    VLCInputItem * const displayedInputItem = self.nodeToDisplay.inputItem;
+    if (changedParentInputItem != nil &&
+        changedParentInputItem.vlcInputItem != displayedInputItem.vlcInputItem) {
+        return;
+    }
+
     dispatch_async(dispatch_get_main_queue(), ^{
         [self clearDisplayedNodeChildrenCaches];
         // Navigation history retains inactive data sources that also receive these notifications.
