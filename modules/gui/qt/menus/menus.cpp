@@ -615,9 +615,7 @@ void VLCMenuBar::PopupMenuPlaylistEntries( QMenu *menu, qt_intf_t *p_intf )
             ":/menu/ic_fluent_next.svg", &PlaylistController::next );
     nextAction->setEnabled( !bPlaylistEmpty );
     connect( THEMPL, &PlaylistController::isEmptyChanged, nextAction, &QAction::setDisabled);
-
-    action = menu->addAction( qtr( "Record" ), THEMIM, &PlayerController::toggleRecord );
-    action->setIcon( QIcon( ":/menu/ic_fluent_record.svg" ) );
+    action = addMIMStaticEntry( p_intf, menu, qtr( "Record" ), ":/menu/ic_fluent_record.svg", &PlayerController::toggleRecord );
     if( !hasInput )
         action->setEnabled( false );
     menu->addSeparator();
