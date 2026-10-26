@@ -120,8 +120,8 @@ if __name__ == "__main__":
         elif args.moc_include_dirs:
             m = moc_include_dirs_re.match(line)
             if m:
-                for i in l.strip().split(' '):
-                    result += f"-I{i}"
+                for i in m.group(1).strip().split(' '):
+                    result += f" -I{i}"
 
     for generated in sources:
         if os.path.exists(generated):
