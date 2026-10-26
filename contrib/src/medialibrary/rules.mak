@@ -4,7 +4,7 @@ MEDIALIBRARY_URL := $(VIDEOLAN_GIT)/videolan/medialibrary/-/archive/$(MEDIALIBRA
 ifndef HAVE_WINSTORE
 PKGS += medialibrary
 endif
-ifeq ($(call need_pkg,"medialibrary >= 0.13.0"),)
+ifeq ($(call need_pkg,"medialibrary >= 0.13.0 medialibrary < 0.14.0"),)
 PKGS_FOUND += medialibrary
 endif
 
