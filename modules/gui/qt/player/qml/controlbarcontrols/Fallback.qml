@@ -43,6 +43,7 @@ T.Control {
     readonly property ColorContext colorContext: ColorContext {
         id: theme
         colorSet: ColorContext.View
+        focused: root.visualFocus
     }
 
     background: Widgets.AnimatedBackground {
