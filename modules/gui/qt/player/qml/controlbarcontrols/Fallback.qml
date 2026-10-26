@@ -18,13 +18,21 @@
 
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Templates as T
 
 import VLC.MainInterface
 import VLC.Widgets as Widgets
 import VLC.Util
 import VLC.Style
 
-Control {
+T.Control {
+    id: root
+
+    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
+                            implicitContentWidth + leftPadding + rightPadding)
+    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
+                             implicitContentHeight + topPadding + bottomPadding)
+
     padding: VLCStyle.focus_border
 
     Keys.priority: Keys.AfterItem
