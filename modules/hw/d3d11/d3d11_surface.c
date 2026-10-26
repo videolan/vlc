@@ -44,12 +44,6 @@
 #include "d3d11_processor.h"
 #include "../../video_chroma/d3d11_fmt.h"
 
-#ifdef ID3D11VideoContext_VideoProcessorBlt
-#define CAN_PROCESSOR 1
-#else
-#define CAN_PROCESSOR 0
-#endif
-
 typedef struct
 {
     copy_cache_t     cache;
@@ -59,7 +53,6 @@ typedef struct
     };
     vlc_mutex_t      staging_lock;
 
-#if CAN_PROCESSOR
     union {
         ID3D11Texture2D  *procOutTexture;
         ID3D11Resource   *procOutResource;
@@ -67,7 +60,6 @@ typedef struct
     /* 420_OPAQUE processor */
     ID3D11VideoProcessorOutputView *processorOutput;
     d3d11_processor_t              d3d_proc;
-#endif
     d3d11_device_t                 *d3d_dev;
 
     /* CPU to GPU */
@@ -75,7 +67,6 @@ typedef struct
     picture_t  *staging_pic;
 } filter_sys_t;
 
-#if CAN_PROCESSOR
 static int SetupProcessor(filter_t *p_filter, d3d11_device_t *d3d_dev,
                           DXGI_FORMAT srcFormat, DXGI_FORMAT dstFormat)
 {
@@ -140,7 +131,6 @@ error:
     d3d11_device_unlock(d3d_dev);
     return VLC_EGENERIC;
 }
-#endif
 
 static HRESULT can_map(filter_sys_t *sys, ID3D11DeviceContext *context)
 {
@@ -190,7 +180,6 @@ static int assert_staging(filter_t *p_filter, filter_sys_t *sys,
                 DxgiFormatToStr(texDesc.Format), (const char*)&cpu_chroma);
         hr = E_FAIL;
     }
-#if CAN_PROCESSOR
     if (FAILED(hr)) {
         /* convert to the exact layout the CPU copy reads, any other one would
          * be interpreted with the wrong pitches or bit depth */
@@ -234,7 +223,6 @@ static int assert_staging(filter_t *p_filter, filter_sys_t *sys,
             }
         }
     }
-#endif
     if (FAILED(hr)) {
         msg_Err(p_filter, "Failed to create a %s staging texture to extract surface pixels (hr=0x%lX)", DxgiFormatToStr(texDesc.Format), hr );
         return VLC_EGENERIC;
@@ -262,7 +250,6 @@ static void D3D11_YUY2(filter_t *p_filter, picture_t *src, picture_t *dst)
     UINT srcSlice = p_sys->slice_index;
     ID3D11Resource *srcResource = p_sys->resource[KNOWN_DXGI_INDEX];
 
-#if CAN_PROCESSOR
     if (sys->d3d_proc.procEnumerator)
     {
         HRESULT hr;
@@ -289,7 +276,6 @@ static void D3D11_YUY2(filter_t *p_filter, picture_t *src, picture_t *dst)
         srcResource = sys->procOutResource;
         srcSlice = 0;
     }
-#endif
     ID3D11DeviceContext_CopySubresourceRegion(sys->d3d_dev->d3dcontext, sys->staging_resource,
                                               0, 0, 0, 0,
                                               srcResource,
@@ -359,7 +345,6 @@ static void D3D11_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
     UINT srcSlice = p_sys->slice_index;
     ID3D11Resource *srcResource = p_sys->resource[KNOWN_DXGI_INDEX];
 
-#if CAN_PROCESSOR
     if (sys->d3d_proc.procEnumerator)
     {
         HRESULT hr;
@@ -386,7 +371,6 @@ static void D3D11_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
         srcResource = sys->procOutResource;
         srcSlice = 0;
     }
-#endif
     ID3D11DeviceContext_CopySubresourceRegion(sys->d3d_dev->d3dcontext, sys->staging_resource,
                                               0, 0, 0, 0,
                                               srcResource,
@@ -602,11 +586,9 @@ static void NV12_D3D11(filter_t *p_filter, picture_t *src, picture_t *dst)
 static void D3D11CloseConverter( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-#if CAN_PROCESSOR
     if (p_sys->procOutTexture)
         ID3D11Texture2D_Release(p_sys->procOutTexture);
     D3D11_ReleaseProcessor( &p_sys->d3d_proc );
-#endif
     CopyCleanCache(&p_sys->cache);
     if (p_sys->staging)
         ID3D11Texture2D_Release(p_sys->staging);
