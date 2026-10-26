@@ -38,7 +38,14 @@ T.Control {
     Keys.priority: Keys.AfterItem
     Keys.onPressed: (event) => Navigation.defaultKeyAction(event)
 
+    property int type: Fallback.NotFound
+
     property bool paintOnly: false
+
+    enum Type {
+        NotFound,
+        Broken
+    }
 
     readonly property ColorContext colorContext: ColorContext {
         id: theme
@@ -52,7 +59,17 @@ T.Control {
     }
 
     contentItem: Widgets.MenuLabel {
-        text: qsTr("WIDGET\nNOT\nFOUND")
+        text: {
+            switch (root.type) {
+            case Fallback.NotFound:
+                return qsTr("WIDGET\nNOT\nFOUND")
+            case Fallback.Broken:
+                return qsTr("BROKEN\nWIDGET")
+            default:
+                return qsTr("N/A")
+            }
+        }
+
         elide: Text.ElideNone
         horizontalAlignment: Text.AlignHCenter
         color: theme.fg.primary
