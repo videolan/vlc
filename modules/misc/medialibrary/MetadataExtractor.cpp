@@ -121,6 +121,7 @@ void MetadataExtractor::populateItem( medialibrary::parser::IItem& item, input_i
         { metadata_t::Album, vlc_meta_Album },
         { metadata_t::Genre, vlc_meta_Genre },
         { metadata_t::Date, vlc_meta_Date },
+        { metadata_t::Rating, vlc_meta_Rating },
         { metadata_t::AlbumArtist, vlc_meta_AlbumArtist },
         { metadata_t::Artist, vlc_meta_Artist },
         { metadata_t::TrackNumber, vlc_meta_TrackNumber },
