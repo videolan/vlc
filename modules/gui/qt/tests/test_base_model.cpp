@@ -305,6 +305,9 @@ public:
 
     //remove an item from the cache as a medialibrary event would do
     void deleteFromCache(int id);
+
+    //insert an item in the cache as a medialibrary event would do
+    void insertInCache(int id, int position);
 };
 
 class ManualModelPrivate : public BaseModelPrivateT<ItemPtr>
@@ -353,6 +356,12 @@ void ManualModel::deleteFromCache(int id)
 {
     Q_D(ManualModel);
     d->m_cache->deleteItem([id](const ItemPtr& item) { return item->id == id; });
+}
+
+void ManualModel::insertInCache(int id, int position)
+{
+    Q_D(ManualModel);
+    d->m_cache->insertItem(std::make_shared<Item>(id), position);
 }
 
 using Ranges = QList<std::pair<int, int>>;
@@ -627,6 +636,131 @@ private slots:
         QCOMPARE(rowRanges(removedSpy), Ranges());
         QCOMPARE(m.getCount(), 5u);
     }
+
+    //removing a visible item must let the next item past the limit take its place
+    void testDeleteVisibleItemWithLimit()
+    {
+        ManualModel m;
+        QVERIFY(initModel(m, 20, 20, 5));
+        QCOMPARE(m.getLoadedCount(), 20u);
+
+        QSignalSpy removedSpy(&m, &QAbstractItemModel::rowsRemoved);
+        m.deleteFromCache(0);
+        QCOMPARE(rowRanges(removedSpy), Ranges({{0, 0}}));
+        QCOMPARE(m.getMaximumCount(), 19u);
+        QCOMPARE(m.getCount(), 5u);
+        QCOMPARE(idAt(m, 0), QVariant(1));
+        QCOMPARE(idAt(m, 4), QVariant(5));
+    }
+
+    //inserting an item must not grow the model past the limit
+    void testInsertItemWithLimit()
+    {
+        ManualModel m;
+        QVERIFY(initModel(m, 20, 20, 5));
+
+        m.insertInCache(100, 0);
+        QCOMPARE(m.getMaximumCount(), 21u);
+        QCOMPARE(m.getCount(), 5u);
+        QCOMPARE(idAt(m, 0), QVariant(100));
+        QCOMPARE(idAt(m, 4), QVariant(3));
+    }
+
+    //decreasing the offset reloads the data without resetting the model
+    void testOffsetDecrease()
+    {
+        ManualModel m;
+        QVERIFY(initModel(m, 50, 20, 0, 10));
+        QCOMPARE(idAt(m, 0), QVariant(10));
+
+        QSignalSpy resetSpy(&m, &QAbstractItemModel::modelReset);
+
+        m.setOffset(5);
+        QVERIFY(m.backend().runAll());
+        QCOMPARE(resetSpy.count(), 0);
+        QCOMPARE(m.getCount(), 45u);
+        QCOMPARE(idAt(m, 0), QVariant(5));
+        QCOMPARE(idAt(m, 10), QVariant(15));
+    }
+
+    //a fetch pending when the offset grows within the loaded data is still
+    //valid and must be kept
+    void testOffsetShiftDuringFetch()
+    {
+        ManualModel m;
+        QVERIFY(initModel(m, 100, 10, 0));
+
+        //request rows [10, 20[
+        idAt(m, 15);
+        QCOMPARE(m.backend().pending.size(), 1u);
+        const size_t fetchId = m.backend().pending.front().req.id;
+
+        m.setOffset(5);
+        QVERIFY(!m.backend().isCancelled(fetchId));
+
+        QVERIFY(m.backend().runAll());
+        QCOMPARE(m.getCount(), 95u);
+        QCOMPARE(idAt(m, 0), QVariant(5));
+        QCOMPARE(idAt(m, 4), QVariant(9));
+        QCOMPARE(idAt(m, 10), QVariant(15));
+    }
+
+    //a fetch pending when the offset skips past the loaded data targets
+    //outdated rows and must be cancelled
+    void testOffsetSkipPastLoadedDataDuringFetch()
+    {
+        ManualModel m;
+        QVERIFY(initModel(m, 100, 10, 0));
+
+        //request rows [10, 20[
+        idAt(m, 15);
+        QCOMPARE(m.backend().pending.size(), 1u);
+        const size_t fetchId = m.backend().pending.front().req.id;
+        m.backend().clearHistory();
+
+        m.setOffset(50);
+        QVERIFY(m.backend().isCancelled(fetchId));
+
+        QVERIFY(m.backend().runAll());
+        QCOMPARE(m.getCount(), 50u);
+        idAt(m, 0);
+        QVERIFY(m.backend().runAll());
+        QCOMPARE(idAt(m, 0), QVariant(50));
+        for (const ManualBackend::Request& req : m.backend().history)
+            QVERIFY2(req.offset >= 50,
+                     qPrintable(QString("requested %1 items at offset %2").arg(req.limit).arg(req.offset)));
+    }
+
+    //the view may change the limit while it is notified of an offset change
+    void testLimitChangeDuringOffsetChange()
+    {
+        ManualModel m;
+        QVERIFY(initModel(m, 50, 20, 10));
+
+        QSignalSpy insertedSpy(&m, &QAbstractItemModel::rowsInserted);
+        QSignalSpy removedSpy(&m, &QAbstractItemModel::rowsRemoved);
+        int rowCount = m.rowCount();
+        bool rowCountConsistent = true;
+        const auto checkRowCount = [&](int first, int last, int sign) {
+            rowCount += sign * (last - first + 1);
+            rowCountConsistent &= (rowCount == m.rowCount());
+        };
+        connect(&m, &QAbstractItemModel::rowsInserted, &m,
+                [&](const QModelIndex&, int first, int last) { checkRowCount(first, last, 1); });
+        connect(&m, &QAbstractItemModel::rowsRemoved, &m,
+                [&](const QModelIndex&, int first, int last) { checkRowCount(first, last, -1); });
+        connect(&m, &QAbstractItemModel::rowsRemoved, &m,
+                [&m]() { m.setLimit(5); }, Qt::SingleShotConnection);
+
+        m.setOffset(3);
+        QVERIFY(m.backend().runAll());
+        QVERIFY(rowCountConsistent);
+        QCOMPARE(m.getCount(), 5u);
+        QCOMPARE(rowCount, 5);
+        QCOMPARE(idAt(m, 0), QVariant(3));
+        QCOMPARE(idAt(m, 4), QVariant(7));
+    }
+
 };
 
 QTEST_GUILESS_MAIN(TestBaseModel)
