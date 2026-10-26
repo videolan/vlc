@@ -25,6 +25,7 @@ import QtQml.Models
 import VLC.Player
 import VLC.Widgets as Widgets
 import VLC.Style
+import VLC.PlayerControls as PC
 
 T.Control {
     id: control
@@ -159,9 +160,23 @@ T.Control {
 
             anchors.fill: (parent === control.contentItem) ? parent : undefined
 
-            source: PlayerControlbarControls.control(model.id).source
+            source: targetSource
+
+            readonly property url targetSource: PlayerControlbarControls.control(model.id).source
+
+            onTargetSourceChanged: {
+                source = targetSource
+            }
 
             Drag.source: control
+
+            onStatusChanged: {
+                if (status === Loader.Error) {
+                    const fallback = "qrc:///qt/qml/VLC/PlayerControls/Fallback.qml"
+                    console.assert(loader.source !== fallback)
+                    loader.setSource(fallback, { type: PC.Fallback.Broken })
+                }
+            }
 
             onLoaded: {
                 item.paintOnly = true
