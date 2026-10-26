@@ -82,7 +82,6 @@ struct dxgi_swapchain
     } swapchainSurface;
 
     ComPtr<IDXGISwapChain1> dxgiswapChain;   /* DXGI 1.2 swap chain */
-    ComPtr<IDXGISwapChain4> dxgiswapChain4;  /* DXGI 1.5 for HDR metadata */
     bool                    send_metadata;
     DXGI_HDR_METADATA_HDR10 hdr10;
 
@@ -187,8 +186,6 @@ void DXGI_SelectSwapchainColorspace(dxgi_swapchain *display, const libvlc_video_
         best = 0;
         msg_Warn(display->obj, "no matching colorspace found force %s", color_spaces[best].name);
     }
-
-    display->dxgiswapChain.As(&display->dxgiswapChain4);
 
     if (match_display)
     if (SUCCEEDED(display->dxgiswapChain->GetContainingOutput(&dxgiOutput)))
@@ -369,8 +366,12 @@ void DXGI_LocalSwapchainSetMetadata( dxgi_swapchain *display, libvlc_video_metad
 {
     assert(type == libvlc_video_metadata_frame_hdr10);
     if ( type == libvlc_video_metadata_frame_hdr10 && metadata &&
-         display->send_metadata && display->dxgiswapChain4.Get() )
+         display->send_metadata )
     {
+        ComPtr<IDXGISwapChain4> dxgiswapChain4;  /* DXGI 1.5 for HDR metadata */
+        if ( FAILED(display->dxgiswapChain.As(&dxgiswapChain4)) )
+            return;
+
         const libvlc_video_frame_hdr10_metadata_t *p_hdr10 = static_cast<const libvlc_video_frame_hdr10_metadata_t *>(metadata);
         DXGI_HDR_METADATA_HDR10 hdr10 = { };
         hdr10.GreenPrimary[0] = p_hdr10->GreenPrimary[0];
@@ -388,7 +389,7 @@ void DXGI_LocalSwapchainSetMetadata( dxgi_swapchain *display, libvlc_video_metad
         if (memcmp(&display->hdr10, &hdr10, sizeof(hdr10)))
         {
             memcpy(&display->hdr10, &hdr10, sizeof(hdr10));
-            display->dxgiswapChain4->SetHDRMetaData(DXGI_HDR_METADATA_TYPE_HDR10,
+            dxgiswapChain4->SetHDRMetaData(DXGI_HDR_METADATA_TYPE_HDR10,
                                             sizeof( &display->hdr10 ), &display->hdr10 );
         }
     }
