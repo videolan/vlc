@@ -485,11 +485,6 @@ Microsoft::WRL::ComPtr<IDXGISwapChain1> & DXGI_GetSwapChain1( dxgi_swapchain *di
     return display->dxgiswapChain;
 }
 
-Microsoft::WRL::ComPtr<IDXGISwapChain4> & DXGI_GetSwapChain4( dxgi_swapchain *display )
-{
-    return display->dxgiswapChain4;
-}
-
 const d3d_format_t  *DXGI_GetPixelFormat( dxgi_swapchain *display )
 {
     return display->pixelFormat;

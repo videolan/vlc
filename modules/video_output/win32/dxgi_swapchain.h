@@ -53,7 +53,6 @@ struct dxgi_swapchain *DXGI_CreateLocalSwapchainHandleDComp(vlc_object_t *,
                                            void /*IDCompositionVisual*/ * dcompVisual);
 
 Microsoft::WRL::ComPtr<IDXGISwapChain1> & DXGI_GetSwapChain1( struct dxgi_swapchain * );
-Microsoft::WRL::ComPtr<IDXGISwapChain4> & DXGI_GetSwapChain4( struct dxgi_swapchain * );
 const d3d_format_t  *DXGI_GetPixelFormat( struct dxgi_swapchain * );
 
 void DXGI_SelectSwapchainColorspace( struct dxgi_swapchain *, const libvlc_video_render_cfg_t *, bool match_display );
