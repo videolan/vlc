@@ -609,6 +609,22 @@ int MediaLibrary::Control( int query, va_list args )
             m_ml->clearHistory( type );
             break;
         }
+        case VLC_ML_CLEAR_HISTORY_BY_MEDIA_TYPE:
+        {
+            medialibrary::IMedia::Type type;
+            switch ( va_arg( args, int ) )
+            {
+                case VLC_ML_MEDIA_TYPE_AUDIO:
+                    type = medialibrary::IMedia::Type::Audio;
+                    break;
+                case VLC_ML_MEDIA_TYPE_VIDEO:
+                    type = medialibrary::IMedia::Type::Video;
+                    break;
+                default:
+                    return VLC_EGENERIC;
+            }
+            return m_ml->clearHistoryByMediaType( type ) ? VLC_SUCCESS : VLC_EGENERIC;
+        }
         case VLC_ML_NEW_EXTERNAL_MEDIA:
         {
             auto priorityAccess = m_ml->acquirePriorityAccess();
