@@ -383,6 +383,32 @@ static vlc_tick_t DvdReadGetControlLength( const demux_sys_t *p_sys )
     return p_sys->ops->title_length( p_sys );
 }
 
+/* seek to a time of the current title */
+static int DvdReadSeekTime( demux_t *p_demux, vlc_tick_t i_time )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    if( p_sys->cur_title < 0 || p_sys->cur_title >= p_sys->i_titles ||
+        p_sys->i_title_blocks == 0 )
+        return VLC_EGENERIC;
+
+    const vlc_tick_t length = DvdReadGetControlLength( p_sys );
+
+    if( length <= 0 )
+        return VLC_EGENERIC;
+
+    vlc_tick_t t = i_time;
+    if( t < 0 ) t = 0;
+    if( t > length ) t = length;
+
+    const uint32_t i_block_offset =
+        (uint32_t)( t * p_sys->i_title_blocks / length );
+
+    const uint32_t i_seek_offset =
+        p_sys->ops->time_to_seek_offset( p_sys, t, i_block_offset );
+    return p_sys->ops->seek( p_demux, i_seek_offset );
+}
+
 /*****************************************************************************
  * Control:
  *****************************************************************************/
@@ -407,8 +433,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             pf = va_arg( args, double * );
 
-            /* vr i_title_offset is vobu count, block ratio wrong */
-            if( p_sys->type == DVD_VR &&
+            /* from the title's timeline: in vr, i_title_offset is a vobu
+             * count; in video, the bitrate varies and the cells also hold
+             * the sectors of other angles and branches, so a block ratio
+             * is no share of the title's time */
+            if( ( p_sys->type == DVD_V || p_sys->type == DVD_VR ) &&
                 p_sys->cur_title >= 0 && p_sys->cur_title < p_sys->i_titles )
             {
                 const vlc_tick_t length = p_sys->titles[p_sys->cur_title]->i_length;
@@ -431,6 +460,15 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_SET_POSITION:
         {
             f = va_arg( args, double );
+            /* video: a position is a share of the title's time, as
+             * GET_POSITION reports it; a title without a length, from a
+             * broken disc, has only its blocks to go by */
+            if( p_sys->type == DVD_V )
+            {
+                const vlc_tick_t length = DvdReadGetControlLength( p_sys );
+                if( length > 0 )
+                    return DvdReadSeekTime( p_demux, f * length );
+            }
             return p_sys->ops->seek( p_demux, f * p_sys->i_title_blocks );
         }
         case DEMUX_GET_TIME:
@@ -444,7 +482,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 const vlc_tick_t length = DvdReadGetControlLength( p_sys );
 
                 vlc_tick_t time = 0;
-                if( p_sys->type == DVD_VR &&
+                if( ( p_sys->type == DVD_V || p_sys->type == DVD_VR ) &&
                     length > 0 && DvdReadGetTimelineBase( p_sys, &time ) )
                 {
                     if( time < 0 ) time = 0;
@@ -460,28 +498,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_EGENERIC;
 
         case DEMUX_SET_TIME:
-        {
-            const vlc_tick_t i_time = va_arg( args, vlc_tick_t );
-            if( p_sys->cur_title < 0 || p_sys->cur_title >= p_sys->i_titles ||
-                p_sys->i_title_blocks == 0 )
-                return VLC_EGENERIC;
-
-            const vlc_tick_t length = DvdReadGetControlLength( p_sys );
-
-            if( length <= 0 )
-                return VLC_EGENERIC;
-
-            vlc_tick_t t = i_time;
-            if( t < 0 ) t = 0;
-            if( t > length ) t = length;
-
-            const uint32_t i_block_offset =
-                (uint32_t)( t * p_sys->i_title_blocks / length );
-
-            const uint32_t i_seek_offset =
-                p_sys->ops->time_to_seek_offset( p_sys, t, i_block_offset );
-            return p_sys->ops->seek( p_demux, i_seek_offset );
-        }
+            return DvdReadSeekTime( p_demux, va_arg( args, vlc_tick_t ) );
 
         case DEMUX_GET_LENGTH:
             if( p_sys->cur_title >= 0 && p_sys->cur_title < p_sys->i_titles )

@@ -129,6 +129,20 @@ static bool DvdReadTimelineBase( const demux_sys_t *p_sys, vlc_tick_t *base )
     vlc_tick_t cell_duration = dvdtime_to_time( &p_cell->playback_time );
     const uint32_t cell_sectors = p_cell->last_sector - p_cell->first_sector + 1;
 
+    /* the vobu being read (or just read), when its DSI is the last one
+     * parsed: the DSI tells its time in the cell */
+    const dsi_gi_t *dsi = &p_sys->dsi_pack.dsi_gi;
+    if( dsi->nv_pck_lbn >= p_cell->first_sector &&
+        dsi->nv_pck_lbn <= p_cell->last_sector &&
+        p_sys->i_cur_block >= (int64_t)dsi->nv_pck_lbn &&
+        p_sys->i_cur_block <= (int64_t)dsi->nv_pck_lbn + dsi->vobu_ea + 1 )
+    {
+        *base = cell_dvd_time + dvdtime_to_time( &dsi->c_eltm );
+        return true;
+    }
+
+    /* otherwise, after a seek, from the sector: interleaved cells and a
+     * varying bitrate make it approximate */
     if( cell_duration > 0 && cell_sectors > 0 )
     {
         int64_t within_sectors = p_sys->i_cur_block - (int64_t)p_cell->first_sector;
@@ -145,14 +159,6 @@ static bool DvdReadTimelineBase( const demux_sys_t *p_sys, vlc_tick_t *base )
 
     *base = cell_dvd_time;
     return true;
-}
-
-static uint32_t DvdReadTimeToSeekOffset( const demux_sys_t *p_sys, vlc_tick_t time,
-                                         uint32_t i_block_offset )
-{
-    VLC_UNUSED( p_sys );
-    VLC_UNUSED( time );
-    return i_block_offset;
 }
 
 static uint32_t DvdReadCellAwareBlock( const demux_sys_t *p_sys,
@@ -207,6 +213,122 @@ static uint32_t DvdReadCellAwareBlock( const demux_sys_t *p_sys,
         block_acc = next_block_acc;
     }
     return i_block_offset;
+}
+
+/* the title offset, in the blocks DvdReadSeek() counts, of a sector of a
+ * cell of the title; false if no cell of the title holds it, or the cell is
+ * an angle's */
+static bool DvdReadSectorOffset( const demux_sys_t *p_sys, uint32_t i_sector,
+                                 uint32_t *pi_offset )
+{
+    const pgc_t *p_pgc = p_sys->p_cur_pgc;
+    uint32_t i_offset = 0;
+    for( int ci = p_sys->i_title_start_cell; ci <= p_sys->i_title_end_cell; ci++ )
+    {
+        const cell_playback_t *cell = &p_pgc->cell_playback[ci];
+        if( i_sector >= cell->first_sector && i_sector <= cell->last_sector &&
+            cell->block_type != BLOCK_TYPE_ANGLE_BLOCK )
+        {
+            *pi_offset = i_offset + ( i_sector - cell->first_sector );
+            return true;
+        }
+        i_offset += cell->last_sector - cell->first_sector + 1;
+    }
+    return false;
+}
+
+/* the cell of the title holding a sector, -1 if none */
+static int DvdReadSectorCell( const demux_sys_t *p_sys, uint32_t i_sector )
+{
+    const pgc_t *p_pgc = p_sys->p_cur_pgc;
+    for( int ci = p_sys->i_title_start_cell; ci <= p_sys->i_title_end_cell; ci++ )
+        if( i_sector >= p_pgc->cell_playback[ci].first_sector &&
+            i_sector <= p_pgc->cell_playback[ci].last_sector )
+            return ci;
+    return -1;
+}
+
+/*****************************************************************************
+ * DvdReadTimeMapOffset: where a time of the title is, from the time map
+ *****************************************************************************
+ * The PGC's time map gives the vobu playing every tmu seconds. It follows
+ * the PGC's cells, so in interleaved cells it points to this PGC's units,
+ * where the cell's sectors hold those of the other branches too.
+ *****************************************************************************/
+static bool DvdReadTimeMapOffset( const demux_sys_t *p_sys, vlc_tick_t time,
+                                  uint32_t *pi_offset )
+{
+    const ifo_handle_t *p_vts = p_sys->p_vts_file;
+    const pgc_t *p_pgc = p_sys->p_cur_pgc;
+    if( p_vts == NULL || p_vts->vts_tmapt == NULL ||
+        p_vts->vts_tmapt->tmap == NULL || p_vts->vts_pgcit == NULL ||
+        p_pgc == NULL || p_pgc->cell_playback == NULL )
+        return false;
+
+    /* the PGC's index, which is its time map's */
+    unsigned i_pgc = 0;
+    while( i_pgc < p_vts->vts_pgcit->nr_of_pgci_srp &&
+           p_vts->vts_pgcit->pgci_srp[i_pgc].pgc != p_pgc )
+        i_pgc++;
+    if( i_pgc >= p_vts->vts_pgcit->nr_of_pgci_srp ||
+        i_pgc >= p_vts->vts_tmapt->nr_of_tmaps )
+        return false;
+
+    const vts_tmap_t *tmap = &p_vts->vts_tmapt->tmap[i_pgc];
+    if( tmap->tmu == 0 || tmap->nr_of_entries == 0 || tmap->map_ent == NULL )
+        return false;
+
+    /* the map counts from the PGC's start, the title from its first cell */
+    vlc_tick_t pgc_time = time;
+    for( int ci = 0; ci < p_sys->i_title_start_cell; ci++ )
+        if( DvdReadCellTimed( &p_pgc->cell_playback[ci] ) )
+            pgc_time += dvdtime_to_time( &p_pgc->cell_playback[ci].playback_time );
+
+    /* entry i is the vobu playing at (i + 1) * tmu: counted from the first
+     * entry, the time gives the index; before the first, the cells tell */
+    const vlc_tick_t unit = vlc_tick_from_sec( tmap->tmu );
+    const vlc_tick_t entry_time = pgc_time - unit;
+    if( entry_time < 0 )
+        return false;
+    const unsigned i_index = __MIN( entry_time / unit,
+                                    tmap->nr_of_entries - 1 );
+
+    /* the top bit flags a discontinuity */
+    const uint32_t i_sector = tmap->map_ent[i_index] & 0x7fffffff;
+    uint32_t i_offset;
+    if( !DvdReadSectorOffset( p_sys, i_sector, &i_offset ) )
+        return false;
+
+    /* between two entries in one cell, not interleaved: its sectors are
+     * this PGC's only, the time is spread on them */
+    if( i_index + 1 < tmap->nr_of_entries )
+    {
+        const uint32_t i_next = tmap->map_ent[i_index + 1] & 0x7fffffff;
+        const int ci = DvdReadSectorCell( p_sys, i_sector );
+        if( i_next > i_sector && ci >= 0 &&
+            DvdReadSectorCell( p_sys, i_next ) == ci &&
+            !p_pgc->cell_playback[ci].interleaved )
+        {
+            const vlc_tick_t within = entry_time - i_index * unit;
+            vlc_tick_t scaled;
+            if( !ckd_mul( &scaled, within, (vlc_tick_t)( i_next - i_sector ) ) )
+                i_offset += scaled / unit;
+        }
+    }
+
+    *pi_offset = i_offset;
+    return true;
+}
+
+/* the title offset to seek to for a time: from the time map, else from the
+ * cells' durations, the time spread on each cell's sectors */
+static uint32_t DvdReadTimeToSeekOffset( const demux_sys_t *p_sys, vlc_tick_t time,
+                                         uint32_t i_block_offset )
+{
+    uint32_t i_offset;
+    if( DvdReadTimeMapOffset( p_sys, time, &i_offset ) )
+        return i_offset;
+    return DvdReadCellAwareBlock( p_sys, i_block_offset );
 }
 
 static int DvdReadPsSource( void )
@@ -467,8 +589,6 @@ static int DvdReadSeek( demux_t *p_demux, uint32_t i_block_offset )
     uint32_t i_block;
     const pgc_t *p_pgc = p_sys->p_cur_pgc;
     const ifo_handle_t *p_vts = p_sys->p_vts_file;
-
-    i_block_offset = DvdReadCellAwareBlock( p_sys, i_block_offset );
 
     /* Find cell */
     i_block = i_block_offset;
