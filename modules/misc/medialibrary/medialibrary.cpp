@@ -1755,6 +1755,8 @@ medialibrary::SortingCriteria MediaLibrary::sortingCriteria(int sort)
             return medialibrary::SortingCriteria::TrackNumber;
         case VLC_ML_SORTING_RATING:
             return medialibrary::SortingCriteria::Rating;
+        case VLC_ML_SORTING_TRACKNUMBER_ALBUM_RELEASE_YEAR:
+            return medialibrary::SortingCriteria::TrackNumberAlbumReleaseYear;
         default:
             vlc_assert_unreachable();
     }
