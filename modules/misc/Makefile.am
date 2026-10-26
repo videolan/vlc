@@ -133,6 +133,7 @@ libmedialibrary_plugin_la_SOURCES = \
 	misc/medialibrary/entities.cpp \
 	misc/medialibrary/Thumbnailer.cpp \
 	misc/medialibrary/medialibrary.h \
+	misc/medialibrary/LazyPreparser.h \
 	misc/medialibrary/fs/device.h \
 	misc/medialibrary/fs/device.cpp \
 	misc/medialibrary/fs/directory.h \
