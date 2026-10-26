@@ -267,6 +267,8 @@ private:
     void asyncCountAndLoad();
     void partialUpdate();
     size_t countWithLimit(size_t maximumCount) const;
+    //update the number of visible rows to match the limit, returns whether it changed
+    bool applyLimit();
     size_t fixupIndexForMove(size_t index) const;
 
     bool m_useMove = false;
