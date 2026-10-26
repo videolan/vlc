@@ -154,7 +154,7 @@ static int RenderPic( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic,
         if ( unlikely(!picsys_cur) || assert_ProcessorInput(p_filter, picsys_cur) )
             return VLC_EGENERIC;
 
-        if ( p_prev )
+        if ( p_prev && p_sys->d3d_dev.adapterDesc.VendorId != GPU_MANUFACTURER_INTEL)
         {
             picture_sys_t *picsys_prev = ActivePictureSys(p_prev);
             if ( unlikely(!picsys_prev) || assert_ProcessorInput(p_filter, picsys_prev) )
