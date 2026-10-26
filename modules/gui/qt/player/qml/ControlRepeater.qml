@@ -19,6 +19,7 @@ import QtQuick
 import QtQuick.Layouts
 
 import VLC.MainInterface
+import VLC.PlayerControls as PC
 
 Repeater {
     id: repeater
@@ -50,7 +51,13 @@ Repeater {
 
         // Settings
 
-        source: PlayerControlbarControls.control(model.id).source
+        source: targetSource
+
+        readonly property url targetSource: PlayerControlbarControls.control(model.id).source
+
+        onTargetSourceChanged: {
+            source = targetSource
+        }
 
         focus: (index === 0)
 
@@ -63,6 +70,14 @@ Repeater {
         Layout.fillHeight: true
 
         Layout.alignment: repeater.alignment
+
+        onStatusChanged: {
+            if (status === Loader.Error) {
+                const fallback = "qrc:///qt/qml/VLC/PlayerControls/Fallback.qml"
+                console.assert(loader.source !== fallback)
+                loader.setSource(fallback, { type: PC.Fallback.Broken })
+            }
+        }
 
         Binding on visible {
             delayed: true // this is important
