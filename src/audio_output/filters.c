@@ -266,7 +266,7 @@ static int aout_FiltersPipelineCreate(vlc_object_t *obj, struct aout_filter *fil
     /* Format */
     if (input.i_format != outfmt->i_format)
     {
-        if (max == 0)
+        if (n == max)
             goto overflow;
 
         filter_t *f = TryFormat (obj, outfmt->i_format, &input);
