@@ -440,6 +440,7 @@ typedef enum vlc_ml_sorting_criteria_t
     VLC_ML_SORTING_ALBUM,
     VLC_ML_SORTING_FILENAME,
     VLC_ML_SORTING_TRACKNUMBER,
+    VLC_ML_SORTING_RATING,
 } vlc_ml_sorting_criteria_t;
 
 /**
