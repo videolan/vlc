@@ -107,7 +107,7 @@ static int RenderPic( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic,
         if ( unlikely(!picsys_cur) || FAILED( D3D11_Assert_ProcessorInput(p_filter, &p_sys->d3d_proc, picsys_cur) ))
             return VLC_EGENERIC;
 
-        if ( p_prev )
+        if ( p_prev && p_sys->d3d_dev->adapterDesc.VendorId != GPU_MANUFACTURER_INTEL)
         {
             picture_sys_d3d11_t *picsys_prev = ActiveD3D11PictureSys(p_prev);
             if ( unlikely(!picsys_prev) || FAILED( D3D11_Assert_ProcessorInput(p_filter, &p_sys->d3d_proc, picsys_prev) ))
