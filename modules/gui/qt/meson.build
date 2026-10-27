@@ -167,6 +167,7 @@ moc_headers = files(
     'widgets/native/mlfolderseditor.hpp',
     'widgets/native/searchlineedit.hpp',
     'widgets/native/viewblockingrectangle.hpp',
+    'widgets/native/backdropblenditem.hpp',
 )
 
 if host_system == 'windows'
@@ -535,6 +536,8 @@ qt_plugin_sources = files(
     'widgets/native/searchlineedit.hpp',
     'widgets/native/viewblockingrectangle.cpp',
     'widgets/native/viewblockingrectangle.hpp',
+    'widgets/native/backdropblenditem.cpp',
+    'widgets/native/backdropblenditem.hpp',
 )
 
 if host_system == 'windows'
