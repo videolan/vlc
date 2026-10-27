@@ -85,6 +85,17 @@ dvdnav_status_t dvdnav_jump_to_sector_by_time(dvdnav_t *, uint64_t, int32_t);
    and only forced captions should show */
 #define DVDNAV_SPU_HIDDEN 0x80
 
+/* Two seamless vobus abut: one's vobu_s_ptm is the previous one's
+ * vobu_e_ptm, give or take the authoring's rounding. In 90 kHz ticks: 1 ms,
+ * far below a frame. */
+#define VOBU_PTM_SLACK 90
+
+/* A new anchor comes from dvdnav_get_current_time(), which is the cell's
+ * elapsed time from the DSI, to the frame, plus the vobu's place in the
+ * cell: it may land a few frames behind the clock it continues. Behind it
+ * by more than this, playback went back. */
+#define PLAYTIME_TOLERANCE VLC_TICK_FROM_MS(100)
+
 static int  AccessDemuxOpen ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
@@ -190,6 +201,11 @@ typedef struct
         vlc_tick_t dvd;
         vlc_tick_t ps;
     } cell_ts;
+    /* The previous vobu's end, from its PCI, to tell a seamless vobu from a
+     * discontinuity; and the last PCR sent, to tell a jump back. */
+    uint32_t    i_vobu_e_ptm;
+    bool        b_vobu_e_ptm;
+    vlc_tick_t  i_last_pcr;
 
     vlc_mouse_t oldmouse;
 } demux_sys_t;
@@ -213,6 +229,8 @@ static int ControlInternal( demux_t *, int, ... );
 static void StillTimer( void * );
 static bool StillActive( demux_sys_t * );
 static void StillReset( demux_sys_t * );
+static void CellTsReset( demux_sys_t * );
+static void ResetPcr( demux_sys_t * );
 static void StillEnd( demux_sys_t * );
 static bool StillSkipIfNoButtons( demux_t * );
 static bool StillStep( demux_t *, int );
@@ -326,8 +344,7 @@ static int CommonOpen( vlc_object_t *p_this,
         return VLC_EGENERIC;
     }
 
-    p_sys->cell_ts.dvd = VLC_TICK_INVALID;
-    p_sys->cell_ts.ps = VLC_TICK_INVALID;
+    CellTsReset( p_sys );
 
     ps_track_init( p_sys->tk );
     p_sys->b_readahead = b_readahead;
@@ -1049,7 +1066,7 @@ static int Demux( demux_t *p_demux )
         StillReset( p_sys );
         if( p_sys->b_reset_pcr )
         {
-            es_out_Control( p_sys->p_tf_out, ES_OUT_RESET_PCR );
+            ResetPcr( p_sys );
             p_sys->b_reset_pcr = false;
         }
         DemuxBlock( p_demux, packet, i_len );
@@ -1203,8 +1220,7 @@ static int Demux( demux_t *p_demux )
             tk->b_configured = false;
         }
 
-        /* reset PCR */
-        es_out_Control( p_sys->p_tf_out, ES_OUT_RESET_PCR );
+        ResetPcr( p_sys );
 
         uint32_t i_width, i_height;
         if( dvdnav_get_video_resolution( p_sys->dvdnav,
@@ -1260,12 +1276,6 @@ static int Demux( demux_t *p_demux )
         p_sys->i_cell_length = FROM_SCALE_NZ(event->cell_length);
         p_sys->i_vobu_index = 0;
         p_sys->i_vobu_flush = 0;
-        p_sys->cell_ts.dvd = VLC_TICK_INVALID;
-        p_sys->cell_ts.ps = VLC_TICK_INVALID;
-        es_out_Control( p_sys->p_tf_out, ES_OUT_RESET_PCR );
-
-        for( int i=0; i<PS_TK_COUNT; i++ )
-            p_sys->tk[i].i_next_block_flags |= BLOCK_FLAG_CELL_DISCONTINUITY;
 
         /* FIXME is it correct or there is better way to know chapter change */
         if( dvdnav_current_title_info( p_sys->dvdnav, &i_nav_title,
@@ -1317,6 +1327,29 @@ static int Demux( demux_t *p_demux )
         if( unlikely(!p_pci) )
             break;
         const pci_gi_t *p_pci_gi = &p_pci->pci_gi;
+
+        /* A vobu that does not follow the previous one - a new VOB, a
+         * non-seamless cell, a jump - is anchored anew; seamless ones, within
+         * a cell, across a cell change or along a branch, keep the anchor.
+         * So does a vobu without times. Only the first are a discontinuity
+         * for the tracks. */
+        const bool b_ptm = p_pci_gi->vobu_s_ptm != 0 || p_pci_gi->vobu_e_ptm != 0;
+        if( b_ptm )
+        {
+            const bool b_continuous = p_sys->b_vobu_e_ptm &&
+                llabs( (int64_t)p_pci_gi->vobu_s_ptm -
+                       (int64_t)p_sys->i_vobu_e_ptm ) <= VOBU_PTM_SLACK;
+            if( !b_continuous )
+            {
+                p_sys->cell_ts.dvd = VLC_TICK_INVALID;
+                p_sys->cell_ts.ps = VLC_TICK_INVALID;
+                for( int i=0; i<PS_TK_COUNT; i++ )
+                    p_sys->tk[i].i_next_block_flags |= BLOCK_FLAG_CELL_DISCONTINUITY;
+            }
+        }
+        p_sys->i_vobu_e_ptm = p_pci_gi->vobu_e_ptm;
+        p_sys->b_vobu_e_ptm = b_ptm;
+
         if( p_pci_gi->vobu_se_e_ptm != 0 && p_pci_gi->vobu_se_e_ptm < p_pci_gi->vobu_e_ptm )
         {
             const dsi_t *p_dsi = dvdnav_get_current_nav_dsi( p_sys->dvdnav );
@@ -1378,7 +1411,7 @@ static int Demux( demux_t *p_demux )
         /* the hop ended any still and any pending drain wait */
         StillReset( p_sys );
         p_sys->i_wait_start = VLC_TICK_INVALID;
-        es_out_Control( p_sys->p_tf_out, ES_OUT_RESET_PCR );
+        ResetPcr( p_sys );
         break;
 
     case DVDNAV_WAIT:
@@ -1689,13 +1722,21 @@ static int DemuxBlock( demux_t *p_demux, const uint8_t *p, int32_t len )
                     p_sys->cell_ts.dvd =
                         FROM_SCALE( dvdnav_get_current_time(p_sys->dvdnav) );
                     p_sys->cell_ts.ps = i_scr;
+
+                    /* A new anchor putting the PCR behind the last one sent:
+                     * playback went back - a looping menu, a jump with no hop. */
+                    if( p_sys->i_last_pcr != VLC_TICK_INVALID &&
+                        p_sys->cell_ts.dvd < p_sys->i_last_pcr - PLAYTIME_TOLERANCE )
+                        es_out_Control( p_sys->p_tf_out, ES_OUT_RESET_PCR );
                 }
 
                 /* Shift the cell scr with the dvd playtime to have a
                  * continuous PCR. */
                 const vlc_tick_t pcr =
                     p_sys->cell_ts.dvd + (i_scr - p_sys->cell_ts.ps);
+
                 es_out_SetPCR( p_sys->p_tf_out, pcr );
+                p_sys->i_last_pcr = pcr;
 
 
                 if( i_mux_rate > 0 ) p_sys->i_mux_rate = i_mux_rate;
@@ -1922,6 +1963,23 @@ static bool StillActive( demux_sys_t *p_sys )
     bool b_active = p_sys->still.b_enabled;
     vlc_mutex_unlock( &p_sys->still.lock );
     return b_active;
+}
+
+/* Forget the timestamp anchor, the previous vobu and the clock: the next
+ * pack anchors anew, after a PCR reset or a jump. */
+static void CellTsReset( demux_sys_t *p_sys )
+{
+    p_sys->cell_ts.dvd = VLC_TICK_INVALID;
+    p_sys->cell_ts.ps = VLC_TICK_INVALID;
+    p_sys->b_vobu_e_ptm = false;
+    p_sys->i_last_pcr = VLC_TICK_INVALID;
+}
+
+/* Reset the clock, and the timestamp anchor with it. */
+static void ResetPcr( demux_sys_t *p_sys )
+{
+    CellTsReset( p_sys );
+    es_out_Control( p_sys->p_tf_out, ES_OUT_RESET_PCR );
 }
 
 /* forget the still without dvdnav_still_skip since a jump cancels it
