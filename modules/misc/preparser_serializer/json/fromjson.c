@@ -706,8 +706,6 @@ static void fromJSON_subs_format(struct serdes_sys *sys,
     bool err = false;
 
     json_object_to_string(obj, "psz_encoding", &sub->psz_encoding, &err);
-    json_object_to_int(obj, "i_x_origin", &sub->i_x_origin, &err);
-    json_object_to_int(obj, "i_y_origin", &sub->i_y_origin, &err);
 
     const struct json_object *subobj = json_get_object(obj, "spu");
     err |= (subobj == NULL);

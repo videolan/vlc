@@ -614,8 +614,6 @@ static void toJSON_subs_format(struct serdes_sys *sys,
         return;
     }
     json_stringify_first(string, sys, "psz_encoding", subs->psz_encoding);
-    json_stringify(number, sys, "i_x_origin", subs->i_x_origin);
-    json_stringify(number, sys, "i_y_origin", subs->i_y_origin);
 
     /* subs->spu */
     json_stringify_utf8string(sys, "spu");

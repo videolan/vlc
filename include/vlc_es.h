@@ -553,9 +553,6 @@ struct subs_format_t
     char *psz_encoding;
 
 
-    int  i_x_origin; /**< x coordinate of the subtitle. 0 = left */
-    int  i_y_origin; /**< y coordinate of the subtitle. 0 = top */
-
     struct
     {
         /* the width of the original movie the spu was extracted from */
