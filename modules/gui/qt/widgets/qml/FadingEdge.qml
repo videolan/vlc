@@ -33,6 +33,17 @@ Item {
     // which results lower memory consumption:
     property alias backgroundColor: backgroundRect.color
 
+    // Set this property to `true` if beneath the
+    // target Qt Quick Scene has uniform background.
+    // In other words, when background color is not
+    // opaque, but it has nothing to blend in to.
+    // This is an optimization hint that eliminates
+    // layering, which helps lowering video memory
+    // consumption. This property does not have an
+    // effect if `enforceClipping` is set, since then
+    // layering is necessary:
+    property bool uniformBackdrop: false
+
     property Item sourceItem
 
     property real beginningMargin
@@ -57,13 +68,14 @@ Item {
     // size intended, which may increase greatly depending on the fraction
     // of the display scale. Also note that if the QML item size is fractional
     // itself, it is ceiled regardless of the display scale or this property.
+    // This property is not relevant when `useLayering` is not set.
     property bool pixelAlignedForDPR: true
 
     readonly property bool effectCompatible: (GraphicsInfo.shaderType === GraphicsInfo.RhiShader)
 
     readonly property bool implicitClipping: !!_shaderEffect?.visible
 
-    property bool useLayering: effectCompatible && (enforceClipping || backgroundColor.a < 1.0)
+    property bool useLayering: effectCompatible && (enforceClipping || (!uniformBackdrop && backgroundColor.a < 1.0))
 
     // Sometimes `Item::clip` may not be suitable to use with item views,
     // this includes, but not limited to, when display margins are set.
