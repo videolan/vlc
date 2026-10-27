@@ -26,6 +26,7 @@ shader_sources = [
     'DualKawaseBlur_upsample_postprocess.frag',
     'BackdropBlend.vert',
     'Arc.frag',
+    'FadingEdgeMask.frag',
 ]
 
 shader_files = files(shader_sources)

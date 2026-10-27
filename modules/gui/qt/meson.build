@@ -169,6 +169,7 @@ moc_headers = files(
     'widgets/native/viewblockingrectangle.hpp',
     'widgets/native/backdropblenditem.hpp',
     'widgets/native/roundedcornermask.hpp',
+    'widgets/native/fadingedgemask.hpp',
 )
 
 if host_system == 'windows'
@@ -541,6 +542,8 @@ qt_plugin_sources = files(
     'widgets/native/backdropblenditem.hpp',
     'widgets/native/roundedcornermask.cpp',
     'widgets/native/roundedcornermask.hpp',
+    'widgets/native/fadingedgemask.cpp',
+    'widgets/native/fadingedgemask.hpp',
 )
 
 if host_system == 'windows'
