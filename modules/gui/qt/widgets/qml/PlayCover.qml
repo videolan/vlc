@@ -19,23 +19,29 @@
  *****************************************************************************/
 
 import QtQuick
+import QtQuick.Templates as T
 
 import VLC.Style
 import VLC.Widgets as Widgets
 
-Item {
+T.RoundButton {
     id: root
 
     // Settings
+
+    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
+                            implicitContentWidth + leftPadding + rightPadding)
+    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
+                             implicitContentHeight + topPadding + bottomPadding)
 
     width: VLCStyle.play_cover_normal
     height: width
 
     // NOTE: This is the same scaling than the PlayButton, except we make it bigger.
     //       Maybe we could crank this to 1.1.
-    scale: (hoverHandler.hovered && !tapHandler.pressed) ? 1.05 : 1.0
+    scale: (hovered && !pressed) ? 1.05 : 1.0
 
-    property real _hoverProgress: hoverHandler.hovered ? 1.0 : 0.0
+    property real _hoverProgress: hovered ? 1.0 : 0.0
 
     activeFocusOnTab: false
 
@@ -46,11 +52,15 @@ Item {
         colorSet: ColorContext.ToolButton
     }
 
+    onClicked: {
+        tapped(Qt.point(pressX, pressY))
+    }
+
     // Animations
 
     Behavior on scale {
         // NOTE: We disable the animation while pressing to make it more impactful.
-        enabled: (!tapHandler.pressed)
+        enabled: (!root.pressed)
 
         NumberAnimation {
             duration: VLCStyle.duration_short
@@ -69,26 +79,8 @@ Item {
 
     // Children
 
-    TapHandler {
-        id: tapHandler
-
-        grabPermissions: TapHandler.CanTakeOverFromHandlersOfDifferentType | TapHandler.ApprovesTakeOverByAnything
-
-        onSingleTapped: (eventPoint, button) => {
-            root.tapped(point)
-        }
-    }
-
-    HoverHandler {
-        id: hoverHandler
-
-        grabPermissions: PointerHandler.CanTakeOverFromHandlersOfDifferentType | PointerHandler.ApprovesTakeOverByAnything
-    }
-
-    Rectangle {
-        anchors.fill: parent
-
-        radius: width / 2
+    background: Rectangle {
+        radius: root.radius
 
         color: "white"
 
@@ -97,9 +89,7 @@ Item {
         }
     }
 
-    Widgets.IconLabel {
-        anchors.centerIn: parent
-
+    contentItem: Widgets.IconLabel {
         text: VLCIcons.play_filled
 
         color: {

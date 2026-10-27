@@ -26,7 +26,7 @@ import VLC.MainInterface
 import VLC.Widgets as Widgets
 import VLC.Style
 
-T.Button {
+T.RoundButton {
     id: root
 
     // Properties
@@ -45,7 +45,7 @@ T.Button {
     property color color: theme.fg.primary
     property color colorFocus: theme.visualFocus
 
-    property int radius: VLCStyle.button_radius
+    radius: VLCStyle.button_radius
 
     //set to true when user animates the background manually
     property bool extBackgroundAnimation: false
