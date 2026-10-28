@@ -290,8 +290,8 @@ void VideoSurface::itemChange(ItemChange change, const ItemChangeData &value)
         {
             // It is intentional that window connection is made in `::updatePaintNode()`, and not here, because we don't
             // want to explicitly connect whenever `ItemHasContents`, `isVisible()`, `window()` are all satisfied, which
-            // is implicitly the case with `::updatePaintNode()` (it is only called when all these are satisfied). This
-            // is strictly for maintenance reasons.
+            // is implicitly the case except `isVisible()` in `::updatePaintNode()`. We can check only for `isVisible()`
+            // there and establish the connection. This is strictly for maintenance reasons.
 
             disconnect(m_synchConnection);
 
@@ -314,7 +314,7 @@ void VideoSurface::itemChange(ItemChange change, const ItemChangeData &value)
         {
             if (!value.boolValue)
             {
-                // Connection is made in `::updatePaintNode()` (which is called when both the item is visible and `ItemHasContents` is set).
+                // Connection is made in `::updatePaintNode()`:
                 disconnect(m_synchConnection);
             }
             break;
@@ -376,7 +376,7 @@ void VideoSurface::setVideoSurfaceProvider(VideoSurfaceProvider *newVideoSurface
     else
     {
         setFlag(ItemHasContents, false);
-        // Connection is made in `::updatePaintNode()` (which is called when both the item is visible and `ItemHasContents` is set).
+        // Connection is made in `::updatePaintNode()`:
         disconnect(m_synchConnection);
     }
 
@@ -396,7 +396,6 @@ QSGNode *VideoSurface::updatePaintNode(QSGNode *node, UpdatePaintNodeData *data)
     if (Q_UNLIKELY(!m_provider))
         return node;
 
-    // WARNING: For some reason `::updatePaintNode()` is called initially when the item is invisible.
     if (!m_synchConnection && isVisible())
     {
         // Disconnection is made in `::itemChange()`'s `ItemSceneChange` handler.
