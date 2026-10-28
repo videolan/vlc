@@ -426,7 +426,6 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
     } else if ([representedObject isKindOfClass:VLCLibrarySegmentBookmarkedLocation.class]) {
         VLCLibrarySegmentBookmarkedLocation * const bookmarkedLocation =
             (VLCLibrarySegmentBookmarkedLocation *)representedObject;
-        self.libraryWindow.librarySegmentType = bookmarkedLocation.segmentType;
         [self.libraryWindow browseFolderByMrl:bookmarkedLocation.mrl];
     } else if ([representedObject isKindOfClass:VLCMediaLibraryGroup.class]) {
         [self.libraryWindow presentLibraryItem:(VLCMediaLibraryGroup *)representedObject];

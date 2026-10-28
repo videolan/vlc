@@ -322,7 +322,6 @@
 
 - (void)browseFolderByMrl:(NSString *)mrl
 {
-    [self presentBrowseView];
     [self.baseDataSource browseFolderByMrl:mrl];
 }
 
