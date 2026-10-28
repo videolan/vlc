@@ -471,6 +471,8 @@ static int Demux( demux_t * p_demux )
             if ( b_doprepcr && p_stream->prepcr.i_size < i_max_packets )
             {
                 /* always double alloc for performance */
+                if ( i_max_packets < 0 )
+                     i_max_packets = 0;
                 i_max_packets = __MAX( i_max_packets << 1, 255 );
                 /* alloc or realloc */
                 block_t **pp_realloc = realloc( p_stream->prepcr.pp_blocks,

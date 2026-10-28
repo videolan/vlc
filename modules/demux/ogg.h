@@ -119,8 +119,8 @@ typedef struct logical_stream_s
     struct
     {
         block_t **pp_blocks;
-        uint8_t i_size; /* max 255 */
-        uint8_t i_used;
+        int i_size; 
+        int i_used;
     } prepcr;
     /* All blocks that are queued because ES isn't created yet */
     block_t *p_preparse_block;
