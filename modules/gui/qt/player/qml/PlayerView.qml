@@ -823,6 +823,7 @@ FocusScope {
                             Widgets.IconToolButton {
                                 text: VLCIcons.topbar_music
                                 font.pixelSize: VLCStyle.icon_audioPlayerButton
+                                visible: Player.hasLyrics
                                 checked: MainCtx.lyricsMode
                                 onClicked: MainCtx.lyricsMode = !MainCtx.lyricsMode
                                 description: qsTr("Lyrics")
