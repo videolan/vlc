@@ -127,7 +127,7 @@ FocusScope {
             component EnterExitTransition : Transition {
                 id: transition
 
-                property alias to: animation.to
+                property alias animation: animation
 
                 NumberAnimation {
                     id: animation
@@ -147,12 +147,12 @@ FocusScope {
 
             enter: EnterExitTransition {
                 // NOTE: It is intentional that `from` is not used.
-                to: popup.implicitHeight
+                animation.to: popup.implicitHeight
             }
 
             exit: EnterExitTransition {
                 // NOTE: It is intentional that `from` is not used.
-                to: 0.0
+                animation.to: 0.0
             }
 
             contentItem: TextFieldExt {
