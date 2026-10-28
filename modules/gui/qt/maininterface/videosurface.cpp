@@ -126,7 +126,13 @@ VideoSurface::VideoSurface(QQuickItem* parent)
     setFlag(ItemAcceptsInputMethod, true);
 
     {
-        // This is for initialization, they are adjusted in `::updatePaintNode()`:
+        // NOTE: Update render position even if render loop is not threaded, since
+        //       calling `QQuickItem::mapToScene()` is expensive whereas the Qt
+        //       renderer can provide the scene position/matrix to the nodes by
+        //       reusing parent item's matrix. Using the inherited value can be
+        //       considered cheaper than having an additional render node, since
+        //       `::mapToScene()` requires traversing through all parent items.
+        //       Disadvantage of this is mainly some bytes of extra memory usage.
         setUpdateRenderPosition(true);
         setFlag(ItemHasContents, false); // `setUpdateRenderPosition(true)` sets `ItemHasContents`
     }
@@ -239,24 +245,8 @@ void VideoSurface::synchronize()
     // during synchronization (GUI thread is not blocked). Try to
     // be very careful.
 
-    QSizeF size;
-    QPointF position;
-
-    static const bool isObjectThread = QThread::currentThread() == thread();
-    if (isObjectThread)
-    {
-        assert(QThread::currentThread() == thread());
-        // Item's thread (GUI thread):
-        size = this->size();
-        position = this->mapToScene(QPointF(0,0));
-    }
-    else
-    {
-        assert(QThread::currentThread() != thread());
-        // Render thread:
-        size = renderSize();
-        position = renderPosition();
-    }
+    const QSizeF size = renderSize();
+    const QPointF position = renderPosition();
 
     std::optional<QSizeF> newSize;
     std::optional<QPointF> newPosition;
@@ -434,19 +424,6 @@ QSGNode *VideoSurface::updatePaintNode(QSGNode *node, UpdatePaintNodeData *data)
     {
         m_allDirty = true;
         m_videoEnabledChanged = false;
-    }
-
-    if (QThread::currentThread() == thread())
-    {
-        // As per `::synchronize()` we do not need `ViewBlockingRectangle` to provide the render position in this case:
-        setUpdateRenderPosition(false);
-        // Override `ViewBlockingRectangle`'s `ItemHasContents`, if it is unset (when both `renderEnabled` and
-        // `updateRenderPosition()` are false):
-        setFlag(ItemHasContents, true);
-    }
-    else
-    {
-        setUpdateRenderPosition(true);
     }
 
     return ViewBlockingRectangle::updatePaintNode(node, data);
