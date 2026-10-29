@@ -34,8 +34,8 @@
 #import "library/home-library/VLCLibraryHomeViewVideoGridContainerView.h"
 #import "main/VLCMain.h"
 
-// Unrelated sections are lightweight views. The stack, Recently Added row,
-// shared carousel, and media source remain production implementations.
+// Unrelated sections are lightweight views. The stack, video carousels, and
+// shared media source remain production implementations.
 @implementation VLCFileDragRecognisingView
 + (BOOL)handlePasteboardFromDragSessionAsPlayQueueItems:(NSPasteboard *)pasteboard { return NO; }
 - (void)setupDragRecognition {}
@@ -54,15 +54,6 @@
 + (instancetype)fromNibWithOwner:(id)owner { return [[self alloc] initWithFrame:NSZeroRect]; }
 - (void)setOptimalRepresentedItem {}
 - (IBAction)playRepresentedItem:(id)sender {}
-@end
-
-@implementation VLCLibraryHomeViewVideoCarouselContainerView
-@synthesize groupDescriptor = _groupDescriptor;
-@synthesize videoGroup = _videoGroup;
-@synthesize dataSource = _dataSource;
-- (void)setup {}
-- (void)connect {}
-- (void)disconnect {}
 @end
 
 @implementation VLCLibraryHomeViewAudioCarouselContainerView
@@ -115,7 +106,7 @@ static VLCMediaLibraryMediaItem *VLCHomeRecentlyAddedMediaItem(int64_t libraryID
 }
 @property (copy) NSArray<VLCMediaLibraryMediaItem *> *listOfRecentlyAddedVideoMedia;
 @property (copy) NSArray<VLCMediaLibraryMediaItem *> *listOfRecentlyAddedAudioMedia;
-@property NSUInteger recentVideoCount;
+@property (copy) NSArray<VLCMediaLibraryMediaItem *> *listOfRecentMedia;
 @property NSUInteger recentAudioCount;
 @end
 
@@ -126,6 +117,7 @@ static VLCMediaLibraryMediaItem *VLCHomeRecentlyAddedMediaItem(int64_t libraryID
     [super setUp];
     self.listOfRecentlyAddedVideoMedia = @[];
     self.listOfRecentlyAddedAudioMedia = @[];
+    self.listOfRecentMedia = @[];
     __weak typeof(self) weakSelf = self;
     [self replaceClassMethod:@selector(sharedInstance) onClass:VLCMain.class withBlock:^id(id __unused receiver) {
         return weakSelf;
@@ -139,13 +131,13 @@ static VLCMediaLibraryMediaItem *VLCHomeRecentlyAddedMediaItem(int64_t libraryID
         source.collectionView.dataSource = source;
     }];
     _controller = [[VLCLibraryHomeViewStackViewController alloc] init];
-    XCTestExpectation * const videosLoaded = [self expectRecentlyAddedSnapshot:@[]
-                                                                        inView:_controller.recentlyAddedVideosView];
-    XCTestExpectation * const audioLoaded = [self expectRecentlyAddedSnapshot:@[]
-                                                                       inView:_controller.recentlyAddedAudioView];
+    XCTestExpectation * const recentsLoaded = [self expectSnapshot:@[] inView:_controller.recentsView];
+    XCTestExpectation * const videosLoaded = [self expectSnapshot:@[] inView:_controller.recentlyAddedVideosView];
+    XCTestExpectation * const audioLoaded = [self expectSnapshot:@[] inView:_controller.recentlyAddedAudioView];
     _stackView = [[NSStackView alloc] initWithFrame:NSZeroRect];
     _controller.collectionsStackView = _stackView;
     [self waitForExpectations:@[
+        recentsLoaded,
         videosLoaded,
         audioLoaded
     ]
@@ -154,6 +146,7 @@ static VLCMediaLibraryMediaItem *VLCHomeRecentlyAddedMediaItem(int64_t libraryID
         VLCLibraryHomeViewStackViewControllerTest * const test = weakSelf;
         if (test != nil) {
             [test->_controller disconnectContainers];
+            test->_controller.recentsView.collectionView.dataSource = nil;
             test->_controller.recentlyAddedVideosView.collectionView.dataSource = nil;
             test->_controller.recentlyAddedAudioView.collectionView.dataSource = nil;
             test->_controller = nil;
@@ -165,11 +158,10 @@ static VLCMediaLibraryMediaItem *VLCHomeRecentlyAddedMediaItem(int64_t libraryID
 
 - (id)libraryController { return self; }
 - (id)libraryModel { return self; }
-- (NSUInteger)numberOfRecentMedia { return self.recentVideoCount; }
 - (NSUInteger)numberOfRecentAudioMedia { return self.recentAudioCount; }
 
-- (XCTestExpectation *)expectRecentlyAddedSnapshot:(NSArray<VLCMediaLibraryMediaItem *> *)items
-                                            inView:(VLCLibraryHomeViewRecentlyAddedCarouselContainerView *)row
+- (XCTestExpectation *)expectSnapshot:(NSArray<VLCMediaLibraryMediaItem *> *)items
+                               inView:(VLCLibraryHomeViewBaseCarouselContainerView *)row
 {
     __block BOOL observed = NO;
     return [self expectationForNotification:VLCLibraryMediaCollectionViewDataSourceDisplayedCollectionChangedNotification
@@ -198,7 +190,7 @@ static VLCMediaLibraryMediaItem *VLCHomeRecentlyAddedMediaItem(int64_t libraryID
         self.listOfRecentlyAddedVideoMedia = items;
     else
         self.listOfRecentlyAddedAudioMedia = items;
-    XCTestExpectation * const loaded = [self expectRecentlyAddedSnapshot:items inView:row];
+    XCTestExpectation * const loaded = [self expectSnapshot:items inView:row];
     NSNotificationName const name = videos
         ? VLCLibraryModelRecentlyAddedVideoMediaListReset
         : VLCLibraryModelRecentlyAddedAudioMediaListReset;
@@ -206,37 +198,44 @@ static VLCMediaLibraryMediaItem *VLCHomeRecentlyAddedMediaItem(int64_t libraryID
     [self waitForExpectations:@[loaded] timeout:5.];
 }
 
+- (void)setRecentVideos:(NSArray<VLCMediaLibraryMediaItem *> *)items
+{
+    self.listOfRecentMedia = items;
+    XCTestExpectation * const loaded = [self expectSnapshot:items inView:_controller.recentsView];
+    [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelRecentsMediaListReset object:self];
+    [self waitForExpectations:@[loaded] timeout:5.];
+}
+
 - (void)assertRecentlyAddedRowsPrecedeBrowse
 {
     const NSUInteger videosIndex = [_stackView.arrangedSubviews indexOfObject:_controller.recentlyAddedVideosView];
     const NSUInteger audioIndex = [_stackView.arrangedSubviews indexOfObject:_controller.recentlyAddedAudioView];
-    const NSUInteger expectedIndex = 2 + (_controller.recentsView != nil) + (_controller.audioRecentsView != nil);
+    const NSUInteger expectedIndex = 2 + (_controller.audioRecentsView != nil);
     XCTAssertEqual(videosIndex, expectedIndex);
     XCTAssertEqual(audioIndex, videosIndex + 1);
     XCTAssertEqual([_stackView.arrangedSubviews indexOfObject:_controller.browseView], audioIndex + 1);
-    if (_controller.recentsView != nil) {
-        XCTAssertEqual([_stackView.arrangedSubviews indexOfObject:_controller.recentsView], (NSUInteger)2);
-    }
+    XCTAssertEqual([_stackView.arrangedSubviews indexOfObject:_controller.actionsView], (NSUInteger)0);
+    XCTAssertEqual([_stackView.arrangedSubviews indexOfObject:_controller.recentsView], (NSUInteger)1);
     if (_controller.audioRecentsView != nil) {
-        XCTAssertEqual([_stackView.arrangedSubviews indexOfObject:_controller.audioRecentsView],
-                       (NSUInteger)2 + (_controller.recentsView != nil));
+        XCTAssertEqual([_stackView.arrangedSubviews indexOfObject:_controller.audioRecentsView], (NSUInteger)2);
     }
 }
 
 - (void)testTypedRecentlyAddedRowsKeepTheirOrderAsPlaybackRecentsAppearAndDisappear
 {
+    XCTAssertTrue(_controller.recentsView.hidden);
     [self assertRecentlyAddedRowsPrecedeBrowse];
     self.recentAudioCount = 1;
     [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelRecentAudioMediaListReset object:self];
     [self assertRecentlyAddedRowsPrecedeBrowse];
-    self.recentVideoCount = 1;
-    [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelRecentsMediaListReset object:self];
+    [self setRecentVideos:@[VLCHomeRecentlyAddedMediaItem(100, VLC_ML_MEDIA_TYPE_VIDEO)]];
+    XCTAssertFalse(_controller.recentsView.hidden);
     [self assertRecentlyAddedRowsPrecedeBrowse];
     self.recentAudioCount = 0;
     [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelRecentAudioMediaListReset object:self];
     [self assertRecentlyAddedRowsPrecedeBrowse];
-    self.recentVideoCount = 0;
-    [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelRecentsMediaListReset object:self];
+    [self setRecentVideos:@[]];
+    XCTAssertTrue(_controller.recentsView.hidden);
     [self assertRecentlyAddedRowsPrecedeBrowse];
 }
 
@@ -307,8 +306,8 @@ static VLCMediaLibraryMediaItem *VLCHomeRecentlyAddedMediaItem(int64_t libraryID
     VLCMediaLibraryMediaItem * const latestSong = VLCHomeRecentlyAddedMediaItem(500, VLC_ML_MEDIA_TYPE_AUDIO);
     self.listOfRecentlyAddedVideoMedia = @[latestVideo];
     self.listOfRecentlyAddedAudioMedia = @[latestSong];
-    XCTestExpectation * const videosDisconnected = [self expectRecentlyAddedSnapshot:@[latestVideo] inView:videos];
-    XCTestExpectation * const audioDisconnected = [self expectRecentlyAddedSnapshot:@[latestSong] inView:audio];
+    XCTestExpectation * const videosDisconnected = [self expectSnapshot:@[latestVideo] inView:videos];
+    XCTestExpectation * const audioDisconnected = [self expectSnapshot:@[latestSong] inView:audio];
     videosDisconnected.inverted = YES;
     audioDisconnected.inverted = YES;
     [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelRecentlyAddedVideoMediaListReset object:self];
@@ -323,8 +322,8 @@ static VLCMediaLibraryMediaItem *VLCHomeRecentlyAddedMediaItem(int64_t libraryID
     XCTAssertEqual([audio.dataSource libraryItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]
                                           forCollectionView:audio.collectionView], firstSong);
 
-    XCTestExpectation * const videosReconnected = [self expectRecentlyAddedSnapshot:@[latestVideo] inView:videos];
-    XCTestExpectation * const audioReconnected = [self expectRecentlyAddedSnapshot:@[latestSong] inView:audio];
+    XCTestExpectation * const videosReconnected = [self expectSnapshot:@[latestVideo] inView:videos];
+    XCTestExpectation * const audioReconnected = [self expectSnapshot:@[latestSong] inView:audio];
     [_controller connectContainers];
     [self waitForExpectations:@[
         videosReconnected,

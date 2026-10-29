@@ -27,7 +27,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCLibraryHeroView;
+
 @interface VLCLibraryHomeViewVideoCarouselContainerView : VLCLibraryHomeViewBaseCarouselContainerView<VLCLibraryHomeViewVideoContainerView>
+
+@property (readonly) VLCLibraryHeroView *heroView;
 
 @end
 

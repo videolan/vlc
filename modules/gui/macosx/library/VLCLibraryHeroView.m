@@ -261,6 +261,7 @@
 {
     if (event.modifierFlags & NSEventModifierFlagControl) {
         [self openContextMenu:event];
+        return;
     }
 
     [super mouseDown:event];
@@ -269,7 +270,6 @@
 - (void)rightMouseDown:(NSEvent *)event
 {
     [self openContextMenu:event];
-    [super rightMouseDown:event];
 }
 
 @end

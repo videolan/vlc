@@ -24,11 +24,14 @@
 
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSView+VLCAdditions.h"
 
 #import "library/VLCLibraryCollectionView.h"
 #import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCarouselCollectionViewItem.h"
 #import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryHeroView.h"
+#import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowSplitViewController.h"
 #import "library/VLCLibrarySegment.h"
@@ -41,11 +44,62 @@
 
 #include "library/VLCLibraryMediaGroupDescriptor.h"
 
+static NSUserInterfaceItemIdentifier const VLCLibraryHomeVideoHeroIdentifier = @"VLCLibraryHomeVideoHero";
+static void * const VLCLibraryHomeVideoHeroContext = (void *)&VLCLibraryHomeVideoHeroContext;
+
+@interface VLCLibraryHomeVideoCarouselDataSource : VLCLibraryHomeViewMediaContainerViewDataSource
+
+@property (strong, nullable) VLCLibraryHeroView *heroView;
+
+@end
+
+@implementation VLCLibraryHomeVideoCarouselDataSource
+
+- (void)setup
+{
+    [super setup];
+    [self.collectionView registerClass:NSView.class
+            forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader
+                        withIdentifier:VLCLibraryHomeVideoHeroIdentifier];
+}
+
+- (NSView *)
+                       collectionView:(NSCollectionView *)collectionView
+    viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
+                          atIndexPath:(NSIndexPath *)indexPath
+{
+    if (![kind isEqualToString:NSCollectionElementKindSectionHeader]) {
+        return [super collectionView:collectionView viewForSupplementaryElementOfKind:kind atIndexPath:indexPath];
+    }
+
+    NSView * const header = [collectionView makeSupplementaryViewOfKind:kind
+                                                         withIdentifier:VLCLibraryHomeVideoHeroIdentifier
+                                                           forIndexPath:indexPath];
+    if (self.heroView != nil && self.heroView.superview != header) {
+        [header addSubview:self.heroView];
+        self.heroView.translatesAutoresizingMaskIntoConstraints = NO;
+        [NSLayoutConstraint activateConstraints:@[
+            [self.heroView.leadingAnchor constraintEqualToAnchor:header.leadingAnchor constant:VLCUIUnits.mediumSpacing],
+            [self.heroView.trailingAnchor constraintEqualToAnchor:header.trailingAnchor],
+            [self.heroView.topAnchor constraintEqualToAnchor:header.topAnchor],
+            [self.heroView.bottomAnchor constraintEqualToAnchor:header.bottomAnchor],
+        ]];
+    }
+    return header;
+}
+
+@end
+
 @implementation VLCLibraryHomeViewVideoCarouselContainerView
 
 @synthesize groupDescriptor = _groupDescriptor;
 @synthesize videoGroup = _videoGroup;
 @synthesize dataSource = _dataSource;
+
+- (void)dealloc
+{
+    [self.heroView removeObserver:self forKeyPath:@"representedItem" context:VLCLibraryHomeVideoHeroContext];
+}
 
 - (NSNotificationName)displayedCollectionChangedNotification
 {
@@ -58,7 +112,13 @@
     self.collectionViewDelegate.staticItemSize = NSMakeSize(VLCUIUnits.carouselViewVideoItemViewWidth,
                                                             VLCUIUnits.carouselViewItemViewHeight);
     self.itemHeight = VLCUIUnits.carouselViewItemViewHeight;
-    _dataSource = [[VLCLibraryHomeViewMediaContainerViewDataSource alloc] init];
+    // This nib has no File's Owner connections. Passing the carousel as its
+    // owner would reenter setup through awakeFromNib before the data source exists.
+    _heroView = [VLCLibraryHeroView fromNibWithOwner:nil];
+    [self.heroView addObserver:self forKeyPath:@"representedItem" options:0 context:VLCLibraryHomeVideoHeroContext];
+    [self.heroView setOptimalRepresentedItem];
+
+    _dataSource = [[VLCLibraryHomeVideoCarouselDataSource alloc] init];
     _dataSource.collectionViewItemIdentifier = VLCLibraryCarouselCollectionViewItemIdentifier;
     self.dataSource.collectionView = self.collectionView;
     [self.dataSource setup];
@@ -71,9 +131,62 @@
     self.dataSource.groupDescriptor = groupDescriptor;
     if (groupDescriptor.group == VLCMediaLibraryParentGroupTypeRecentVideos) {
         self.headerView.title = _NS("Recently watched");
+        self.numberOfRows = 2;
     } else {
         self.headerView.title = groupDescriptor.name;
+        self.numberOfRows = 1;
     }
+    [self updateHeroLayout];
+}
+
+- (void)updateHeroLayout
+{
+    const BOOL recentVideos = self.groupDescriptor != nil &&
+        self.videoGroup == VLCMediaLibraryParentGroupTypeRecentVideos;
+    const BOOL showsHero = recentVideos && self.heroView.representedItem != nil;
+    VLCLibraryHomeVideoCarouselDataSource * const dataSource = (id)self.dataSource;
+    dataSource.heroView = showsHero
+        ? self.heroView
+        : nil;
+
+    // Match two video columns, including their gap. The section header itself
+    // starts before the flow layout's leading inset, so include that padding.
+    const CGFloat heroWidth = self.collectionViewDelegate.staticItemSize.width * 2. +
+        self.collectionViewLayout.minimumLineSpacing;
+    const CGFloat height = self.itemHeight * self.numberOfRows +
+        (self.numberOfRows - 1) * self.collectionViewLayout.minimumInteritemSpacing;
+    const NSSize headerSize = showsHero
+        ? NSMakeSize(heroWidth + VLCUIUnits.mediumSpacing, height)
+        : NSZeroSize;
+    if (!NSEqualSizes(self.collectionViewLayout.headerReferenceSize, headerSize)) {
+        self.collectionViewLayout.headerReferenceSize = headerSize;
+        [self.collectionViewLayout invalidateLayout];
+    }
+    self.hidden = recentVideos && self.headerView.itemCount == 0 && !showsHero;
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath
+                      ofObject:(id)object
+                        change:(NSDictionary<NSKeyValueChangeKey, id> *)change
+                       context:(void *)context
+{
+    if (context == VLCLibraryHomeVideoHeroContext) {
+        [self updateHeroLayout];
+        return;
+    }
+    [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+}
+
+- (void)displayedCollectionChanged:(NSNotification *)notification
+{
+    [super displayedCollectionChanged:notification];
+    [self updateHeroLayout];
+}
+
+- (void)reloadData
+{
+    [self.heroView setOptimalRepresentedItem];
+    [super reloadData];
 }
 
 - (void)openLibrary:(id)sender
