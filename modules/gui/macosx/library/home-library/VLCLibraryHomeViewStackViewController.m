@@ -126,9 +126,7 @@
 
 - (void)updateHeroVisibility
 {
-    const NSUInteger recentCount = [self.recentsView.dataSource collectionView:self.recentsView.collectionView
-                                                        numberOfItemsInSection:0];
-    self.heroView.hidden = recentCount > 0 || self.heroView.representedItem == nil;
+    self.heroView.hidden = self.recentsView.dataSource.numberOfMediaItems > 0 || self.heroView.representedItem == nil;
 }
 
 - (void)recentVideosChanged:(NSNotification *)notification

@@ -31,6 +31,7 @@
 #import "library/VLCLibraryCarouselCollectionViewItem.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryHeroView.h"
+#import "library/VLCLibraryRepresentedItem.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowSplitViewController.h"
@@ -91,6 +92,9 @@ static void * const VLCLibraryHomeVideoHeroContext = (void *)&VLCLibraryHomeVide
 @end
 
 @implementation VLCLibraryHomeViewVideoCarouselContainerView
+{
+    BOOL _updatingHeroLayout;
+}
 
 @synthesize groupDescriptor = _groupDescriptor;
 @synthesize videoGroup = _videoGroup;
@@ -141,10 +145,25 @@ static void * const VLCLibraryHomeVideoHeroContext = (void *)&VLCLibraryHomeVide
 
 - (void)updateHeroLayout
 {
+    if (_updatingHeroLayout) {
+        return;
+    }
+    _updatingHeroLayout = YES;
     const BOOL recentVideos = self.groupDescriptor != nil &&
         self.videoGroup == VLCMediaLibraryParentGroupTypeRecentVideos;
-    const BOOL hasRecentVideos = recentVideos && self.headerView.itemCount > 0;
+    const BOOL hasRecentVideos = recentVideos && self.dataSource.numberOfMediaItems > 0;
+    // Select and exclude from the same snapshot, including while a newer model
+    // list is still loading, so the featured video cannot also become a card.
+    if (hasRecentVideos && self.heroView.representedItem.item != self.dataSource.firstMediaItem) {
+        self.heroView.representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:self.dataSource.firstMediaItem
+                                                                             parentType:VLCMediaLibraryParentGroupTypeRecentVideos];
+    } else if (!hasRecentVideos && self.heroView.representedItem != nil) {
+        self.heroView.representedItem = nil;
+    }
     const BOOL showsHero = hasRecentVideos && self.heroView.representedItem != nil;
+    self.dataSource.excludedLibraryID = showsHero
+        ? self.heroView.representedItem.item.libraryID
+        : 0;
     VLCLibraryHomeVideoCarouselDataSource * const dataSource = (id)self.dataSource;
     dataSource.heroView = showsHero
         ? self.heroView
@@ -164,6 +183,7 @@ static void * const VLCLibraryHomeVideoHeroContext = (void *)&VLCLibraryHomeVide
         [self.collectionViewLayout invalidateLayout];
     }
     self.hidden = recentVideos && !hasRecentVideos;
+    _updatingHeroLayout = NO;
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
@@ -181,6 +201,9 @@ static void * const VLCLibraryHomeVideoHeroContext = (void *)&VLCLibraryHomeVide
 - (void)displayedCollectionChanged:(NSNotification *)notification
 {
     [super displayedCollectionChanged:notification];
+    if (self.videoGroup == VLCMediaLibraryParentGroupTypeRecentVideos) {
+        self.headerView.itemCount = self.dataSource.numberOfMediaItems;
+    }
     [self updateHeroLayout];
 }
 
