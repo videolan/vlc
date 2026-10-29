@@ -96,6 +96,15 @@ static const CGFloat VLCCarouselDecelerationEdgeTolerance = .01;
         [self scrollToHorizontalOffset:targetOffset
                               animated:YES
                               duration:VLCCarouselItemScrollDuration];
+    } else {
+        // Supplementary views may extend beyond the first or last item, or be
+        // the only content when there are no recent videos.
+        const CGFloat edgeOffset = forward
+            ? NSMaxX(self.frame) - NSWidth(scrollView.documentVisibleRect)
+            : NSMinX(self.frame);
+        [self scrollToHorizontalOffset:edgeOffset
+                              animated:YES
+                              duration:VLCCarouselItemScrollDuration];
     }
 }
 

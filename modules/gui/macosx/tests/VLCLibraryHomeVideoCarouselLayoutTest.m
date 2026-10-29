@@ -22,6 +22,8 @@
 
 #import "VLCAppKitMockingTestCase.h"
 
+#import <objc/runtime.h>
+
 #include <math.h>
 
 #import "library/VLCLibraryCollectionViewDelegate.h"
@@ -235,6 +237,53 @@ static const CGFloat VLCHomeLayoutTestHeroWidth = 656.;
     [self layoutContainer];
     XCTAssertEqualWithAccuracy(NSHeight(_container.scrollView.contentView.bounds), _container.itemHeight, .01);
     XCTAssertEqualWithAccuracy(NSMinY([self frameForItem:0]), NSMinY([self frameForItem:1]), .01);
+}
+
+- (void)disableNavigationAnimation
+{
+    SEL const selector = NSSelectorFromString(@"scrollToHorizontalOffset:animated:duration:");
+    IMP const implementation = class_getMethodImplementation(VLCCarouselView.class, selector);
+    [self replaceInstanceMethod:selector
+                        onClass:VLCCarouselView.class
+                      withBlock:^(id receiver, CGFloat offset, BOOL __unused animated, NSTimeInterval __unused duration) {
+        // Exercise navigation and clip-view scrolling synchronously.
+        ((void (*)(id, SEL, CGFloat, BOOL, NSTimeInterval))implementation)(receiver, selector, offset, NO, 0.);
+    }];
+}
+
+- (void)testBackwardNavigationFromFirstVideoColumnReturnsToHero
+{
+    [self configureTwoRowsWithHero:YES];
+    [self disableNavigationAnimation];
+
+    [_container.collectionView scrollByOneItemForward:YES];
+    XCTAssertEqualWithAccuracy(NSMinX(_container.scrollView.documentVisibleRect), VLCHomeLayoutTestHeroWidth, .01);
+    XCTAssertFalse(_container.leftButton.hidden);
+    [_container.collectionView scrollByOneItemForward:NO];
+    XCTAssertEqualWithAccuracy(NSMinX(_container.scrollView.documentVisibleRect), 0., .01);
+    XCTAssertTrue(_container.leftButton.hidden);
+}
+
+- (void)testHeroWithoutRecentVideosScrollsToBothEdgesInANarrowWindow
+{
+    _itemCount = 0;
+    [_window setContentSize:NSMakeSize(520., 450.)];
+    [self configureTwoRowsWithHero:YES];
+    [self disableNavigationAnimation];
+    const CGFloat maximumOffset = NSMaxX(_container.collectionView.frame) -
+        NSWidth(_container.scrollView.documentVisibleRect);
+    XCTAssertGreaterThan(maximumOffset, 0.);
+    XCTAssertTrue(_container.leftButton.hidden);
+    XCTAssertFalse(_container.rightButton.hidden);
+
+    [_container.collectionView scrollByOneItemForward:YES];
+    XCTAssertEqualWithAccuracy(NSMinX(_container.scrollView.documentVisibleRect), maximumOffset, .01);
+    XCTAssertFalse(_container.leftButton.hidden);
+    XCTAssertTrue(_container.rightButton.hidden);
+    [_container.collectionView scrollByOneItemForward:NO];
+    XCTAssertEqualWithAccuracy(NSMinX(_container.scrollView.documentVisibleRect), 0., .01);
+    XCTAssertTrue(_container.leftButton.hidden);
+    XCTAssertFalse(_container.rightButton.hidden);
 }
 
 @end
