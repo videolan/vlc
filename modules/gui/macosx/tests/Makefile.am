@@ -28,6 +28,7 @@ VLCMacOSXTests_SOURCES = \
 	gui/macosx/tests/VLCLibraryHomeBrowseCarouselTest.m \
 	gui/macosx/tests/VLCLibraryHomeMediaDataSourceTest.m \
 	gui/macosx/tests/VLCLibraryHomeViewStackViewControllerTest.m \
+	gui/macosx/tests/VLCLibraryHomeVideoCarouselLayoutTest.m \
 	gui/macosx/tests/VLCLibraryHomeTestSupport.m \
 	gui/macosx/tests/VLCLogMessageTest.m \
 	gui/macosx/tests/VLCMacOSXTestDefaults.m \

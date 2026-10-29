@@ -206,6 +206,7 @@
 #endif
 
     _itemHeight = VLCUIUnits.carouselViewItemViewHeight;
+    _numberOfRows = 1;
     _collectionViewDelegate.staticItemSize = NSMakeSize(_itemHeight, _itemHeight);
 
     [self updateCarouselViewHeight];
@@ -269,12 +270,15 @@
 
 - (void)updateCarouselViewHeight
 {
+    const CGFloat height = self.numberOfRows * self.itemHeight +
+        (self.numberOfRows - 1) * self.collectionViewLayout.minimumInteritemSpacing;
     if (self.heightConstraint == nil) {
-        _heightConstraint = [self.scrollView.heightAnchor constraintEqualToConstant:_itemHeight];
+        _heightConstraint = [self.scrollView.heightAnchor constraintEqualToConstant:height];
         self.heightConstraint.active = YES;
     } else {
-        self.heightConstraint.constant = _itemHeight;
+        self.heightConstraint.constant = height;
     }
+    [self.collectionViewLayout invalidateLayout];
 }
 
 - (void)updateCarouselButtonVisibility
@@ -304,6 +308,12 @@
     _itemHeight = itemHeight;
     self.collectionViewDelegate.staticItemSize = NSMakeSize(self.collectionViewDelegate.staticItemSize.width,
                                                             itemHeight);
+    [self updateCarouselViewHeight];
+}
+
+- (void)setNumberOfRows:(NSUInteger)numberOfRows
+{
+    _numberOfRows = MAX(numberOfRows, 1);
     [self updateCarouselViewHeight];
 }
 
