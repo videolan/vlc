@@ -867,7 +867,8 @@ referenceSizeForHeaderInSection:(NSInteger)section
 - (void)reloadData
 {
     [self updateTableViewItems];
-    id const currentDataSource = self.childDataSource ?: self;
+    id<NSTableViewDataSource, NSCollectionViewDataSource> const currentDataSource =
+        self.childDataSource ?: self;
     if (self.tableView.dataSource != currentDataSource ||
         self.collectionView.dataSource != currentDataSource) {
         return;
