@@ -269,6 +269,7 @@
     XCTAssertEqual(_container.heroView.playButton.target, _container.heroView);
     XCTAssertEqual(_container.heroView.playButton.action, @selector(playRepresentedItem:));
     [self showHero];
+    [self setRecentItemCount:1];
     [self assertHeroIsEmbeddedInSectionHeader];
 }
 
@@ -292,22 +293,16 @@
     [owner disconnect];
 }
 
-- (void)testHeroKeepsTheSectionVisibleWithoutRecentVideosAndKvoRemovesItsSpace
+- (void)testCarouselIsHiddenWithoutRecentsEvenWhenTheHeroHasAnItem
 {
-    XCTAssertTrue(_container.hidden);
     [self showHero];
-    XCTAssertFalse(_container.hidden);
-    XCTAssertGreaterThan(_container.collectionViewLayout.headerReferenceSize.width, 0.);
-    XCTAssertEqual(_container.headerView.itemCount, (NSUInteger)0);
-    [self assertHeroIsEmbeddedInSectionHeader];
-
-    _container.heroView.representedItem = nil;
-    [self layoutContainer];
     XCTAssertTrue(_container.hidden);
     XCTAssertTrue(NSEqualSizes(_container.collectionViewLayout.headerReferenceSize, NSZeroSize));
-
-    [self showHero];
+    [self setRecentItemCount:3];
     [self assertHeroIsEmbeddedInSectionHeader];
+    [self setRecentItemCount:0];
+    XCTAssertTrue(_container.hidden);
+    XCTAssertTrue(NSEqualSizes(_container.collectionViewLayout.headerReferenceSize, NSZeroSize));
 }
 
 - (void)testHeroAttachesToTheCarouselAndPopulatedSectionSurvivesItsRemoval
@@ -356,7 +351,7 @@
     XCTAssertEqual(_container.headerView.itemCount, (NSUInteger)0);
     XCTAssertTrue(_container.hidden);
     [self showHero];
-    XCTAssertFalse(_container.hidden);
+    XCTAssertTrue(_container.hidden);
 }
 
 @end

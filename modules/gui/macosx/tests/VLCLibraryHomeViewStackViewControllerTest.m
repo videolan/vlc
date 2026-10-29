@@ -210,14 +210,15 @@ static VLCMediaLibraryMediaItem *VLCHomeRecentlyAddedMediaItem(int64_t libraryID
 {
     const NSUInteger videosIndex = [_stackView.arrangedSubviews indexOfObject:_controller.recentlyAddedVideosView];
     const NSUInteger audioIndex = [_stackView.arrangedSubviews indexOfObject:_controller.recentlyAddedAudioView];
-    const NSUInteger expectedIndex = 2 + (_controller.audioRecentsView != nil);
+    const NSUInteger expectedIndex = 3 + (_controller.audioRecentsView != nil);
     XCTAssertEqual(videosIndex, expectedIndex);
     XCTAssertEqual(audioIndex, videosIndex + 1);
     XCTAssertEqual([_stackView.arrangedSubviews indexOfObject:_controller.browseView], audioIndex + 1);
     XCTAssertEqual([_stackView.arrangedSubviews indexOfObject:_controller.actionsView], (NSUInteger)0);
-    XCTAssertEqual([_stackView.arrangedSubviews indexOfObject:_controller.recentsView], (NSUInteger)1);
+    XCTAssertEqual([_stackView.arrangedSubviews indexOfObject:_controller.heroView], (NSUInteger)1);
+    XCTAssertEqual([_stackView.arrangedSubviews indexOfObject:_controller.recentsView], (NSUInteger)2);
     if (_controller.audioRecentsView != nil) {
-        XCTAssertEqual([_stackView.arrangedSubviews indexOfObject:_controller.audioRecentsView], (NSUInteger)2);
+        XCTAssertEqual([_stackView.arrangedSubviews indexOfObject:_controller.audioRecentsView], (NSUInteger)3);
     }
 }
 

@@ -143,7 +143,8 @@ static void * const VLCLibraryHomeVideoHeroContext = (void *)&VLCLibraryHomeVide
 {
     const BOOL recentVideos = self.groupDescriptor != nil &&
         self.videoGroup == VLCMediaLibraryParentGroupTypeRecentVideos;
-    const BOOL showsHero = recentVideos && self.heroView.representedItem != nil;
+    const BOOL hasRecentVideos = recentVideos && self.headerView.itemCount > 0;
+    const BOOL showsHero = hasRecentVideos && self.heroView.representedItem != nil;
     VLCLibraryHomeVideoCarouselDataSource * const dataSource = (id)self.dataSource;
     dataSource.heroView = showsHero
         ? self.heroView
@@ -162,7 +163,7 @@ static void * const VLCLibraryHomeVideoHeroContext = (void *)&VLCLibraryHomeVide
         self.collectionViewLayout.headerReferenceSize = headerSize;
         [self.collectionViewLayout invalidateLayout];
     }
-    self.hidden = recentVideos && self.headerView.itemCount == 0 && !showsHero;
+    self.hidden = recentVideos && !hasRecentVideos;
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath

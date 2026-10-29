@@ -28,6 +28,7 @@
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryController.h"
+#import "library/VLCLibraryHeroView.h"
 #import "library/VLCLibraryItemPresentingCapable.h"
 #import "library/VLCLibraryModel.h"
 
@@ -68,6 +69,7 @@
 
 - (void)dealloc
 {
+    [self.heroView removeObserver:self forKeyPath:@"representedItem" context:NULL];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -91,11 +93,20 @@
 - (void)generateCustomContainers
 {
     _actionsView = [VLCLibraryHomeViewActionsView fromNibWithOwner:self];
-    _leadingViews = @[self.actionsView];
-
-    [self addCustomContainerViews];
+    _heroView = [VLCLibraryHeroView fromNibWithOwner:nil];
+    [self.heroView.widthAnchor constraintEqualToAnchor:self.heroView.heightAnchor multiplier:21. / 9.].active = YES;
+    [self.heroView addObserver:self forKeyPath:@"representedItem" options:0 context:NULL];
     _recentsView = [[VLCLibraryHomeViewVideoCarouselContainerView alloc] init];
     self.recentsView.videoGroup = VLCMediaLibraryParentGroupTypeRecentVideos;
+    _leadingViews = @[self.actionsView, self.heroView];
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(recentVideosChanged:)
+                                               name:VLCLibraryMediaCollectionViewDataSourceDisplayedCollectionChangedNotification
+                                             object:self.recentsView.dataSource];
+    [self.heroView setOptimalRepresentedItem];
+    [self updateHeroVisibility];
+
+    [self addCustomContainerViews];
     [_containers addObject:self.recentsView];
     [self addContainerView:self.recentsView toStackView:self.collectionsStackView];
     [self audioRecentsChanged:nil];
@@ -110,6 +121,30 @@
     _browseView = [[VLCLibraryHomeViewBrowseCarouselContainerView alloc] init];
     [_containers addObject:self.browseView];
     [self addContainerView:self.browseView toStackView:self.collectionsStackView];
+}
+
+- (void)updateHeroVisibility
+{
+    const NSUInteger recentCount = [self.recentsView.dataSource collectionView:self.recentsView.collectionView
+                                                        numberOfItemsInSection:0];
+    self.heroView.hidden = recentCount > 0 || self.heroView.representedItem == nil;
+}
+
+- (void)recentVideosChanged:(NSNotification *)notification
+{
+    [self updateHeroVisibility];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath
+                      ofObject:(id)object
+                        change:(NSDictionary<NSKeyValueChangeKey, id> *)change
+                       context:(void *)context
+{
+    if (object == self.heroView && [keyPath isEqualToString:@"representedItem"]) {
+        [self updateHeroVisibility];
+        return;
+    }
+    [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 }
 
 - (void)addCustomContainerViews
@@ -128,7 +163,7 @@
 - (void)insertRecentItemsContainer:(NSView<VLCLibraryHomeViewContainerView> *)container
                           atIndex:(NSUInteger)index
 {
-    // Actions precede the ordered video, music, and Browse rows.
+    // Actions and the standalone Hero precede the video, music, and Browse rows.
     [self.collectionsStackView insertArrangedSubview:container atIndex:_leadingViews.count + index];
     [self setupContainerView:container withStackView:_collectionsStackView];
     [_containers insertObject:container atIndex:index];
@@ -174,6 +209,8 @@
 - (void)reloadData
 {
     dispatch_async(dispatch_get_main_queue(), ^{
+        [self.heroView setOptimalRepresentedItem];
+        [self updateHeroVisibility];
         for (NSView<VLCLibraryHomeViewContainerView> * const containerView in self->_containers) {
             if ([containerView isKindOfClass:VLCLibraryHomeViewBaseCarouselContainerView.class]) {
                 VLCLibraryHomeViewBaseCarouselContainerView * const baseContainerView = (VLCLibraryHomeViewBaseCarouselContainerView *)containerView;
