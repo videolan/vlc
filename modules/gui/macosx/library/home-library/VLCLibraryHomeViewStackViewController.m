@@ -94,6 +94,7 @@
 {
     _actionsView = [VLCLibraryHomeViewActionsView fromNibWithOwner:self];
     _heroView = [VLCLibraryHeroView fromNibWithOwner:nil];
+    self.heroView.selectionMode = VLCLibraryHeroViewSelectionModeRandomItem;
     [self.heroView.widthAnchor constraintEqualToAnchor:self.heroView.heightAnchor multiplier:21. / 9.].active = YES;
     [self.heroView addObserver:self forKeyPath:@"representedItem" options:0 context:NULL];
     _recentsView = [[VLCLibraryHomeViewVideoCarouselContainerView alloc] init];

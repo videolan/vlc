@@ -30,6 +30,7 @@ VLCMacOSXTests_SOURCES = \
 	gui/macosx/tests/VLCLibraryHomeViewStackViewControllerTest.m \
 	gui/macosx/tests/VLCLibraryHomeVideoCarouselLayoutTest.m \
 	gui/macosx/tests/VLCLibraryHomeVideoCarouselTest.m \
+	gui/macosx/tests/VLCLibraryHeroViewTest.m \
 	gui/macosx/tests/VLCLibraryHomeTestSupport.m \
 	gui/macosx/tests/VLCLogMessageTest.m \
 	gui/macosx/tests/VLCMacOSXTestDefaults.m \
@@ -48,6 +49,7 @@ VLCMacOSXTests_SOURCES = \
 	gui/macosx/extensions/NSView+VLCAdditions.m \
 	gui/macosx/library/home-library/VLCLibraryHomeViewSectionHeaderView.m \
 	gui/macosx/library/VLCLibraryCarouselView.m \
+	gui/macosx/library/VLCLibraryHeroView.m \
 	gui/macosx/library/VLCLibraryCollectionViewDelegate.m \
 	gui/macosx/library/VLCLibraryCollectionViewFlowLayout.m \
 	gui/macosx/extensions/NSArray+VLCAdditions.m \

@@ -26,6 +26,7 @@
 #import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryHeroView.h"
+#import "library/VLCLibraryRepresentedItem.h"
 #import "library/VLCLibraryRepresentedItemCollectionViewItem.h"
 #import "library/home-library/VLCLibraryHomeViewMediaContainerViewDataSource.h"
 #import "library/home-library/VLCLibraryHomeViewVideoCarouselContainerView.h"
@@ -113,6 +114,11 @@
         if (test != nil) {
             ++test->_heroSelectionCount;
         }
+    }];
+    [self replaceInstanceMethod:NSSelectorFromString(@"updateRepresentedItem")
+                        onClass:VLCLibraryHeroView.class
+                      withBlock:^(id __unused receiver) {
+        // The Hero tests exercise media metadata with their own fixture items.
     }];
     [self replaceClassMethod:@selector(fromNibWithOwner:)
                      onClass:VLCLibraryHeroView.class
@@ -220,9 +226,13 @@
 
 - (void)showHero
 {
-    // The container only needs the represented item's presence. The Hero stub
-    // retains it through the real property setter and emits ordinary KVO.
-    _container.heroView.representedItem = (id)[[NSObject alloc] init];
+    // Exercise the production Hero's property/KVO lifecycle while keeping this
+    // fixture's selection and metadata updates isolated from media services.
+    VLCMediaLibraryDummyItem * const item = [[VLCMediaLibraryDummyItem alloc] initWithDisplayString:@"Hero"
+                                                                            withPrimaryDetailString:nil
+                                                                          withSecondaryDetailString:nil];
+    _container.heroView.representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:item
+                                                                               parentType:VLCMediaLibraryParentGroupTypeVideoLibrary];
 }
 
 - (void)assertHeroIsEmbeddedInSectionHeader
@@ -266,9 +276,11 @@
     XCTAssertNotNil(_container.heroView.titleTextField);
     XCTAssertNotNil(_container.heroView.detailTextField);
     XCTAssertNotNil(_container.heroView.playButton);
+    XCTAssertEqual(_container.heroView.selectionMode, VLCLibraryHeroViewSelectionModeMostRecentVideo);
     XCTAssertEqual(_container.heroView.playButton.target, _container.heroView);
     XCTAssertEqual(_container.heroView.playButton.action, @selector(playRepresentedItem:));
     [self showHero];
+    XCTAssertTrue(_container.hidden);
     [self setRecentItemCount:1];
     [self assertHeroIsEmbeddedInSectionHeader];
 }

@@ -115,8 +115,8 @@ static void * const VLCLibraryHomeVideoHeroContext = (void *)&VLCLibraryHomeVide
     // This nib has no File's Owner connections. Passing the carousel as its
     // owner would reenter setup through awakeFromNib before the data source exists.
     _heroView = [VLCLibraryHeroView fromNibWithOwner:nil];
+    self.heroView.selectionMode = VLCLibraryHeroViewSelectionModeMostRecentVideo;
     [self.heroView addObserver:self forKeyPath:@"representedItem" options:0 context:VLCLibraryHomeVideoHeroContext];
-    [self.heroView setOptimalRepresentedItem];
 
     _dataSource = [[VLCLibraryHomeVideoCarouselDataSource alloc] init];
     _dataSource.collectionViewItemIdentifier = VLCLibraryCarouselCollectionViewItemIdentifier;

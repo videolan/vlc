@@ -21,6 +21,8 @@
  *****************************************************************************/
 
 #import "library/VLCLibraryCarouselCollectionViewItem.h"
+#import "library/VLCLibraryImageCache.h"
+#import "library/VLCLibraryMenuController.h"
 #import "library/VLCLibraryRepresentedItem.h"
 
 // The shared carousel registers its media item even when Browse supplies all
@@ -112,6 +114,37 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
 - (void)moveToTrash
 {
     [NSException raise:NSInternalInconsistencyException format:@"Home tests unexpectedly trashed media"];
+}
+
+@end
+
+@implementation VLCLibraryImageCache
+
++ (void)thumbnailForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
+                 withCompletion:(void (^)(const NSImage *))completionHandler
+{
+    completionHandler([[NSImage alloc] initWithSize:NSMakeSize(1., 1.)]);
+}
+
++ (void)thumbnailForInputItem:(VLCInputItem *)inputItem
+               withCompletion:(void (^)(const NSImage *))completionHandler
+{
+    completionHandler([[NSImage alloc] initWithSize:NSMakeSize(1., 1.)]);
+}
+
++ (void)thumbnailForPlayQueueItem:(VLCPlayQueueItem *)playlistItem
+                   withCompletion:(void (^)(const NSImage *))completionHandler
+{
+    completionHandler([[NSImage alloc] initWithSize:NSMakeSize(1., 1.)]);
+}
+
+@end
+
+@implementation VLCLibraryMenuController
+
+- (void)popupMenuWithEvent:(NSEvent *)theEvent forView:(NSView *)theView
+{
+    [NSException raise:NSInternalInconsistencyException format:@"Home tests unexpectedly displayed a media menu"];
 }
 
 @end

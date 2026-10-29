@@ -50,12 +50,6 @@
 - (IBAction)openCaptureDeviceAction:(id)sender {}
 @end
 
-@implementation VLCLibraryHeroView
-+ (instancetype)fromNibWithOwner:(id)owner { return [[self alloc] initWithFrame:NSZeroRect]; }
-- (void)setOptimalRepresentedItem {}
-- (IBAction)playRepresentedItem:(id)sender {}
-@end
-
 @implementation VLCLibraryHomeViewAudioCarouselContainerView
 - (void)setup {}
 - (void)connect {}
@@ -75,6 +69,9 @@
 @interface VLCHomeRecentlyAddedTestMediaItem : NSObject
 @property int64_t libraryID;
 @property vlc_ml_media_type_t mediaType;
+@property float progress;
+@property (copy) NSString *displayString;
+@property (copy) NSString *primaryDetailString;
 @end
 
 @implementation VLCHomeRecentlyAddedTestMediaItem
@@ -85,6 +82,8 @@ static VLCMediaLibraryMediaItem *VLCHomeRecentlyAddedMediaItem(int64_t libraryID
     VLCHomeRecentlyAddedTestMediaItem * const item = [[VLCHomeRecentlyAddedTestMediaItem alloc] init];
     item.libraryID = libraryID;
     item.mediaType = type;
+    item.displayString = [NSString stringWithFormat:@"Media %lld", libraryID];
+    item.primaryDetailString = @"Media details";
     return (id)item;
 }
 
@@ -107,6 +106,7 @@ static VLCMediaLibraryMediaItem *VLCHomeRecentlyAddedMediaItem(int64_t libraryID
 @property (copy) NSArray<VLCMediaLibraryMediaItem *> *listOfRecentlyAddedVideoMedia;
 @property (copy) NSArray<VLCMediaLibraryMediaItem *> *listOfRecentlyAddedAudioMedia;
 @property (copy) NSArray<VLCMediaLibraryMediaItem *> *listOfRecentMedia;
+@property (copy) NSArray<VLCMediaLibraryMediaItem *> *listOfVideoMedia;
 @property NSUInteger recentAudioCount;
 @end
 
@@ -118,9 +118,15 @@ static VLCMediaLibraryMediaItem *VLCHomeRecentlyAddedMediaItem(int64_t libraryID
     self.listOfRecentlyAddedVideoMedia = @[];
     self.listOfRecentlyAddedAudioMedia = @[];
     self.listOfRecentMedia = @[];
+    self.listOfVideoMedia = @[];
     __weak typeof(self) weakSelf = self;
     [self replaceClassMethod:@selector(sharedInstance) onClass:VLCMain.class withBlock:^id(id __unused receiver) {
         return weakSelf;
+    }];
+    [self replaceClassMethod:@selector(fromNibWithOwner:)
+                     onClass:VLCLibraryHeroView.class
+                   withBlock:^id(id __unused receiver, id owner) {
+        return [weakSelf loadHeroNibWithOwner:owner];
     }];
     [self replaceInstanceMethod:@selector(setup)
                         onClass:VLCLibraryHomeViewMediaContainerViewDataSource.class
@@ -159,6 +165,22 @@ static VLCMediaLibraryMediaItem *VLCHomeRecentlyAddedMediaItem(int64_t libraryID
 - (id)libraryController { return self; }
 - (id)libraryModel { return self; }
 - (NSUInteger)numberOfRecentAudioMedia { return self.recentAudioCount; }
+
+- (VLCLibraryHeroView *)loadHeroNibWithOwner:(id)owner
+{
+    NSBundle * const bundle = [NSBundle bundleForClass:self.class];
+    NSNib * const nib = [[NSNib alloc] initWithNibNamed:@"VLCLibraryHeroView" bundle:bundle];
+    XCTAssertNotNil(nib);
+    NSArray *objects;
+    XCTAssertTrue([nib instantiateWithOwner:owner topLevelObjects:&objects]);
+    for (id object in objects) {
+        if ([object isKindOfClass:VLCLibraryHeroView.class]) {
+            return object;
+        }
+    }
+    XCTFail(@"The real Hero nib must contain its Hero view");
+    return nil;
+}
 
 - (XCTestExpectation *)expectSnapshot:(NSArray<VLCMediaLibraryMediaItem *> *)items
                                inView:(VLCLibraryHomeViewBaseCarouselContainerView *)row

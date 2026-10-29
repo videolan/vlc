@@ -46,8 +46,14 @@
 
 @implementation VLCLibraryHeroView
 
+- (void)dealloc
+{
+    [NSNotificationCenter.defaultCenter removeObserver:self];
+}
+
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     self.largeImageView.contentGravity = VLCImageViewContentGravityResizeAspectFill;
     self.playButton.bezelColor = NSColor.VLCAccentColor;
     self.playButton.font = NSFont.VLCLibrarySubsectionSubheaderFont;
@@ -74,6 +80,13 @@
     const id<VLCMediaLibraryItemProtocol> actualItem = self.representedItem.item;
     self.titleTextField.stringValue = actualItem.displayString;
     self.detailTextField.stringValue = actualItem.primaryDetailString;
+    self.explanationTextField.stringValue = self.selectionMode == VLCLibraryHeroViewSelectionModeMostRecentVideo
+        ? _NS("Last watched")
+        : _NS("From your library");
+    VLCMediaLibraryMediaItem * const mediaItem = (id)actualItem;
+    self.playButton.title = mediaItem.progress > 0. && mediaItem.progress < 1.
+        ? _NS("Resume playing")
+        : _NS("Play now");
 
     __weak typeof(self) weakSelf = self;
     [VLCLibraryImageCache thumbnailForLibraryItem:actualItem withCompletion:^(NSImage * const image) {
@@ -100,12 +113,19 @@
         self.explanationTextField.stringValue = @"";
         self.playButton.title = @"";
         self.menuController.representedItems = @[];
-        [self connectForNewVideo];
         return;
     }
 
-    [self disconnectForNewVideo];
     [self updateRepresentedItem];
+}
+
+- (void)setSelectionMode:(VLCLibraryHeroViewSelectionMode)selectionMode
+{
+    if (_selectionMode == selectionMode) {
+        return;
+    }
+    _selectionMode = selectionMode;
+    [self setOptimalRepresentedItem];
 }
 
 - (VLCMediaLibraryMediaItem *)randomItem
@@ -116,53 +136,23 @@
     if (videoCount == 0) {
         return nil;
     }
-    const uint32_t randIdx = arc4random_uniform((uint32_t)(videoCount - 1));
+    const uint32_t randIdx = arc4random_uniform((uint32_t)videoCount);
     return [videos objectAtIndex:randIdx];
-}
-
-- (VLCMediaLibraryMediaItem *)latestPartiallyPlayedItem
-{
-    VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
-    NSArray<VLCMediaLibraryMediaItem *> * const recentMedia = libraryModel.listOfRecentMedia;
-    const NSUInteger firstPartialPlayItemIdx = [recentMedia indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMediaItem *testedItem, NSUInteger __unused idx, BOOL * const __unused stop) {
-        const float playProgress = testedItem.progress;
-        return playProgress > 0 && playProgress < 100;
-    }];
-
-    if (firstPartialPlayItemIdx == NSNotFound) {
-        return nil;
-    }
-
-    return [recentMedia objectAtIndex:firstPartialPlayItemIdx];
 }
 
 - (void)setOptimalRepresentedItem
 {
-    VLCMediaLibraryMediaItem * const latestPartialPlayItem = self.latestPartiallyPlayedItem;
-    if (latestPartialPlayItem != nil) {
-        const BOOL isVideo = latestPartialPlayItem.mediaType == VLC_ML_MEDIA_TYPE_VIDEO;
-        const VLCMediaLibraryParentGroupType parentType = isVideo ? VLCMediaLibraryParentGroupTypeRecentVideos : VLCMediaLibraryParentGroupTypeAudioLibrary;
-        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:latestPartialPlayItem parentType:parentType];
-
-        self.representedItem = representedItem;
-        self.explanationTextField.stringValue = _NS("Last watched");
-        self.playButton.title = _NS("Resume playing");
+    VLCMediaLibraryMediaItem * const mediaItem = self.selectionMode == VLCLibraryHeroViewSelectionModeMostRecentVideo
+        ? VLCMain.sharedInstance.libraryController.libraryModel.listOfRecentMedia.firstObject
+        : self.randomItem;
+    if (mediaItem == nil) {
+        self.representedItem = nil;
         return;
     }
-
-    VLCMediaLibraryMediaItem * const randomItem = self.randomItem;
-    if (randomItem != nil) {
-        const BOOL isVideo = randomItem.mediaType == VLC_ML_MEDIA_TYPE_VIDEO;
-        const VLCMediaLibraryParentGroupType parentType = isVideo ? VLCMediaLibraryParentGroupTypeVideoLibrary : VLCMediaLibraryParentGroupTypeAudioLibrary;
-        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:randomItem parentType:parentType];
-
-        self.representedItem = representedItem;
-        self.explanationTextField.stringValue = _NS("From your library");
-        self.playButton.title = _NS("Play now");
-        return;
-    }
-
-    self.representedItem = nil;
+    const VLCMediaLibraryParentGroupType parentType = self.selectionMode == VLCLibraryHeroViewSelectionModeMostRecentVideo
+        ? VLCMediaLibraryParentGroupTypeRecentVideos
+        : VLCMediaLibraryParentGroupTypeVideoLibrary;
+    self.representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:mediaItem parentType:parentType];
 }
 
 - (IBAction)playRepresentedItem:(id)sender
@@ -170,47 +160,59 @@
     [self.representedItem play];
 }
 
-- (void)connectForNewVideo
-{
-    [self disconnectForNewVideo];
-    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
-    [notificationCenter addObserver:self
-                           selector:@selector(newVideosAvailable:)
-                               name:VLCLibraryModelVideoMediaListReset
-                             object:nil];
-    [notificationCenter addObserver:self
-                           selector:@selector(newVideosAvailable:)
-                               name:VLCLibraryModelRecentsMediaListReset
-                             object:nil];
-    [notificationCenter addObserver:self
-                           selector:@selector(newVideosAvailable:)
-                               name:VLCLibraryModelAllCachesDropped
-                             object:nil];
-}
-
-- (void)disconnectForNewVideo
-{
-    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
-    [notificationCenter removeObserver:self name:VLCLibraryModelVideoMediaListReset object:nil];
-    [notificationCenter removeObserver:self name:VLCLibraryModelRecentsMediaListReset object:nil];
-    [notificationCenter removeObserver:self name:VLCLibraryModelAllCachesDropped object:nil];
-}
-
 - (void)newVideosAvailable:(NSNotification *)notification
 {
-    [self setOptimalRepresentedItem];
+    if (self.selectionMode == VLCLibraryHeroViewSelectionModeMostRecentVideo || self.representedItem == nil) {
+        [self setOptimalRepresentedItem];
+        return;
+    }
+    if ([notification.name isEqualToString:VLCLibraryModelRecentsMediaListReset]) {
+        return;
+    }
+
+    // Keep a random recommendation stable while the library refreshes. Replace
+    // it only when it disappears, while still refreshing its metadata.
+    const int64_t selectedID = self.representedItem.item.libraryID;
+    NSArray<VLCMediaLibraryMediaItem *> * const videos = VLCMain.sharedInstance.libraryController.libraryModel.listOfVideoMedia;
+    if (videos.count == 0) {
+        self.representedItem = nil;
+        return;
+    }
+    const NSUInteger selectedIndex = [videos indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMediaItem *item, NSUInteger __unused index, BOOL * __unused stop) {
+        return item.libraryID == selectedID;
+    }];
+    if (selectedIndex == NSNotFound) {
+        [self setOptimalRepresentedItem];
+    } else {
+        self.representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:videos[selectedIndex]
+                                                                    parentType:VLCMediaLibraryParentGroupTypeVideoLibrary];
+    }
 }
 
 - (void)connectItemUpdaters
 {
     NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+    [notificationCenter removeObserver:self];
+    for (NSNotificationName name in @[VLCLibraryModelVideoMediaListReset,
+                                      VLCLibraryModelRecentsMediaListReset,
+                                      VLCLibraryModelAllCachesDropped]) {
+        [notificationCenter addObserver:self selector:@selector(newVideosAvailable:) name:name object:nil];
+    }
     [notificationCenter addObserver:self
                            selector:@selector(itemUpdated:)
                                name:VLCLibraryModelVideoMediaItemUpdated
                              object:nil];
     [notificationCenter addObserver:self
+                           selector:@selector(itemUpdated:)
+                               name:VLCLibraryModelRecentsMediaItemUpdated
+                             object:nil];
+    [notificationCenter addObserver:self
                            selector:@selector(itemDeleted:)
                                name:VLCLibraryModelVideoMediaItemDeleted
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(itemDeleted:)
+                               name:VLCLibraryModelRecentsMediaItemDeleted
                              object:nil];
 }
 
@@ -218,11 +220,11 @@
 {
     VLCMediaLibraryMediaItem * const mediaItem = notification.object;
     NSAssert(mediaItem != nil, @"Notification should contain a media item!");
-    if (mediaItem.libraryID != self.representedItem.item.libraryID) {
-        return;
-    } else if (mediaItem.progress == 0 || mediaItem.progress == 100 || mediaItem.playCount == 0) {
-        // If the item is now unplayed or fully played, it is not optimal anymore
+    if (self.selectionMode == VLCLibraryHeroViewSelectionModeMostRecentVideo || self.representedItem == nil) {
         [self setOptimalRepresentedItem];
+        return;
+    }
+    if (mediaItem.libraryID != self.representedItem.item.libraryID) {
         return;
     }
 
@@ -236,7 +238,8 @@
 {
     VLCMediaLibraryMediaItem * const mediaItem = notification.object;
     NSAssert(mediaItem != nil, @"Notification should contain a media item!");
-    if (mediaItem.libraryID != self.representedItem.item.libraryID) {
+    if (self.selectionMode != VLCLibraryHeroViewSelectionModeMostRecentVideo &&
+        mediaItem.libraryID != self.representedItem.item.libraryID) {
         return;
     }
 
