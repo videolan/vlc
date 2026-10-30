@@ -566,14 +566,23 @@ static void stream_StopResampling(vlc_aout_stream *stream)
     aout_FiltersAdjustResampling (stream->filters, 0);
 }
 
+static void stream_Play(audio_output_t *aout, block_t *block,
+                        vlc_tick_t date)
+{
+    /* Output modules don't handle empty blocks */
+    assert(block->i_buffer > 0);
+    aout->play(aout, block, date);
+}
+
 static void stream_Silence (vlc_aout_stream *stream, vlc_tick_t length, vlc_tick_t pts)
 {
+    assert(length > 0);
     audio_output_t *aout = aout_stream_aout(stream);
     const audio_sample_format_t *fmt = &stream->mixer_format;
     size_t frames = samples_from_vlc_tick(length, fmt->i_rate);
+    size_t size = frames * fmt->i_bytes_per_frame / fmt->i_frame_length;
 
-    block_t *block = block_Alloc (frames * fmt->i_bytes_per_frame
-                                  / fmt->i_frame_length);
+    block_t *block = block_Alloc (size);
     if (unlikely(block == NULL))
         return; /* uho! */
 
@@ -591,7 +600,7 @@ static void stream_Silence (vlc_aout_stream *stream, vlc_tick_t length, vlc_tick
                                  stream->sync.rate, NULL);
     vlc_clock_Unlock(stream->sync.clock);
     stream->timing.played_samples += block->i_nb_samples;
-    aout->play(aout, block, system_pts);
+    stream_Play(aout, block, system_pts);
 }
 
 static void stream_HandleDrift(vlc_aout_stream *stream, vlc_tick_t drift,
@@ -913,7 +922,7 @@ int vlc_aout_stream_Play(vlc_aout_stream *stream, block_t *block)
     /* Output */
     stream->sync.played = true;
     stream->timing.played_samples += block->i_nb_samples;
-    aout->play(aout, block, play_date);
+    stream_Play(aout, block, play_date);
 
     atomic_fetch_add_explicit(&stream->buffers_played, 1, memory_order_relaxed);
     return ret;
@@ -1057,7 +1066,7 @@ void vlc_aout_stream_Drain(vlc_aout_stream *stream)
         {
             assert (block->i_pts != VLC_TICK_INVALID);
             stream->timing.played_samples += block->i_nb_samples;
-            aout->play(aout, block, vlc_tick_now());
+            stream_Play(aout, block, vlc_tick_now());
         }
     }
 
