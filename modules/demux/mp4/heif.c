@@ -612,14 +612,17 @@ static int LoadGridImage( demux_t *p_demux,
     const unsigned tileheight = p_picture->format.i_visible_height;
     const unsigned offsetpxw = (tile % gridcols) * tilewidth;
     const unsigned offsetpxh = (tile / gridcols) * tileheight;
-    if (i_buffer < offsetpxh * imagewidth * 4)
+    unsigned offset_len;
+    if (ckd_mul(&offset_len, offsetpxh, imagewidth) ||
+        ckd_mul(&offset_len, offset_len, 4) ||
+        i_buffer < offset_len)
     {
         picture_Release( p_picture );
         return VLC_EINVAL;
     }
 
-    size_t dst_size = i_buffer - offsetpxh * imagewidth * 4;
-    uint8_t *dstline = &p_buffer[offsetpxh * imagewidth * 4];
+    size_t dst_size = i_buffer - offset_len;
+    uint8_t *dstline = &p_buffer[offset_len];
     if( offsetpxw <= imagewidth )
     {
         const uint8_t *srcline = p_picture->p[0].p_pixels +
