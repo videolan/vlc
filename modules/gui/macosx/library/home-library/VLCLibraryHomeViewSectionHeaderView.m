@@ -43,6 +43,7 @@
 @interface VLCLibraryHomeViewSectionHeaderView ()
 
 @property (readonly) NSTextField *countField;
+@property (readonly) NSTextField *titleField;
 
 @end
 
@@ -69,6 +70,7 @@
 - (void)setupView
 {
     _countField = [self labelWithFont:NSFont.VLCLibrarySubsectionSubheaderFont textColor:NSColor.secondaryLabelColor];
+    _titleField = [self labelWithFont:NSFont.VLClibrarySectionHeaderFont textColor:NSColor.labelColor];
     _libraryButton = [NSButton buttonWithTitle:@"" target:nil action:nil];
     self.libraryButton.cell = [[VLCLibraryHomeViewSectionHeaderButtonCell alloc] initTextCell:@""];
     [self.libraryButton setButtonType:NSButtonTypeMomentaryPushIn];
@@ -98,6 +100,7 @@
     [self.countField setContentCompressionResistancePriority:NSLayoutPriorityRequired
                                              forOrientation:NSLayoutConstraintOrientationHorizontal];
     [self addSubview:self.libraryButton];
+    [self addSubview:self.titleField];
     [self addSubview:self.countField];
 
     [NSLayoutConstraint activateConstraints:@[
@@ -105,11 +108,25 @@
         [self.libraryButton.trailingAnchor constraintLessThanOrEqualToAnchor:self.countField.leadingAnchor constant:-VLCUIUnits.largeSpacing],
         [self.libraryButton.topAnchor constraintEqualToAnchor:self.topAnchor],
         [self.libraryButton.bottomAnchor constraintEqualToAnchor:self.bottomAnchor],
+        [self.titleField.leadingAnchor constraintEqualToAnchor:self.leadingAnchor],
+        [self.titleField.trailingAnchor constraintLessThanOrEqualToAnchor:self.countField.leadingAnchor constant:-VLCUIUnits.largeSpacing],
+        [self.titleField.firstBaselineAnchor constraintEqualToAnchor:self.libraryButton.firstBaselineAnchor],
+        [self.titleField.topAnchor constraintGreaterThanOrEqualToAnchor:self.topAnchor],
+        [self.titleField.bottomAnchor constraintLessThanOrEqualToAnchor:self.bottomAnchor],
         [self.countField.trailingAnchor constraintEqualToAnchor:self.trailingAnchor],
         [self.countField.centerYAnchor constraintEqualToAnchor:self.libraryButton.centerYAnchor],
         [self.countField.topAnchor constraintGreaterThanOrEqualToAnchor:self.topAnchor],
         [self.countField.bottomAnchor constraintLessThanOrEqualToAnchor:self.bottomAnchor],
     ]];
+    self.navigable = YES;
+}
+
+- (void)setNavigable:(BOOL)navigable
+{
+    _navigable = navigable;
+    self.libraryButton.hidden = !navigable;
+    self.libraryButton.enabled = navigable;
+    self.titleField.hidden = navigable;
 }
 
 - (NSTextField *)labelWithFont:(NSFont *)font textColor:(NSColor *)textColor
@@ -128,6 +145,7 @@
 - (void)setTitle:(NSString *)title
 {
     _title = [title copy];
+    self.titleField.stringValue = title;
     self.libraryButton.title = title;
     self.libraryButton.accessibilityLabel = [NSString stringWithFormat:_NS("Open %@ in the library"), title];
     self.libraryButton.toolTip = self.libraryButton.accessibilityLabel;

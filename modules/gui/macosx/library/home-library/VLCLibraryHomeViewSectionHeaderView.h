@@ -28,6 +28,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readwrite, copy, nonatomic) NSString *title;
 @property (readwrite, nonatomic) NSUInteger itemCount;
+// Defaults to YES; non-navigable headings use a plain text label.
+@property (readwrite, nonatomic) BOOL navigable;
 @property (readonly) NSButton *libraryButton;
 
 @end

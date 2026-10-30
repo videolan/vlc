@@ -18,6 +18,7 @@
 
 @interface VLCLibraryHomeViewSectionHeaderView (TestAccess)
 @property (readonly) NSTextField *countField;
+@property (readonly) NSTextField *titleField;
 @end
 
 @interface VLCLibraryHomeViewSectionHeaderViewTest : XCTestCase
@@ -70,7 +71,8 @@
 
 - (void)assertContentFitsHeader
 {
-    for (NSView *view in @[self.header.countField, self.header.libraryButton]) {
+    NSView * const titleView = self.header.navigable ? self.header.libraryButton : self.header.titleField;
+    for (NSView *view in @[self.header.countField, titleView]) {
         // Native controls include drawing margins outside their alignment rect.
         const NSRect alignmentRect = [view alignmentRectForFrame:view.frame];
         const NSRect contentRect = [view.superview convertRect:alignmentRect toView:self.header];
@@ -151,10 +153,66 @@
     }
     XCTAssertNotNil(self.header.libraryButton.image);
     XCTAssertEqual(self.header.libraryButton.imagePosition, NSImageTrailing);
-    XCTAssertEqual(self.header.subviews.count, (NSUInteger)2);
+    XCTAssertEqual(self.header.subviews.count, (NSUInteger)3);
+    XCTAssertTrue(self.header.navigable);
+    XCTAssertTrue(self.header.titleField.hidden);
     XCTAssertEqual(self.header.libraryButton.superview, self.header);
     XCTAssertEqual(self.header.countField.superview, self.header);
     XCTAssertLessThan(self.header.libraryButton.frame.size.width, self.header.frame.size.width);
+}
+
+- (void)testStaticTitleKeepsNormalAppearanceWithoutButtonInteraction
+{
+    self.header.libraryButton.target = self;
+    self.header.libraryButton.action = @selector(openLibrary:);
+    self.header.navigable = NO;
+    self.header.title = @"Recently added";
+    [self.window.contentView layoutSubtreeIfNeeded];
+
+    XCTAssertFalse(self.header.titleField.hidden);
+    XCTAssertTrue(self.header.titleField.enabled);
+    XCTAssertEqualObjects(self.header.titleField.stringValue, self.header.title);
+    XCTAssertEqualObjects(self.header.titleField.font, self.header.libraryButton.font);
+    XCTAssertEqualObjects(self.header.titleField.textColor, NSColor.labelColor);
+    XCTAssertFalse(self.header.titleField.editable);
+    XCTAssertFalse(self.header.titleField.selectable);
+    XCTAssertEqualObjects(self.header.titleField.cell.accessibilityRole, NSAccessibilityStaticTextRole);
+    XCTAssertEqualObjects(self.header.titleField.cell.accessibilityValue, self.header.title);
+    XCTAssertTrue([self.header.accessibilityChildren containsObject:self.header.titleField.cell]);
+    XCTAssertTrue(self.header.libraryButton.hidden);
+    XCTAssertFalse([self.header.accessibilityChildren containsObject:self.header.libraryButton.cell]);
+    [self.header.libraryButton performClick:nil];
+    XCTAssertEqual(self.actionCount, (NSUInteger)0);
+    [self assertContentFitsHeader];
+
+    self.header.navigable = YES;
+    XCTAssertTrue(self.header.titleField.hidden);
+    XCTAssertFalse(self.header.libraryButton.hidden);
+    XCTAssertTrue(self.header.libraryButton.enabled);
+    XCTAssertNotNil(self.header.libraryButton.image);
+    XCTAssertEqualObjects(self.header.libraryButton.title, @"Recently added");
+    XCTAssertFalse([self.header.accessibilityChildren containsObject:self.header.titleField.cell]);
+    XCTAssertTrue([self.header.accessibilityChildren containsObject:self.header.libraryButton.cell]);
+    [self.header.libraryButton performClick:nil];
+    XCTAssertEqual(self.actionCount, (NSUInteger)1);
+}
+
+- (void)testStaticTitleTruncatesWithoutObscuringTheCount
+{
+    self.header.title = @"A very long recently added collection section title";
+    self.header.navigable = NO;
+    self.widthConstraint.constant = 320;
+    for (NSNumber *count in @[@0, @1, @(NSUIntegerMax), @2]) {
+        self.header.itemCount = count.unsignedIntegerValue;
+        [self.window.contentView layoutSubtreeIfNeeded];
+        [self assertContentFitsHeader];
+        const NSRect titleRect = [self.header.titleField alignmentRectForFrame:self.header.titleField.frame];
+        const NSRect countRect = [self.header.countField alignmentRectForFrame:self.header.countField.frame];
+        XCTAssertLessThanOrEqual(NSMaxX(titleRect), NSMinX(countRect));
+        XCTAssertEqualWithAccuracy(NSMaxX(countRect), NSMaxX(self.header.bounds), 0.5);
+    }
+    XCTAssertLessThan(self.header.titleField.frame.size.width, self.header.titleField.intrinsicContentSize.width);
+    XCTAssertEqual(self.header.titleField.lineBreakMode, NSLineBreakByTruncatingTail);
 }
 
 - (void)testNarrowHeaderTruncatesTitleAndKeepsCountAtTrailingEdge
