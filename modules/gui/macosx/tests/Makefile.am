@@ -56,6 +56,7 @@ VLCMacOSXTests_SOURCES = \
 	gui/macosx/library/home-library/VLCLibraryHomeViewBaseCarouselContainerView.m \
 	gui/macosx/library/home-library/VLCLibraryHomeViewVideoContainerViewDataSource.m \
 	gui/macosx/library/video-library/VLCLibraryVideoGroupDescriptor.m \
+	gui/macosx/library/home-library/VLCLibraryHomeViewRecentlyAddedCarouselContainerView.m \
 	gui/macosx/library/home-library/VLCLibraryHomeViewBrowseCarouselContainerView.m \
 	gui/macosx/library/home-library/VLCLibraryHomeViewBrowseCarouselItemCell.m \
 	gui/macosx/library/home-library/VLCLibraryHomeViewBrowseCarouselItemView.m \
