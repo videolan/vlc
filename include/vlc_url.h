@@ -152,8 +152,8 @@ struct vlc_url_t
     char *psz_option;
     char *psz_fragment;
 
-    char *psz_buffer; /* to be freed */
-    char *psz_pathbuffer; /* to be freed */
+    void *psz_buffer; /* to be freed */
+    void *psz_pathbuffer; /* to be freed */
 };
 
 /**
