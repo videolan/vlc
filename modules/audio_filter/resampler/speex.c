@@ -173,6 +173,15 @@ static block_t *Resample (filter_t *filter, block_t *in)
         msg_Err (filter, "lost %"PRIu32" of %u input frames",
                  in->i_nb_samples - ilen, in->i_nb_samples);
 
+    /* The resampler can keep all the input frames: never return an empty
+     * block */
+    if (olen == 0)
+    {
+        block_Release (out);
+        out = NULL;
+        goto error;
+    }
+
     out->i_buffer = olen * framesize;
     out->i_nb_samples = olen;
     out->i_pts = in->i_pts;
