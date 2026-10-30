@@ -691,11 +691,8 @@ static int parseURL( vlc_object_t *p_obj, vlc_url_t *url, const char *path, enum
     /* FTP URLs are relative to user's default directory (RFC1738 §3.2)
     For absolute path use ftp://foo.bar//usr/local/etc/filename */
     /* FIXME: we should issue a series of CWD, one per slash */
-    if( url->psz_path )
-    {
-        assert( url->psz_path[0] == '/' );
-        url->psz_path++;
-    }
+    assert( url->psz_path[0] == '/' );
+    url->psz_path++;
 
     char *type = strstr( url->psz_path, ";type=" );
     if( type )
