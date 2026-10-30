@@ -634,6 +634,7 @@ static void Close(vout_display_t *vd)
         if (sys->asc.previous_picture != NULL)
             picture_Release(sys->asc.previous_picture);
         asc_api->ASurfaceControl.release(sys->asc.sc);
+        AWindowHandler_releaseANativeWindow(sys->awh, AWindow_Video);
     }
 
     if (sys->sub.window != NULL)
