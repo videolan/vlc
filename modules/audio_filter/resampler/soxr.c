@@ -296,6 +296,11 @@ SoXR_Resample( filter_t *p_filter, soxr_t soxr, block_t *p_in, size_t i_olen )
         p_sys->last_soxr = NULL;
     }
 
+    /* SoXR can keep all the input frames to fill its filter: never return an
+     * empty block */
+    if( i_odone == 0 )
+        goto drop;
+
     if( p_in && p_out != p_in )
         block_Release( p_in );
 
@@ -367,16 +372,9 @@ Resample( filter_t *p_filter, block_t *p_in )
     {
         assert( !p_out );
         p_out = SoXR_Resample( p_filter, soxr, p_in, i_olen );
-        if( !p_out )
-        {
-            /* p_in is released by SoXR_Resample() */
-            if( p_flushed_out )
-                block_Release( p_flushed_out );
-            return NULL;
-        }
     }
 
-    if( p_flushed_out )
+    if( p_flushed_out && p_out )
     {
         /* Prepend the flushed output data to p_out */
         const unsigned i_nb_samples = p_flushed_out->i_nb_samples
@@ -391,6 +389,11 @@ Resample( filter_t *p_filter, block_t *p_in )
         }
         p_out->i_nb_samples = i_nb_samples;
     }
+    else if( p_flushed_out )
+        p_out = p_flushed_out;
+
+    if( !p_out )
+        return NULL;
     p_out->i_pts = i_pts;
     return p_out;
 }
