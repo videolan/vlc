@@ -23,6 +23,8 @@
 
 #import "NSView+VLCAdditions.h"
 
+#import <QuartzCore/QuartzCore.h>
+
 #import "NSAppearance+VLCAdditions.h"
 
 #import "views/VLCUIUnits.h"
@@ -59,6 +61,13 @@
 - (BOOL)shouldShowDarkAppearance
 {
     return self.effectiveAppearance.shouldShowDarkAppearance;
+}
+
+- (void)vlc_clipToRoundedCornersWithRadius:(CGFloat)radius
+{
+    self.wantsLayer = YES;
+    self.layer.cornerRadius = radius;
+    self.layer.masksToBounds = YES;
 }
 
 - (void)enableSubviews:(BOOL)enabled

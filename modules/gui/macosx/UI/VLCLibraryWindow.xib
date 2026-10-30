@@ -194,9 +194,13 @@
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="SM6-nx-NKD" customClass="VLCTrackingView">
                                                 <rect key="frame" x="0.0" y="0.0" width="40" height="40"/>
                                                 <subviews>
-                                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="5o7-Z0-dqS" userLabel="Artwork image view" customClass="VLCImageView">
+                                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="5o7-Z0-dqS" userLabel="Artwork container">
                                                         <rect key="frame" x="0.0" y="0.0" width="40" height="40"/>
                                                         <subviews>
+                                                            <imageView translatesAutoresizingMaskIntoConstraints="NO" id="VIm-G3-dv1" userLabel="Artwork image view" customClass="VLCImageView">
+                                                                <rect key="frame" x="0.0" y="0.0" width="40" height="40"/>
+                                                                <imageCell key="cell" refusesFirstResponder="YES" imageScaling="proportionallyUpOrDown" id="viN-03-CEl"/>
+                                                            </imageView>
                                                             <box boxType="custom" borderType="none" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="CzG-0S-Kke">
                                                                 <rect key="frame" x="0.0" y="0.0" width="40" height="40"/>
                                                                 <view key="contentView" id="xiz-t0-wHG">
@@ -256,6 +260,10 @@
                                                             </box>
                                                         </subviews>
                                                         <constraints>
+                                                            <constraint firstItem="VIm-G3-dv1" firstAttribute="leading" secondItem="5o7-Z0-dqS" secondAttribute="leading" id="vIm-03-l01"/>
+                                                            <constraint firstAttribute="trailing" secondItem="VIm-G3-dv1" secondAttribute="trailing" id="vIm-03-t01"/>
+                                                            <constraint firstItem="VIm-G3-dv1" firstAttribute="top" secondItem="5o7-Z0-dqS" secondAttribute="top" id="vIm-03-t02"/>
+                                                            <constraint firstAttribute="bottom" secondItem="VIm-G3-dv1" secondAttribute="bottom" id="vIm-03-b01"/>
                                                             <constraint firstAttribute="width" secondItem="5o7-Z0-dqS" secondAttribute="height" multiplier="1:1" id="0jj-cr-D72"/>
                                                             <constraint firstAttribute="height" constant="40" id="DYU-eT-dYg"/>
                                                             <constraint firstItem="CzG-0S-Kke" firstAttribute="leading" secondItem="5o7-Z0-dqS" secondAttribute="leading" id="LLd-6R-Tgh"/>
@@ -774,7 +782,7 @@
         </window>
         <customObject id="Uzf-Tf-H8x" userLabel="Detached Window Controls Bar" customClass="VLCMainWindowControlsBar">
             <connections>
-                <outlet property="artworkImageView" destination="5o7-Z0-dqS" id="Pns-yT-lKx"/>
+                <outlet property="artworkImageView" destination="VIm-G3-dv1" id="Pns-yT-lKx"/>
                 <outlet property="backwardButton" destination="jGc-Xw-GYI" id="0AG-44-SN3"/>
                 <outlet property="bottomBarView" destination="vUy-jt-gjY" id="WqX-SW-mpv"/>
                 <outlet property="dropView" destination="MQH-bI-Zdh" id="Wz9-NB-wtE"/>

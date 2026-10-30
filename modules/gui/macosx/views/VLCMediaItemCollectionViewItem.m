@@ -26,6 +26,7 @@
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSView+VLCAdditions.h"
 
 #import "views/VLCImageView.h"
 #import "views/VLCLinearProgressIndicator.h"
@@ -59,6 +60,9 @@ const CGFloat VLCMediaItemCollectionViewItemMaximumDisplayedProgress = 0.95;
 
 - (void)awakeFromNib
 {
+    // Clip the progress overlay to the same rounded artwork bounds.
+    [self.mediaImageView.superview vlc_clipToRoundedCornersWithRadius:VLCUIUnits.cornerRadius];
+
     if (@available(macOS 26.0, *)) {
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
         self.playInstantlyButton.bordered = YES;

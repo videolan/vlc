@@ -98,13 +98,14 @@
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <customView translatesAutoresizingMaskIntoConstraints="NO" id="Ydb-7n-5Cd" customClass="VLCImageView">
+                <imageView translatesAutoresizingMaskIntoConstraints="NO" id="Ydb-7n-5Cd" customClass="VLCImageView">
                     <rect key="frame" x="20" y="326" width="104" height="104"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="104" id="Azf-OD-SUU"/>
                         <constraint firstAttribute="width" constant="104" id="m0o-Ct-VQF"/>
                     </constraints>
-                </customView>
+                    <imageCell key="cell" refusesFirstResponder="YES" imageScaling="proportionallyUpOrDown" id="viN-01-CEl"/>
+                </imageView>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="KVh-Zn-l7I">
                     <rect key="frame" x="40" y="346" width="64" height="64"/>
                     <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="libraryPlay" imagePosition="only" alignment="center" inset="2" id="oLK-Ll-w7g">

@@ -37,9 +37,8 @@ typedef NS_ENUM(NSInteger, VLCImageViewContentGravity) {
     VLCImageViewContentGravityResizeAspectFill,
 };
 
-@interface VLCImageView : NSView
+@interface VLCImageView : NSImageView
 
-@property (readwrite, retain, nonatomic, nullable) NSImage *image;
 @property (readwrite, nonatomic) VLCImageViewContentGravity contentGravity;
 @property (readwrite) BOOL cropsImagesToRoundedCorners;
 

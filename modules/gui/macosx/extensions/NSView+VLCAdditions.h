@@ -33,6 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) BOOL shouldShowDarkAppearance;
 
 - (void)enableSubviews:(BOOL)enabled;
+- (void)vlc_clipToRoundedCornersWithRadius:(CGFloat)radius;
 - (NSArray<NSLayoutConstraint *> *)constraintsToFillView:(NSView *)view activate:(BOOL)activate;
 - (NSArray<NSLayoutConstraint *> *)applyConstraintsToFillSuperview;
 

@@ -10,7 +10,7 @@
                 <outlet property="annotationTextField" destination="isd-eb-9XW" id="fvc-2y-amx"/>
                 <outlet property="detailTextField" destination="orq-rq-pBK" id="czh-aO-pe4"/>
                 <outlet property="highlightBox" destination="gbr-Zj-SfM" id="0nG-FQ-W3p"/>
-                <outlet property="coverImageView" destination="6QI-EH-rMu" id="B23-fp-a2H"/>
+                <outlet property="coverImageView" destination="VIm-G1-dv1" id="B23-fp-a2H"/>
                 <outlet property="progressIndicator" destination="yL8-2q-Oke" id="Pys-e7-wrU"/>
                 <outlet property="titleTextField" destination="CKr-3L-pMu" id="ot4-iB-tBK"/>
             </connections>
@@ -21,9 +21,13 @@
             <rect key="frame" x="0.0" y="0.0" width="468" height="454"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <customView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6QI-EH-rMu" customClass="VLCImageView">
+                <customView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6QI-EH-rMu">
                     <rect key="frame" x="0.0" y="0.0" width="468" height="454"/>
                     <subviews>
+                        <imageView translatesAutoresizingMaskIntoConstraints="NO" id="VIm-G1-dv1" customClass="VLCImageView">
+                            <rect key="frame" x="0.0" y="0.0" width="468" height="454"/>
+                            <imageCell key="cell" refusesFirstResponder="YES" imageScaling="proportionallyUpOrDown" id="viN-01-CEl"/>
+                        </imageView>
                         <customView translatesAutoresizingMaskIntoConstraints="NO" id="a6H-E2-egy" customClass="VLCMainVideoViewOverlayView">
                             <rect key="frame" x="0.0" y="0.0" width="468" height="454"/>
                         </customView>
@@ -51,6 +55,10 @@
                         </box>
                     </subviews>
                     <constraints>
+                        <constraint firstItem="VIm-G1-dv1" firstAttribute="leading" secondItem="6QI-EH-rMu" secondAttribute="leading" id="vIm-01-l01"/>
+                        <constraint firstAttribute="trailing" secondItem="VIm-G1-dv1" secondAttribute="trailing" id="vIm-01-t01"/>
+                        <constraint firstItem="VIm-G1-dv1" firstAttribute="top" secondItem="6QI-EH-rMu" secondAttribute="top" id="vIm-01-t02"/>
+                        <constraint firstAttribute="bottom" secondItem="VIm-G1-dv1" secondAttribute="bottom" id="vIm-01-b01"/>
                         <constraint firstItem="a6H-E2-egy" firstAttribute="leading" secondItem="6QI-EH-rMu" secondAttribute="leading" id="1hR-0Z-EtS"/>
                         <constraint firstAttribute="trailing" secondItem="gbr-Zj-SfM" secondAttribute="trailing" id="CNq-Da-ilA"/>
                         <constraint firstAttribute="bottom" secondItem="a6H-E2-egy" secondAttribute="bottom" id="DKA-QP-duD"/>

@@ -12,9 +12,10 @@
         <customView wantsLayer="YES" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="LPV-K6-7AE" customClass="VLCLibraryHeroView">
             <rect key="frame" x="0.0" y="0.0" width="833" height="357"/>
             <subviews>
-                <customView horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="qdP-As-qZ0" customClass="VLCImageView">
+                <imageView horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="qdP-As-qZ0" customClass="VLCImageView">
                     <rect key="frame" x="0.0" y="0.0" width="833" height="357"/>
-                </customView>
+                    <imageCell key="cell" refusesFirstResponder="YES" imageScaling="proportionallyUpOrDown" id="viN-01-CEl"/>
+                </imageView>
                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="GoN-QI-mru">
                     <rect key="frame" x="14" y="313" width="155" height="28"/>
                     <shadow key="shadow" blurRadius="20">

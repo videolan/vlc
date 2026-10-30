@@ -26,7 +26,6 @@
 
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSView+VLCAdditions.h"
-
 #import "views/VLCUIUnits.h"
 
 @interface VLCImageView()
@@ -57,41 +56,19 @@
 
 - (void)setup
 {
+    self.imageFrameStyle = NSImageFrameNone;
+    self.editable = NO;
     self.wantsLayer = YES;
-    self.layerContentsRedrawPolicy = NSViewLayerContentsRedrawOnSetNeedsDisplay;
-    self.contentGravity = VLCImageViewContentGravityResizeAspectFill;
     self.cropsImagesToRoundedCorners = YES;
-    self.needsDisplay = YES;
-}
-
-- (void)updateLayer
-{
-    self.layer.borderColor = self.shouldShowDarkAppearance ? NSColor.VLCDarkSubtleBorderColor.CGColor : NSColor.VLCLightSubtleBorderColor.CGColor;
-    [self updateLayerImageCornerCropping];
-    [self updateLayerContentGravity];
-    [self updateLayerImage];
-}
-
-- (BOOL)wantsUpdateLayer
-{
-    return YES;
-}
-
-- (void)updateLayerImageCornerCropping
-{
-    if (self.cropsImagesToRoundedCorners) {
-        self.layer.cornerRadius = VLCUIUnits.cornerRadius;
-        self.layer.borderWidth = VLCUIUnits.borderThickness;
-    } else {
-        self.layer.cornerRadius = 0.;
-        self.layer.borderWidth = 0.;
-    }
+    [self updateBorderColor];
+    self.contentGravity = VLCImageViewContentGravityResizeAspectFill;
 }
 
 - (void)setCropsImagesToRoundedCorners:(BOOL)cropsImagesToRoundedCorners
 {
     self.layer.masksToBounds = cropsImagesToRoundedCorners;
-    [self updateLayerImageCornerCropping];
+    self.layer.cornerRadius = cropsImagesToRoundedCorners ? VLCUIUnits.cornerRadius : 0.;
+    self.layer.borderWidth = cropsImagesToRoundedCorners ? VLCUIUnits.borderThickness : 0.;
 }
 
 - (BOOL)cropsImagesToRoundedCorners
@@ -99,71 +76,97 @@
     return self.layer.masksToBounds;
 }
 
-- (void)updateLayerImage
+- (void)updateBorderColor
 {
-    const CGFloat desiredScaleFactor = [self.window backingScaleFactor];
-    const CGFloat actualScaleFactor = [_image recommendedLayerContentsScale:desiredScaleFactor];
-
-    const id layerContents = [_image layerContentsForContentsScale:actualScaleFactor];
-
-    [self updateLayerContentGravity];
-    self.layer.contents = layerContents;
-    self.layer.contentsScale = actualScaleFactor;
+    self.layer.borderColor = self.shouldShowDarkAppearance ? NSColor.VLCDarkSubtleBorderColor.CGColor : NSColor.VLCLightSubtleBorderColor.CGColor;
 }
 
-- (void)setImage:(NSImage *)image
+- (void)viewDidChangeEffectiveAppearance
 {
-    _image = image;
-    [self updateLayerImage];
+    [super viewDidChangeEffectiveAppearance];
+    [self updateBorderColor];
 }
 
-- (void)updateLayerContentGravity
-{
-    switch (_contentGravity) {
-        case VLCImageViewContentGravityCenter:
-            self.layer.contentsGravity = kCAGravityCenter;
-            break;
-        case VLCImageViewContentGravityTop:
-            self.layer.contentsGravity = kCAGravityTop;
-            break;
-        case VLCImageViewContentGravityBottom:
-            self.layer.contentsGravity = kCAGravityBottom;
-            break;
-        case VLCImageViewContentGravityLeft:
-            self.layer.contentsGravity = kCAGravityLeft;
-            break;
-        case VLCImageViewContentGravityRight:
-            self.layer.contentsGravity = kCAGravityRight;
-            break;
-        case VLCImageViewContentGravityTopLeft:
-            self.layer.contentsGravity = kCAGravityTopLeft;
-            break;
-        case VLCImageViewContentGravityTopRight:
-            self.layer.contentsGravity = kCAGravityTopRight;
-            break;
-        case VLCImageViewContentGravityBottomLeft:
-            self.layer.contentsGravity = kCAGravityBottomLeft;
-            break;
-        case VLCImageViewContentGravityBottomRight:
-            self.layer.contentsGravity = kCAGravityBottomRight;
-            break;
-        case VLCImageViewContentGravityResize:
-            self.layer.contentsGravity = kCAGravityResize;
-            break;
-        case VLCImageViewContentGravityResizeAspect:
-            self.layer.contentsGravity = kCAGravityResizeAspect;
-            break;
-        case VLCImageViewContentGravityResizeAspectFill:
-        default:
-            self.layer.contentsGravity = kCAGravityResizeAspectFill;
-            break;
+- (void)drawRect:(NSRect)dirtyRect {
+    if (self.contentGravity != VLCImageViewContentGravityResizeAspectFill || self.image == nil) {
+        [super drawRect:dirtyRect];
+        return;
     }
+
+    NSSize imageSize = self.image.size;
+    NSSize viewSize = self.bounds.size;
+    if (imageSize.width <= 0 || imageSize.height <= 0 ||
+        viewSize.width <= 0 || viewSize.height <= 0) return;
+
+    CGFloat imageAspect = imageSize.width / imageSize.height;
+    CGFloat viewAspect = viewSize.width / viewSize.height;
+    NSRect sourceRect = NSMakeRect(0, 0, imageSize.width, imageSize.height);
+    if (imageAspect > viewAspect) {
+        CGFloat sourceWidth = imageSize.height * viewAspect;
+        sourceRect.origin.x = (imageSize.width - sourceWidth) / 2.;
+        sourceRect.size.width = sourceWidth;
+    } else if (imageAspect < viewAspect) {
+        CGFloat sourceHeight = imageSize.width / viewAspect;
+        sourceRect.origin.y = (imageSize.height - sourceHeight) / 2.;
+        sourceRect.size.height = sourceHeight;
+    }
+
+    [self.image drawInRect:self.bounds
+                  fromRect:sourceRect
+                 operation:NSCompositingOperationSourceOver
+                  fraction:1.
+            respectFlipped:YES
+                     hints:@{NSImageHintInterpolation: @(NSImageInterpolationHigh)}];
 }
+
 
 - (void)setContentGravity:(VLCImageViewContentGravity)contentGravity
 {
+    if (_contentGravity == contentGravity)
+        return;
     _contentGravity = contentGravity;
-    [self updateLayerContentGravity];
+    self.needsDisplay = YES;
+    self.imageAlignment = NSImageAlignCenter;
+    switch (contentGravity) {
+        case VLCImageViewContentGravityTop:
+            self.imageAlignment = NSImageAlignTop;
+            break;
+        case VLCImageViewContentGravityBottom:
+            self.imageAlignment = NSImageAlignBottom;
+            break;
+        case VLCImageViewContentGravityLeft:
+            self.imageAlignment = NSImageAlignLeft;
+            break;
+        case VLCImageViewContentGravityRight:
+            self.imageAlignment = NSImageAlignRight;
+            break;
+        case VLCImageViewContentGravityTopLeft:
+            self.imageAlignment = NSImageAlignTopLeft;
+            break;
+        case VLCImageViewContentGravityTopRight:
+            self.imageAlignment = NSImageAlignTopRight;
+            break;
+        case VLCImageViewContentGravityBottomLeft:
+            self.imageAlignment = NSImageAlignBottomLeft;
+            break;
+        case VLCImageViewContentGravityBottomRight:
+            self.imageAlignment = NSImageAlignBottomRight;
+            break;
+        default:
+            break;
+    }
+    switch (contentGravity) {
+        case VLCImageViewContentGravityResize:
+            self.imageScaling = NSImageScaleAxesIndependently;
+            break;
+        case VLCImageViewContentGravityResizeAspect:
+        case VLCImageViewContentGravityResizeAspectFill:
+            self.imageScaling = NSImageScaleProportionallyUpOrDown;
+            break;
+        default:
+            self.imageScaling = NSImageScaleNone;
+            break;
+    }
 }
 
 - (void)setImageURL:(NSURL * _Nonnull)artworkURL placeholderImage:(NSImage * _Nullable)image

@@ -26,6 +26,7 @@
 
 #import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSView+VLCAdditions.h"
 
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryImageCache.h"
@@ -262,6 +263,7 @@
     [self.forwardButton setAction:@selector(fwd:)];
     [self.backwardButton setAction:@selector(bwd:)];
 
+    [self.artworkImageView.superview vlc_clipToRoundedCornersWithRadius:VLCUIUnits.cornerRadius];
     self.artworkImageView.cropsImagesToRoundedCorners = YES;
     self.artworkImageView.image = NSImage.VLCNoArtImage;
     self.artworkImageView.contentGravity = VLCImageViewContentGravityResize;

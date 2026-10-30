@@ -61,12 +61,13 @@
                         <real value="3.4028234663852886e+38"/>
                     </customSpacing>
                 </stackView>
-                <customView translatesAutoresizingMaskIntoConstraints="NO" id="Ydb-7n-5Cd" customClass="VLCImageView">
+                <imageView translatesAutoresizingMaskIntoConstraints="NO" id="Ydb-7n-5Cd" customClass="VLCImageView">
                     <rect key="frame" x="10" y="5" width="77" height="48"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="Ydb-7n-5Cd" secondAttribute="height" multiplier="16:10" id="4aB-rs-m22"/>
                     </constraints>
-                </customView>
+                    <imageCell key="cell" refusesFirstResponder="YES" imageScaling="proportionallyUpOrDown" id="viN-01-CEl"/>
+                </imageView>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Mk2-5A-q4g">
                     <rect key="frame" x="8" y="13" width="22" height="31"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="♪" id="mdz-SA-hCl">
@@ -75,12 +76,13 @@
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <customView translatesAutoresizingMaskIntoConstraints="NO" id="97z-d7-S3D" customClass="VLCImageView">
+                <imageView translatesAutoresizingMaskIntoConstraints="NO" id="97z-d7-S3D" customClass="VLCImageView">
                     <rect key="frame" x="39" y="5" width="48" height="48"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="97z-d7-S3D" secondAttribute="height" multiplier="1:1" id="YBL-j9-anm"/>
                     </constraints>
-                </customView>
+                    <imageCell key="cell" refusesFirstResponder="YES" imageScaling="proportionallyUpOrDown" id="viN-02-CEl"/>
+                </imageView>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3Ha-ZH-fa9">
                     <rect key="frame" x="350" y="21" width="40" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Label" id="N0j-xB-3t9">

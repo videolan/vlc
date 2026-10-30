@@ -33,6 +33,7 @@
 
 #import "views/VLCImageView.h"
 #import "views/VLCLinearProgressIndicator.h"
+#import "views/VLCUIUnits.h"
 
 NSString * const VLCLibraryCarouselCollectionViewItemIdentifier =
     @"VLCLibraryCarouselCollectionViewItemIdentifier";
@@ -54,6 +55,8 @@ NSString * const VLCLibraryCarouselCollectionViewItemIdentifier =
 
 - (void)setup
 {
+    [self.coverImageView.superview vlc_clipToRoundedCornersWithRadius:VLCUIUnits.cornerRadius];
+
     self.highlightBox.borderColor = NSColor.VLCAccentColor;
     self.titleTextField.font = NSFont.VLCLibrarySubsectionHeaderFont;
     self.detailTextField.font = NSFont.VLCLibrarySubsectionSubheaderFont;

@@ -26,12 +26,13 @@
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <customView translatesAutoresizingMaskIntoConstraints="NO" id="rko-Nc-j4c" customClass="VLCImageView">
+                <imageView translatesAutoresizingMaskIntoConstraints="NO" id="rko-Nc-j4c" customClass="VLCImageView">
                     <rect key="frame" x="0.0" y="24" width="214" height="214"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="rko-Nc-j4c" secondAttribute="height" multiplier="1:1" id="tGe-gB-9im"/>
                     </constraints>
-                </customView>
+                    <imageCell key="cell" refusesFirstResponder="YES" imageScaling="proportionallyUpOrDown" id="viN-01-CEl"/>
+                </imageView>
             </subviews>
             <constraints>
                 <constraint firstItem="rko-Nc-j4c" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="4mg-zK-oCq"/>

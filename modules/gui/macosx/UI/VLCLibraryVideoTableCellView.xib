@@ -15,12 +15,13 @@
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="ffE-px-l0g" customClass="VLCTrackingView">
                     <rect key="frame" x="0.0" y="0.0" width="398" height="48"/>
                 </customView>
-                <customView translatesAutoresizingMaskIntoConstraints="NO" id="Ydb-7n-5Cd" customClass="VLCImageView">
+                <imageView translatesAutoresizingMaskIntoConstraints="NO" id="Ydb-7n-5Cd" customClass="VLCImageView">
                     <rect key="frame" x="5" y="5" width="68" height="38"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="Ydb-7n-5Cd" secondAttribute="height" multiplier="16:9" id="4aB-rs-m22"/>
                     </constraints>
-                </customView>
+                    <imageCell key="cell" refusesFirstResponder="YES" imageScaling="proportionallyUpOrDown" id="viN-01-CEl"/>
+                </imageView>
                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2yt-Ph-v3B" customClass="VLCStackView">
                     <userDefinedRuntimeAttributes>
                         <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
