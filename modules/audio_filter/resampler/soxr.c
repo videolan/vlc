@@ -273,8 +273,7 @@ SoXR_Resample( filter_t *p_filter, soxr_t soxr, block_t *p_in, size_t i_olen )
     if( error )
     {
         msg_Err( p_filter, "soxr_process failed: %s", soxr_strerror( error ) );
-        block_Release( p_out );
-        goto error;
+        goto drop;
     }
     if( unlikely( i_idone < i_ilen ) )
         msg_Err( p_filter, "lost %zd of %zd input frames",
@@ -297,11 +296,18 @@ SoXR_Resample( filter_t *p_filter, soxr_t soxr, block_t *p_in, size_t i_olen )
         p_sys->last_soxr = NULL;
     }
 
-error:
     if( p_in && p_out != p_in )
         block_Release( p_in );
 
     return p_out;
+
+drop:
+    if( p_out != p_in )
+        block_Release( p_out );
+error:
+    if( p_in )
+        block_Release( p_in );
+    return NULL;
 }
 
 static size_t
@@ -362,7 +368,12 @@ Resample( filter_t *p_filter, block_t *p_in )
         assert( !p_out );
         p_out = SoXR_Resample( p_filter, soxr, p_in, i_olen );
         if( !p_out )
-            goto error;
+        {
+            /* p_in is released by SoXR_Resample() */
+            if( p_flushed_out )
+                block_Release( p_flushed_out );
+            return NULL;
+        }
     }
 
     if( p_flushed_out )
@@ -374,14 +385,14 @@ Resample( filter_t *p_filter, block_t *p_in )
         block_ChainAppend( &p_flushed_out, p_out );
         p_out = block_ChainGather( p_flushed_out );
         if( !p_out )
-            goto error;
+        {
+            block_ChainRelease( p_flushed_out );
+            return NULL;
+        }
         p_out->i_nb_samples = i_nb_samples;
     }
     p_out->i_pts = i_pts;
     return p_out;
-error:
-    block_Release( p_in );
-    return NULL;
 }
 
 static block_t *
