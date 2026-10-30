@@ -42,7 +42,7 @@
     self.window.releasedWhenClosed = NO;
     self.header = [[VLCLibraryHomeViewSectionHeaderView alloc] initWithFrame:NSZeroRect];
     self.header.translatesAutoresizingMaskIntoConstraints = NO;
-    self.header.title = @"Recent videos";
+    self.header.title = @"Recently watched";
     self.header.itemCount = 123;
     [self.window.contentView addSubview:self.header];
     self.widthConstraint = [self.header.widthAnchor constraintEqualToConstant:800];
@@ -96,13 +96,13 @@
 
 - (void)testTitleIsCopiedAndUpdatesButtonAndAccessibility
 {
-    NSMutableString * const title = [@"Recent music" mutableCopy];
+    NSMutableString * const title = [@"Recently listened to" mutableCopy];
     self.header.title = title;
     [title appendString:@" changed after assignment"];
-    XCTAssertEqualObjects(self.header.title, @"Recent music");
-    XCTAssertEqualObjects(self.header.libraryButton.title, @"Recent music");
+    XCTAssertEqualObjects(self.header.title, @"Recently listened to");
+    XCTAssertEqualObjects(self.header.libraryButton.title, @"Recently listened to");
     NSString * const accessibilityLabel =
-        [NSString stringWithFormat:_NS("Open %@ in the library"), @"Recent music"];
+        [NSString stringWithFormat:_NS("Open %@ in the library"), @"Recently listened to"];
     XCTAssertEqualObjects(self.header.libraryButton.accessibilityLabel, accessibilityLabel);
     XCTAssertEqualObjects(self.header.libraryButton.toolTip, accessibilityLabel);
 

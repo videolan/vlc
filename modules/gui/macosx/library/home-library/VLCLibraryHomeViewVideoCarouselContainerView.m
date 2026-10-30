@@ -70,7 +70,7 @@
     _videoGroup = groupDescriptor.group;
     self.dataSource.groupDescriptor = groupDescriptor;
     if (groupDescriptor.group == VLCMediaLibraryParentGroupTypeRecentVideos) {
-        self.headerView.title = _NS("Recent videos");
+        self.headerView.title = _NS("Recently watched");
     } else {
         self.headerView.title = groupDescriptor.name;
     }

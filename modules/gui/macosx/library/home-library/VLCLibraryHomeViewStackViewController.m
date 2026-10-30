@@ -36,6 +36,7 @@
 #import "library/home-library/VLCLibraryHomeViewAudioCarouselContainerView.h"
 #import "library/home-library/VLCLibraryHomeViewBrowseCarouselContainerView.h"
 #import "library/home-library/VLCLibraryHomeViewContainerView.h"
+#import "library/home-library/VLCLibraryHomeViewRecentlyAddedCarouselContainerView.h"
 #import "library/home-library/VLCLibraryHomeViewVideoCarouselContainerView.h"
 #import "library/home-library/VLCLibraryHomeViewVideoContainerView.h"
 #import "library/home-library/VLCLibraryHomeViewVideoContainerViewDataSource.h"
@@ -113,6 +114,9 @@
     [self addCustomContainerViews];
     [self recentsChanged:nil];
     [self audioRecentsChanged:nil];
+    _recentlyAddedView = [[VLCLibraryHomeViewRecentlyAddedCarouselContainerView alloc] init];
+    [_containers addObject:self.recentlyAddedView];
+    [self addContainerView:self.recentlyAddedView toStackView:self.collectionsStackView];
     _browseView = [[VLCLibraryHomeViewBrowseCarouselContainerView alloc] init];
     [_containers addObject:self.browseView];
     [self addContainerView:self.browseView toStackView:self.collectionsStackView];

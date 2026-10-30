@@ -124,7 +124,7 @@
 
     switch (audioLibrarySegment) {
         case VLCAudioLibraryRecentsSegment:
-            self.headerView.title = _NS("Recent music");
+            self.headerView.title = _NS("Recently listened to");
             break;
         case VLCAudioLibraryArtistsSegment:
             self.headerView.title = _NS("Artists");
