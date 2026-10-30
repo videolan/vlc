@@ -37,6 +37,7 @@
 #import "main/VLCMain.h"
 
 #import "views/VLCImageView.h"
+#import "views/VLCCarouselView.h"
 
 @interface VLCLibraryHeroView ()
 
@@ -267,7 +268,30 @@
         return;
     }
 
-    [super mouseDown:event];
+    VLCLibraryRepresentedItem * const representedItem = self.representedItem;
+    if (representedItem == nil) {
+        return;
+    }
+
+    VLCCarouselView * const carouselView = self.carouselView;
+    NSEvent *mouseUpEvent;
+    if (carouselView != nil) {
+        [self.window makeFirstResponder:carouselView];
+        mouseUpEvent = [carouselView trackMouseDown:event];
+    } else {
+        mouseUpEvent = [self trackMouseDown:event dragHandler:nil];
+    }
+    if (mouseUpEvent == nil ||
+        self.representedItem == nil ||
+        self.representedItem.item.libraryID != representedItem.item.libraryID ||
+        !NSPointInRect([self convertPoint:mouseUpEvent.locationInWindow fromView:nil], self.bounds)) {
+        return;
+    }
+    if (mouseUpEvent.modifierFlags & NSEventModifierFlagControl) {
+        [self openContextMenu:mouseUpEvent];
+        return;
+    }
+    [self playRepresentedItem:self];
 }
 
 - (void)rightMouseDown:(NSEvent *)event

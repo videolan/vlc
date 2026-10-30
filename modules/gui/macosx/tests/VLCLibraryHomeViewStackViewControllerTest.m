@@ -430,6 +430,8 @@ static VLCMediaLibraryMediaItem *VLCHomeStackMediaItem(int64_t libraryID,
     XCTAssertEqualObjects([_stackView.arrangedSubviews subarrayWithRange:NSMakeRange(0, 3)],
                           (@[_controller.actionsView, _controller.heroView, _controller.recentsView]));
     XCTAssertFalse([_controller.heroView isDescendantOf:_controller.recentsView]);
+    XCTAssertNil(_controller.heroView.carouselView);
+    XCTAssertEqual(_controller.recentsView.heroView.carouselView, _controller.recentsView.collectionView);
 }
 
 - (void)testSeparateHeroesAreDirectStackSiblingsWithIndependentSelectionModes

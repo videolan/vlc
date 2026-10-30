@@ -25,6 +25,10 @@
 
 #import "NSAppearance+VLCAdditions.h"
 
+#import "views/VLCUIUnits.h"
+
+#include <math.h>
+
 @implementation NSView (VLCAdditions)
 
 + (instancetype)fromNibWithOwner:(id)owner
@@ -96,6 +100,38 @@
         [NSLayoutConstraint activateConstraints:constraints];
     }
     return constraints;
+}
+
+- (NSEvent *)trackMouseDown:(NSEvent *)event
+                dragHandler:(void (^)(NSEvent *event, BOOL didDrag))dragHandler
+{
+    NSWindow * const window = self.window;
+    if (window == nil) {
+        return nil;
+    }
+
+    const NSPoint downPoint = event.locationInWindow;
+    BOOL didDrag = NO;
+    while (true) {
+        NSEvent * const trackedEvent =
+            [window nextEventMatchingMask:NSEventMaskLeftMouseDragged | NSEventMaskLeftMouseUp
+                                untilDate:NSDate.distantFuture
+                                   inMode:NSEventTrackingRunLoopMode
+                                  dequeue:YES];
+        if (trackedEvent == nil) {
+            return nil;
+        }
+        const NSPoint point = trackedEvent.locationInWindow;
+        didDrag |= hypot(point.x - downPoint.x, point.y - downPoint.y) >= VLCUIUnits.mouseDragThreshold;
+        if (trackedEvent.type == NSEventTypeLeftMouseUp) {
+            return didDrag
+                ? nil
+                : trackedEvent;
+        }
+        if (dragHandler != nil) {
+            dragHandler(trackedEvent, didDrag);
+        }
+    }
 }
 
 @end

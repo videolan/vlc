@@ -24,6 +24,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCCarouselView;
 @class VLCImageView;
 @class VLCLibraryRepresentedItem;
 @protocol VLCMediaLibraryItemProtocol;
@@ -43,6 +44,7 @@ typedef NS_ENUM(NSUInteger, VLCLibraryHeroViewSelectionMode) {
 
 @property (readwrite, nonatomic, nullable) VLCLibraryRepresentedItem *representedItem;
 @property (readwrite, nonatomic) VLCLibraryHeroViewSelectionMode selectionMode;
+@property (nonatomic, readwrite, weak, nullable) VLCCarouselView *carouselView;
 
 - (IBAction)playRepresentedItem:(id)sender;
 - (void)setOptimalRepresentedItem;

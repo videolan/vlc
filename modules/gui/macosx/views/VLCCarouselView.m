@@ -23,13 +23,12 @@
 #import "VLCCarouselView.h"
 
 #import "extensions/NSAnimationContext+VLCAdditions.h"
+#import "extensions/NSView+VLCAdditions.h"
 
 #import <QuartzCore/QuartzCore.h>
 
 #include <math.h>
 
-// Minimum mouse movement, in points, before a click becomes a drag.
-static const CGFloat VLCCarouselMouseDragThreshold = 3.;
 // Minimum horizontal release velocity, in points per second, that starts inertia.
 static const CGFloat VLCCarouselMinimumInertialVelocity = 40.;
 // Horizontal velocity, in points per second, at which inertia stops.
@@ -163,59 +162,46 @@ static const CGFloat VLCCarouselDecelerationEdgeTolerance = .01;
 
 - (void)mouseDown:(NSEvent *)event
 {
-    [self stopDecelerating];
-
     const NSPoint downPoint = [self convertPoint:event.locationInWindow fromView:nil];
     NSIndexPath * const clickedIndexPath = [self indexPathForItemAtPoint:downPoint];
     if (clickedIndexPath != nil) {
         [self.window makeFirstResponder:self];
     }
-    NSTimeInterval previousTimestamp = event.timestamp;
-    CGFloat horizontalVelocity = 0.;
-    BOOL didDrag = NO;
-    NSEvent *mouseUpEvent = nil;
-
-    while (true) {
-        NSEvent * const trackedEvent =
-            [self.window nextEventMatchingMask:NSEventMaskLeftMouseDragged | NSEventMaskLeftMouseUp
-                                      untilDate:NSDate.distantFuture
-                                         inMode:NSEventTrackingRunLoopMode
-                                        dequeue:YES];
-        const NSPoint point = [self convertPoint:trackedEvent.locationInWindow fromView:nil];
-
-        if (trackedEvent.type == NSEventTypeLeftMouseDragged) {
-            const NSTimeInterval elapsed = trackedEvent.timestamp - previousTimestamp;
-            if (elapsed > 0.) {
-                const CGFloat instantVelocity = trackedEvent.deltaX / elapsed;
-                horizontalVelocity = horizontalVelocity * VLCCarouselDragVelocitySmoothingFactor +
-                    instantVelocity * (1. - VLCCarouselDragVelocitySmoothingFactor);
-            }
-            previousTimestamp = trackedEvent.timestamp;
-
-            const CGFloat horizontalDistance = point.x - downPoint.x;
-            const CGFloat verticalDistance = point.y - downPoint.y;
-            if (!didDrag && hypot(horizontalDistance, verticalDistance) >= VLCCarouselMouseDragThreshold) {
-                didDrag = YES;
-            }
-            if (didDrag) {
-                [self scrollByHorizontalDelta:trackedEvent.deltaX];
-            }
-            continue;
-        }
-
-        mouseUpEvent = trackedEvent;
-        break;
-    }
-
-    if (!didDrag && clickedIndexPath != nil) {
+    NSEvent * const mouseUpEvent = [self trackMouseDown:event];
+    if (mouseUpEvent != nil && clickedIndexPath != nil) {
         if (mouseUpEvent.modifierFlags & NSEventModifierFlagControl) {
             [self requestContextMenuForItemAtIndexPath:clickedIndexPath event:mouseUpEvent];
             return;
         }
         [self activateItemAtIndexPath:clickedIndexPath];
-    } else if (didDrag && fabs(horizontalVelocity) >= VLCCarouselMinimumInertialVelocity) {
+    }
+}
+
+- (NSEvent *)trackMouseDown:(NSEvent *)event
+{
+    [self stopDecelerating];
+
+    __block NSTimeInterval previousTimestamp = event.timestamp;
+    __block CGFloat horizontalVelocity = 0.;
+    NSEvent * const mouseUpEvent =
+        [self trackMouseDown:event dragHandler:^(NSEvent * const trackedEvent, const BOOL didDrag) {
+        const NSTimeInterval elapsed = trackedEvent.timestamp - previousTimestamp;
+        if (elapsed > 0.) {
+            const CGFloat instantVelocity = trackedEvent.deltaX / elapsed;
+            horizontalVelocity = horizontalVelocity * VLCCarouselDragVelocitySmoothingFactor +
+                instantVelocity * (1. - VLCCarouselDragVelocitySmoothingFactor);
+        }
+        previousTimestamp = trackedEvent.timestamp;
+
+        if (didDrag) {
+            [self scrollByHorizontalDelta:trackedEvent.deltaX];
+        }
+    }];
+
+    if (mouseUpEvent == nil && fabs(horizontalVelocity) >= VLCCarouselMinimumInertialVelocity) {
         [self startDeceleratingWithVelocity:horizontalVelocity];
     }
+    return mouseUpEvent;
 }
 
 - (void)rightMouseDown:(NSEvent *)event

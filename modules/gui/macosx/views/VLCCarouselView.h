@@ -29,6 +29,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) CGFloat leadingItemInset;
 
 - (void)scrollByOneItemForward:(BOOL)forward;
+// Tracks carousel dragging and inertia, returning the release event only for a click.
+- (nullable NSEvent *)trackMouseDown:(NSEvent *)event;
 - (void)activateItemAtIndexPath:(NSIndexPath *)indexPath;
 - (BOOL)requestContextMenuForItemAtIndexPath:(NSIndexPath *)indexPath event:(NSEvent *)event;
 

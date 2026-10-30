@@ -320,6 +320,7 @@ static NSUserInterfaceItemIdentifier const VLCHomeLifecycleTestItemIdentifier = 
     XCTAssertNotNil(header);
     XCTAssertEqual(_container.heroView.superview, header);
     XCTAssertTrue([_container.heroView isDescendantOf:_container.collectionView]);
+    XCTAssertEqual(_container.heroView.carouselView, _container.collectionView);
     XCTAssertEqualWithAccuracy(NSMinX(_container.heroView.frame), VLCUIUnits.mediumSpacing, .01);
     XCTAssertEqualWithAccuracy(NSMaxX(_container.heroView.frame), NSWidth(header.bounds), .01);
     XCTAssertEqualWithAccuracy(NSHeight(_container.heroView.frame), NSHeight(_container.scrollView.contentView.bounds), .01);
@@ -334,6 +335,7 @@ static NSUserInterfaceItemIdentifier const VLCHomeLifecycleTestItemIdentifier = 
     XCTAssertTrue(_container.hidden);
     XCTAssertTrue(_container.heroView.hidden);
     XCTAssertNil(_container.heroView.representedItem);
+    XCTAssertEqual(_container.heroView.carouselView, _container.collectionView);
     XCTAssertEqual(_container.heroView.selectionMode, VLCLibraryHeroViewSelectionModeMostRecentVideo);
     XCTAssertEqual(_container.dataSource.numberOfMediaItems, (NSUInteger)0);
     XCTAssertEqual(_container.headerView.itemCount, (NSUInteger)0);

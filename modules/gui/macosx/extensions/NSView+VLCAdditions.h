@@ -36,6 +36,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSArray<NSLayoutConstraint *> *)constraintsToFillView:(NSView *)view activate:(BOOL)activate;
 - (NSArray<NSLayoutConstraint *> *)applyConstraintsToFillSuperview;
 
+// Returns the mouse-up event for a click, or nil for a drag.
+- (nullable NSEvent *)trackMouseDown:(NSEvent *)event
+                         dragHandler:(void (^ _Nullable)(NSEvent *event, BOOL didDrag))dragHandler;
+
 @end
 
 NS_ASSUME_NONNULL_END
