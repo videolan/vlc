@@ -130,6 +130,7 @@ typedef struct decoder_sys_t
             vlc_video_context *ctx;
             struct asurface_picture_ctx apic_ctxs[MAX_PIC];
             void *p_surface;
+            AWindowHandler *awh;
             unsigned i_angle;
             unsigned i_input_offset_x, i_input_offset_y;
             unsigned i_input_width, i_input_height;
@@ -1046,6 +1047,7 @@ CreateSurface(decoder_t *p_dec, vlc_decoder_device *dec_dev,
             msg_Err(p_dec, "Could not find a valid ANativeWindow");
             goto error;
         }
+        p_sys->video.awh = awh;
         goto end;
     }
 
@@ -1462,6 +1464,10 @@ static void CleanDecoder(decoder_sys_t *p_sys)
         case VIDEO_ES:
             if (p_sys->video.surfacetexture)
                 vlc_asurfacetexture_Delete(p_sys->video.surfacetexture);
+
+            if (p_sys->video.awh != NULL)
+                AWindowHandler_releaseANativeWindow(p_sys->video.awh,
+                                                    AWindow_Video);
 
             if (p_sys->video.timestamp_fifo)
                 timestamp_FifoRelease(p_sys->video.timestamp_fifo);
