@@ -143,7 +143,7 @@ VLC_API char *vlc_uri_fixup(const char *) VLC_MALLOC;
 
 struct vlc_url_t
 {
-    char *psz_protocol;
+    const char *psz_protocol;
     char *psz_username;
     char *psz_password;
     char *psz_host;

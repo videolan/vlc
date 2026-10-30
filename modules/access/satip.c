@@ -700,7 +700,7 @@ static int satip_open(vlc_object_t *obj)
     if( setup_url.psz_protocol == NULL ||
         strncasecmp( setup_url.psz_protocol, "satip", 5 ) == 0 )
     {
-        setup_url.psz_protocol = (char *)"rtsp";
+        setup_url.psz_protocol = "rtsp";
     }
 
     char *psz_setup_url = vlc_uri_compose(&setup_url);

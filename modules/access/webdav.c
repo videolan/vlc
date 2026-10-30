@@ -86,7 +86,7 @@ vlc_module_end()
 static char *BuildChildUrl(access_sys_t *sys, const char *href)
 {
     vlc_url_t base = {
-        .psz_protocol = sys->secure ? (char *)"webdavs" : (char *)"webdav",
+        .psz_protocol = sys->secure ? "webdavs" : "webdav",
         .psz_host     = sys->host,
         .i_port       = sys->port,
         .psz_path     = sys->path,
@@ -529,7 +529,7 @@ static int Open(vlc_object_t *obj)
     if (sys->manager == NULL)
         goto clean;
 
-    sys->url.psz_protocol = sys->secure ? (char *)"https" : (char *)"http";
+    sys->url.psz_protocol = sys->secure ? "https" : "http";
 
     vlc_credential crd;
     vlc_credential_init(&crd, &sys->url);

@@ -290,7 +290,7 @@ std::string ChromecastCommunication::getServerBaseURL() const
 {
 
     vlc_url_t url_comps{};
-    url_comps.psz_protocol = (char*)"http";
+    url_comps.psz_protocol = "http";
     url_comps.psz_host = (char*)m_serverIp.c_str();
     url_comps.i_port = m_serverPort;
 

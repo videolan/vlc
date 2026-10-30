@@ -64,7 +64,7 @@ void ConnectionParams::setPath(const std::string &path_)
     vlc_url_t url_components{};
     char *uri_str;
 
-    url_components.psz_protocol = const_cast<char *>(scheme.c_str());
+    url_components.psz_protocol = scheme.c_str();
     url_components.psz_path = const_cast<char *>(path_.c_str());
     url_components.i_port = 0;
 
