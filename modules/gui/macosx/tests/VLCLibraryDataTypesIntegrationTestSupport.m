@@ -939,6 +939,14 @@ BOOL VLCLibraryDataTypesIntegrationRenameAlbum(int64_t libraryID, NSString *titl
             title);
 }
 
+BOOL VLCLibraryDataTypesIntegrationSetMediaInsertionDate(int64_t mediaID, NSDate *date)
+{
+    return VLCLibraryDataTypesIntegrationExecuteEntityStatement(
+        "UPDATE Media SET insertion_date = ?2 WHERE id_media = ?1",
+        mediaID,
+        @((int64_t)date.timeIntervalSince1970));
+}
+
 BOOL VLCLibraryDataTypesIntegrationSetMediaPresent(int64_t libraryID, BOOL present)
 {
     // Real presence triggers update the album, artist, and group counts.

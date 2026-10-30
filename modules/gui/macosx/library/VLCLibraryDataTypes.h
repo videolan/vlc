@@ -48,10 +48,10 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
     // Additional types over vlc_ml_parent_type below
     VLCMediaLibraryParentGroupTypeAudioLibrary,
     VLCMediaLibraryParentGroupTypeRecentAudios,
-    // Video library-specific entries.
-    // Please define these in the order the are expected to be presented
+    // Home's video groups are contiguous from RecentVideos to VideoLibrary.
     VLCMediaLibraryParentGroupTypeRecentVideos,
     VLCMediaLibraryParentGroupTypeVideoLibrary,
+    VLCMediaLibraryParentGroupTypeRecentlyAdded,
     VLCMediaLibraryParentGroupTypeAllFavorites, // This should be last
 };
 

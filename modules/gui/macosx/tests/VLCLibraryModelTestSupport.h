@@ -41,6 +41,8 @@
 - (void)resetCachedListOfMovies;
 - (void)resetCachedListOfRecentMedia;
 - (void)resetCachedListOfRecentAudioMedia;
+- (void)resetCachedListOfRecentlyAddedMedia;
+- (void)mediaItemThumbnailGenerated:(VLCMediaLibraryMediaItem *)item;
 - (void)resetCachedListOfMonitoredFolders;
 - (void)handleMediaItemAddedEvent:(const vlc_ml_event_t *)event;
 - (void)handleMediaItemUpdateEvent:(const vlc_ml_event_t *)event;
@@ -77,6 +79,7 @@
 @property (readwrite, nonatomic) NSArray<VLCMediaLibraryMovie *> *cachedListOfMovies;
 @property (readwrite, nonatomic) NSArray<VLCMediaLibraryMediaItem *> *cachedRecentMedia;
 @property (readwrite, nonatomic) NSArray<VLCMediaLibraryMediaItem *> *cachedRecentAudioMedia;
+@property (readwrite, nonatomic) NSArray<VLCMediaLibraryMediaItem *> *cachedRecentlyAddedMedia;
 @property (readwrite, nonatomic) NSArray<VLCMediaLibraryEntryPoint *> *cachedListOfMonitoredFolders;
 @property (readwrite, nonatomic) NSArray<NSString *> *cachedMediaTitles;
 @property (readonly, nonatomic) NSArray<VLCMediaLibraryFolderObserver *> *folderObservers;
@@ -146,6 +149,7 @@ typedef NS_ENUM(NSUInteger, VLCLibraryModelTestCacheKind) {
     VLCLibraryModelTestMovieCache,
     VLCLibraryModelTestRecentAudioCache,
     VLCLibraryModelTestRecentVideoCache,
+    VLCLibraryModelTestRecentlyAddedCache,
 };
 
 // Real persisted records and queries, with model events delivered explicitly so

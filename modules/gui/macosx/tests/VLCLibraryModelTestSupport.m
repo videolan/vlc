@@ -435,6 +435,8 @@ VLCMediaLibraryMediaItem *VLCLibraryModelTestMediaItem(vlc_ml_media_type_t type,
         [self resetCachedListOfRecentAudioMedia];
     else if (getter == @selector(cachedRecentMedia))
         [self resetCachedListOfRecentMedia];
+    else if (getter == @selector(cachedRecentlyAddedMedia))
+        [self resetCachedListOfRecentlyAddedMedia];
     else
         XCTFail(@"Unsupported cache getter");
 }
@@ -612,6 +614,10 @@ VLCMediaLibraryMediaItem *VLCLibraryModelTestMediaItem(vlc_ml_media_type_t type,
     VLCMediaLibraryMediaItem * const otherVideo = [VLCMediaLibraryMediaItem mediaItemForLibraryID:
         VLCLibraryDataTypesIntegrationSortingVideoAlphaMediaID()];
     switch (kind) {
+        case VLCLibraryModelTestRecentlyAddedCache:
+            _pendingItem = audio;
+            _changedItem = video;
+            break;
         case VLCLibraryModelTestAudioCache:
         case VLCLibraryModelTestRecentAudioCache:
             _pendingItem = audio;
@@ -710,6 +716,8 @@ VLCMediaLibraryMediaItem *VLCLibraryModelTestMediaItem(vlc_ml_media_type_t type,
             return @selector(cachedRecentAudioMedia);
         case VLCLibraryModelTestRecentVideoCache:
             return @selector(cachedRecentMedia);
+        case VLCLibraryModelTestRecentlyAddedCache:
+            return @selector(cachedRecentlyAddedMedia);
     }
 }
 
@@ -732,6 +740,8 @@ VLCMediaLibraryMediaItem *VLCLibraryModelTestMediaItem(vlc_ml_media_type_t type,
             return @[ VLCLibraryModelListOfShowsReset, VLCLibraryModelShowUpdated, VLCLibraryModelShowDeleted ];
         case VLCLibraryModelTestMovieCache:
             return @[ VLCLibraryModelListOfMoviesReset ];
+        case VLCLibraryModelTestRecentlyAddedCache:
+            return @[ VLCLibraryModelRecentlyAddedMediaListReset ];
         case VLCLibraryModelTestRecentAudioCache:
             return @[ VLCLibraryModelRecentAudioMediaListReset, VLCLibraryModelRecentAudioMediaItemUpdated, VLCLibraryModelRecentAudioMediaItemDeleted ];
         case VLCLibraryModelTestRecentVideoCache:
@@ -762,6 +772,8 @@ VLCMediaLibraryMediaItem *VLCLibraryModelTestMediaItem(vlc_ml_media_type_t type,
             return _model.cachedRecentAudioMedia;
         case VLCLibraryModelTestRecentVideoCache:
             return _model.cachedRecentMedia;
+        case VLCLibraryModelTestRecentlyAddedCache:
+            return _model.cachedRecentlyAddedMedia;
     }
 }
 
@@ -798,6 +810,9 @@ VLCMediaLibraryMediaItem *VLCLibraryModelTestMediaItem(vlc_ml_media_type_t type,
         case VLCLibraryModelTestRecentVideoCache:
             _model.cachedRecentMedia = (id)items;
             break;
+        case VLCLibraryModelTestRecentlyAddedCache:
+            _model.cachedRecentlyAddedMedia = (id)items;
+            break;
     }
 }
 
@@ -814,17 +829,25 @@ VLCMediaLibraryMediaItem *VLCLibraryModelTestMediaItem(vlc_ml_media_type_t type,
             ? _model.recentAudioMediaLimit
             : _model.recentMediaLimit;
     }
+    if (_kind == VLCLibraryModelTestRecentlyAddedCache) {
+        params.i_sort = VLC_ML_SORTING_INSERTIONDATE;
+        params.b_desc = true;
+        params.i_nbResults = 20;
+    }
     NSMutableArray * const items = NSMutableArray.array;
     switch (_kind) {
         case VLCLibraryModelTestAudioCache:
         case VLCLibraryModelTestVideoCache:
         case VLCLibraryModelTestRecentAudioCache:
-        case VLCLibraryModelTestRecentVideoCache: {
+        case VLCLibraryModelTestRecentVideoCache:
+        case VLCLibraryModelTestRecentlyAddedCache: {
             vlc_ml_media_list_t *list;
             if (_kind == VLCLibraryModelTestAudioCache)
                 list = vlc_ml_list_audio_media(library, &params);
             else if (_kind == VLCLibraryModelTestVideoCache)
                 list = vlc_ml_list_video_media(library, &params);
+            else if (_kind == VLCLibraryModelTestRecentlyAddedCache)
+                list = vlc_ml_list_media(library, &params);
             else if (_kind == VLCLibraryModelTestRecentAudioCache)
                 list = vlc_ml_list_audio_history(library, &params);
             else
@@ -917,7 +940,8 @@ VLCMediaLibraryMediaItem *VLCLibraryModelTestMediaItem(vlc_ml_media_type_t type,
         case VLCLibraryModelTestAudioCache:
         case VLCLibraryModelTestVideoCache:
         case VLCLibraryModelTestMovieCache:
-        case VLCLibraryModelTestShowCache: {
+        case VLCLibraryModelTestShowCache:
+        case VLCLibraryModelTestRecentlyAddedCache: {
             const int64_t mediaID = _kind == VLCLibraryModelTestShowCache
                 ? _pendingItem.firstMediaItem.libraryID
                 : _pendingItem.libraryID;

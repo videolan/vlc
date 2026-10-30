@@ -55,5 +55,6 @@ BOOL VLCLibraryDataTypesIntegrationMoveMediaToAlbum(int64_t mediaID, int64_t alb
 BOOL VLCLibraryDataTypesIntegrationMoveMediaToArtist(int64_t mediaID, int64_t artistID);
 BOOL VLCLibraryDataTypesIntegrationSetMovieSummary(int64_t mediaID, NSString *summary);
 BOOL VLCLibraryDataTypesIntegrationSetMediaPresent(int64_t libraryID, BOOL present);
+BOOL VLCLibraryDataTypesIntegrationSetMediaInsertionDate(int64_t mediaID, NSDate *date);
 BOOL VLCLibraryDataTypesIntegrationSetGroupDuration(int64_t libraryID, int64_t duration);
 BOOL VLCLibraryDataTypesIntegrationSetGroupModificationDate(int64_t libraryID, NSDate *date);
