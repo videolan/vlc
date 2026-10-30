@@ -21,6 +21,7 @@
  *****************************************************************************/
 
 #import "library/VLCLibraryCarouselCollectionViewItem.h"
+#import "library/VLCLibraryRepresentedItem.h"
 
 // The shared carousel registers its media item even when Browse supplies all
 // displayed cards. Keep that unused path separate from the production Browse
@@ -58,6 +59,59 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
 {
     [NSException raise:NSInternalInconsistencyException
                 format:@"Home Browse tests unexpectedly requested a media carousel menu"];
+}
+
+@end
+
+// Home source tests inspect the represented item and its parent context while
+// keeping playback and filesystem actions outside the AppKit test bundle.
+@implementation VLCLibraryRepresentedItem
+
+- (instancetype)initWithItem:(id<VLCMediaLibraryItemProtocol>)item
+                  parentType:(VLCMediaLibraryParentGroupType)parentType
+{
+    return [self initWithItem:item parentType:parentType parentItem:nil positionInParent:NSNotFound];
+}
+
+- (instancetype)initWithItem:(id<VLCMediaLibraryItemProtocol>)item
+                  parentType:(VLCMediaLibraryParentGroupType)parentType
+                  parentItem:(id<VLCMediaLibraryItemProtocol>)parentItem
+            positionInParent:(NSInteger)positionInParent
+{
+    self = [super init];
+    if (self) {
+        _item = item;
+        _parentType = parentType;
+        _parentItem = parentItem;
+        _positionInParent = positionInParent;
+        _itemIndexInParent = NSNotFound;
+    }
+    return self;
+}
+
+- (NSArray<VLCMediaLibraryMediaItem *> *)parentMediaArray
+{
+    return @[];
+}
+
+- (void)play
+{
+    [NSException raise:NSInternalInconsistencyException format:@"Home tests unexpectedly started media playback"];
+}
+
+- (void)queue
+{
+    [NSException raise:NSInternalInconsistencyException format:@"Home tests unexpectedly queued media"];
+}
+
+- (void)revealInFinder
+{
+    [NSException raise:NSInternalInconsistencyException format:@"Home tests unexpectedly revealed media"];
+}
+
+- (void)moveToTrash
+{
+    [NSException raise:NSInternalInconsistencyException format:@"Home tests unexpectedly trashed media"];
 }
 
 @end

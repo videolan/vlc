@@ -48,6 +48,7 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
 {
     VLCLibraryCollectionViewFlowLayout *_collectionViewFlowLayout;
     VLCLibraryModel *_libraryModel;
+    NSUInteger _reloadGeneration;
 }
 
 @property (readwrite, atomic) NSMutableArray *collectionArray;
@@ -180,24 +181,53 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
                                name:VLCLibraryModelRecentsMediaItemDeleted
                              object:nil];
 
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelRecentlyAddedListReset:)
+                               name:VLCLibraryModelRecentlyAddedMediaListReset
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelRecentlyAddedListReset:)
+                               name:VLCLibraryModelAllCachesDropped
+                             object:nil];
+
     [self reloadData];
+}
+
+- (void)libraryModelRecentlyAddedListReset:(NSNotification *)notification
+{
+    if (self.groupDescriptor.group == VLCMediaLibraryParentGroupTypeRecentlyAdded) {
+        [self reloadData];
+    }
 }
 
 - (void)disconnect
 {
+    ++_reloadGeneration;
     [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 - (void)reloadData
 {
+    if (!NSThread.isMainThread) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self reloadData];
+        });
+        return;
+    }
+
     if(self.collectionView == nil || !_groupDescriptor) {
         NSLog(@"Null collection view or video group descriptor");
         return;
     }
 
+    const NSUInteger generation = ++_reloadGeneration;
+    const VLCMediaLibraryParentGroupType group = self.groupDescriptor.group;
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
         NSArray *newCollectionArray = nil;
-        switch(self->_groupDescriptor.group) {
+        switch(group) {
+            case VLCMediaLibraryParentGroupTypeRecentlyAdded:
+                newCollectionArray = self->_libraryModel.listOfRecentlyAddedMedia;
+                break;
             case VLCMediaLibraryParentGroupTypeVideoLibrary:
                 newCollectionArray = self->_libraryModel.listOfVideoMedia;
                 break;
@@ -209,6 +239,9 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
         }
 
         dispatch_async(dispatch_get_main_queue(), ^{
+            if (generation != self->_reloadGeneration) {
+                return;
+            }
             self.collectionArray = [newCollectionArray mutableCopy];
             [self.collectionView reloadData];
             [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification

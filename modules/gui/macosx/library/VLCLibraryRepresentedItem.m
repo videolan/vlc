@@ -213,7 +213,8 @@
         return self.parentItem.mediaItems;
     }
 
-    if (self.parentType == VLCMediaLibraryParentGroupTypeAllFavorites) {
+    if (self.parentType == VLCMediaLibraryParentGroupTypeAllFavorites ||
+        self.parentType == VLCMediaLibraryParentGroupTypeRecentlyAdded) {
         VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
         return [libraryModel listOfMediaItemsForParentType:self.parentType];
     }
