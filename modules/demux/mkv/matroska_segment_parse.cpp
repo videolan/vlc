@@ -362,6 +362,40 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
         {
             debug( vars, "Track Max BlockAdditionID=%d", static_cast<uint32_t>( mbl ) ) ;
         }
+#if LIBMATROSKA_VERSION >= 0x010600
+        E_CASE( KaxBlockAdditionMapping, bam )
+        {
+            ONLY_FMT(VIDEO);
+            auto type = FindChild<KaxBlockAddIDType>( bam );
+            auto extra = FindChild<KaxBlockAddIDExtraData>( bam );
+            if( !type || !extra || extra->GetSize() < 4 )
+                return;
+
+            const vlc_fourcc_t fcc = hton32( static_cast<uint32_t>( *type ) );
+            debug( vars, "Track BlockAdditionMapping type=%4.4s",
+                   reinterpret_cast<const char *>( &fcc ) );
+            if( fcc != VLC_FOURCC('d','v','c','C') &&
+                fcc != VLC_FOURCC('d','v','v','C') &&
+                fcc != VLC_FOURCC('d','v','w','C') )
+                return;
+
+            const uint8_t *p = extra->GetBuffer();
+            const uint16_t flags = GetWBE( &p[2] );
+            auto &dovi = vars.tk->fmt.video.dovi;
+            dovi.version_major = p[0];
+            dovi.version_minor = p[1];
+            dovi.profile = (flags >> 9) & 0x7f;
+            dovi.level = (flags >> 3) & 0x3f;
+            dovi.rpu_present = (flags >> 2) & 0x01;
+            dovi.el_present = (flags >> 1) & 0x01;
+            dovi.bl_present = flags & 0x01;
+            if( extra->GetSize() > 4 )
+            {
+                dovi.bl_signal_compatibility_id = p[4] >> 4;
+                dovi.md_compression = (p[4] >> 2) & 0x03;
+            }
+        }
+#endif
         E_CASE( KaxTrackName, tname )
         {
             free(vars.tk->fmt.psz_description);
