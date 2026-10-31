@@ -382,6 +382,8 @@ struct video_format_t
         unsigned rpu_present : 1;
         unsigned el_present : 1;
         unsigned bl_present : 1;
+        unsigned bl_signal_compatibility_id : 4;
+        unsigned md_compression : 2;
     } dovi;
     uint32_t i_cubemap_padding; /**< padding in pixels of the cube map faces */
 };

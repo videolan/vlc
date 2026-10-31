@@ -4157,6 +4157,7 @@ static int MP4_ReadBox_dvcC( stream_t *p_stream, MP4_Box_t *p_box )
 {
     MP4_Box_data_dvcC_t *p_dvcC;
     uint16_t flags;
+    uint8_t compat;
     MP4_READBOX_ENTER( MP4_Box_data_dvcC_t, NULL );
     p_dvcC = p_box->data.p_dvcC;
     MP4_GET1BYTE( p_dvcC->i_version_major );
@@ -4167,6 +4168,9 @@ static int MP4_ReadBox_dvcC( stream_t *p_stream, MP4_Box_t *p_box )
     p_dvcC->i_rpu_present   = (flags >> 2) & 0x01;  // 1 bit
     p_dvcC->i_el_present    = (flags >> 1) & 0x01;  // 1 bit
     p_dvcC->i_bl_present    =  flags       & 0x01;  // 1 bit
+    MP4_GET1BYTE( compat );
+    p_dvcC->i_bl_signal_compatibility_id = compat >> 4;  // 4 bits
+    p_dvcC->i_md_compression = (compat >> 2) & 0x03;     // 2 bits
     /* TODO: remainder of box, if needed */
     MP4_READBOX_EXIT( 1 );
 }

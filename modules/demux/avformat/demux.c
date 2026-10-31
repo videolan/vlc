@@ -206,6 +206,11 @@ static void get_dovi_config(es_format_t *fmt, const AVStream *s)
     fmt->video.dovi.rpu_present = cfg->rpu_present_flag;
     fmt->video.dovi.el_present = cfg->el_present_flag;
     fmt->video.dovi.bl_present = cfg->bl_present_flag;
+    fmt->video.dovi.bl_signal_compatibility_id =
+        cfg->dv_bl_signal_compatibility_id;
+#if LIBAVUTIL_VERSION_CHECK( 59, 30, 100 )
+    fmt->video.dovi.md_compression = cfg->dv_md_compression;
+#endif
 #endif
 }
 

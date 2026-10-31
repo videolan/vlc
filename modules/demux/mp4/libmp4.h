@@ -740,6 +740,8 @@ typedef struct
     uint8_t i_rpu_present;
     uint8_t i_el_present;
     uint8_t i_bl_present;
+    uint8_t i_bl_signal_compatibility_id;
+    uint8_t i_md_compression;
 } MP4_Box_data_dvcC_t;
 
 #define SAMPLE_DESC_COMMON_HEADER \

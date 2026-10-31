@@ -529,6 +529,9 @@ int SetupVideoES( demux_t *p_demux, const mp4_track_t *p_track, const MP4_Box_t 
         p_fmt->video.dovi.rpu_present = p_data->i_rpu_present;
         p_fmt->video.dovi.bl_present = p_data->i_bl_present;
         p_fmt->video.dovi.el_present = p_data->i_el_present;
+        p_fmt->video.dovi.bl_signal_compatibility_id =
+            p_data->i_bl_signal_compatibility_id;
+        p_fmt->video.dovi.md_compression = p_data->i_md_compression;
     }
 
     SetupGlobalExtensions( p_sample, p_fmt );

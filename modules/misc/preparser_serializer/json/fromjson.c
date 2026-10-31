@@ -685,6 +685,14 @@ static void fromJSON_video_format(struct serdes_sys *sys,
         if (!json_object_to_integer(subobj, "bl_present", &tmp, &err, 0, 1)) {
             video->dovi.bl_present = tmp;
         }
+        if (!json_object_to_integer(subobj, "bl_signal_compatibility_id",
+                                    &tmp, &err, 0, (1 << 4) - 1)) {
+            video->dovi.bl_signal_compatibility_id = tmp;
+        }
+        if (!json_object_to_integer(subobj, "md_compression", &tmp, &err, 0,
+                                    (1 << 2) - 1)) {
+            video->dovi.md_compression = tmp;
+        }
     }
 
     json_object_to_uint(obj, "i_cubemap_padding", &video->i_cubemap_padding,
