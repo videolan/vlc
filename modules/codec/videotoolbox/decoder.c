@@ -208,6 +208,7 @@ struct vt_h264_context
 {
     struct hxxx_helper hh;
     h264_poc_context_t poc;
+    bool b_extra_has_config;
 };
 
 static void GetxPSH264(uint8_t i_pps_id, void *priv,
@@ -369,6 +370,7 @@ static bool InitH264(decoder_t *p_dec)
         CleanH264(ctx);
         return false;
     }
+    ctx->b_extra_has_config = hxxx_helper_has_config(&ctx->hh);
     p_sys->p_codec_context = ctx;
     p_sys->dpb.i_fields_per_buffer = 2;
     return true;
@@ -380,7 +382,7 @@ static CFDictionaryRef CopyDecoderExtradataH264(decoder_t *p_dec)
     struct vt_h264_context *h264ctx = p_sys->p_codec_context;
 
     CFDictionaryRef extradata = NULL;
-    if (p_dec->fmt_in->i_extra && h264ctx->hh.i_input_nal_length_size)
+    if (h264ctx->b_extra_has_config && h264ctx->hh.i_input_nal_length_size)
     {
         /* copy DecoderConfiguration */
         extradata = ExtradataInfoCreate(CFSTR("avcC"),
@@ -462,7 +464,7 @@ static bool LateStartH264(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     struct vt_h264_context *h264ctx = p_sys->p_codec_context;
-    return (p_dec->fmt_in->i_extra == 0 && !hxxx_helper_has_config(&h264ctx->hh));
+    return !hxxx_helper_has_config(&h264ctx->hh);
 }
 
 static bool ConfigureVoutH264(decoder_t *p_dec)
@@ -569,6 +571,7 @@ struct vt_hevc_context
 {
     struct hxxx_helper hh;
     hevc_poc_ctx_t poc;
+    bool b_extra_has_config;
 };
 
 static void CleanHEVC(void *p_codec_context)
@@ -593,6 +596,8 @@ static bool InitHEVC(decoder_t *p_dec)
         CleanHEVC(ctx);
         return false;
     }
+    ctx->b_extra_has_config = ctx->hh.hevc.i_sps_count &&
+                              ctx->hh.hevc.i_pps_count;
     p_sys->p_codec_context = ctx;
     return true;
 }
@@ -767,7 +772,7 @@ static CFDictionaryRef CopyDecoderExtradataHEVC(decoder_t *p_dec)
     struct vt_hevc_context *hevcctx = p_sys->p_codec_context;
 
     CFDictionaryRef extradata = NULL;
-    if (p_dec->fmt_in->i_extra && hevcctx->hh.i_input_nal_length_size)
+    if (hevcctx->b_extra_has_config && hevcctx->hh.i_input_nal_length_size)
     {
         /* copy DecoderConfiguration */
         extradata = ExtradataInfoCreate(CFSTR("hvcC"),
@@ -793,7 +798,8 @@ static bool LateStartHEVC(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     struct vt_hevc_context *hevcctx = p_sys->p_codec_context;
-    return (p_dec->fmt_in->i_extra == 0 && !hxxx_helper_has_config(&hevcctx->hh));
+    return !hevcctx->b_extra_has_config &&
+           !hxxx_helper_has_config(&hevcctx->hh);
 }
 
 static bool CodecSupportedHEVC(decoder_t *p_dec)
