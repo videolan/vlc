@@ -495,7 +495,8 @@ bool MediaLibrary::Init()
         return false;
     }
 
-    m_ml->setDiscoverNetworkEnabled( true );
+    m_ml->setDiscoverNetworkEnabled(
+        var_InheritBool( VLC_OBJECT( m_vlc_ml ), "ml-network-discovery" ) );
 
     m_initialized = true;
     return true;
@@ -2701,6 +2702,7 @@ static void Close( vlc_object_t* obj )
                               "media from" )
 
 #define ML_VERBOSE _( "Extra verbose media library logs" )
+#define ML_NETWORK_DISCOVERY N_( "Discover network shares" )
 
 vlc_module_begin()
     set_shortname(N_("media library"))
@@ -2709,4 +2711,5 @@ vlc_module_begin()
     set_capability("medialibrary", 100)
     set_callbacks(Open, Close)
     add_bool( "ml-verbose", false, ML_VERBOSE, nullptr )
+    add_bool( "ml-network-discovery", true, ML_NETWORK_DISCOVERY, nullptr )
 vlc_module_end()
