@@ -43,6 +43,28 @@ cfdict_set_int32(CFMutableDictionaryRef dict, CFStringRef key, int value)
     CFRelease(number);
 }
 
+bool
+cfdict_set_dovi_config(CFMutableDictionaryRef dict, const video_format_t *fmt)
+{
+    const uint8_t record[24] = {
+        fmt->dovi.version_major,
+        fmt->dovi.version_minor,
+        fmt->dovi.profile << 1 | fmt->dovi.level >> 5,
+        (fmt->dovi.level & 0x1f) << 3 | fmt->dovi.rpu_present << 2 |
+            fmt->dovi.el_present << 1 | fmt->dovi.bl_present,
+        fmt->dovi.bl_signal_compatibility_id << 4 |
+            fmt->dovi.md_compression << 2,
+    };
+
+    CFDataRef data = CFDataCreate(kCFAllocatorDefault, record, sizeof(record));
+    if (data == NULL)
+        return false;
+    CFDictionarySetValue(dict, fmt->dovi.profile > 7 ? CFSTR("dvvC")
+                                                     : CFSTR("dvcC"), data);
+    CFRelease(data);
+    return true;
+}
+
 struct cvpxpic_ctx
 {
     picture_context_t s;

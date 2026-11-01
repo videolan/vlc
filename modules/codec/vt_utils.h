@@ -28,6 +28,9 @@ CFMutableDictionaryRef cfdict_create(CFIndex capacity);
 
 void cfdict_set_int32(CFMutableDictionaryRef dict, CFStringRef key, int value);
 
+bool cfdict_set_dovi_config(CFMutableDictionaryRef dict,
+                            const video_format_t *fmt);
+
 /*
  * Attach a cvpx buffer to a picture
  *
