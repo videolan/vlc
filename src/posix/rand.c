@@ -30,6 +30,9 @@
 #include <stdlib.h>
 
 #include <sys/types.h>
+#ifdef HAVE_GETRANDOM
+#include <sys/random.h>
+#endif
 #include <fcntl.h>
 #include <unistd.h>
 #include <vlc_fs.h>
@@ -37,6 +40,26 @@
 #include <vlc_hash.h>
 #include <vlc_tick.h>
 #include <vlc_threads.h>
+
+static ssize_t vlc_getrandom(unsigned char *buf, size_t len)
+{
+    ssize_t val;
+
+#ifdef HAVE_GETRANDOM
+    val = getrandom(buf, len, 0);
+    if (val >= 0)
+        return val;
+
+    /* ENOSYS fallback */
+#endif
+    int fd = vlc_open("/dev/urandom", O_RDONLY);
+    if (fd < 0)
+        return -1;
+
+    val = read(fd, buf, len);
+    vlc_close(fd);
+    return val;
+}
 
 /*
  * Pseudo-random number generator using a HMAC-MD5 in counter mode.
@@ -49,18 +72,12 @@ static uint8_t okey[BLOCK_SIZE], ikey[BLOCK_SIZE];
 
 static void vlc_rand_init (void)
 {
-    uint8_t key[BLOCK_SIZE];
+    uint8_t key[BLOCK_SIZE] = { };
+    ssize_t val = 0;
 
     /* Get non-predictible value as key for HMAC */
-    int fd = vlc_open ("/dev/urandom", O_RDONLY);
-    if (fd == -1)
-        return; /* Uho! */
-
-    for (size_t i = 0; i < sizeof (key);)
-    {
-         ssize_t val = read (fd, key + i, sizeof (key) - i);
-         if (val > 0)
-             i += val;
+    for (size_t i = 0; i < sizeof (key) && val > 0; i += val) {
+        val = vlc_getrandom(key + i, sizeof (key) - i);
     }
 
     /* Precompute outer and inner keys for HMAC */
@@ -69,8 +86,6 @@ static void vlc_rand_init (void)
         okey[i] = key[i] ^ 0x5c;
         ikey[i] = key[i] ^ 0x36;
     }
-
-    vlc_close (fd);
 }
 
 
