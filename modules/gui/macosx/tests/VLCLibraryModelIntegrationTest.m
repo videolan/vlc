@@ -1124,7 +1124,14 @@
                          counter:(size_t (^)(void))counter
                           loader:(NSArray *(^)(void))loader
 {
+    // Stop media-library callbacks after lazy construction and drain submitted work.
+    (void)self.model;
     [self stopModelCallback];
+    XCTestExpectation * const settled = [self expectationWithDescription:@"Media-library callbacks settled before filtered count query"];
+    [self.model finishPendingQueriesWithCompletion:^{
+        [settled fulfill];
+    }];
+    [self waitForExpectations:@[ settled ] timeout:10.];
     const struct {
         SEL getter;
         __unsafe_unretained NSNotificationName notification;
