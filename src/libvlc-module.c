@@ -2175,8 +2175,10 @@ vlc_module_begin ()
 #endif
 #ifdef HAVE_DBUS
     add_bool( "dbus", false, DBUS_TEXT, DBUS_LONGTEXT )
+        change_volatile()
 #endif
     add_bool( "media-library", false, ML_TEXT, ML_LONGTEXT )
+        change_volatile()
     add_bool( "playlist-tree", false, PLTREE_TEXT, PLTREE_LONGTEXT )
 
     add_string( "open", "", OPEN_TEXT, OPEN_LONGTEXT )
