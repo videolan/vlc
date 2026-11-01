@@ -1384,7 +1384,10 @@
             [notification.object libraryID] != libraryID)
             return NO;
         XCTAssertTrue(NSThread.isMainThread);
-        XCTAssertEqual(notification.object, previous);
+        VLCMediaLibraryMediaItem * const deletedItem = notification.object;
+        // Media-library callbacks may replace the snapshot before deletion arrives.
+        XCTAssertEqual(deletedItem.libraryID, previous.libraryID);
+        XCTAssertEqual(deletedItem.mediaType, type);
         NSArray * const cache = audio
             ? self.model.listOfRecentAudioMedia
             : self.model.listOfRecentMedia;

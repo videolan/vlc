@@ -1916,6 +1916,22 @@ typedef NS_ENUM(NSUInteger, VLCLibraryModelOverlapChange) {
         NSNotificationName const recentDeletion = audio ? VLCLibraryModelRecentAudioMediaItemDeleted : VLCLibraryModelRecentsMediaItemDeleted;
         [changes addObject:[self expectChangesNamed:mainDeletion IDs:@[ @(pendingID) ]]];
         [changes addObject:[self expectChangesNamed:recentDeletion IDs:@[ @(pendingID) ]]];
+        // Controlled event delivery keeps these seeded snapshots stable until deletion.
+        NSArray * const deletedItems = @[
+            [self itemWithID:pendingID inItems:self.fixture.cachedItems],
+            [self itemWithID:pendingID inItems:[self recentItemsForKind:kind]],
+        ];
+        NSArray<NSNotificationName> * const deletionNames = @[ mainDeletion, recentDeletion ];
+        [deletionNames enumerateObjectsUsingBlock:^(NSNotificationName name, NSUInteger index, BOOL * __unused stop) {
+            id const cachedItem = deletedItems[index];
+            [self observeNotification:name
+                               object:nil
+                                queue:NSOperationQueue.mainQueue
+                           usingBlock:^(NSNotification *notification) {
+                if ([notification.object libraryID] == pendingID)
+                    XCTAssertEqual(notification.object, cachedItem);
+            }];
+        }];
     }
     XCTestExpectation * const queueHeld = [self expectationWithDescription:@"Shared media-cache queue held"];
     [model holdWritesFollowingNextCacheReadWithHandler:^{
