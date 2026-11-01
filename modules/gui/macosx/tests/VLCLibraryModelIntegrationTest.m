@@ -1236,7 +1236,6 @@
     XCTestExpectation * const loaded = [self expectationForNotification:VLCLibraryModelListOfMonitoredFoldersUpdated
                                                                  object:self.model
                                                                 handler:nil];
-    [self.model resetCachedListOfMonitoredFolders];
     [self waitForExpectations:@[ loaded ] timeout:5.];
     XCTAssertGreaterThan(self.model.cachedListOfMonitoredFolders.count, (NSUInteger)0);
     NSArray<VLCMediaLibraryFolderObserver *> * const previousObservers = self.model.folderObservers;
@@ -1682,7 +1681,6 @@
     XCTestExpectation * const loaded = [self expectationForNotification:VLCLibraryModelListOfMonitoredFoldersUpdated
                                                                  object:self.model
                                                                 handler:nil];
-    [self.model resetCachedListOfMonitoredFolders];
     [self waitForExpectations:@[ loaded ] timeout:5.];
     __weak VLCMediaLibraryFolderObserver *previousObserver = nil;
     NSSet<NSURL *> *previousURLs = nil;

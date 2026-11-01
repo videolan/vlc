@@ -345,14 +345,9 @@ VLCMediaLibraryMediaItem *VLCLibraryModelTestMediaItem(vlc_ml_media_type_t type,
 
 - (void)waitForInitialCounts
 {
-    NSPredicate * const predicate = [NSPredicate predicateWithBlock:
-        ^BOOL(VLCLibraryModelTestQueryGate *model,
-              NSDictionary * __unused bindings) {
-        return model.initialCountsLoaded;
-    }];
-    XCTNSPredicateExpectation * const counts = [[XCTNSPredicateExpectation alloc] initWithPredicate:predicate
-                                                                                         object:self];
-    XCTAssertEqual([XCTWaiter waitForExpectations:@[ counts ] timeout:10.], XCTWaiterResultCompleted);
+    for (NSUInteger attempt = 0; attempt < 1000 && !self.initialCountsLoaded; attempt++)
+        [NSThread sleepForTimeInterval:.01];
+    XCTAssertTrue(self.initialCountsLoaded);
 }
 
 - (void)holdNextQueryResultForGetter:(SEL)getter
