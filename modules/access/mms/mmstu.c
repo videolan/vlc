@@ -71,7 +71,7 @@ static block_t *Block( stream_t *, bool * );
 static int Seek( stream_t *, uint64_t );
 static int Control( stream_t *, int, va_list );
 
-static int  MMSOpen ( stream_t *, vlc_url_t *, int );
+static int  MMSOpen ( stream_t *, const vlc_url_t *, int );
 static int  MMSStart( stream_t *, uint32_t );
 static int  MMSStop ( stream_t * );
 static void MMSClose( stream_t * );
@@ -474,7 +474,7 @@ static block_t *Block( stream_t *p_access, bool *restrict eof )
 /****************************************************************************
  * MMSOpen : Open a connection with the server over mmst or mmsu
  ****************************************************************************/
-static int MMSOpen( stream_t  *p_access, vlc_url_t *p_url, int  i_proto )
+static int MMSOpen( stream_t  *p_access, const vlc_url_t *p_url, int  i_proto )
 {
     access_sys_t *p_sys = p_access->p_sys;
     int           b_udp = ( i_proto == MMS_PROTO_UDP ) ? 1 : 0;
