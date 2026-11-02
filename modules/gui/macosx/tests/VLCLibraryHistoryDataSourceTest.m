@@ -22,6 +22,7 @@
 
 #import "VLCAppKitMockingTestCase.h"
 
+#import "extensions/NSString+Helpers.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryRepresentedItem.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
@@ -205,6 +206,29 @@ NSString *VLCLibrarySupplementaryElementViewIdentifier = @"VLCLibrarySupplementa
     NSPasteboardItem * const writer = (id)[self.source tableView:(NSTableView *)self.table pasteboardWriterForRow:4];
     XCTAssertNotNil([writer dataForType:VLCMediaLibraryMediaItemUTI]);
     XCTAssertEqual([self.source rowForLibraryItem:[self mediaWithID:99 type:VLC_ML_MEDIA_TYPE_AUDIO date:self.today]], NSNotFound);
+}
+
+- (void)testDateHeadersRepresentOnlyTheirOrderedMediaAndExposeItemCounts
+{
+    NSArray<NSNumber *> * const rows = @[@0, @3, @5];
+    NSArray<NSArray<VLCMediaLibraryMediaItem *> *> * const expectedGroups = @[
+        @[self.media[1], self.media[0]], @[self.media[2]], @[self.media[3]]
+    ];
+    [rows enumerateObjectsUsingBlock:^(NSNumber *row, NSUInteger index, BOOL * const __unused stop) {
+        VLCLibraryRepresentedItem * const header = [self.source representedItemForHeaderRow:row.integerValue];
+        XCTAssertNotNil(header);
+        XCTAssertEqualObjects(header.item.displayString, [self.source titleForRow:row.integerValue]);
+        XCTAssertEqualObjects(header.item.mediaItems, expectedGroups[index]);
+        NSString * const countString = _NPS("%lu item", "%lu items", (unsigned long)expectedGroups[index].count);
+        XCTAssertEqualObjects(header.item.primaryDetailString, countString);
+        XCTAssertEqual(header.parentType, VLCMediaLibraryParentGroupTypeUnknown);
+        NSMutableArray<VLCMediaLibraryMediaItem *> * const iterated = NSMutableArray.array;
+        [header.item iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem *item) { [iterated addObject:item]; }];
+        XCTAssertEqualObjects(iterated, expectedGroups[index]);
+    }];
+    for (NSNumber *row in @[@(-1), @1, @2, @4, @6, @7, @(NSIntegerMax)]) {
+        XCTAssertNil([self.source representedItemForHeaderRow:row.integerValue]);
+    }
 }
 
 - (void)testDoubleClickUsesClickedMediaRowAndIgnoresHeadersAndOtherSenders

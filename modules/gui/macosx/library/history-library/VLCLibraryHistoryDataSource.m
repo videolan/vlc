@@ -211,6 +211,20 @@
     return [self.sections[_tableRows[row].section] titleWithCalendar:_calendar now:_now];
 }
 
+- (VLCLibraryRepresentedItem *)representedItemForHeaderRow:(NSInteger)row
+{
+    if (![self isHeaderRow:row]) {
+        return nil;
+    }
+
+    VLCLibraryHistorySection * const section = self.sections[_tableRows[row].section];
+    VLCMediaLibraryDummyItem * const groupItem =
+        [[VLCMediaLibraryDummyItem alloc] initWithDisplayString:[self titleForRow:row]
+                                                 withMediaItems:section.mediaItems];
+    return [[VLCLibraryRepresentedItem alloc] initWithItem:groupItem
+                                                parentType:VLCMediaLibraryParentGroupTypeUnknown];
+}
+
 - (VLCMediaLibraryParentGroupType)currentParentType
 {
     return VLCMediaLibraryParentGroupTypeUnknown;
