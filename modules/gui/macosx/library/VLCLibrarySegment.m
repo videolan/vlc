@@ -45,6 +45,8 @@
 
 #import "library/home-library/VLCLibraryHomeViewController.h"
 
+#import "library/history-library/VLCLibraryHistoryViewController.h"
+
 #import "library/media-source/VLCLibraryMediaSourceViewController.h"
 #import "library/media-source/VLCMediaSource.h"
 #import "library/media-source/VLCMediaSourceProvider.h"
@@ -204,6 +206,44 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             return VLCLibraryWindowPersistentPreferences.sharedInstance.favoritesLibraryViewMode;
         };
         self.internalToolbarDisplayFlags = standardLibraryViewToolbarDisplayFlags;
+    }
+    return self;
+}
+
+@end
+
+// MARK: - VLCLibraryHistorySegment
+
+@interface VLCLibraryHistorySegment : VLCLibrarySegment
+@end
+
+@implementation VLCLibraryHistorySegment
+
+- (instancetype)init
+{
+    self = [super initWithSegmentType:VLCLibraryHistorySegmentType];
+    if (self) {
+        self.internalDisplayString = _NS("History");
+        self.internalSearchFieldPlaceholder = _NS("Search your history");
+        if (@available(macOS 11.0, *)) {
+            self.internalDisplayImage = [NSImage imageWithSystemSymbolName:@"clock.arrow.circlepath"
+                                                  accessibilityDescription:@"History icon"];
+        } else {
+            self.internalDisplayImage = [NSImage imageNamed:NSImageNameRefreshTemplate];
+        }
+        self.internalMediaLibraryRequired = YES;
+        self.internalLibraryViewControllerClass = VLCLibraryHistoryViewController.class;
+        self.internalLibraryViewControllerCreator = ^{
+            return [[VLCLibraryHistoryViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
+        };
+        self.internalLibraryViewPresenter = ^(VLCLibraryAbstractSegmentViewController * const controller) {
+            [(VLCLibraryHistoryViewController *)controller presentHistoryView];
+        };
+        self.internalGetViewModePreference = ^{
+            return VLCLibraryGridViewModeSegment;
+        };
+        self.internalSaveViewModePreference = ^(const NSInteger __unused viewMode) {};
+        self.internalToolbarDisplayFlags = VLCLibraryWindowToolbarDisplayFlagLibrarySearchBar;
     }
     return self;
 }
@@ -933,6 +973,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             [[VLCLibraryHomeSegment alloc] init],
             [[VLCLibraryHeaderSegment alloc] initWithDisplayString:_NS("Library")],
             [[VLCLibraryFavoritesSegment alloc] init],
+            [[VLCLibraryHistorySegment alloc] init],
             [[VLCLibraryVideoSegment alloc] init],
             [[VLCLibraryMusicSegment alloc] init],
             [[VLCLibraryPlaylistSegment alloc] init],
@@ -956,6 +997,8 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             return [[VLCLibraryHomeSegment alloc] init];
         case VLCLibraryFavoritesSegmentType:
             return [[VLCLibraryFavoritesSegment alloc] init];
+        case VLCLibraryHistorySegmentType:
+            return [[VLCLibraryHistorySegment alloc] init];
         case VLCLibraryVideoSegmentType:
             return [[VLCLibraryVideoSegment alloc] init];
         case VLCLibraryShowsVideoSubSegmentType:
