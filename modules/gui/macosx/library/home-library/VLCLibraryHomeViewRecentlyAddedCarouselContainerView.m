@@ -21,8 +21,11 @@
 #import "VLCLibraryHomeViewRecentlyAddedCarouselContainerView.h"
 
 #import "library/VLCLibraryCarouselCollectionViewItem.h"
+#import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/home-library/VLCLibraryHomeViewVideoContainerViewDataSource.h"
 #import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
+
+#import "views/VLCUIUnits.h"
 
 @implementation VLCLibraryHomeViewRecentlyAddedCarouselContainerView
 {
@@ -37,6 +40,11 @@
                       group == VLCMediaLibraryParentGroupTypeRecentlyAddedAudios);
     self = [super init];
     if (self) {
+        if (group == VLCMediaLibraryParentGroupTypeRecentlyAddedVideos) {
+            self.collectionViewDelegate.itemsAspectRatio = VLCLibraryCollectionViewItemAspectRatioVideoItem;
+            self.collectionViewDelegate.staticItemSize = NSMakeSize(VLCUIUnits.carouselViewVideoItemViewWidth,
+                                                                  self.itemHeight);
+        }
         _groupDescriptor = [[VLCLibraryVideoCollectionViewGroupDescriptor alloc] initWithVLCVideoLibraryGroup:group];
         ((VLCLibraryHomeViewVideoContainerViewDataSource *)self.dataSource).groupDescriptor = _groupDescriptor;
         [self setupHeader];
