@@ -103,9 +103,7 @@
     return NSZeroSize;
 }
 
-- (BOOL)collectionView:(NSCollectionView *)collectionView
-canDragItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
-             withEvent:(NSEvent *)event
+- (BOOL)collectionView:(NSCollectionView *)collectionView canDragItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths withEvent:(NSEvent *)event
 {
     return YES;
 }
@@ -135,7 +133,9 @@ writeItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
             VLCMediaLibraryFile *file = mediaItem.files.firstObject;
             if (file) {
                 NSURL *url = [NSURL URLWithString:file.MRL];
-                [filePathsArray addObject:url.path];
+                if (url.isFileURL && url.path.length > 0) {
+                    [filePathsArray addObject:url.path];
+                }
             }
         }];
     }
