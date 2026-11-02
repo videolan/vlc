@@ -31,6 +31,24 @@
 
 @synthesize dataSource = _dataSource;
 
+- (instancetype)init
+{
+    return [self initWithGroup:VLCMediaLibraryParentGroupTypeRecentlyAddedVideos];
+}
+
+- (instancetype)initWithGroup:(VLCMediaLibraryParentGroupType)group
+{
+    NSParameterAssert(group == VLCMediaLibraryParentGroupTypeRecentlyAddedVideos ||
+                      group == VLCMediaLibraryParentGroupTypeRecentlyAddedAudios);
+    self = [super init];
+    if (self) {
+        _groupDescriptor = [[VLCLibraryVideoCollectionViewGroupDescriptor alloc] initWithVLCVideoLibraryGroup:group];
+        ((VLCLibraryHomeViewVideoContainerViewDataSource *)self.dataSource).groupDescriptor = _groupDescriptor;
+        [self setupHeader];
+    }
+    return self;
+}
+
 - (NSNotificationName)displayedCollectionChangedNotification
 {
     return VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification;
@@ -43,16 +61,15 @@
     source.collectionViewItemIdentifier = VLCLibraryCarouselCollectionViewItemIdentifier;
     source.collectionView = self.collectionView;
     [source setup];
-    _groupDescriptor = [[VLCLibraryVideoCollectionViewGroupDescriptor alloc]
-        initWithVLCVideoLibraryGroup:VLCMediaLibraryParentGroupTypeRecentlyAddedVideos];
-    source.groupDescriptor = _groupDescriptor;
     _dataSource = source;
 }
 
 - (void)setupHeader
 {
     [super setupHeader];
-    self.headerView.title = _groupDescriptor.name;
+    if (_groupDescriptor != nil) {
+        self.headerView.title = _groupDescriptor.name;
+    }
     self.headerView.navigable = NO;
 }
 

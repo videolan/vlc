@@ -19,10 +19,14 @@
  *****************************************************************************/
 
 #import "VLCLibraryHomeViewBaseCarouselContainerView.h"
+#import "library/VLCLibraryDataTypes.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryHomeViewRecentlyAddedCarouselContainerView : VLCLibraryHomeViewBaseCarouselContainerView
+
+- (instancetype)initWithGroup:(VLCMediaLibraryParentGroupType)group;
+
 @end
 
 NS_ASSUME_NONNULL_END
