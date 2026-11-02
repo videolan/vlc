@@ -344,6 +344,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/favorites-library/VLCLibraryFavoritesTableViewDelegate.m \
 	gui/macosx/library/favorites-library/VLCLibraryFavoritesViewController.h \
 	gui/macosx/library/favorites-library/VLCLibraryFavoritesViewController.m \
+	gui/macosx/library/history-library/VLCLibraryHistorySection.h \
+	gui/macosx/library/history-library/VLCLibraryHistorySection.m \
 	gui/macosx/library/media-source/VLCLibraryMediaSourceViewController.h \
 	gui/macosx/library/media-source/VLCLibraryMediaSourceViewController.m \
 	gui/macosx/library/media-source/VLCMediaSource.h \
