@@ -1055,6 +1055,10 @@ bool matroska_segment_c::EnsureDuration(KaxCluster & fromCluster)
         {
             if( MKV_CHECKED_PTR_DECL ( simpleblock, KaxSimpleBlock, l ) )
             {
+                // with SCOPE_PARTIAL_DATA a Block whose header could not be
+                // read is kept in the Cluster, without frames or timestamp
+                if( simpleblock->NumberFrames() == 0 )
+                    continue;
                 simpleblock->SetParent( *p_last_cluster );
                 i_last_timecode = std::max(i_last_timecode, simpleblock->GlobalTimestamp());
             }
@@ -1065,6 +1069,8 @@ bool matroska_segment_c::EnsureDuration(KaxCluster & fromCluster)
                 {
                     if( MKV_CHECKED_PTR_DECL ( block, KaxBlock, g ) )
                     {
+                        if( block->NumberFrames() == 0 )
+                            continue;
                         block->SetParent( *p_last_cluster );
                         i_group_timecode += block->GlobalTimestamp();
                     }
