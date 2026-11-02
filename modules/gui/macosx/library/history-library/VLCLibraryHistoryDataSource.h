@@ -22,22 +22,26 @@
 
 #import "library/VLCLibraryCollectionViewDataSource.h"
 #import "library/VLCLibraryConnectableDataSource.h"
+#import "library/VLCLibrarySectionedTableViewDataSource.h"
 #import "VLCLibraryHistorySection.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryModel;
 
-@interface VLCLibraryHistoryDataSource : NSObject<VLCLibraryCollectionViewDataSource, VLCLibraryConnectableDataSource>
+@interface VLCLibraryHistoryDataSource : NSObject<VLCLibraryCollectionViewDataSource, VLCLibrarySectionedTableViewDataSource, VLCLibraryConnectableDataSource>
 
 @property (readwrite, strong, nonatomic) VLCLibraryModel *libraryModel;
 @property (readwrite, weak) NSCollectionView *collectionView;
+@property (readwrite, weak) NSTableView *tableView;
+@property (readwrite, nonatomic) BOOL tableViewActive;
 @property (readonly, copy) NSArray<VLCLibraryHistorySection *> *sections;
 @property (readwrite, copy, nullable) void (^dataChangedHandler)(void);
 
 - (void)connect;
 - (void)disconnect;
 - (void)reloadData;
+- (void)doubleClickAction:(id)sender;
 
 @end
 

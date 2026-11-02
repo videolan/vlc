@@ -34,6 +34,7 @@ VLCMacOSXTests_SOURCES = \
 	gui/macosx/tests/VLCLibraryHomeVideoDataSourceTest.m \
 	gui/macosx/tests/VLCLibraryHomeTestSupport.m \
 	gui/macosx/tests/VLCLibraryHistorySectionTest.m \
+	gui/macosx/tests/VLCLibraryHistoryDataSourceTest.m \
 	gui/macosx/tests/VLCLogMessageTest.m \
 	gui/macosx/tests/VLCLyricEntryTest.m \
 	gui/macosx/tests/VLCMacOSXTestDefaults.m \
@@ -52,6 +53,9 @@ VLCMacOSXTests_SOURCES = \
 	gui/macosx/extensions/NSView+VLCAdditions.m \
 	gui/macosx/library/home-library/VLCLibraryHomeViewSectionHeaderView.m \
 	gui/macosx/library/history-library/VLCLibraryHistorySection.m \
+	gui/macosx/library/history-library/VLCLibraryHistoryDataSource.m \
+	gui/macosx/library/VLCLibraryWindowPersistentPreferences.m \
+	gui/macosx/extensions/NSPasteboardItem+VLCAdditions.m \
 	gui/macosx/library/VLCLibraryCarouselView.m \
 	gui/macosx/library/VLCLibraryHeroView.m \
 	gui/macosx/library/VLCLibraryCollectionViewDelegate.m \

@@ -34,7 +34,11 @@
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibrarySegment.h"
+#import "library/VLCLibrarySectionedTableViewDelegate.h"
+#import "library/VLCLibraryTableCellView.h"
+#import "library/VLCLibraryTableView.h"
 #import "library/VLCLibraryWindow.h"
+#import "library/VLCLibraryWindowPersistentPreferences.h"
 #import "library/history-library/VLCLibraryHistoryDataSource.h"
 #import "main/VLCMain.h"
 
@@ -43,6 +47,9 @@
     VLCLibraryCollectionView *_collectionView;
     NSScrollView *_scrollView;
     VLCLibraryCollectionViewDelegate *_collectionViewDelegate;
+    VLCLibraryTableView *_tableView;
+    NSScrollView *_tableScrollView;
+    VLCLibrarySectionedTableViewDelegate *_tableViewDelegate;
     VLCLibraryHistoryDataSource *_dataSource;
     NSArray<NSLayoutConstraint *> *_placeholderConstraints;
 }
@@ -79,6 +86,22 @@
                       withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifier];
         _scrollView = [NSScrollView libraryScrollViewWithDocumentView:_collectionView];
 
+        _tableView = [[VLCLibraryTableView alloc] init];
+        _tableView.headerView = nil;
+        _tableView.allowsEmptySelection = YES;
+        _tableView.allowsMultipleSelection = YES;
+        _tableView.columnAutoresizingStyle = NSTableViewLastColumnOnlyAutoresizingStyle;
+        NSTableColumn * const column = [[NSTableColumn alloc] initWithIdentifier:@"history"];
+        [_tableView addTableColumn:column];
+        NSNib * const tableCellNib = [[NSNib alloc]
+            initWithNibNamed:NSStringFromClass(VLCLibraryTableCellView.class)
+                      bundle:nil];
+        [_tableView registerNib:tableCellNib forIdentifier:VLCLibraryTableCellViewIdentifier];
+        _tableViewDelegate = [[VLCLibrarySectionedTableViewDelegate alloc] init];
+        _tableViewDelegate.cellViewIdentifier = VLCLibraryTableCellViewIdentifier;
+        _tableView.delegate = _tableViewDelegate;
+        _tableScrollView = [NSScrollView libraryDetailScrollViewWithDocumentView:_tableView];
+
         _placeholderConstraints = @[
             [self.placeholderImageView.widthAnchor constraintEqualToConstant:182.],
             [self.placeholderImageView.heightAnchor constraintEqualToConstant:114.]
@@ -87,7 +110,13 @@
         _dataSource = [[VLCLibraryHistoryDataSource alloc] init];
         _dataSource.libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
         _dataSource.collectionView = _collectionView;
+        _dataSource.tableView = _tableView;
         _collectionView.dataSource = _dataSource;
+        _tableView.dataSource = _dataSource;
+        _tableView.target = _dataSource;
+        _tableView.doubleAction = @selector(doubleClickAction:);
+        _dataSource.tableViewActive = VLCLibraryWindowPersistentPreferences.sharedInstance.historyLibraryViewMode ==
+                                     VLCLibraryListViewModeSegment;
         __weak typeof(self) weakSelf = self;
         _dataSource.dataChangedHandler = ^{
             [weakSelf updatePresentedView];
@@ -119,8 +148,22 @@
 
 - (void)presentHistoryView
 {
+    const BOOL tableViewActive = VLCLibraryWindowPersistentPreferences.sharedInstance.historyLibraryViewMode ==
+                                 VLCLibraryListViewModeSegment;
+    const BOOL modeChanged = _dataSource.tableViewActive != tableViewActive;
+    _dataSource.tableViewActive = tableViewActive;
     [_dataSource reloadData];
     [self updatePresentedView];
+    if (modeChanged) {
+        if (tableViewActive && _tableView.selectedRow >= 0) {
+            [_tableView scrollRowToVisible:_tableView.selectedRow];
+        } else if (!tableViewActive && _collectionView.selectionIndexPaths.count > 0) {
+            NSIndexPath * const firstSelection =
+                [_collectionView.selectionIndexPaths.allObjects sortedArrayUsingSelector:@selector(compare:)].firstObject;
+            [_collectionView scrollToItemsAtIndexPaths:[NSSet setWithObject:firstSelection]
+                                        scrollPosition:NSCollectionViewScrollPositionTop];
+        }
+    }
 }
 
 - (void)connect
@@ -135,8 +178,9 @@
         return;
     }
     if (_dataSource.sections.count > 0) {
-        if (_scrollView.superview != self.libraryTargetView) {
-            [self.libraryWindow displayLibraryView:_scrollView];
+        NSScrollView * const selectedView = _dataSource.tableViewActive ? _tableScrollView : _scrollView;
+        if (selectedView.superview != self.libraryTargetView) {
+            [self.libraryWindow displayLibraryView:selectedView];
         }
     } else if (_dataSource.libraryModel.filterString.length > 0) {
         [self.libraryWindow displayNoResultsMessage];

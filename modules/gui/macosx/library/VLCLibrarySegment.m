@@ -240,10 +240,13 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             [(VLCLibraryHistoryViewController *)controller presentHistoryView];
         };
         self.internalGetViewModePreference = ^{
-            return VLCLibraryGridViewModeSegment;
+            return VLCLibraryWindowPersistentPreferences.sharedInstance.historyLibraryViewMode;
         };
-        self.internalSaveViewModePreference = ^(const NSInteger __unused viewMode) {};
-        self.internalToolbarDisplayFlags = VLCLibraryWindowToolbarDisplayFlagLibrarySearchBar;
+        self.internalSaveViewModePreference = ^(const NSInteger viewMode) {
+            VLCLibraryWindowPersistentPreferences.sharedInstance.historyLibraryViewMode = viewMode;
+        };
+        self.internalToolbarDisplayFlags = VLCLibraryWindowToolbarDisplayFlagToggleViewModeSegmentButton |
+                                           VLCLibraryWindowToolbarDisplayFlagLibrarySearchBar;
     }
     return self;
 }

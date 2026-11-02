@@ -108,6 +108,9 @@
 
     NSObject<VLCMediaLibraryItemProtocol> * const libraryItem =
         [vlcDataSource libraryItemAtRow:row forTableView:tableView];
+    if (libraryItem == nil) {
+        return @[];
+    }
 
     if (edge == NSTableRowActionEdgeLeading) {
         NSTableViewRowAction * const appendToPlayQueueAction =

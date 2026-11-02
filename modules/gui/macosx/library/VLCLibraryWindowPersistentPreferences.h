@@ -32,6 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readwrite, nonatomic) VLCLibraryViewModeSegment homeLibraryViewMode;
 @property (readwrite, nonatomic) VLCLibraryViewModeSegment favoritesLibraryViewMode;
+@property (readwrite, nonatomic) VLCLibraryViewModeSegment historyLibraryViewMode;
 @property (readwrite, nonatomic) VLCLibraryViewModeSegment videoLibraryViewMode;
 @property (readwrite, nonatomic) VLCLibraryViewModeSegment showsLibraryViewMode;
 @property (readwrite, nonatomic) VLCLibraryViewModeSegment moviesLibraryViewMode;
