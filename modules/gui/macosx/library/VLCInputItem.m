@@ -297,7 +297,15 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
 - (NSString *)decodedMRL
 {
-    char *psz_url = vlc_uri_decode(input_item_GetURI(_vlcInputItem));
+    char *uri = input_item_GetURI(_vlcInputItem);
+    if (uri == NULL)
+        return @"";
+    char *psz_url = vlc_uri_decode(uri);
+    if (psz_url == NULL)
+    {
+        free(uri);
+        return @"";
+    }
     NSString *returnValue = toNSStr(psz_url);
     FREENULL(psz_url);
     return returnValue;
