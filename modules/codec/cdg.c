@@ -166,6 +166,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
         p_pic = decoder_NewPicture( p_dec );
         if( !p_pic )
             goto exit;
+        p_pic->b_progressive = true;
 
         Render( p_sys, p_pic );
         p_pic->date = p_block->i_pts != VLC_TICK_INVALID ? p_block->i_pts : p_block->i_dts;
