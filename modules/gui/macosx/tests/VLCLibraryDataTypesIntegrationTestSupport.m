@@ -16,9 +16,10 @@
 #import <vlc/libvlc.h>
 
 #include <string.h>
-#include <ctype.h>
+#include <stdlib.h>
 #include <dispatch/dispatch.h>
-#include <sqlite3.h>
+#include <signal.h>
+#include <fcntl.h>
 #include <unistd.h>
 
 #import "VLCLibraryDataTypesIntegrationTestSupport.h"
@@ -52,62 +53,97 @@ static int64_t sGroupID;
 static BOOL sFactoryFixturesPrepared;
 static NSString *sUserDataPath;
 
-// Match medialibrary 0.13.2's sqlite::Connection::collateFilename, including
-// its leading-number comparison and length-bounded case-insensitive suffix.
-// Adapted from SqliteConnection.cpp.
-static int VLCLibraryDataTypesIntegrationCompareFilenames(void * __unused context,
-                                                          int lhsSize,
-                                                          const void *lhs,
-                                                          int rhsSize,
-                                                          const void *rhs)
+// The media-library plugin has its own SQLite copy. Run fixture SQL in another
+// process so SQLite's process-wide file locks keep the two clients coordinated.
+static NSDictionary *VLCLibraryDataTypesIntegrationSQLStatement(NSString *sql,
+                                                               NSArray *parameters,
+                                                               NSUInteger minimumChanges)
 {
-    const char *left = lhs;
-    const char *right = rhs;
-    int size = MIN(lhsSize, rhsSize);
-    if (size == 0)
-        return lhsSize - rhsSize;
-    if (!isdigit((unsigned char)*left) || !isdigit((unsigned char)*right))
-        return sqlite3_strnicmp(left, right, size);
-
-    int leftNumber = 0;
-    while (lhsSize > 0 && isdigit((unsigned char)*left)) {
-        leftNumber = leftNumber * 10 + (*left++ - '0');
-        lhsSize--;
-    }
-    int rightNumber = 0;
-    while (rhsSize > 0 && isdigit((unsigned char)*right)) {
-        rightNumber = rightNumber * 10 + (*right++ - '0');
-        rhsSize--;
-    }
-    if (leftNumber != rightNumber)
-        return leftNumber - rightNumber;
-    return sqlite3_strnicmp(left, right, MIN(lhsSize, rhsSize));
+    return @{ @"sql": sql, @"parameters": parameters, @"minimumChanges": @(minimumChanges) };
 }
 
-static BOOL VLCLibraryDataTypesIntegrationOpenDatabase(sqlite3 **database)
+static BOOL VLCLibraryDataTypesIntegrationExecuteStatements(NSArray<NSDictionary *> *statements)
 {
-    NSString * const path = [sUserDataPath stringByAppendingPathComponent:@"ml/ml.db"];
-    BOOL success = sqlite3_open_v2(path.fileSystemRepresentation,
-                                   database,
-                                   SQLITE_OPEN_READWRITE,
-                                   NULL) == SQLITE_OK;
-    if (success) {
-        success = sqlite3_busy_timeout(*database, 5000) == SQLITE_OK &&
-            sqlite3_create_collation_v2(*database,
-                                        "FILENAME",
-                                        SQLITE_UTF8,
-                                        NULL,
-                                        VLCLibraryDataTypesIntegrationCompareFilenames,
-                                        NULL) == SQLITE_OK &&
-            sqlite3_exec(*database, "PRAGMA foreign_keys = ON", NULL, NULL, NULL) == SQLITE_OK &&
-            sqlite3_exec(*database, "PRAGMA recursive_triggers = ON", NULL, NULL, NULL) == SQLITE_OK;
+    NSString * const databasePath = [sUserDataPath stringByAppendingPathComponent:@"ml/ml.db"];
+    NSString * const helperPath = [[[[NSBundle bundleForClass:VLCInputItem.class] executablePath]
+        stringByDeletingLastPathComponent] stringByAppendingPathComponent:@"VLCLibraryFixtureSQL"];
+    NSError *error = nil;
+    NSData * const request = [NSJSONSerialization dataWithJSONObject:
+        @{ @"database": databasePath, @"statements": statements }
+        options:0 error:&error];
+    if (request == nil) {
+        NSLog(@"Could not encode fixture SQL request: %@", error);
+        return NO;
     }
-    if (!success && *database != NULL) {
-        NSLog(@"Could not open fixture database: %s", sqlite3_errmsg(*database));
-        sqlite3_close(*database);
-        *database = NULL;
+
+    NSTask * const task = [[NSTask alloc] init];
+    task.executableURL = [NSURL fileURLWithPath:helperPath];
+    NSPipe * const input = NSPipe.pipe;
+    NSPipe * const output = NSPipe.pipe;
+    task.standardInput = input;
+    task.standardOutput = output;
+    // A child killed at the deadline must not send SIGPIPE to the test runner.
+    if (fcntl(input.fileHandleForWriting.fileDescriptor, F_SETNOSIGPIPE, 1) < 0) {
+        [input.fileHandleForWriting closeFile];
+        [output.fileHandleForReading closeFile];
+        NSLog(@"Could not configure fixture SQL input pipe");
+        return NO;
     }
-    return success;
+    // The child reports one small JSON result; diagnostics inherit stderr.
+    dispatch_semaphore_t const finished = dispatch_semaphore_create(0);
+    task.terminationHandler = ^(NSTask * __unused terminatedTask) {
+        dispatch_semaphore_signal(finished);
+    };
+    if (![task launchAndReturnError:&error]) {
+        [input.fileHandleForWriting closeFile];
+        [output.fileHandleForReading closeFile];
+        NSLog(@"Could not launch fixture SQL helper: %@", error);
+        return NO;
+    }
+
+    dispatch_group_t const io = dispatch_group_create();
+    dispatch_queue_t const queue = dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0);
+    __block NSString *writeError = nil;
+    __block NSString *readError = nil;
+    __block NSData *responseData = nil;
+    dispatch_group_async(io, queue, ^{
+        @try {
+            [input.fileHandleForWriting writeData:request];
+        } @catch (NSException *exception) {
+            writeError = exception.reason;
+        } @finally {
+            [input.fileHandleForWriting closeFile];
+        }
+    });
+    dispatch_group_async(io, queue, ^{
+        @try {
+            responseData = [output.fileHandleForReading readDataToEndOfFile];
+        } @catch (NSException *exception) {
+            readError = exception.reason;
+        } @finally {
+            [output.fileHandleForReading closeFile];
+        }
+    });
+    const BOOL timedOut = dispatch_semaphore_wait(finished,
+        dispatch_time(DISPATCH_TIME_NOW, 15 * NSEC_PER_SEC)) != 0;
+    if (timedOut && task.running)
+        kill(task.processIdentifier, SIGKILL);
+    // Reap the child and finish pipe I/O before the fixture database is removed.
+    [task waitUntilExit];
+    dispatch_group_wait(io, DISPATCH_TIME_FOREVER);
+    if (timedOut || writeError != nil || readError != nil) {
+        NSLog(@"Fixture SQL transport failed: %@", timedOut
+            ? @"helper exceeded its 15-second deadline" : writeError ?: readError);
+        return NO;
+    }
+    id const response = [NSJSONSerialization JSONObjectWithData:responseData options:0 error:&error];
+    if (task.terminationStatus != EXIT_SUCCESS ||
+        ![response isKindOfClass:NSDictionary.class] || ![response[@"success"] boolValue]) {
+        NSLog(@"Fixture SQL helper failed (exit %d): %@", task.terminationStatus,
+              [response isKindOfClass:NSDictionary.class] ? response[@"error"] : error);
+        return NO;
+    }
+    return YES;
 }
 
 typedef struct
@@ -137,82 +173,28 @@ static BOOL VLCLibraryDataTypesIntegrationMediaMatchesMRL(const vlc_ml_media_t *
 
 static BOOL VLCLibraryDataTypesIntegrationSetMovieMetadata(int64_t mediaID)
 {
-    /* The VLC medialibrary bridge exposes movie fields as read-only. Seed the
-     * persisted media and movie rows so the wrapper conversion is tested with
-     * a real video-typed movie and non-empty metadata. */
-    sqlite3 *database = NULL;
-    if (!VLCLibraryDataTypesIntegrationOpenDatabase(&database))
-        return NO;
-
-    sqlite3_stmt *statement = NULL;
-    BOOL success = sqlite3_prepare_v2(database,
-                                      "UPDATE Media SET type = ?, subtype = ? "
-                                      "WHERE id_media = ?",
-                                      -1,
-                                      &statement,
-                                      NULL) == SQLITE_OK;
-    if (success) {
-        sqlite3_bind_int(statement, 1, VLC_ML_MEDIA_TYPE_VIDEO);
-        sqlite3_bind_int(statement, 2, VLC_ML_MEDIA_SUBTYPE_MOVIE);
-        sqlite3_bind_int64(statement, 3, mediaID);
-        success = sqlite3_step(statement) == SQLITE_DONE;
-    }
-    sqlite3_finalize(statement);
-
-    if (success) {
-        success = sqlite3_prepare_v2(database,
-                                      "DELETE FROM Movie WHERE media_id = ?",
-                                      -1,
-                                      &statement,
-                                      NULL) == SQLITE_OK;
-    }
-    if (success) {
-        sqlite3_bind_int64(statement, 1, mediaID);
-        success = sqlite3_step(statement) == SQLITE_DONE;
-    }
-    sqlite3_finalize(statement);
-
-    if (success) {
-        success = sqlite3_prepare_v2(database,
-                                      "INSERT INTO Movie (media_id, summary, imdb_id) "
-                                      "VALUES (?, ?, ?)",
-                                      -1,
-                                      &statement,
-                                      NULL) == SQLITE_OK;
-    }
-    if (success) {
-        sqlite3_bind_int64(statement, 1, mediaID);
-        sqlite3_bind_text(statement, 2, "Factory movie summary", -1, SQLITE_STATIC);
-        sqlite3_bind_text(statement, 3, "tt1234567", -1, SQLITE_STATIC);
-        success = sqlite3_step(statement) == SQLITE_DONE;
-    }
-    sqlite3_finalize(statement);
-    sqlite3_close(database);
-    return success;
+    // The VLC bridge exposes movie fields as read-only. Seed the related rows
+    // atomically so media-library readers cannot observe a partly converted movie.
+    return VLCLibraryDataTypesIntegrationExecuteStatements(@[
+        VLCLibraryDataTypesIntegrationSQLStatement(
+            @"UPDATE Media SET type = ?1, subtype = ?2 WHERE id_media = ?3",
+            @[ @(VLC_ML_MEDIA_TYPE_VIDEO), @(VLC_ML_MEDIA_SUBTYPE_MOVIE), @(mediaID) ], 1),
+        VLCLibraryDataTypesIntegrationSQLStatement(
+            @"DELETE FROM Movie WHERE media_id = ?1", @[ @(mediaID) ], 0),
+        VLCLibraryDataTypesIntegrationSQLStatement(
+            @"INSERT INTO Movie (media_id, summary, imdb_id) VALUES (?1, ?2, ?3)",
+            @[ @(mediaID), @"Factory movie summary", @"tt1234567" ], 1),
+    ]);
 }
 
 static BOOL VLCLibraryDataTypesIntegrationSetMediaType(int64_t mediaID,
                                                        int type)
 {
-    sqlite3 *database = NULL;
-    if (!VLCLibraryDataTypesIntegrationOpenDatabase(&database))
-        return NO;
-
-    sqlite3_stmt *statement = NULL;
-    BOOL success = sqlite3_prepare_v2(database,
-                                      "UPDATE Media SET type = ?, import_type = 0, "
-                                      "is_present = 1 WHERE id_media = ?",
-                                      -1,
-                                      &statement,
-                                      NULL) == SQLITE_OK;
-    if (success) {
-        sqlite3_bind_int(statement, 1, type);
-        sqlite3_bind_int64(statement, 2, mediaID);
-        success = sqlite3_step(statement) == SQLITE_DONE && sqlite3_changes(database) == 1;
-    }
-    sqlite3_finalize(statement);
-    sqlite3_close(database);
-    return success;
+    return VLCLibraryDataTypesIntegrationExecuteStatements(@[
+        VLCLibraryDataTypesIntegrationSQLStatement(
+            @"UPDATE Media SET type = ?2, import_type = 0, is_present = 1 WHERE id_media = ?1",
+            @[ @(mediaID), @(type) ], 1),
+    ]);
 }
 
 static void VLCLibraryDataTypesIntegrationMediaLibraryEvent(void *data,
@@ -888,24 +870,10 @@ static BOOL VLCLibraryDataTypesIntegrationExecuteEntityStatement(const char *sql
                                                                  int64_t libraryID,
                                                                  id value)
 {
-    sqlite3 *database = NULL;
-    if (!VLCLibraryDataTypesIntegrationOpenDatabase(&database))
-        return NO;
-    sqlite3_stmt *statement = NULL;
-    BOOL success = sqlite3_prepare_v2(database, sql, -1, &statement, NULL) == SQLITE_OK;
-    if (success) {
-        sqlite3_bind_int64(statement, 1, libraryID);
-        if ([value isKindOfClass:NSNumber.class])
-            sqlite3_bind_int64(statement, 2, [value longLongValue]);
-        else if ([value isKindOfClass:NSString.class])
-            sqlite3_bind_text(statement, 2, [value UTF8String], -1, SQLITE_TRANSIENT);
-        success = sqlite3_step(statement) == SQLITE_DONE && sqlite3_changes(database) > 0;
-    }
-    if (!success)
-        NSLog(@"Could not modify fixture entity %lld: %s", libraryID, sqlite3_errmsg(database));
-    sqlite3_finalize(statement);
-    sqlite3_close(database);
-    return success;
+    NSArray * const parameters = value == nil ? @[ @(libraryID) ] : @[ @(libraryID), value ];
+    return VLCLibraryDataTypesIntegrationExecuteStatements(@[
+        VLCLibraryDataTypesIntegrationSQLStatement([NSString stringWithUTF8String:sql], parameters, 1),
+    ]);
 }
 
 int64_t VLCLibraryDataTypesIntegrationCreateExternalMediaOfType(const char *mrl, vlc_ml_media_type_t type)
@@ -1057,37 +1025,16 @@ BOOL VLCLibraryDataTypesIntegrationMoveMediaToAlbum(int64_t mediaID, int64_t alb
 
 BOOL VLCLibraryDataTypesIntegrationMoveMediaToArtist(int64_t mediaID, int64_t artistID)
 {
-    sqlite3 *database = NULL;
-    if (!VLCLibraryDataTypesIntegrationOpenDatabase(&database))
-        return NO;
-    BOOL success = sqlite3_exec(database, "BEGIN IMMEDIATE", NULL, NULL, NULL) == SQLITE_OK;
-    // The relation-table delete/insert triggers maintain both artists' real
-    // track counts. Keep the media's primary artist and relation consistent.
-    const char * const statements[] = {
-        "DELETE FROM MediaArtistRelation WHERE media_id = ?1",
-        "UPDATE Media SET artist_id = ?2 WHERE id_media = ?1",
-        "INSERT INTO MediaArtistRelation (media_id, artist_id) VALUES (?1, ?2)",
-    };
-    for (NSUInteger index = 0; success && index < sizeof(statements) / sizeof(statements[0]); index++) {
-        sqlite3_stmt *statement = NULL;
-        success = sqlite3_prepare_v2(database, statements[index], -1, &statement, NULL) == SQLITE_OK;
-        if (success) {
-            success = sqlite3_bind_int64(statement, 1, mediaID) == SQLITE_OK;
-            if (success && sqlite3_bind_parameter_count(statement) > 1)
-                success = sqlite3_bind_int64(statement, 2, artistID) == SQLITE_OK;
-            if (success)
-                success = sqlite3_step(statement) == SQLITE_DONE && sqlite3_changes(database) > 0;
-        }
-        sqlite3_finalize(statement);
-    }
-    if (success)
-        success = sqlite3_exec(database, "COMMIT", NULL, NULL, NULL) == SQLITE_OK;
-    if (!success) {
-        NSLog(@"Could not move fixture media %lld to artist %lld: %s", mediaID, artistID, sqlite3_errmsg(database));
-        sqlite3_exec(database, "ROLLBACK", NULL, NULL, NULL);
-    }
-    sqlite3_close(database);
-    return success;
+    // Keep the primary artist and trigger-maintained relation counts consistent.
+    return VLCLibraryDataTypesIntegrationExecuteStatements(@[
+        VLCLibraryDataTypesIntegrationSQLStatement(
+            @"DELETE FROM MediaArtistRelation WHERE media_id = ?1", @[ @(mediaID) ], 1),
+        VLCLibraryDataTypesIntegrationSQLStatement(
+            @"UPDATE Media SET artist_id = ?2 WHERE id_media = ?1", @[ @(mediaID), @(artistID) ], 1),
+        VLCLibraryDataTypesIntegrationSQLStatement(
+            @"INSERT INTO MediaArtistRelation (media_id, artist_id) VALUES (?1, ?2)",
+            @[ @(mediaID), @(artistID) ], 1),
+    ]);
 }
 
 BOOL VLCLibraryDataTypesIntegrationSetMovieSummary(int64_t mediaID, NSString *summary)

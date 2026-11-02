@@ -5,7 +5,7 @@ if ENABLE_MACOSX_XCTESTS
 macosx_gui_xctest_frameworks_dir = $(shell $(XCRUN) --sdk macosx --show-sdk-platform-path)/Developer/Library/Frameworks
 macosx_gui_xctest_bundles = VLCMacOSXTests.xctest
 
-check_PROGRAMS += VLCMacOSXTests
+check_PROGRAMS += VLCMacOSXTests VLCLibraryFixtureSQL
 TESTS += $(macosx_gui_xctest_bundles)
 
 VLCMacOSXTests_SOURCES = \
@@ -105,20 +105,27 @@ VLCMacOSXTests_LDFLAGS = \
 
 VLCMacOSXTests_LDADD = \
 	$(top_builddir)/lib/libvlc.la \
-	$(top_builddir)/src/libvlccore.la \
-	-lsqlite3
+	$(top_builddir)/src/libvlccore.la
+
+VLCLibraryFixtureSQL_SOURCES = gui/macosx/tests/VLCLibraryFixtureSQL.m
+VLCLibraryFixtureSQL_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc -fobjc-exceptions -fmodules
+VLCLibraryFixtureSQL_LDFLAGS = -Wl,-framework,Foundation
+VLCLibraryFixtureSQL_LDADD = -lsqlite3
 
 VLCMacOSXTests_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(OBJCLD) \
 	$(VLCMacOSXTests_OBJCFLAGS) $(OBJCFLAGS) \
 	$(VLCMacOSXTests_LDFLAGS) $(LDFLAGS) -o $@
 
-VLCMacOSXTests.xctest: VLCMacOSXTests$(EXEEXT) $(srcdir)/gui/macosx/tests/VLCMacOSXTests-Info.plist
+VLCMacOSXTests.xctest: VLCMacOSXTests$(EXEEXT) VLCLibraryFixtureSQL$(EXEEXT) $(srcdir)/gui/macosx/tests/VLCMacOSXTests-Info.plist
 	$(AM_V_GEN)rm -rf $@
 	$(AM_V_at)$(MKDIR_P) $@/Contents/MacOS
 	$(AM_V_at)$(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install \
 		$(INSTALL_PROGRAM) VLCMacOSXTests$(EXEEXT) \
 		$(abs_builddir)/$@/Contents/MacOS/VLCMacOSXTests
+	$(AM_V_at)$(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install \
+		$(INSTALL_PROGRAM) VLCLibraryFixtureSQL$(EXEEXT) \
+		$(abs_builddir)/$@/Contents/MacOS/VLCLibraryFixtureSQL
 	$(AM_V_at)$(INSTALL_DATA) $(srcdir)/gui/macosx/tests/VLCMacOSXTests-Info.plist $@/Contents/Info.plist
 
 EXTRA_DIST += gui/macosx/tests/VLCMacOSXTests-Info.plist
