@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryVideoGroupDescriptor.m: MacOS X interface module
+ * VLCLibraryMediaGroupDescriptor.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2022 VLC authors and VideoLAN
  *
@@ -20,15 +20,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCLibraryVideoGroupDescriptor.h"
+#import "VLCLibraryMediaGroupDescriptor.h"
 
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCLibraryModel.h"
 
-@implementation VLCLibraryVideoCollectionViewGroupDescriptor
+@implementation VLCLibraryMediaCollectionViewGroupDescriptor
 
-- (instancetype)initWithVLCVideoLibraryGroup:(const VLCMediaLibraryParentGroupType)group
+- (instancetype)initWithLibraryGroup:(const VLCMediaLibraryParentGroupType)group
 {
     self = [super init];
 

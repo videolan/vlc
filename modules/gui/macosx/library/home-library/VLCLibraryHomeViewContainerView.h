@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryVideoGroupDescriptor.h: MacOS X interface module
+ * VLCLibraryHomeViewContainerView.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2022 VLC authors and VideoLAN
  *

@@ -22,14 +22,14 @@
 
 #import "library/VLCLibraryCarouselCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewDelegate.h"
-#import "library/home-library/VLCLibraryHomeViewVideoContainerViewDataSource.h"
-#import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
+#import "library/home-library/VLCLibraryHomeViewMediaContainerViewDataSource.h"
+#import "library/VLCLibraryMediaGroupDescriptor.h"
 
 #import "views/VLCUIUnits.h"
 
 @implementation VLCLibraryHomeViewRecentlyAddedCarouselContainerView
 {
-    VLCLibraryVideoCollectionViewGroupDescriptor *_groupDescriptor;
+    VLCLibraryMediaCollectionViewGroupDescriptor *_groupDescriptor;
 }
 
 @synthesize dataSource = _dataSource;
@@ -45,8 +45,8 @@
             self.collectionViewDelegate.staticItemSize = NSMakeSize(VLCUIUnits.carouselViewVideoItemViewWidth,
                                                                   self.itemHeight);
         }
-        _groupDescriptor = [[VLCLibraryVideoCollectionViewGroupDescriptor alloc] initWithVLCVideoLibraryGroup:group];
-        ((VLCLibraryHomeViewVideoContainerViewDataSource *)self.dataSource).groupDescriptor = _groupDescriptor;
+        _groupDescriptor = [[VLCLibraryMediaCollectionViewGroupDescriptor alloc] initWithLibraryGroup:group];
+        ((VLCLibraryHomeViewMediaContainerViewDataSource *)self.dataSource).groupDescriptor = _groupDescriptor;
         [self setupHeader];
     }
     return self;
@@ -54,13 +54,13 @@
 
 - (NSNotificationName)displayedCollectionChangedNotification
 {
-    return VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification;
+    return VLCLibraryMediaCollectionViewDataSourceDisplayedCollectionChangedNotification;
 }
 
 - (void)setupDataSource
 {
-    VLCLibraryHomeViewVideoContainerViewDataSource * const source =
-        [[VLCLibraryHomeViewVideoContainerViewDataSource alloc] init];
+    VLCLibraryHomeViewMediaContainerViewDataSource * const source =
+        [[VLCLibraryHomeViewMediaContainerViewDataSource alloc] init];
     source.collectionViewItemIdentifier = VLCLibraryCarouselCollectionViewItemIdentifier;
     source.collectionView = self.collectionView;
     [source setup];

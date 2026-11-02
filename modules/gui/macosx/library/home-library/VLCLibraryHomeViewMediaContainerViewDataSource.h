@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryVideoGroupDescriptor.h: MacOS X interface module
+ * VLCLibraryHomeViewMediaContainerViewDataSource.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2022 VLC authors and VideoLAN
  *
@@ -22,19 +22,24 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryCollectionViewDataSource.h"
+
+@class VLCLibraryHomeViewVideoGridContainerView;
+@class VLCLibraryMediaCollectionViewGroupDescriptor;
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryVideoCollectionViewGroupDescriptor : NSObject
+extern NSString * const VLCLibraryMediaCollectionViewDataSourceDisplayedCollectionChangedNotification;
 
-@property (readonly) VLCMediaLibraryParentGroupType group;
-@property (readonly) SEL libraryModelDataSelector;
-@property (readonly) NSMethodSignature *libraryModelDataMethodSignature;
-@property (readonly) NSString *name;
-@property (readonly) BOOL isHorizontalBarCollectionView;
+@interface VLCLibraryHomeViewMediaContainerViewDataSource : NSObject <VLCLibraryCollectionViewDataSource>
 
-- (instancetype)initWithVLCVideoLibraryGroup:(const VLCMediaLibraryParentGroupType)group;
+@property (readwrite, weak) NSCollectionView *collectionView;
+@property (readwrite, copy) NSUserInterfaceItemIdentifier collectionViewItemIdentifier;
+@property (readwrite, assign, nonatomic) VLCLibraryMediaCollectionViewGroupDescriptor *groupDescriptor;
+@property (readwrite, assign) VLCLibraryHomeViewVideoGridContainerView *parentCell;
+
+- (void)setup;
+- (void)reloadData;
 
 @end
 

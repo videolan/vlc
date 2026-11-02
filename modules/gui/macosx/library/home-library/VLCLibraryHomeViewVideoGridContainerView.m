@@ -33,9 +33,9 @@
 #import "library/VLCLibraryWindowSplitViewController.h"
 
 #import "library/home-library/VLCLibraryHomeViewSectionHeaderView.h"
-#import "library/home-library/VLCLibraryHomeViewVideoContainerViewDataSource.h"
+#import "library/home-library/VLCLibraryHomeViewMediaContainerViewDataSource.h"
 
-#import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
+#import "library/VLCLibraryMediaGroupDescriptor.h"
 
 #import "main/VLCMain.h"
 
@@ -127,7 +127,7 @@
 
 - (void)setupDataSource
 {
-    _dataSource = [[VLCLibraryHomeViewVideoContainerViewDataSource alloc] init];
+    _dataSource = [[VLCLibraryHomeViewMediaContainerViewDataSource alloc] init];
     _dataSource.collectionView = _collectionView;
     [_dataSource setup];
 }
@@ -145,11 +145,11 @@
 {
     NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter removeObserver:self
-                                  name:VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification
+                                  name:VLCLibraryMediaCollectionViewDataSourceDisplayedCollectionChangedNotification
                                 object:self.dataSource];
     [notificationCenter addObserver:self
                            selector:@selector(displayedCollectionChanged:)
-                               name:VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification
+                               name:VLCLibraryMediaCollectionViewDataSourceDisplayedCollectionChangedNotification
                              object:self.dataSource];
     [self.dataSource disconnect];
     [self.dataSource connect];
@@ -159,7 +159,7 @@
 - (void)disconnect
 {
     [NSNotificationCenter.defaultCenter removeObserver:self
-                                                  name:VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification
+                                                  name:VLCLibraryMediaCollectionViewDataSourceDisplayedCollectionChangedNotification
                                                 object:self.dataSource];
     [self.dataSource disconnect];
 }
@@ -182,7 +182,7 @@
         selectSegment:VLCLibraryVideoSegmentType];
 }
 
-- (void)setGroupDescriptor:(VLCLibraryVideoCollectionViewGroupDescriptor *)groupDescriptor
+- (void)setGroupDescriptor:(VLCLibraryMediaCollectionViewGroupDescriptor *)groupDescriptor
 {
     _groupDescriptor = groupDescriptor;
     _videoGroup = groupDescriptor.group;
@@ -202,7 +202,7 @@
         return;
     }
 
-    VLCLibraryVideoCollectionViewGroupDescriptor * const descriptor = [[VLCLibraryVideoCollectionViewGroupDescriptor alloc] initWithVLCVideoLibraryGroup:group];
+    VLCLibraryMediaCollectionViewGroupDescriptor * const descriptor = [[VLCLibraryMediaCollectionViewGroupDescriptor alloc] initWithLibraryGroup:group];
     [self setGroupDescriptor:descriptor];
 }
 

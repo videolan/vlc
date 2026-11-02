@@ -23,17 +23,17 @@
 #import <Cocoa/Cocoa.h>
 
 #import "library/home-library/VLCLibraryHomeViewContainerView.h"
-#import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
+#import "library/VLCLibraryMediaGroupDescriptor.h"
 
-@class VLCLibraryHomeViewVideoContainerViewDataSource;
+@class VLCLibraryHomeViewMediaContainerViewDataSource;
 
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol VLCLibraryHomeViewVideoContainerView <VLCLibraryHomeViewContainerView>
 
-@property (readonly) VLCLibraryVideoCollectionViewGroupDescriptor *groupDescriptor;
+@property (readonly) VLCLibraryMediaCollectionViewGroupDescriptor *groupDescriptor;
 @property (readwrite, assign, nonatomic) VLCMediaLibraryParentGroupType videoGroup;
-@property (readonly) VLCLibraryHomeViewVideoContainerViewDataSource *dataSource;
+@property (readonly) VLCLibraryHomeViewMediaContainerViewDataSource *dataSource;
 
 - (void)setVideoGroup:(VLCMediaLibraryParentGroupType)group;
 

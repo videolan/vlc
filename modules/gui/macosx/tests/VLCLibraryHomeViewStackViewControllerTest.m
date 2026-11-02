@@ -30,7 +30,7 @@
 #import "library/home-library/VLCLibraryHomeViewRecentlyAddedCarouselContainerView.h"
 #import "library/home-library/VLCLibraryHomeViewStackViewController.h"
 #import "library/home-library/VLCLibraryHomeViewVideoCarouselContainerView.h"
-#import "library/home-library/VLCLibraryHomeViewVideoContainerViewDataSource.h"
+#import "library/home-library/VLCLibraryHomeViewMediaContainerViewDataSource.h"
 #import "library/home-library/VLCLibraryHomeViewVideoGridContainerView.h"
 #import "main/VLCMain.h"
 
@@ -131,8 +131,8 @@ static VLCMediaLibraryMediaItem *VLCHomeRecentlyAddedMediaItem(int64_t libraryID
         return weakSelf;
     }];
     [self replaceInstanceMethod:@selector(setup)
-                        onClass:VLCLibraryHomeViewVideoContainerViewDataSource.class
-                      withBlock:^(VLCLibraryHomeViewVideoContainerViewDataSource *source) {
+                        onClass:VLCLibraryHomeViewMediaContainerViewDataSource.class
+                      withBlock:^(VLCLibraryHomeViewMediaContainerViewDataSource *source) {
         // Keep source snapshots and notifications real without loading card or detail nibs.
         [source.collectionView registerClass:VLCHomeRecentlyAddedTestCard.class
                        forItemWithIdentifier:source.collectionViewItemIdentifier];
@@ -172,10 +172,10 @@ static VLCMediaLibraryMediaItem *VLCHomeRecentlyAddedMediaItem(int64_t libraryID
                                             inView:(VLCLibraryHomeViewRecentlyAddedCarouselContainerView *)row
 {
     __block BOOL observed = NO;
-    return [self expectationForNotification:VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification
+    return [self expectationForNotification:VLCLibraryMediaCollectionViewDataSourceDisplayedCollectionChangedNotification
                                      object:row.dataSource
                                     handler:^BOOL(NSNotification *notification) {
-        VLCLibraryHomeViewVideoContainerViewDataSource * const source = notification.object;
+        VLCLibraryHomeViewMediaContainerViewDataSource * const source = notification.object;
         if (observed || [source collectionView:source.collectionView numberOfItemsInSection:0] != (NSInteger)items.count) {
             return NO;
         }

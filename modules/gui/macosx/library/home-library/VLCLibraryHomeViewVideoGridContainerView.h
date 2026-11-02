@@ -24,14 +24,14 @@
 
 #import "library/VLCLibraryItemPresentingCapable.h"
 #import "library/home-library/VLCLibraryHomeViewVideoContainerView.h"
-#import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
+#import "library/VLCLibraryMediaGroupDescriptor.h"
 
 @class VLCSubScrollView;
 @class VLCLibraryCollectionView;
 @class VLCLibraryCollectionViewDelegate;
 @class VLCLibraryCollectionViewFlowLayout;
 @class VLCLibraryHomeViewSectionHeaderView;
-@class VLCLibraryVideoCollectionViewGroupDescriptor;
+@class VLCLibraryMediaCollectionViewGroupDescriptor;
 
 NS_ASSUME_NONNULL_BEGIN
 

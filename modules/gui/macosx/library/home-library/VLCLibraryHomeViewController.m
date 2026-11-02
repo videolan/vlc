@@ -34,7 +34,7 @@
 #import "library/audio-library/VLCLibraryAudioViewController.h"
 
 #import "library/home-library/VLCLibraryHomeViewStackViewController.h"
-#import "library/home-library/VLCLibraryHomeViewVideoContainerViewDataSource.h"
+#import "library/home-library/VLCLibraryHomeViewMediaContainerViewDataSource.h"
 
 #import "library/search-library/VLCLibrarySearchViewController.h"
 

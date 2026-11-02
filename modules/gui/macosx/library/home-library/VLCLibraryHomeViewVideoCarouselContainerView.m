@@ -34,12 +34,12 @@
 #import "library/VLCLibrarySegment.h"
 #import "library/VLCLibraryWindowNavigationSidebarViewController.h"
 
-#import "library/home-library/VLCLibraryHomeViewVideoContainerViewDataSource.h"
+#import "library/home-library/VLCLibraryHomeViewMediaContainerViewDataSource.h"
 
 #import "views/VLCUIUnits.h"
 #import "main/VLCMain.h"
 
-#include "library/video-library/VLCLibraryVideoGroupDescriptor.h"
+#include "library/VLCLibraryMediaGroupDescriptor.h"
 
 @implementation VLCLibraryHomeViewVideoCarouselContainerView
 
@@ -49,7 +49,7 @@
 
 - (NSNotificationName)displayedCollectionChangedNotification
 {
-    return VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification;
+    return VLCLibraryMediaCollectionViewDataSourceDisplayedCollectionChangedNotification;
 }
 
 - (void)setupDataSource
@@ -58,13 +58,13 @@
     self.collectionViewDelegate.staticItemSize = NSMakeSize(VLCUIUnits.carouselViewVideoItemViewWidth,
                                                             VLCUIUnits.carouselViewItemViewHeight);
     self.itemHeight = VLCUIUnits.carouselViewItemViewHeight;
-    _dataSource = [[VLCLibraryHomeViewVideoContainerViewDataSource alloc] init];
+    _dataSource = [[VLCLibraryHomeViewMediaContainerViewDataSource alloc] init];
     _dataSource.collectionViewItemIdentifier = VLCLibraryCarouselCollectionViewItemIdentifier;
     self.dataSource.collectionView = self.collectionView;
     [self.dataSource setup];
 }
 
-- (void)setGroupDescriptor:(VLCLibraryVideoCollectionViewGroupDescriptor *)groupDescriptor
+- (void)setGroupDescriptor:(VLCLibraryMediaCollectionViewGroupDescriptor *)groupDescriptor
 {
     _groupDescriptor = groupDescriptor;
     _videoGroup = groupDescriptor.group;
@@ -88,7 +88,7 @@
         return;
     }
 
-    VLCLibraryVideoCollectionViewGroupDescriptor * const descriptor = [[VLCLibraryVideoCollectionViewGroupDescriptor alloc] initWithVLCVideoLibraryGroup:group];
+    VLCLibraryMediaCollectionViewGroupDescriptor * const descriptor = [[VLCLibraryMediaCollectionViewGroupDescriptor alloc] initWithLibraryGroup:group];
     [self setGroupDescriptor:descriptor];
 }
 

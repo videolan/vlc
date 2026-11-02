@@ -31,7 +31,7 @@
 #import "library/VLCLibraryRepresentedItem.h"
 #import "library/VLCLibraryTableCellView.h"
 
-#import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
+#import "library/VLCLibraryMediaGroupDescriptor.h"
 
 #import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryHomeViewVideoContainerViewDataSource.m: MacOS X interface module
+ * VLCLibraryHomeViewMediaContainerViewDataSource.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2022 VLC authors and VideoLAN
  *
@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCLibraryHomeViewVideoContainerViewDataSource.h"
+#import "VLCLibraryHomeViewMediaContainerViewDataSource.h"
 
 #import "extensions/NSView+VLCAdditions.h"
 
@@ -36,15 +36,15 @@
 #import "library/home-library/VLCLibraryHomeViewVideoCarouselContainerView.h"
 #import "library/home-library/VLCLibraryHomeViewVideoGridContainerView.h"
 
-#import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
+#import "library/VLCLibraryMediaGroupDescriptor.h"
 
 #import "main/VLCMain.h"
 
 #import "views/VLCUIUnits.h"
 
-NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification = @"VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification";
+NSString * const VLCLibraryMediaCollectionViewDataSourceDisplayedCollectionChangedNotification = @"VLCLibraryMediaCollectionViewDataSourceDisplayedCollectionChangedNotification";
 
-@interface VLCLibraryHomeViewVideoContainerViewDataSource ()
+@interface VLCLibraryHomeViewMediaContainerViewDataSource ()
 {
     VLCLibraryCollectionViewFlowLayout *_collectionViewFlowLayout;
     VLCLibraryModel *_libraryModel;
@@ -55,7 +55,7 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
 
 @end
 
-@implementation VLCLibraryHomeViewVideoContainerViewDataSource
+@implementation VLCLibraryHomeViewMediaContainerViewDataSource
 
 - (instancetype)init
 {
@@ -228,7 +228,7 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
     }
 
     if(self.collectionView == nil || !_groupDescriptor) {
-        NSLog(@"Null collection view or video group descriptor");
+        NSLog(@"Null collection view or group descriptor");
         return;
     }
 
@@ -259,7 +259,7 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
             }
             self.collectionArray = [newCollectionArray mutableCopy];
             [self.collectionView reloadData];
-            [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification
+            [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryMediaCollectionViewDataSourceDisplayedCollectionChangedNotification
                                                               object:self];
         });
     });
@@ -276,7 +276,7 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
 
     NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:mediaItemIndex inSection:0];
     [self.collectionView reloadItemsAtIndexPaths:[NSSet setWithObject:indexPath]];
-    [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification
+    [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryMediaCollectionViewDataSourceDisplayedCollectionChangedNotification
                                                       object:self];
 }
 
@@ -291,11 +291,11 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
 
     NSIndexPath * const indexPath = [NSIndexPath indexPathForItem:mediaItemIndex inSection:0];
     [self.collectionView deleteItemsAtIndexPaths:[NSSet setWithObject:indexPath]];
-    [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification
+    [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryMediaCollectionViewDataSourceDisplayedCollectionChangedNotification
                                                       object:self];
 }
 
-- (void)setGroupDescriptor:(VLCLibraryVideoCollectionViewGroupDescriptor *)groupDescriptor
+- (void)setGroupDescriptor:(VLCLibraryMediaCollectionViewGroupDescriptor *)groupDescriptor
 {
     if(!groupDescriptor) {
         NSLog(@"Invalid group descriptor");

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryHomeVideoDataSourceTest.m: Recently Added source tests
+ * VLCLibraryHomeMediaDataSourceTest.m: Recently Added source tests
  *****************************************************************************
  * Copyright (C) 2026 VLC authors and VideoLAN
  *
@@ -24,8 +24,8 @@
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryRepresentedItem.h"
-#import "library/home-library/VLCLibraryHomeViewVideoContainerViewDataSource.h"
-#import "library/video-library/VLCLibraryVideoGroupDescriptor.h"
+#import "library/home-library/VLCLibraryHomeViewMediaContainerViewDataSource.h"
+#import "library/VLCLibraryMediaGroupDescriptor.h"
 #import "main/VLCMain.h"
 
 @interface VLCHomeDataSourceTestMediaItem : NSObject
@@ -129,18 +129,18 @@ NSString *const VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifi
 
 @end
 
-@interface VLCLibraryHomeVideoDataSourceTest : VLCAppKitMockingTestCase
+@interface VLCLibraryHomeMediaDataSourceTest : VLCAppKitMockingTestCase
 {
     VLCHomeDataSourceTestModel *_model;
-    VLCLibraryHomeViewVideoContainerViewDataSource *_videoSource;
-    VLCLibraryHomeViewVideoContainerViewDataSource *_audioSource;
+    VLCLibraryHomeViewMediaContainerViewDataSource *_videoSource;
+    VLCLibraryHomeViewMediaContainerViewDataSource *_audioSource;
     VLCHomeDataSourceTestCollection *_videoCollection;
     VLCHomeDataSourceTestCollection *_audioCollection;
-    NSMutableDictionary<NSNumber *, VLCLibraryVideoCollectionViewGroupDescriptor *> *_descriptors;
+    NSMutableDictionary<NSNumber *, VLCLibraryMediaCollectionViewGroupDescriptor *> *_descriptors;
 }
 @end
 
-@implementation VLCLibraryHomeVideoDataSourceTest
+@implementation VLCLibraryHomeMediaDataSourceTest
 
 - (void)setUp
 {
@@ -163,14 +163,14 @@ NSString *const VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifi
     _descriptors = NSMutableDictionary.dictionary;
     _videoCollection = [[VLCHomeDataSourceTestCollection alloc] init];
     _audioCollection = [[VLCHomeDataSourceTestCollection alloc] init];
-    _videoSource = [[VLCLibraryHomeViewVideoContainerViewDataSource alloc] init];
-    _audioSource = [[VLCLibraryHomeViewVideoContainerViewDataSource alloc] init];
+    _videoSource = [[VLCLibraryHomeViewMediaContainerViewDataSource alloc] init];
+    _audioSource = [[VLCLibraryHomeViewMediaContainerViewDataSource alloc] init];
     _videoSource.collectionView = _videoCollection;
     _audioSource.collectionView = _audioCollection;
     _videoCollection.dataSource = _videoSource;
     _audioCollection.dataSource = _audioSource;
     [self addTeardownBlock:^{
-        VLCLibraryHomeVideoDataSourceTest * const test = weakSelf;
+        VLCLibraryHomeMediaDataSourceTest * const test = weakSelf;
         [test->_videoSource disconnect];
         [test->_audioSource disconnect];
         test->_videoCollection.dataSource = nil;
@@ -193,23 +193,23 @@ NSString *const VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifi
 - (id)libraryController { return self; }
 - (id)libraryModel { return _model; }
 
-- (void)configureSource:(VLCLibraryHomeViewVideoContainerViewDataSource *)source
+- (void)configureSource:(VLCLibraryHomeViewMediaContainerViewDataSource *)source
                   group:(VLCMediaLibraryParentGroupType)group
 {
-    VLCLibraryVideoCollectionViewGroupDescriptor * const descriptor =
-        [[VLCLibraryVideoCollectionViewGroupDescriptor alloc] initWithVLCVideoLibraryGroup:group];
+    VLCLibraryMediaCollectionViewGroupDescriptor * const descriptor =
+        [[VLCLibraryMediaCollectionViewGroupDescriptor alloc] initWithLibraryGroup:group];
     _descriptors[@(group)] = descriptor;
     source.groupDescriptor = descriptor;
 }
 
-- (XCTestExpectation *)expectDisplayedChangeForSource:(VLCLibraryHomeViewVideoContainerViewDataSource *)source
+- (XCTestExpectation *)expectDisplayedChangeForSource:(VLCLibraryHomeViewMediaContainerViewDataSource *)source
 {
-    return [self expectationForNotification:VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification
+    return [self expectationForNotification:VLCLibraryMediaCollectionViewDataSourceDisplayedCollectionChangedNotification
                                      object:source
                                     handler:nil];
 }
 
-- (NSArray<NSNumber *> *)displayedIDsForSource:(VLCLibraryHomeViewVideoContainerViewDataSource *)source
+- (NSArray<NSNumber *> *)displayedIDsForSource:(VLCLibraryHomeViewMediaContainerViewDataSource *)source
 {
     NSMutableArray<NSNumber *> * const identifiers = NSMutableArray.array;
     const NSUInteger count = [source collectionView:source.collectionView numberOfItemsInSection:0];
@@ -224,7 +224,7 @@ NSString *const VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifi
 
 - (void)testRecentlyAddedTypedSourcesKeepTheirQueryOrderAndPlaybackContext
 {
-    for (VLCLibraryHomeViewVideoContainerViewDataSource *source in @[
+    for (VLCLibraryHomeViewMediaContainerViewDataSource *source in @[
         _videoSource,
         _audioSource
     ]) {
@@ -320,7 +320,7 @@ NSString *const VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifi
     XCTAssertEqualObjects([self displayedIDsForSource:_audioSource], (@[@40]));
 }
 
-- (dispatch_semaphore_t)holdNextSnapshotForSource:(VLCLibraryHomeViewVideoContainerViewDataSource *)source
+- (dispatch_semaphore_t)holdNextSnapshotForSource:(VLCLibraryHomeViewMediaContainerViewDataSource *)source
 {
     dispatch_semaphore_t const gate = dispatch_semaphore_create(0);
     XCTestExpectation * const captured = [self expectationWithDescription:@"Older typed snapshot captured"];
@@ -335,7 +335,7 @@ NSString *const VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifi
 
 - (void)testRecentlyAddedDisconnectRejectsBothTypedPendingSnapshots
 {
-    for (VLCLibraryHomeViewVideoContainerViewDataSource *source in @[
+    for (VLCLibraryHomeViewMediaContainerViewDataSource *source in @[
         _videoSource,
         _audioSource
     ]) {
@@ -352,7 +352,7 @@ NSString *const VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifi
 
 - (void)testRecentlyAddedNewerTypedReloadRejectsOlderSnapshot
 {
-    for (VLCLibraryHomeViewVideoContainerViewDataSource *source in @[
+    for (VLCLibraryHomeViewMediaContainerViewDataSource *source in @[
         _videoSource,
         _audioSource
     ]) {

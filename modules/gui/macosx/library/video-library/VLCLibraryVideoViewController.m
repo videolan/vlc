@@ -41,7 +41,7 @@
 
 #import "library/audio-library/VLCLibraryAudioViewController.h"
 
-#import "library/home-library/VLCLibraryHomeViewVideoContainerViewDataSource.h"
+#import "library/home-library/VLCLibraryHomeViewMediaContainerViewDataSource.h"
 
 #import "library/playlist-library/VLCLibraryPlaylistViewController.h"
 

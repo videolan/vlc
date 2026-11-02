@@ -487,8 +487,8 @@ modules/gui/macosx/library/media-source/VLCMediaSourceDeviceCollectionViewItem.h
 modules/gui/macosx/library/media-source/VLCMediaSourceDeviceCollectionViewItem.m
 modules/gui/macosx/library/media-source/VLCMediaSourceProvider.h
 modules/gui/macosx/library/media-source/VLCMediaSourceProvider.m
-modules/gui/macosx/library/video-library/VLCLibraryVideoGroupDescriptor.h
-modules/gui/macosx/library/video-library/VLCLibraryVideoGroupDescriptor.m
+modules/gui/macosx/library/VLCLibraryMediaGroupDescriptor.h
+modules/gui/macosx/library/VLCLibraryMediaGroupDescriptor.m
 modules/gui/macosx/library/video-library/VLCLibraryVideoDataSource.h
 modules/gui/macosx/library/video-library/VLCLibraryVideoDataSource.m
 modules/gui/macosx/library/VLCLibraryWindow.h
