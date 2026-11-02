@@ -184,6 +184,15 @@ static block_t *Mix( filter_t *p_filter, block_t *p_buf )
     const size_t i_outputBlockSize = sizeof(float) * p_sys->i_outputNb * AMB_BLOCK_TIME_LEN;
     const size_t i_nbBlocks = p_sys->inputSamples.size() * sizeof(float) / i_inputBlockSize;
 
+    if (i_nbBlocks == 0)
+    {
+        /* The next output starts with the frames queued from this block */
+        if (p_sys->i_inputPTS == 0)
+            p_sys->i_inputPTS = p_buf->i_pts;
+        block_Release(p_buf);
+        return NULL;
+    }
+
     block_t *p_out_buf = block_Alloc(i_outputBlockSize * i_nbBlocks);
     if (unlikely(p_out_buf == NULL))
     {
