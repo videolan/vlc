@@ -32,10 +32,10 @@ static void onItemPreparseEnded(vlc_media_tree_t *, input_item_node_t * node,
 
 MediaTreeListener::MediaTreeListener(MediaTreePtr tree, std::unique_ptr<MediaTreeListenerCb> &&cb )
     : tree( tree )
+    , cb( std::move( cb ) )
     , listener( nullptr, [tree]( vlc_media_tree_listener_id* l ) {
             vlc_media_tree_RemoveListener( tree.get(), l );
         } )
-    , cb( std::move( cb ) )
 {
     static const vlc_media_tree_callbacks cbs {
         &onItemCleared,

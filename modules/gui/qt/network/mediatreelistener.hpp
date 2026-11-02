@@ -43,14 +43,17 @@ public:
 public:
     MediaTreeListener( MediaTreePtr tree, std::unique_ptr<MediaTreeListenerCb> &&cb );
 
-    MediaTreeListener( MediaTreeListener&& ) = default;
-    MediaTreeListener& operator=( MediaTreeListener&& ) = default;
+    // the media tree keeps a pointer to this instance as its listener userdata
+    MediaTreeListener( MediaTreeListener&& ) = delete;
+    MediaTreeListener& operator=( MediaTreeListener&& ) = delete;
 
     MediaTreeListener( const MediaTreeListener& ) = delete;
     MediaTreeListener& operator=( const MediaTreeListener& ) = delete;
 
     MediaTreePtr tree;
-    ListenerPtr listener = nullptr;
     std::unique_ptr<MediaTreeListenerCb> cb;
+    // must be destroyed first: callbacks run from other threads and use cb
+    // until the listener is removed from the tree
+    ListenerPtr listener = nullptr;
 };
 #endif // MLNETWORKSOURCELISTENER_HPP
