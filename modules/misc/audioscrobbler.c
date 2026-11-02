@@ -752,7 +752,7 @@ static void *Run(void *data)
         }
 
         msg_Dbg(p_intf, "Going to submit some data...");
-        vlc_url_t *url;
+        const vlc_url_t *url;
         struct vlc_memstream req, payload;
 
         vlc_memstream_open(&payload);
