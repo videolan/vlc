@@ -162,6 +162,15 @@ static block_t *Resample (filter_t *filter, block_t *in)
         msg_Err (filter, "lost %ld of %ld input frames",
                  src.input_frames - src.input_frames_used, src.input_frames);
 
+    /* The sinc converters can keep all the input frames for their filter
+     * delay: never return an empty block */
+    if (src.output_frames_gen == 0)
+    {
+        block_Release (out);
+        out = NULL;
+        goto error;
+    }
+
     out->i_buffer = src.output_frames_gen * framesize;
     out->i_nb_samples = src.output_frames_gen;
     out->i_pts = in->i_pts;
