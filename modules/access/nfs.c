@@ -314,7 +314,7 @@ FileControl(stream_t *p_access, int i_query, va_list args)
 }
 
 static char *
-NfsGetUrl(vlc_url_t *p_url, const char *psz_file)
+NfsGetUrl(const vlc_url_t *p_url, const char *psz_file)
 {
     /* nfs://<psz_host><psz_path><psz_file>?<psz_option> */
     char *psz_url;
