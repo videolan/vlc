@@ -31,11 +31,6 @@
 
 @synthesize dataSource = _dataSource;
 
-- (instancetype)init
-{
-    return [self initWithGroup:VLCMediaLibraryParentGroupTypeRecentlyAddedVideos];
-}
-
 - (instancetype)initWithGroup:(VLCMediaLibraryParentGroupType)group
 {
     NSParameterAssert(group == VLCMediaLibraryParentGroupTypeRecentlyAddedVideos ||

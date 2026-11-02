@@ -109,14 +109,22 @@
 {
     _actionsView = [VLCLibraryHomeViewActionsView fromNibWithOwner:self];
     _heroView = [VLCLibraryHeroView fromNibWithOwner:self];
-    _leadingViews = @[self.actionsView, self.heroView];
+    _leadingViews = @[
+        self.actionsView,
+        self.heroView
+    ];
 
     [self addCustomContainerViews];
     [self recentsChanged:nil];
     [self audioRecentsChanged:nil];
-    _recentlyAddedView = [[VLCLibraryHomeViewRecentlyAddedCarouselContainerView alloc] init];
-    [_containers addObject:self.recentlyAddedView];
-    [self addContainerView:self.recentlyAddedView toStackView:self.collectionsStackView];
+    _recentlyAddedVideosView = [[VLCLibraryHomeViewRecentlyAddedCarouselContainerView alloc]
+        initWithGroup:VLCMediaLibraryParentGroupTypeRecentlyAddedVideos];
+    [_containers addObject:self.recentlyAddedVideosView];
+    [self addContainerView:self.recentlyAddedVideosView toStackView:self.collectionsStackView];
+    _recentlyAddedAudioView = [[VLCLibraryHomeViewRecentlyAddedCarouselContainerView alloc]
+        initWithGroup:VLCMediaLibraryParentGroupTypeRecentlyAddedAudios];
+    [_containers addObject:self.recentlyAddedAudioView];
+    [self addContainerView:self.recentlyAddedAudioView toStackView:self.collectionsStackView];
     _browseView = [[VLCLibraryHomeViewBrowseCarouselContainerView alloc] init];
     [_containers addObject:self.browseView];
     [self addContainerView:self.browseView toStackView:self.collectionsStackView];

@@ -26,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface VLCLibraryHomeViewRecentlyAddedCarouselContainerView : VLCLibraryHomeViewBaseCarouselContainerView
 
 - (instancetype)initWithGroup:(VLCMediaLibraryParentGroupType)group;
+- (instancetype)init NS_UNAVAILABLE;
 
 @end
 
