@@ -338,6 +338,7 @@ BOOL VLCLibraryDataTypesIntegrationStart(void)
         "--text-renderer=dummy",
         "--no-auto-preparse",
         "--media-library",
+        "--no-ml-network-discovery",
     };
     sIntfReady = dispatch_semaphore_create(0);
     sLibVLC = libvlc_new((int)(sizeof(args) / sizeof(args[0])), args);
