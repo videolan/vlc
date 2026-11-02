@@ -129,7 +129,7 @@ static void Disconnect( stream_t * );
 
 
 static int AuthCheckReply( stream_t *p_access, const char *psz_header,
-                           vlc_url_t *p_url, vlc_http_auth_t *p_auth );
+                           const vlc_url_t *p_url, vlc_http_auth_t *p_auth );
 
 /*****************************************************************************
  * Open:
@@ -615,7 +615,7 @@ static int Control( stream_t *p_access, int i_query, va_list args )
 static int Connect( stream_t *p_access )
 {
     access_sys_t   *p_sys = p_access->p_sys;
-    vlc_url_t      srv = p_sys->b_proxy ? p_sys->proxy : p_sys->url;
+    const vlc_url_t *srv = p_sys->b_proxy ? &p_sys->proxy : &p_sys->url;
     ssize_t val;
 
     /* Clean info */
@@ -707,10 +707,10 @@ static int Connect( stream_t *p_access )
     /* Open connection */
     assert(p_sys->stream == NULL); /* No open sockets (leaking fds is BAD) */
     p_sys->stream = vlc_tls_SocketOpenTCP(VLC_OBJECT(p_access),
-                                          srv.psz_host, srv.i_port);
+                                          srv->psz_host, srv->i_port);
     if (p_sys->stream == NULL)
     {
-        msg_Err( p_access, "cannot connect to %s:%d", srv.psz_host, srv.i_port );
+        msg_Err( p_access, "cannot connect to %s:%d", srv->psz_host, srv->i_port );
         free( stream.ptr );
         return -1;
     }
@@ -977,7 +977,7 @@ static void Disconnect( stream_t *p_access )
  *****************************************************************************/
 
 static int AuthCheckReply( stream_t *p_access, const char *psz_header,
-                           vlc_url_t *p_url, vlc_http_auth_t *p_auth )
+                           const vlc_url_t *p_url, vlc_http_auth_t *p_auth )
 {
     return
         vlc_http_auth_ParseAuthenticationInfoHeader( VLC_OBJECT(p_access),
