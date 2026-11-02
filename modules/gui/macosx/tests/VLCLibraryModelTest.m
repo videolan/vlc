@@ -78,6 +78,7 @@
     self.model.cachedListOfGroups = @[ [VLCMediaLibraryGroup new] ];
     self.model.cachedRecentMedia = @[ [VLCMediaLibraryMediaItem new] ];
     self.model.cachedRecentAudioMedia = @[ [VLCMediaLibraryMediaItem new] ];
+    self.model.cachedHistoryMedia = @[ [VLCMediaLibraryMediaItem new] ];
     self.model.cachedListOfMonitoredFolders = @[ [VLCMediaLibraryEntryPoint new] ];
     self.model.cachedMediaTitles = @[ @"title" ];
 
@@ -98,6 +99,7 @@
     XCTAssertNil(self.model.cachedListOfGroups);
     XCTAssertNil(self.model.cachedRecentMedia);
     XCTAssertNil(self.model.cachedRecentAudioMedia);
+    XCTAssertNil(self.model.cachedHistoryMedia);
     XCTAssertNil(self.model.cachedListOfMonitoredFolders);
     XCTAssertNil(self.model.cachedMediaTitles);
 }
