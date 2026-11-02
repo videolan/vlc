@@ -824,6 +824,41 @@ int64_t VLCLibraryDataTypesIntegrationGroupID(void)
     return sGroupID;
 }
 
+int64_t VLCLibraryDataTypesIntegrationCreateScannedMedia(NSString *name, vlc_ml_media_type_t type)
+{
+    if ((type != VLC_ML_MEDIA_TYPE_AUDIO && type != VLC_ML_MEDIA_TYPE_VIDEO) ||
+        !VLCLibraryDataTypesIntegrationPrepareFactoryFixtures()) {
+        return 0;
+    }
+
+    const BOOL audio = type == VLC_ML_MEDIA_TYPE_AUDIO;
+    NSString * const sourceName = audio ? @"factory-track.mp3" : @"Factory Show S01E01.mp4";
+    NSString * const source = [[sUserDataPath stringByAppendingPathComponent:@"factory-fixtures"]
+        stringByAppendingPathComponent:sourceName];
+    NSString * const directory = [sUserDataPath stringByAppendingPathComponent:NSUUID.UUID.UUIDString];
+    NSString * const path = [directory stringByAppendingPathComponent:
+        [name stringByAppendingPathExtension:audio ? @"mp3" : @"mp4"]];
+    if (![NSFileManager.defaultManager createDirectoryAtPath:directory
+                                 withIntermediateDirectories:YES
+                                                  attributes:nil
+                                                       error:nil] ||
+        ![NSFileManager.defaultManager copyItemAtPath:source toPath:path error:nil] ||
+        !VLCLibraryDataTypesIntegrationWaitForMediaAdded(
+            [NSURL fileURLWithPath:directory].absoluteString,
+            @[[NSURL fileURLWithPath:path].absoluteString])) {
+        return 0;
+    }
+
+    vlc_ml_media_t * const media = vlc_ml_get_media_by_mrl(sMediaLibrary,
+                                                           [NSURL fileURLWithPath:path].absoluteString.UTF8String);
+    if (media == NULL) {
+        return 0;
+    }
+    const int64_t mediaID = media->i_id;
+    vlc_ml_media_release(media);
+    return VLCLibraryDataTypesIntegrationSetMediaType(mediaID, type) ? mediaID : 0;
+}
+
 int64_t VLCLibraryDataTypesIntegrationCreateScannedShow(NSString *name)
 {
     NSString * const directory = [sUserDataPath stringByAppendingPathComponent:NSUUID.UUID.UUIDString];

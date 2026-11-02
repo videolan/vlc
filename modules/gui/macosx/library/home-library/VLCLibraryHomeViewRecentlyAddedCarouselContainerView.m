@@ -44,7 +44,7 @@
     source.collectionView = self.collectionView;
     [source setup];
     _groupDescriptor = [[VLCLibraryVideoCollectionViewGroupDescriptor alloc]
-        initWithVLCVideoLibraryGroup:VLCMediaLibraryParentGroupTypeRecentlyAdded];
+        initWithVLCVideoLibraryGroup:VLCMediaLibraryParentGroupTypeRecentlyAddedVideos];
     source.groupDescriptor = _groupDescriptor;
     _dataSource = source;
 }

@@ -183,7 +183,11 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
 
     [notificationCenter addObserver:self
                            selector:@selector(libraryModelRecentlyAddedListReset:)
-                               name:VLCLibraryModelRecentlyAddedMediaListReset
+                               name:VLCLibraryModelRecentlyAddedVideoMediaListReset
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelRecentlyAddedListReset:)
+                               name:VLCLibraryModelRecentlyAddedAudioMediaListReset
                              object:nil];
     [notificationCenter addObserver:self
                            selector:@selector(libraryModelRecentlyAddedListReset:)
@@ -195,7 +199,15 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
 
 - (void)libraryModelRecentlyAddedListReset:(NSNotification *)notification
 {
-    if (self.groupDescriptor.group == VLCMediaLibraryParentGroupTypeRecentlyAdded) {
+    const VLCMediaLibraryParentGroupType group = self.groupDescriptor.group;
+    const BOOL resetVideos = group == VLCMediaLibraryParentGroupTypeRecentlyAddedVideos &&
+        [notification.name isEqualToString:VLCLibraryModelRecentlyAddedVideoMediaListReset];
+    const BOOL resetAudio = group == VLCMediaLibraryParentGroupTypeRecentlyAddedAudios &&
+        [notification.name isEqualToString:VLCLibraryModelRecentlyAddedAudioMediaListReset];
+    const BOOL dropAll = [notification.name isEqualToString:VLCLibraryModelAllCachesDropped] &&
+        (group == VLCMediaLibraryParentGroupTypeRecentlyAddedVideos ||
+         group == VLCMediaLibraryParentGroupTypeRecentlyAddedAudios);
+    if (resetVideos || resetAudio || dropAll) {
         [self reloadData];
     }
 }
@@ -225,8 +237,11 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
         NSArray *newCollectionArray = nil;
         switch(group) {
-            case VLCMediaLibraryParentGroupTypeRecentlyAdded:
-                newCollectionArray = self->_libraryModel.listOfRecentlyAddedMedia;
+            case VLCMediaLibraryParentGroupTypeRecentlyAddedVideos:
+                newCollectionArray = self->_libraryModel.listOfRecentlyAddedVideoMedia;
+                break;
+            case VLCMediaLibraryParentGroupTypeRecentlyAddedAudios:
+                newCollectionArray = self->_libraryModel.listOfRecentlyAddedAudioMedia;
                 break;
             case VLCMediaLibraryParentGroupTypeVideoLibrary:
                 newCollectionArray = self->_libraryModel.listOfVideoMedia;

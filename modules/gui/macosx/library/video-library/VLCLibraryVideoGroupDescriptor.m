@@ -36,10 +36,15 @@
         _group = group;
 
         switch (_group) {
-            case VLCMediaLibraryParentGroupTypeRecentlyAdded:
-                _libraryModelDataSelector = @selector(listOfRecentlyAddedMedia);
+            case VLCMediaLibraryParentGroupTypeRecentlyAddedVideos:
+                _libraryModelDataSelector = @selector(listOfRecentlyAddedVideoMedia);
                 _isHorizontalBarCollectionView = YES;
-                _name = _NS("Recently added");
+                _name = _NS("Recently added videos");
+                break;
+            case VLCMediaLibraryParentGroupTypeRecentlyAddedAudios:
+                _libraryModelDataSelector = @selector(listOfRecentlyAddedAudioMedia);
+                _isHorizontalBarCollectionView = YES;
+                _name = _NS("Recently added music");
                 break;
             case VLCMediaLibraryParentGroupTypeRecentVideos:
                 _libraryModelDataSelector = @selector(listOfRecentMedia);

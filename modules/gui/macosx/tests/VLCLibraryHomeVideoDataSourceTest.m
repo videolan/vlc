@@ -79,24 +79,36 @@ NSString *const VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifi
 @end
 
 @interface VLCHomeDataSourceTestModel : NSObject
-@property (copy) NSArray<VLCMediaLibraryMediaItem *> *recentlyAddedItems;
+@property (copy) NSArray<VLCMediaLibraryMediaItem *> *videoItems;
+@property (copy) NSArray<VLCMediaLibraryMediaItem *> *audioItems;
+@property vlc_ml_media_type_t readType;
 @property (strong) dispatch_semaphore_t readGate;
 @property (copy) dispatch_block_t readCaptured;
+@property NSUInteger videoReads;
+@property NSUInteger audioReads;
 @end
 
 @implementation VLCHomeDataSourceTestModel
 
-- (NSArray<VLCMediaLibraryMediaItem *> *)listOfRecentlyAddedMedia
+- (NSArray<VLCMediaLibraryMediaItem *> *)snapshotForType:(vlc_ml_media_type_t)type
 {
     NSArray *items;
-    dispatch_semaphore_t gate;
-    dispatch_block_t captured;
+    dispatch_semaphore_t gate = nil;
+    dispatch_block_t captured = nil;
     @synchronized (self) {
-        items = self.recentlyAddedItems.copy;
-        gate = self.readGate;
-        captured = self.readCaptured;
-        self.readGate = nil;
-        self.readCaptured = nil;
+        if (type == VLC_ML_MEDIA_TYPE_VIDEO) {
+            items = self.videoItems.copy;
+            self.videoReads++;
+        } else {
+            items = self.audioItems.copy;
+            self.audioReads++;
+        }
+        if (self.readType == type) {
+            gate = self.readGate;
+            captured = self.readCaptured;
+            self.readGate = nil;
+            self.readCaptured = nil;
+        }
     }
     if (gate != nil) {
         dispatch_async(dispatch_get_main_queue(), captured);
@@ -105,14 +117,26 @@ NSString *const VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifi
     return items;
 }
 
+- (NSArray<VLCMediaLibraryMediaItem *> *)listOfRecentlyAddedVideoMedia
+{
+    return [self snapshotForType:VLC_ML_MEDIA_TYPE_VIDEO];
+}
+
+- (NSArray<VLCMediaLibraryMediaItem *> *)listOfRecentlyAddedAudioMedia
+{
+    return [self snapshotForType:VLC_ML_MEDIA_TYPE_AUDIO];
+}
+
 @end
 
 @interface VLCLibraryHomeVideoDataSourceTest : VLCAppKitMockingTestCase
 {
     VLCHomeDataSourceTestModel *_model;
-    VLCHomeDataSourceTestCollection *_collection;
-    VLCLibraryHomeViewVideoContainerViewDataSource *_dataSource;
-    VLCLibraryVideoCollectionViewGroupDescriptor *_groupDescriptor;
+    VLCLibraryHomeViewVideoContainerViewDataSource *_videoSource;
+    VLCLibraryHomeViewVideoContainerViewDataSource *_audioSource;
+    VLCHomeDataSourceTestCollection *_videoCollection;
+    VLCHomeDataSourceTestCollection *_audioCollection;
+    NSMutableDictionary<NSNumber *, VLCLibraryVideoCollectionViewGroupDescriptor *> *_descriptors;
 }
 @end
 
@@ -122,9 +146,13 @@ NSString *const VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifi
 {
     [super setUp];
     _model = [[VLCHomeDataSourceTestModel alloc] init];
-    _model.recentlyAddedItems = @[
-        VLCHomeDataSourceMediaItem(10, VLC_ML_MEDIA_TYPE_AUDIO),
+    _model.videoItems = @[
         VLCHomeDataSourceMediaItem(20, VLC_ML_MEDIA_TYPE_VIDEO),
+        VLCHomeDataSourceMediaItem(30, VLC_ML_MEDIA_TYPE_VIDEO)
+    ];
+    _model.audioItems = @[
+        VLCHomeDataSourceMediaItem(10, VLC_ML_MEDIA_TYPE_AUDIO),
+        VLCHomeDataSourceMediaItem(40, VLC_ML_MEDIA_TYPE_AUDIO)
     ];
     __weak typeof(self) weakSelf = self;
     [self replaceClassMethod:@selector(sharedInstance)
@@ -132,144 +160,219 @@ NSString *const VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifi
                    withBlock:^id(id __unused receiver) {
         return weakSelf;
     }];
-    _collection = [[VLCHomeDataSourceTestCollection alloc] init];
-    _dataSource = [[VLCLibraryHomeViewVideoContainerViewDataSource alloc] init];
-    _dataSource.collectionView = _collection;
-    _collection.dataSource = _dataSource;
+    _descriptors = NSMutableDictionary.dictionary;
+    _videoCollection = [[VLCHomeDataSourceTestCollection alloc] init];
+    _audioCollection = [[VLCHomeDataSourceTestCollection alloc] init];
+    _videoSource = [[VLCLibraryHomeViewVideoContainerViewDataSource alloc] init];
+    _audioSource = [[VLCLibraryHomeViewVideoContainerViewDataSource alloc] init];
+    _videoSource.collectionView = _videoCollection;
+    _audioSource.collectionView = _audioCollection;
+    _videoCollection.dataSource = _videoSource;
+    _audioCollection.dataSource = _audioSource;
     [self addTeardownBlock:^{
         VLCLibraryHomeVideoDataSourceTest * const test = weakSelf;
-        [test->_dataSource disconnect];
-        test->_collection.dataSource = nil;
-        test->_dataSource = nil;
+        [test->_videoSource disconnect];
+        [test->_audioSource disconnect];
+        test->_videoCollection.dataSource = nil;
+        test->_audioCollection.dataSource = nil;
+        test->_videoSource = nil;
+        test->_audioSource = nil;
         [test drainMainQueue];
     }];
-    XCTestExpectation * const loaded = [self expectDisplayedChange];
-    _groupDescriptor = [[VLCLibraryVideoCollectionViewGroupDescriptor alloc]
-        initWithVLCVideoLibraryGroup:VLCMediaLibraryParentGroupTypeRecentlyAdded];
-    _dataSource.groupDescriptor = _groupDescriptor;
-    [self waitForExpectations:@[loaded] timeout:5.];
+    XCTestExpectation * const videosLoaded = [self expectDisplayedChangeForSource:_videoSource];
+    XCTestExpectation * const audioLoaded = [self expectDisplayedChangeForSource:_audioSource];
+    [self configureSource:_videoSource group:VLCMediaLibraryParentGroupTypeRecentlyAddedVideos];
+    [self configureSource:_audioSource group:VLCMediaLibraryParentGroupTypeRecentlyAddedAudios];
+    [self waitForExpectations:@[
+        videosLoaded,
+        audioLoaded
+    ]
+                      timeout:5.];
 }
 
-- (id)libraryController
+- (id)libraryController { return self; }
+- (id)libraryModel { return _model; }
+
+- (void)configureSource:(VLCLibraryHomeViewVideoContainerViewDataSource *)source
+                  group:(VLCMediaLibraryParentGroupType)group
 {
-    return self;
+    VLCLibraryVideoCollectionViewGroupDescriptor * const descriptor =
+        [[VLCLibraryVideoCollectionViewGroupDescriptor alloc] initWithVLCVideoLibraryGroup:group];
+    _descriptors[@(group)] = descriptor;
+    source.groupDescriptor = descriptor;
 }
 
-- (id)libraryModel
-{
-    return _model;
-}
-
-- (XCTestExpectation *)expectDisplayedChange
+- (XCTestExpectation *)expectDisplayedChangeForSource:(VLCLibraryHomeViewVideoContainerViewDataSource *)source
 {
     return [self expectationForNotification:VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChangedNotification
-                                     object:_dataSource
+                                     object:source
                                     handler:nil];
 }
 
-- (NSArray<NSNumber *> *)displayedIDs
+- (NSArray<NSNumber *> *)displayedIDsForSource:(VLCLibraryHomeViewVideoContainerViewDataSource *)source
 {
     NSMutableArray<NSNumber *> * const identifiers = NSMutableArray.array;
-    const NSUInteger count = [_dataSource collectionView:_collection numberOfItemsInSection:0];
+    const NSUInteger count = [source collectionView:source.collectionView numberOfItemsInSection:0];
     for (NSUInteger index = 0; index < count; ++index) {
-        id<VLCMediaLibraryItemProtocol> const item = [_dataSource
-            libraryItemAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0]
-                 forCollectionView:_collection];
+        id<VLCMediaLibraryItemProtocol> const item =
+            [source libraryItemAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0]
+                         forCollectionView:source.collectionView];
         [identifiers addObject:@(item.libraryID)];
     }
     return identifiers;
 }
 
-- (void)testRecentlyAddedKeepsMixedMediaOrderAndParentContext
+- (void)testRecentlyAddedTypedSourcesKeepTheirQueryOrderAndPlaybackContext
 {
-    XCTAssertEqualObjects(self.displayedIDs, (@[@10, @20]));
-    for (NSUInteger index = 0; index < 2; ++index) {
-        NSIndexPath * const path = [NSIndexPath indexPathForItem:index inSection:0];
-        VLCHomeDataSourceTestCard * const card = (id)[_dataSource collectionView:_collection
-                                             itemForRepresentedObjectAtIndexPath:path];
-        XCTAssertEqual(card.representedItem.item, _model.recentlyAddedItems[index]);
-        XCTAssertEqual(card.representedItem.parentType, VLCMediaLibraryParentGroupTypeRecentlyAdded);
-        NSArray<VLCLibraryRepresentedItem *> * const actions = [_dataSource
-            representedItemsAtIndexPaths:[NSSet setWithObject:path]
-                       forCollectionView:_collection];
-        XCTAssertEqual(actions.firstObject.item, _model.recentlyAddedItems[index]);
-        XCTAssertEqual(actions.firstObject.parentType, VLCMediaLibraryParentGroupTypeRecentlyAdded);
-        XCTAssertEqualObjects([_dataSource indexPathForLibraryItem:_model.recentlyAddedItems[index]], path);
+    for (VLCLibraryHomeViewVideoContainerViewDataSource *source in @[
+        _videoSource,
+        _audioSource
+    ]) {
+        const BOOL videos = source == _videoSource;
+        NSArray<VLCMediaLibraryMediaItem *> * const items = videos ? _model.videoItems : _model.audioItems;
+        const VLCMediaLibraryParentGroupType group = videos
+            ? VLCMediaLibraryParentGroupTypeRecentlyAddedVideos
+            : VLCMediaLibraryParentGroupTypeRecentlyAddedAudios;
+        NSArray<NSNumber *> * const expectedIDs = videos ? @[@20, @30] : @[@10, @40];
+        XCTAssertEqualObjects([self displayedIDsForSource:source], expectedIDs);
+        for (NSUInteger index = 0; index < items.count; ++index) {
+            NSIndexPath * const path = [NSIndexPath indexPathForItem:index inSection:0];
+            VLCHomeDataSourceTestCard * const card = (id)[source collectionView:source.collectionView
+                                            itemForRepresentedObjectAtIndexPath:path];
+            XCTAssertEqual(card.representedItem.item, items[index]);
+            XCTAssertEqual(card.representedItem.parentType, group);
+            NSArray<VLCLibraryRepresentedItem *> * const actions =
+                [source representedItemsAtIndexPaths:[NSSet setWithObject:path]
+                                   forCollectionView:source.collectionView];
+            XCTAssertEqual(actions.firstObject.item, items[index]);
+            XCTAssertEqual(actions.firstObject.parentType, group);
+            XCTAssertEqualObjects([source indexPathForLibraryItem:items[index]], path);
+        }
     }
 }
 
-- (void)testRecentlyAddedResetAndCacheDropRefreshTheDisplayedSnapshot
+- (void)testTypedNotificationsRefreshOnlyTheirSourceAndCacheDropRefreshesBoth
 {
-    VLCMediaLibraryMediaItem * const updated = VLCHomeDataSourceMediaItem(20, VLC_ML_MEDIA_TYPE_VIDEO);
-    VLCMediaLibraryMediaItem * const newest = VLCHomeDataSourceMediaItem(30, VLC_ML_MEDIA_TYPE_AUDIO);
-    _model.recentlyAddedItems = @[newest, updated];
-    XCTestExpectation * const reset = [self expectDisplayedChange];
-    [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelRecentlyAddedMediaListReset object:_model];
-    [self waitForExpectations:@[reset] timeout:5.];
-    XCTAssertEqualObjects(self.displayedIDs, (@[@30, @20]));
-    XCTAssertEqual([_dataSource libraryItemAtIndexPath:[NSIndexPath indexPathForItem:1 inSection:0]
-                                     forCollectionView:_collection], updated);
+    _model.videoItems = @[VLCHomeDataSourceMediaItem(50, VLC_ML_MEDIA_TYPE_VIDEO)];
+    _model.audioItems = @[VLCHomeDataSourceMediaItem(60, VLC_ML_MEDIA_TYPE_AUDIO)];
+    const NSUInteger audioReads = _model.audioReads;
+    XCTestExpectation * const videosChanged = [self expectDisplayedChangeForSource:_videoSource];
+    XCTestExpectation * const audioUnchanged = [self expectDisplayedChangeForSource:_audioSource];
+    audioUnchanged.inverted = YES;
+    [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelRecentlyAddedVideoMediaListReset object:_model];
+    [self waitForExpectations:@[videosChanged] timeout:5.];
+    [self waitForExpectations:@[audioUnchanged] timeout:.2];
+    XCTAssertEqualObjects([self displayedIDsForSource:_videoSource], (@[@50]));
+    XCTAssertEqualObjects([self displayedIDsForSource:_audioSource], (@[@10, @40]));
+    XCTAssertEqual(_model.audioReads, audioReads);
 
-    _model.recentlyAddedItems = @[];
-    XCTestExpectation * const dropped = [self expectDisplayedChange];
+    const NSUInteger videoReads = _model.videoReads;
+    XCTestExpectation * const audioChanged = [self expectDisplayedChangeForSource:_audioSource];
+    [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelRecentlyAddedAudioMediaListReset object:_model];
+    [self waitForExpectations:@[audioChanged] timeout:5.];
+    XCTAssertEqualObjects([self displayedIDsForSource:_audioSource], (@[@60]));
+    XCTAssertEqual(_model.videoReads, videoReads);
+
+    _model.videoItems = @[];
+    _model.audioItems = @[];
+    XCTestExpectation * const videosDropped = [self expectDisplayedChangeForSource:_videoSource];
+    XCTestExpectation * const audioDropped = [self expectDisplayedChangeForSource:_audioSource];
     [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelAllCachesDropped object:_model];
-    [self waitForExpectations:@[dropped] timeout:5.];
-    XCTAssertEqualObjects(self.displayedIDs, @[]);
+    [self waitForExpectations:@[
+        videosDropped,
+        audioDropped
+    ]
+                      timeout:5.];
+    XCTAssertEqualObjects([self displayedIDsForSource:_videoSource], @[]);
+    XCTAssertEqualObjects([self displayedIDsForSource:_audioSource], @[]);
 }
 
-- (void)testRecentlyAddedReconnectLoadsChangesMissedWhileDisconnected
+- (void)testRecentlyAddedReconnectLoadsBothTypedSnapshotsMissedWhileDisconnected
 {
-    [_dataSource disconnect];
-    _model.recentlyAddedItems = @[_model.recentlyAddedItems.lastObject];
-    XCTestExpectation * const disconnected = [self expectDisplayedChange];
-    disconnected.inverted = YES;
-    [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelRecentlyAddedMediaListReset object:_model];
-    [self waitForExpectations:@[disconnected] timeout:.2];
-    XCTAssertEqualObjects(self.displayedIDs, (@[@10, @20]));
+    [_videoSource disconnect];
+    [_audioSource disconnect];
+    _model.videoItems = @[_model.videoItems.lastObject];
+    _model.audioItems = @[_model.audioItems.lastObject];
+    XCTestExpectation * const videosDisconnected = [self expectDisplayedChangeForSource:_videoSource];
+    XCTestExpectation * const audioDisconnected = [self expectDisplayedChangeForSource:_audioSource];
+    videosDisconnected.inverted = YES;
+    audioDisconnected.inverted = YES;
+    [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelRecentlyAddedVideoMediaListReset object:_model];
+    [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelRecentlyAddedAudioMediaListReset object:_model];
+    [self waitForExpectations:@[
+        videosDisconnected,
+        audioDisconnected
+    ]
+                      timeout:.2];
+    XCTAssertEqualObjects([self displayedIDsForSource:_videoSource], (@[@20, @30]));
+    XCTAssertEqualObjects([self displayedIDsForSource:_audioSource], (@[@10, @40]));
 
-    XCTestExpectation * const reconnected = [self expectDisplayedChange];
-    [_dataSource connect];
-    [self waitForExpectations:@[reconnected] timeout:5.];
-    XCTAssertEqualObjects(self.displayedIDs, (@[@20]));
+    XCTestExpectation * const videosReconnected = [self expectDisplayedChangeForSource:_videoSource];
+    XCTestExpectation * const audioReconnected = [self expectDisplayedChangeForSource:_audioSource];
+    [_videoSource connect];
+    [_audioSource connect];
+    [self waitForExpectations:@[
+        videosReconnected,
+        audioReconnected
+    ]
+                      timeout:5.];
+    XCTAssertEqualObjects([self displayedIDsForSource:_videoSource], (@[@30]));
+    XCTAssertEqualObjects([self displayedIDsForSource:_audioSource], (@[@40]));
 }
 
-- (dispatch_semaphore_t)holdNextSnapshot
+- (dispatch_semaphore_t)holdNextSnapshotForSource:(VLCLibraryHomeViewVideoContainerViewDataSource *)source
 {
     dispatch_semaphore_t const gate = dispatch_semaphore_create(0);
-    XCTestExpectation * const captured = [self expectationWithDescription:@"Older snapshot captured"];
+    XCTestExpectation * const captured = [self expectationWithDescription:@"Older typed snapshot captured"];
+    _model.readType = source == _videoSource ? VLC_ML_MEDIA_TYPE_VIDEO : VLC_ML_MEDIA_TYPE_AUDIO;
     _model.readGate = gate;
     _model.readCaptured = ^{ [captured fulfill]; };
     [self addTeardownBlock:^{ dispatch_semaphore_signal(gate); }];
-    [_dataSource reloadData];
+    [source reloadData];
     [self waitForExpectations:@[captured] timeout:5.];
     return gate;
 }
 
-- (void)testRecentlyAddedDisconnectRejectsPendingSnapshot
+- (void)testRecentlyAddedDisconnectRejectsBothTypedPendingSnapshots
 {
-    dispatch_semaphore_t const gate = [self holdNextSnapshot];
-    [_dataSource disconnect];
-    XCTestExpectation * const late = [self expectDisplayedChange];
-    late.inverted = YES;
-    dispatch_semaphore_signal(gate);
-    [self waitForExpectations:@[late] timeout:.2];
-    XCTAssertEqualObjects(self.displayedIDs, (@[@10, @20]));
+    for (VLCLibraryHomeViewVideoContainerViewDataSource *source in @[
+        _videoSource,
+        _audioSource
+    ]) {
+        NSArray<NSNumber *> * const originalIDs = [self displayedIDsForSource:source];
+        dispatch_semaphore_t const gate = [self holdNextSnapshotForSource:source];
+        [source disconnect];
+        XCTestExpectation * const late = [self expectDisplayedChangeForSource:source];
+        late.inverted = YES;
+        dispatch_semaphore_signal(gate);
+        [self waitForExpectations:@[late] timeout:.2];
+        XCTAssertEqualObjects([self displayedIDsForSource:source], originalIDs);
+    }
 }
 
-- (void)testRecentlyAddedNewerReloadRejectsOlderSnapshot
+- (void)testRecentlyAddedNewerTypedReloadRejectsOlderSnapshot
 {
-    dispatch_semaphore_t const gate = [self holdNextSnapshot];
-    _model.recentlyAddedItems = @[VLCHomeDataSourceMediaItem(30, VLC_ML_MEDIA_TYPE_VIDEO)];
-    XCTestExpectation * const latest = [self expectDisplayedChange];
-    [_dataSource reloadData];
-    [self waitForExpectations:@[latest] timeout:5.];
-    XCTAssertEqualObjects(self.displayedIDs, (@[@30]));
+    for (VLCLibraryHomeViewVideoContainerViewDataSource *source in @[
+        _videoSource,
+        _audioSource
+    ]) {
+        dispatch_semaphore_t const gate = [self holdNextSnapshotForSource:source];
+        if (source == _videoSource)
+            _model.videoItems = @[VLCHomeDataSourceMediaItem(50, VLC_ML_MEDIA_TYPE_VIDEO)];
+        else
+            _model.audioItems = @[VLCHomeDataSourceMediaItem(60, VLC_ML_MEDIA_TYPE_AUDIO)];
+        XCTestExpectation * const latest = [self expectDisplayedChangeForSource:source];
+        [source reloadData];
+        [self waitForExpectations:@[latest] timeout:5.];
+        NSArray<NSNumber *> * const expectedIDs = source == _videoSource ? @[@50] : @[@60];
+        XCTAssertEqualObjects([self displayedIDsForSource:source], expectedIDs);
 
-    XCTestExpectation * const late = [self expectDisplayedChange];
-    late.inverted = YES;
-    dispatch_semaphore_signal(gate);
-    [self waitForExpectations:@[late] timeout:.2];
-    XCTAssertEqualObjects(self.displayedIDs, (@[@30]));
+        XCTestExpectation * const late = [self expectDisplayedChangeForSource:source];
+        late.inverted = YES;
+        dispatch_semaphore_signal(gate);
+        [self waitForExpectations:@[late] timeout:.2];
+        XCTAssertEqualObjects([self displayedIDsForSource:source], expectedIDs);
+    }
 }
 
 @end

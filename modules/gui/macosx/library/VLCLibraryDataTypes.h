@@ -51,7 +51,8 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
     // Home's video groups are contiguous from RecentVideos to VideoLibrary.
     VLCMediaLibraryParentGroupTypeRecentVideos,
     VLCMediaLibraryParentGroupTypeVideoLibrary,
-    VLCMediaLibraryParentGroupTypeRecentlyAdded,
+    VLCMediaLibraryParentGroupTypeRecentlyAddedVideos,
+    VLCMediaLibraryParentGroupTypeRecentlyAddedAudios,
     VLCMediaLibraryParentGroupTypeAllFavorites, // This should be last
 };
 

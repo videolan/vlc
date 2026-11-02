@@ -113,7 +113,7 @@ static VLCMediaLibraryMediaItem *VLCHomeRecentlyAddedMediaItem(int64_t libraryID
     VLCLibraryHomeViewStackViewController *_controller;
     NSStackView *_stackView;
 }
-@property (copy) NSArray<VLCMediaLibraryMediaItem *> *listOfRecentlyAddedMedia;
+@property (copy) NSArray<VLCMediaLibraryMediaItem *> *listOfRecentlyAddedVideoMedia;
 @property NSUInteger recentVideoCount;
 @property NSUInteger recentAudioCount;
 @end
@@ -123,7 +123,7 @@ static VLCMediaLibraryMediaItem *VLCHomeRecentlyAddedMediaItem(int64_t libraryID
 - (void)setUp
 {
     [super setUp];
-    self.listOfRecentlyAddedMedia = @[];
+    self.listOfRecentlyAddedVideoMedia = @[];
     __weak typeof(self) weakSelf = self;
     [self replaceClassMethod:@selector(sharedInstance) onClass:VLCMain.class withBlock:^id(id __unused receiver) {
         return weakSelf;
@@ -165,7 +165,7 @@ static VLCMediaLibraryMediaItem *VLCHomeRecentlyAddedMediaItem(int64_t libraryID
                                      object:_controller.recentlyAddedView.dataSource
                                     handler:^BOOL(NSNotification *notification) {
         VLCLibraryHomeViewVideoContainerViewDataSource * const source = notification.object;
-        if (observed || [source collectionView:source.collectionView numberOfItemsInSection:0] != items.count) {
+        if (observed || [source collectionView:source.collectionView numberOfItemsInSection:0] != (NSInteger)items.count) {
             return NO;
         }
         for (NSUInteger index = 0; index < items.count; ++index) {
@@ -181,9 +181,9 @@ static VLCMediaLibraryMediaItem *VLCHomeRecentlyAddedMediaItem(int64_t libraryID
 
 - (void)setRecentlyAddedItems:(NSArray<VLCMediaLibraryMediaItem *> *)items
 {
-    self.listOfRecentlyAddedMedia = items;
+    self.listOfRecentlyAddedVideoMedia = items;
     XCTestExpectation * const loaded = [self expectRecentlyAddedSnapshot:items];
-    [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelRecentlyAddedMediaListReset object:self];
+    [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelRecentlyAddedVideoMediaListReset object:self];
     [self waitForExpectations:@[loaded] timeout:5.];
 }
 
@@ -219,21 +219,21 @@ static VLCMediaLibraryMediaItem *VLCHomeRecentlyAddedMediaItem(int64_t libraryID
     [self assertRecentlyAddedPrecedesBrowse];
 }
 
-- (void)testRecentlyAddedMixedSnapshotUpdatesAndEmptyState
+- (void)testRecentlyAddedVideoSnapshotUpdatesAndEmptyState
 {
     VLCLibraryHomeViewRecentlyAddedCarouselContainerView * const row = _controller.recentlyAddedView;
     XCTAssertTrue(row.hidden);
-    VLCMediaLibraryMediaItem * const audio = VLCHomeRecentlyAddedMediaItem(200, VLC_ML_MEDIA_TYPE_AUDIO);
+    VLCMediaLibraryMediaItem * const earlierVideo = VLCHomeRecentlyAddedMediaItem(200, VLC_ML_MEDIA_TYPE_VIDEO);
     VLCMediaLibraryMediaItem * const video = VLCHomeRecentlyAddedMediaItem(300, VLC_ML_MEDIA_TYPE_VIDEO);
-    [self setRecentlyAddedItems:@[audio, video]];
+    [self setRecentlyAddedItems:@[earlierVideo, video]];
     XCTAssertFalse(row.hidden);
     XCTAssertEqual(row.headerView.itemCount, (NSUInteger)2);
-    XCTAssertEqualObjects(row.headerView.title, @"Recently added");
+    XCTAssertEqualObjects(row.headerView.title, @"Recently added videos");
     XCTAssertFalse(row.headerView.navigable);
     XCTAssertTrue(row.headerView.libraryButton.hidden);
     XCTAssertFalse(row.headerView.libraryButton.enabled);
     XCTAssertEqual([row.dataSource libraryItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]
-                                     forCollectionView:row.collectionView], audio);
+                                     forCollectionView:row.collectionView], earlierVideo);
     XCTAssertEqual([row.dataSource libraryItemAtIndexPath:[NSIndexPath indexPathForItem:1 inSection:0]
                                      forCollectionView:row.collectionView], video);
 
@@ -252,14 +252,14 @@ static VLCMediaLibraryMediaItem *VLCHomeRecentlyAddedMediaItem(int64_t libraryID
 
 - (void)testRecentlyAddedReconnectRefreshesChangesWhileHomeWasDisconnected
 {
-    VLCMediaLibraryMediaItem * const first = VLCHomeRecentlyAddedMediaItem(200, VLC_ML_MEDIA_TYPE_AUDIO);
+    VLCMediaLibraryMediaItem * const first = VLCHomeRecentlyAddedMediaItem(200, VLC_ML_MEDIA_TYPE_VIDEO);
     [self setRecentlyAddedItems:@[first]];
     [_controller disconnectContainers];
     VLCMediaLibraryMediaItem * const latest = VLCHomeRecentlyAddedMediaItem(300, VLC_ML_MEDIA_TYPE_VIDEO);
-    self.listOfRecentlyAddedMedia = @[latest];
+    self.listOfRecentlyAddedVideoMedia = @[latest];
     XCTestExpectation * const disconnected = [self expectRecentlyAddedSnapshot:@[latest]];
     disconnected.inverted = YES;
-    [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelRecentlyAddedMediaListReset object:self];
+    [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelRecentlyAddedVideoMediaListReset object:self];
     [self waitForExpectations:@[disconnected] timeout:.2];
     XCTAssertEqual([_controller.recentlyAddedView.dataSource
                    libraryItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]
