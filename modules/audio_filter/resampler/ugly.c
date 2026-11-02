@@ -99,6 +99,13 @@ static block_t *DoWork( filter_t * p_filter, block_t * p_in_buf )
     const unsigned framesize = (p_filter->fmt_in.audio.i_bitspersample / 8)
         * aout_FormatNbChannels( &p_filter->fmt_in.audio );
 
+    /* Downsampling a block shorter than in_rate / out_rate frames */
+    if( i_out_nb == 0 )
+    {
+        block_Release( p_in_buf );
+        return NULL;
+    }
+
     if( p_filter->fmt_out.audio.i_rate > p_filter->fmt_in.audio.i_rate )
     {
         p_out_buf = block_Alloc( i_out_nb * framesize );
