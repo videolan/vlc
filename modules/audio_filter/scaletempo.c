@@ -614,6 +614,9 @@ static block_t *DoPitchWork( filter_t * p_filter, block_t * p_in_buf )
 
     /* Change rate, thus changing pitch */
     p_in_buf = p->resampler->ops->filter_audio( p->resampler, p_in_buf );
+    /* The resampler may keep all the frames for now */
+    if( p_in_buf == NULL )
+        return NULL;
 
     /* Change tempo while preserving shifted pitch */
     return DoWork( p_filter, p_in_buf );
