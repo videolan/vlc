@@ -544,7 +544,13 @@ static int vlclua_input_metas_internal( lua_State *L, input_item_t *p_item )
     if( psz_filename )
     {
         /* url decode, without leading slash */
-        psz_filename = vlc_uri_decode( psz_filename + 1 );
+        char* decoded = vlc_uri_decode( psz_filename + 1 );
+        if (unlikely(decoded == NULL))
+        {
+            free( psz_uri );
+            return vlclua_error( L );
+        }
+        psz_filename = decoded;
     }
 
     lua_pushstring( L, psz_filename );
