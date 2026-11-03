@@ -44,6 +44,8 @@ struct decoder_owner
     decoder_t dec;
     es_format_t fmt_in;
     decoder_t *packetizer;
+    void (*on_picture)(void *opaque, const picture_t *pic);
+    void *opaque;
 };
 
 static inline struct decoder_owner *dec_get_owner(decoder_t *dec)
@@ -67,7 +69,9 @@ static vlc_decoder_device * get_no_device( decoder_t *dec )
 
 static void queue_video(decoder_t *dec, picture_t *pic)
 {
-    (void) dec;
+    struct decoder_owner *owner = dec_get_owner(dec);
+    if (owner->on_picture != NULL)
+        owner->on_picture(owner->opaque, pic);
     picture_Release(pic);
 }
 
@@ -129,7 +133,10 @@ void test_decoder_destroy(decoder_t *decoder)
     decoder_destroy_clean(decoder);
 }
 
-decoder_t *test_decoder_create(vlc_object_t *parent, const es_format_t *fmt)
+decoder_t *test_decoder_create(vlc_object_t *parent, const es_format_t *fmt,
+                               void (*on_picture)(void *opaque,
+                                                  const picture_t *pic),
+                               void *opaque)
 {
     assert(parent && fmt);
     decoder_t *packetizer = decoder_create(parent);
@@ -144,6 +151,8 @@ decoder_t *test_decoder_create(vlc_object_t *parent, const es_format_t *fmt)
 
     struct decoder_owner *owner = dec_get_owner(decoder);
     owner->packetizer = packetizer;
+    owner->on_picture = on_picture;
+    owner->opaque = opaque;
 
     static const struct decoder_owner_callbacks dec_video_cbs =
     {

@@ -86,7 +86,7 @@ static es_out_id_t *EsOutAdd(es_out_t *out, input_source_t* in, const es_format_
     ctx->ids = id;
 #ifdef HAVE_DECODERS
     es_format_Copy(&id->fmt, fmt);
-    id->decoder = test_decoder_create(ctx->parent, &id->fmt);
+    id->decoder = test_decoder_create(ctx->parent, &id->fmt, NULL, NULL);
     if (id->decoder == NULL)
         es_format_Clean(&id->fmt);
 #endif
@@ -165,7 +165,7 @@ static int EsOutControl(es_out_t *out, input_source_t* in, int query, va_list ar
             es_out_id_t* id = va_arg(args, es_out_id_t*);
             EsOutCheckId(ctx, id);
             test_decoder_destroy(id->decoder);
-            test_decoder_create(ctx->parent, &id->fmt);
+            test_decoder_create(ctx->parent, &id->fmt, NULL, NULL);
 #endif
             break;
         }

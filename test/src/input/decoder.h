@@ -20,6 +20,10 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-decoder_t *test_decoder_create(vlc_object_t *parent, const es_format_t *fmt);
+/* on_picture is called with each decoded picture, released after the call */
+decoder_t *test_decoder_create(vlc_object_t *parent, const es_format_t *fmt,
+                               void (*on_picture)(void *opaque,
+                                                  const picture_t *pic),
+                               void *opaque);
 void test_decoder_destroy(decoder_t *decoder);
 int test_decoder_process(decoder_t *decoder, block_t *block);
