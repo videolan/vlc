@@ -62,7 +62,8 @@
                         _NS("Play Count"),
                         _NS("Album"),
                         _NS("Filename"),
-                        _NS("Track Number")];
+                        _NS("Track Number"),
+                        _NS("Rating")];
     NSUInteger count = titles.count;
     for (NSUInteger x = 0; x < count; x++) {
         NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:titles[x] action:@selector(selectSortKey:) keyEquivalent:@""];
