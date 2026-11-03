@@ -108,7 +108,7 @@ static int decoder_load(decoder_t *decoder, bool is_packetizer,
 
     decoder->b_frame_drop_allowed = true;
 
-    decoder_LoadModule(decoder, is_packetizer, false);
+    decoder_LoadModule(decoder, is_packetizer, !is_packetizer);
     if (!decoder->p_module)
     {
         decoder_Clean( decoder );
