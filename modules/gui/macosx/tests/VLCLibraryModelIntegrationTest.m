@@ -412,6 +412,38 @@
                    VLCLibraryDataTypesIntegrationSortingAudioAlphaMediaID());
 }
 
+- (void)testAudioMediaQuerySortsByRatingInBothDirectionsWithUnratedLast
+{
+    vlc_medialibrary_t * const library = VLCLibraryDataTypesIntegrationMediaLibrary();
+    const int64_t highestRatedID =
+        VLCLibraryDataTypesIntegrationSortingAudioAlphaMediaID();
+    const int64_t lowestRatedID =
+        VLCLibraryDataTypesIntegrationSortingAudioZuluMediaID();
+    const int64_t unratedID = VLCLibraryDataTypesIntegrationFactoryAudioMediaID();
+    XCTAssertEqual(vlc_ml_media_set_playback_state(library, highestRatedID,
+                                                   VLC_ML_PLAYBACK_STATE_RATING, "5"),
+                   VLC_SUCCESS);
+    XCTAssertEqual(vlc_ml_media_set_playback_state(library, lowestRatedID,
+                                                   VLC_ML_PLAYBACK_STATE_RATING, "1"),
+                   VLC_SUCCESS);
+
+    [self.model sortByCriteria:VLC_ML_SORTING_RATING andDescending:NO];
+    NSArray<VLCMediaLibraryMediaItem *> *media = [self audioMediaAfterFilter:@""];
+
+    XCTAssertEqual(media.count, (NSUInteger)3);
+    XCTAssertEqual(media[0].libraryID, lowestRatedID);
+    XCTAssertEqual(media[1].libraryID, highestRatedID);
+    XCTAssertEqual(media[2].libraryID, unratedID);
+
+    [self.model sortByCriteria:VLC_ML_SORTING_RATING andDescending:YES];
+    media = [self audioMediaAfterFilter:@""];
+
+    XCTAssertEqual(media.count, (NSUInteger)3);
+    XCTAssertEqual(media[0].libraryID, highestRatedID);
+    XCTAssertEqual(media[1].libraryID, lowestRatedID);
+    XCTAssertEqual(media[2].libraryID, unratedID);
+}
+
 - (void)testVideoMediaQuerySortsMatchingItemsInAscendingOrder
 {
     [self.model sortByCriteria:VLC_ML_SORTING_ALPHA andDescending:NO];
