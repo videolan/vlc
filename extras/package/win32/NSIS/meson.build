@@ -26,7 +26,7 @@ nsProcess_link_args = ['-static-libgcc']
 nsProcess_sources = files('nsProcess/nsProcess.c', 'nsProcess/nsis/pluginapi.c')
 nsProcess_src = []
 nsProcess_obj = []
-if host_machine.cpu_family() != 'x86'
+if host_machine.cpu_family() != 'x86' and host_machine.cpu_family() != 'x86_64'
     # nsProcess.dll needs to be a 32-bit DLL
     # with clang we can link a i686 DLL via -target i686-w64-mingw32
     if cc.has_link_argument(['--target=i686-w64-mingw32'], required: nsis_required)

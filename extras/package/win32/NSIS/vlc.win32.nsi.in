@@ -47,6 +47,11 @@ Name "${PRODUCT_NAME}"
 @HAVE_WIN64_FALSE@                   OutFile ..\vlc-${VERSION}-win32.exe
 @HAVE_WIN64_TRUE@ @HAVE_ARM64_FALSE@ OutFile ..\vlc-${VERSION}-win64.exe
 @HAVE_WIN64_TRUE@ @HAVE_ARM64_TRUE@  OutFile ..\vlc-${VERSION}-winarm64.exe
+
+@HAVE_WIN64_FALSE@                   CPU "x86"
+@HAVE_WIN64_TRUE@ @HAVE_ARM64_FALSE@ CPU "amd64"
+@HAVE_WIN64_TRUE@ @HAVE_ARM64_TRUE@  CPU "x86"  ; use x86 until arm64 is supported
+
 InstallDir "$@PROGRAMFILES@\${PRODUCT_PUBLISHER}\VLC"
 !ifdef NSIS_LZMA_COMPRESS_WHOLE
 SetCompressor lzma
