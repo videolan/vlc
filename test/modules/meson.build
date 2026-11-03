@@ -178,6 +178,17 @@ vlc_tests += {
 }
 
 vlc_tests += {
+    'name' : 'test_modules_codec_cdg',
+    'sources' : files('codec/decoder.c', '../src/input/decoder.c',
+                      '../../modules/codec/cdg.c'),
+    'suite' : ['modules', 'test_modules'],
+    'c_args' : ['-DENABLE_TEST', '-DMODULE_NAME=cdg_test',
+                '-DMODULE_STRING="cdg_test"'],
+    'link_with' : [libvlc, libvlccore],
+    'module_depends' : ['packetizer_copy']
+}
+
+vlc_tests += {
     'name' : 'test_modules_video_output_opengl_filters',
     'sources' : files(
         'video_output/opengl/filters.c',

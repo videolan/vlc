@@ -86,6 +86,7 @@ check_PROGRAMS = \
 	test_modules_codec_cea708 \
 	test_modules_codec_cea708_aspect_ratio \
 	test_modules_codec_cea708_integration \
+	test_modules_codec_cdg \
 	test_modules_keystore \
 	test_modules_demux_json \
 	test_modules_demux_libmp4 \
@@ -431,6 +432,12 @@ test_modules_codec_cea708_aspect_ratio_LDADD = $(LIBVLCCORE) $(LIBVLC)
 
 test_modules_codec_cea708_integration_SOURCES = modules/codec/cea708_integration.c
 test_modules_codec_cea708_integration_LDADD = $(LIBVLCCORE) $(LIBVLC)
+
+test_modules_codec_cdg_SOURCES = modules/codec/decoder.c modules/codec/decoder.h \
+	src/input/decoder.c src/input/decoder.h ../modules/codec/cdg.c
+test_modules_codec_cdg_CPPFLAGS = $(AM_CPPFLAGS) -DENABLE_TEST \
+	-DMODULE_NAME=cdg_test -DMODULE_STRING=\"cdg_test\"
+test_modules_codec_cdg_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_modules_video_output_opengl_filters_SOURCES = \
 	modules/video_output/opengl/filters.c \
 	../modules/video_output/opengl/filters.c \

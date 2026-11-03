@@ -412,3 +412,57 @@ static int Render( decoder_sys_t *p_cdg, picture_t *p_picture )
     return 0;
 }
 
+#ifdef ENABLE_TEST
+#include "../../test/modules/codec/decoder.h"
+
+/* Load colour table low (instruction 30): colour 0, which fills the initial
+ * screen, becomes R,G,B 0xf,0x8,0x1 */
+static const uint8_t test_load_colours[CDG_PACKET_SIZE] = {
+    0x09, 30, 0, 0, 0xf << 2 | 0x8 >> 2, (0x8 & 0x3) << 4 | 0x1,
+};
+/* Only pushes the previous packet out of the copy packetizer */
+static const uint8_t test_nop[CDG_PACKET_SIZE];
+
+static const struct decoder_test_packet test_packets[] = {
+    DECODER_TEST_PACKET(test_load_colours),
+    DECODER_TEST_PACKET(test_nop),
+};
+
+static int TestCheckPicture( const picture_t *pic )
+{
+    int failures = 0;
+
+    if( pic->format.i_chroma != VLC_CODEC_RGBX )
+    {
+        decoder_test_log( "FAIL: cdg: chroma %4.4s, expected RGBX\n",
+                          (const char *)&pic->format.i_chroma );
+        failures++;
+    }
+    if( !pic->b_progressive )
+    {
+        decoder_test_log( "FAIL: cdg: the picture is not progressive\n" );
+        failures++;
+    }
+
+    const uint8_t *px = pic->p[0].p_pixels;
+    if( px[0] != 0xf0 || px[1] != 0x80 || px[2] != 0x10 )
+    {
+        decoder_test_log( "FAIL: cdg: pixel %02x %02x %02x, expected f0 80 10\n",
+                          px[0], px[1], px[2] );
+        failures++;
+    }
+    return failures;
+}
+
+const struct decoder_test decoder_tests[] = {
+    {
+        .name = "cdg",
+        .codec = VLC_CODEC_CDG,
+        .packets = test_packets,
+        .packet_count = ARRAY_SIZE(test_packets),
+        .picture_count = 1,
+        .check_picture = TestCheckPicture,
+    },
+    { .name = NULL },
+};
+#endif
