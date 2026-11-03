@@ -72,6 +72,7 @@ NSString * const VLCLibraryArtistSortDescriptorKey = @"VLCLibraryArtistSortDescr
 NSString * const VLCLibraryAlbumSortDescriptorKey = @"VLCLibraryAlbumSortDescriptorKey";
 NSString * const VLCLibraryPlayCountSortDescriptorKey = @"VLCLibraryPlayCountSortDescriptorKey";
 NSString * const VLCLibraryYearSortDescriptorKey = @"VLCLibraryYearSortDescriptorKey";
+NSString * const VLCLibraryRatingSortDescriptorKey = @"VLCLibraryRatingSortDescriptorKey";
 // TODO: Add sorting by genre
 
 NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification = @"VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification";
@@ -548,6 +549,9 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
     } else if (existingSortCriteria == VLC_ML_SORTING_RELEASEDATE) {
         return VLCLibraryYearSortDescriptorKey;
 
+    } else if (existingSortCriteria == VLC_ML_SORTING_RATING) {
+        return VLCLibraryRatingSortDescriptorKey;
+
     }
 
     return VLCLibraryTitleSortDescriptorKey;
@@ -958,6 +962,9 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
     } else if ([sortDescriptorKey isEqualToString:VLCLibraryYearSortDescriptorKey]) {
         return VLC_ML_SORTING_RELEASEDATE;
+
+    } else if ([sortDescriptorKey isEqualToString:VLCLibraryRatingSortDescriptorKey]) {
+        return VLC_ML_SORTING_RATING;
 
     }
 

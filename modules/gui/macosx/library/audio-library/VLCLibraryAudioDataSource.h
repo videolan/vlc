@@ -56,6 +56,7 @@ extern NSString * const VLCLibraryArtistSortDescriptorKey;
 extern NSString * const VLCLibraryAlbumSortDescriptorKey;
 extern NSString * const VLCLibraryPlayCountSortDescriptorKey;
 extern NSString * const VLCLibraryYearSortDescriptorKey;
+extern NSString * const VLCLibraryRatingSortDescriptorKey;
 
 extern NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification;
 
