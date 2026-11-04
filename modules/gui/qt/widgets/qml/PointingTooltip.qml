@@ -16,6 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick
+import QtQuick.Templates as T
 
 import VLC.Style
 
@@ -34,6 +35,8 @@ ToolTipExt {
 
     x: _x
     y: _pos.y - (implicitHeight + arrowArea.implicitHeight + VLCStyle.dp(7.5, VLCStyle.scale))
+
+    popupType: T.Popup.Window
 
     readonly property real _x: _pos.x - (width / 2)
     property point pos
