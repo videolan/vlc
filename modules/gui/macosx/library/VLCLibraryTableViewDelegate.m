@@ -57,7 +57,7 @@
 - (void)configureCellView:(NSView<VLCLibraryTableCellViewProtocol> *)cellView
 {
     if ([cellView isKindOfClass:VLCLibraryTableCellView.class]) {
-        ((VLCLibraryTableCellView *)cellView).showsMarkUnplayedButton = self.showsMarkUnplayedButton;
+        ((VLCLibraryTableCellView *)cellView).showsMarkUnplayedButton = self.showsMarkUnplayedActions;
     }
 }
 
@@ -100,7 +100,8 @@
                               rowActionsForRow:(NSInteger)row
                                           edge:(NSTableRowActionEdge)edge
 {
-    if (![tableView.dataSource conformsToProtocol:@protocol(VLCLibraryTableViewDataSource)]) {
+    if (row < 0 || row >= tableView.numberOfRows ||
+        ![tableView.dataSource conformsToProtocol:@protocol(VLCLibraryTableViewDataSource)]) {
         return @[];
     }
 
@@ -139,7 +140,44 @@
         }];
         favoriteAction.backgroundColor =
             isFavorited ? NSColor.systemRedColor : NSColor.systemBlueColor;
-        return @[favoriteAction];
+
+        if (!self.showsMarkUnplayedActions) {
+            return @[favoriteAction];
+        }
+
+        VLCMediaLibraryMediaItem * const mediaItem =
+            [libraryItem isKindOfClass:VLCMediaLibraryMediaItem.class]
+            ? [VLCMediaLibraryMediaItem mediaItemForLibraryID:libraryItem.libraryID]
+            : nil;
+        if (mediaItem.lastPlayedDate <= 0) {
+            return @[favoriteAction];
+        }
+
+        NSString *markUnplayedTitle;
+        switch (mediaItem.mediaType) {
+            case VLC_ML_MEDIA_TYPE_AUDIO:
+                markUnplayedTitle = _NS("Mark as Unheard");
+                break;
+            case VLC_ML_MEDIA_TYPE_VIDEO:
+                markUnplayedTitle = _NS("Mark as Unseen");
+                break;
+            default:
+                markUnplayedTitle = _NS("Mark as Unplayed");
+                break;
+        }
+
+        __weak NSTableView * const weakTableView = tableView;
+        NSTableViewRowAction * const markUnplayedAction =
+            [NSTableViewRowAction rowActionWithStyle:NSTableViewRowActionStyleRegular
+                                               title:markUnplayedTitle
+                                             handler:^(NSTableViewRowAction * const __unused action,
+                                                       const NSInteger __unused row) {
+            if ([mediaItem markAsUnplayed] == VLC_SUCCESS) {
+                weakTableView.rowActionsVisible = NO;
+            }
+        }];
+        markUnplayedAction.backgroundColor = NSColor.VLCAccentColor;
+        return @[favoriteAction, markUnplayedAction];
     }
     return @[];
 }

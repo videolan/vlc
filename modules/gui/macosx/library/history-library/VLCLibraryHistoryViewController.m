@@ -107,7 +107,7 @@
         _tableViewDelegate = [[VLCLibrarySectionedTableViewDelegate alloc] init];
         _tableViewDelegate.cellViewIdentifier = @"VLCVideoLibraryTableViewCellIdentifier";
         _tableViewDelegate.rowHeight = VLCUIUnits.videoLibraryTableViewRowHeight;
-        _tableViewDelegate.showsMarkUnplayedButton = YES;
+        _tableViewDelegate.showsMarkUnplayedActions = YES;
         [_tableView registerNib:tableCellNib forIdentifier:_tableViewDelegate.cellViewIdentifier];
         _tableView.delegate = _tableViewDelegate;
         _tableScrollView = [NSScrollView libraryScrollViewWithDocumentView:_tableView];
