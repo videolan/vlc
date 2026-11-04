@@ -36,7 +36,8 @@ ToolTipExt {
     x: _x
     y: _pos.y - (implicitHeight + arrowArea.implicitHeight + VLCStyle.dp(7.5, VLCStyle.scale))
 
-    popupType: T.Popup.Window
+    popupType: Qt.platform.pluginName.startsWith("wayland") ? T.Popup.Item
+                                                            : T.Popup.Window
 
     readonly property real _x: _pos.x - (width / 2)
     property point pos
