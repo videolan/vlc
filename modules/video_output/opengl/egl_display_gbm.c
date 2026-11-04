@@ -98,46 +98,50 @@ static vlc_egl_display_open_fn Open;
 static int
 Open(struct vlc_egl_display *display)
 {
-    struct sys *sys = display->sys = malloc(sizeof(*sys));
-    if (!sys)
-        return VLC_EGENERIC;
-
     const char *extensions = eglQueryString(EGL_NO_DISPLAY, EGL_EXTENSIONS);
     if (!extensions)
         return VLC_EGENERIC;
 
     if (!vlc_gl_StrHasToken(extensions, "EGL_KHR_platform_gbm"))
-        return VLC_EGENERIC;
+        return VLC_ENOTSUP;
+
+    struct sys *sys = malloc(sizeof(*sys));
+    if (!sys)
+        return VLC_ENOMEM;
 
     const char *device_path;
     sys->fd = OpenDeviceFd(&device_path);
     if (sys->fd < 0)
-        return VLC_EGENERIC;
+        goto error;
 
     sys->device = gbm_create_device(sys->fd);
     if (!sys->device)
-    {
-        vlc_close(sys->fd);
-        return VLC_EGENERIC;
-    }
+        goto gbm_error;
 
     display->display = eglGetPlatformDisplay(EGL_PLATFORM_GBM_KHR, sys->device,
                                              NULL);
     if (display->display == EGL_NO_DISPLAY)
-    {
-        gbm_device_destroy(sys->device);
-        vlc_close(sys->fd);
-        return VLC_EGENERIC;
-    }
+        goto egl_error;
 
     static const struct vlc_egl_display_ops ops = {
         .close = Close,
     };
     display->ops = &ops;
+    display->sys = sys;
 
     msg_Info(display, "EGL using GBM platform on device %s (fd=%d)",
                       device_path, sys->fd);
     return VLC_SUCCESS;
+
+egl_error:
+    gbm_device_destroy(sys->device);
+
+gbm_error:
+    vlc_close(sys->fd);
+
+error:
+    free(sys);
+    return VLC_EGENERIC;
 }
 
 vlc_module_begin()
