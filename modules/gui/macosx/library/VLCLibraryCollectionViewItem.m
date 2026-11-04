@@ -229,13 +229,9 @@ NSString *VLCLibraryCollectionViewItemIdentifier = @"VLCLibraryCollectionViewIte
     NSArray<VLCLibraryRepresentedItem *> * const selectedItems =
         [libraryDataSource representedItemsAtIndexPaths:indexPaths
                                       forCollectionView:collectionView];
-    const NSInteger representedItemIndex = [selectedItems indexOfObjectPassingTest:^BOOL(
-        VLCLibraryRepresentedItem * const repItem, const NSUInteger __unused idx, BOOL * const __unused stop
-    ) {
-        return [repItem isEqual:self.representedItem];
-    }];
+    NSIndexPath * const clickedIndexPath = [collectionView indexPathForItem:self];
     NSArray<VLCLibraryRepresentedItem *> *items = nil;
-    if (representedItemIndex == NSNotFound) {
+    if (clickedIndexPath == nil || ![indexPaths containsObject:clickedIndexPath]) {
         items = @[self.representedItem];
     } else {
         items = selectedItems;
