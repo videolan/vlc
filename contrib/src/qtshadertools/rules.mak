@@ -20,7 +20,7 @@ PKGS_FOUND += qtshadertools-tools
 endif
 
 $(TARBALLS)/qtshadertools-everywhere-src-$(QTSHADERTOOLS_VERSION).tar.xz:
-	$(call download_pkg,$(QTSHADERTOOLS_URL),qtshadertools)
+	$(call download_pkg,$(QTSHADERTOOLS_URL),qt)
 
 .sum-qtshadertools: qtshadertools-everywhere-src-$(QTSHADERTOOLS_VERSION).tar.xz
 
