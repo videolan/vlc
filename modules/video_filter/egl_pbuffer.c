@@ -136,7 +136,7 @@ static int InitEGL(vlc_gl_t *gl, int opengl_api, unsigned width, unsigned height
     EGLint major, minor;
     if (eglInitialize(sys->display, &major, &minor) != EGL_TRUE)
     {
-        vlc_egl_display_Delete(sys->display);
+        vlc_egl_display_Delete(sys->vlc_display);
         return VLC_EGENERIC;
     }
     msg_Dbg(gl, "EGL version %s by %s, API %s",
