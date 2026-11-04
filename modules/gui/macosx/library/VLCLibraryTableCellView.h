@@ -52,6 +52,7 @@ typedef NS_ENUM(NSUInteger, VLCLibraryTableCellImageAspectRatio) {
 @property (readwrite, weak) IBOutlet NSTextField *primaryTitleTextField;
 @property (readwrite, weak) IBOutlet VLCImageView *representedImageView;
 @property (readwrite, weak) IBOutlet NSButton *playInstantlyButton;
+@property (readwrite, weak, nullable) IBOutlet NSTextField *audioMediaTypeIndicator;
 
 @property (readwrite, nonatomic) VLCLibraryTableCellDetailMode detailMode;
 @property (readwrite, nonatomic) VLCLibraryTableCellImageAspectRatio representedImageAspectRatio;

@@ -33,39 +33,14 @@
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryModel.h"
-#import "library/VLCLibraryRepresentedItem.h"
 #import "library/VLCLibrarySegment.h"
-#import "library/VLCLibraryTableCellView.h"
+#import "library/VLCLibrarySectionedTableViewDelegate.h"
 #import "library/VLCLibraryTableView.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
 #import "library/history-library/VLCLibraryHistoryDataSource.h"
-#import "library/video-library/VLCLibraryVideoTableViewDelegate.h"
 #import "main/VLCMain.h"
-#import "views/VLCImageView.h"
 #import "views/VLCUIUnits.h"
-
-@interface VLCLibraryHistoryTableViewDelegate : VLCLibraryVideoTableViewDelegate
-@end
-
-@implementation VLCLibraryHistoryTableViewDelegate
-
-- (NSView *)tableView:(NSTableView *)tableView
-   viewForTableColumn:(NSTableColumn *)tableColumn
-                  row:(NSInteger)row
-{
-    NSView * const view = [super tableView:tableView viewForTableColumn:tableColumn row:row];
-    if ([view isKindOfClass:VLCLibraryTableCellView.class]) {
-        VLCLibraryTableCellView * const cell = (VLCLibraryTableCellView *)view;
-        // Fit square album covers into the shared thumbnail column without cropping them.
-        cell.representedImageView.contentGravity = cell.representedItem.item.firstMediaItem.mediaType == VLC_ML_MEDIA_TYPE_AUDIO
-            ? VLCImageViewContentGravityResizeAspect
-            : VLCImageViewContentGravityResizeAspectFill;
-    }
-    return view;
-}
-
-@end
 
 @interface VLCLibraryHistoryViewController ()
 {
@@ -74,7 +49,7 @@
     VLCLibraryCollectionViewDelegate *_collectionViewDelegate;
     VLCLibraryTableView *_tableView;
     NSScrollView *_tableScrollView;
-    VLCLibraryHistoryTableViewDelegate *_tableViewDelegate;
+    VLCLibrarySectionedTableViewDelegate *_tableViewDelegate;
     VLCLibraryHistoryDataSource *_dataSource;
     NSArray<NSLayoutConstraint *> *_placeholderConstraints;
 }
@@ -129,7 +104,9 @@
         NSNib * const tableCellNib = [[NSNib alloc]
             initWithNibNamed:@"VLCLibraryVideoTableCellView"
                       bundle:nil];
-        _tableViewDelegate = [[VLCLibraryHistoryTableViewDelegate alloc] init];
+        _tableViewDelegate = [[VLCLibrarySectionedTableViewDelegate alloc] init];
+        _tableViewDelegate.cellViewIdentifier = @"VLCVideoLibraryTableViewCellIdentifier";
+        _tableViewDelegate.rowHeight = VLCUIUnits.videoLibraryTableViewRowHeight;
         [_tableView registerNib:tableCellNib forIdentifier:_tableViewDelegate.cellViewIdentifier];
         _tableView.delegate = _tableViewDelegate;
         _tableScrollView = [NSScrollView libraryScrollViewWithDocumentView:_tableView];

@@ -15,13 +15,35 @@
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="ffE-px-l0g" customClass="VLCTrackingView">
                     <rect key="frame" x="0.0" y="0.0" width="398" height="48"/>
                 </customView>
-                <imageView translatesAutoresizingMaskIntoConstraints="NO" id="Ydb-7n-5Cd" customClass="VLCImageView">
+                <customView translatesAutoresizingMaskIntoConstraints="NO" id="artwork-column">
                     <rect key="frame" x="5" y="5" width="68" height="38"/>
+                    <subviews>
+                        <imageView translatesAutoresizingMaskIntoConstraints="NO" id="Ydb-7n-5Cd" customClass="VLCImageView">
+                            <rect key="frame" x="0.0" y="0.0" width="68" height="38"/>
+                            <constraints>
+                                <constraint firstAttribute="width" secondItem="Ydb-7n-5Cd" secondAttribute="height" multiplier="16:9" id="4aB-rs-m22"/>
+                            </constraints>
+                            <imageCell key="cell" refusesFirstResponder="YES" imageScaling="proportionallyUpOrDown" id="viN-01-CEl"/>
+                        </imageView>
+                        <textField hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aud-type-note">
+                            <rect key="frame" x="42" y="3" width="26" height="31"/>
+                            <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="♪" id="aud-type-cell">
+                                <font key="font" textStyle="largeTitle" name=".SFNS-Regular"/>
+                                <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </textFieldCell>
+                        </textField>
+                    </subviews>
                     <constraints>
-                        <constraint firstAttribute="width" secondItem="Ydb-7n-5Cd" secondAttribute="height" multiplier="16:9" id="4aB-rs-m22"/>
+                        <constraint firstAttribute="width" secondItem="artwork-column" secondAttribute="height" multiplier="16:9" id="artwork-column-ratio"/>
+                        <constraint firstItem="Ydb-7n-5Cd" firstAttribute="leading" secondItem="artwork-column" secondAttribute="leading" id="artwork-leading"/>
+                        <constraint firstItem="Ydb-7n-5Cd" firstAttribute="top" secondItem="artwork-column" secondAttribute="top" id="artwork-top"/>
+                        <constraint firstAttribute="bottom" secondItem="Ydb-7n-5Cd" secondAttribute="bottom" id="artwork-bottom"/>
+                        <constraint firstAttribute="trailing" secondItem="aud-type-note" secondAttribute="trailing" id="aud-note-trailing"/>
+                        <constraint firstItem="aud-type-note" firstAttribute="centerY" secondItem="artwork-column" secondAttribute="centerY" id="aud-note-centerY"/>
+                        <constraint firstItem="aud-type-note" firstAttribute="width" secondItem="artwork-column" secondAttribute="height" multiplier="7:9" constant="-4" id="aud-note-width"/>
                     </constraints>
-                    <imageCell key="cell" refusesFirstResponder="YES" imageScaling="proportionallyUpOrDown" id="viN-01-CEl"/>
-                </imageView>
+                </customView>
                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2yt-Ph-v3B" customClass="VLCStackView">
                     <userDefinedRuntimeAttributes>
                         <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
@@ -80,7 +102,7 @@
             </subviews>
             <constraints>
                 <constraint firstItem="NFZ-x0-t5c" firstAttribute="centerX" secondItem="Ydb-7n-5Cd" secondAttribute="centerX" id="0Eb-LH-6nF"/>
-                <constraint firstItem="Ydb-7n-5Cd" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" constant="4" id="8hv-Qt-uAI" customClass="VLCSpacingConstraint">
+                <constraint firstItem="artwork-column" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" constant="4" id="8hv-Qt-uAI" customClass="VLCSpacingConstraint">
                     <userDefinedRuntimeAttributes>
                         <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
                             <integer value="1"/>
@@ -92,7 +114,7 @@
                 <constraint firstItem="ffE-px-l0g" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" id="M01-2i-CLZ"/>
                 <constraint firstItem="2yt-Ph-v3B" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" id="Xsk-fe-nEI"/>
                 <constraint firstAttribute="bottom" secondItem="2yt-Ph-v3B" secondAttribute="bottom" id="Xsk-fe-nEZ"/>
-                <constraint firstAttribute="bottom" secondItem="Ydb-7n-5Cd" secondAttribute="bottom" constant="4" id="aVd-Ld-lUH" customClass="VLCSpacingConstraint">
+                <constraint firstAttribute="bottom" secondItem="artwork-column" secondAttribute="bottom" constant="4" id="aVd-Ld-lUH" customClass="VLCSpacingConstraint">
                     <userDefinedRuntimeAttributes>
                         <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
                             <integer value="1"/>
@@ -100,7 +122,7 @@
                     </userDefinedRuntimeAttributes>
                 </constraint>
                 <constraint firstItem="NFZ-x0-t5c" firstAttribute="centerY" secondItem="Ydb-7n-5Cd" secondAttribute="centerY" id="dRw-WH-Y00"/>
-                <constraint firstItem="Ydb-7n-5Cd" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" constant="4" id="iPZ-zR-jTv" customClass="VLCSpacingConstraint">
+                <constraint firstItem="artwork-column" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" constant="4" id="iPZ-zR-jTv" customClass="VLCSpacingConstraint">
                     <userDefinedRuntimeAttributes>
                         <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
                             <integer value="1"/>
@@ -108,7 +130,7 @@
                     </userDefinedRuntimeAttributes>
                 </constraint>
                 <constraint firstAttribute="trailing" secondItem="ffE-px-l0g" secondAttribute="trailing" id="m4c-HB-V5e"/>
-                <constraint firstItem="2yt-Ph-v3B" firstAttribute="leading" secondItem="Ydb-7n-5Cd" secondAttribute="trailing" constant="8" id="svv-3z-IWh" customClass="VLCSpacingConstraint">
+                <constraint firstItem="2yt-Ph-v3B" firstAttribute="leading" secondItem="artwork-column" secondAttribute="trailing" constant="8" id="svv-3z-IWh" customClass="VLCSpacingConstraint">
                     <userDefinedRuntimeAttributes>
                         <userDefinedRuntimeAttribute type="number" keyPath="spacingToken">
                             <integer value="2"/>
@@ -124,6 +146,8 @@
                 </constraint>
             </constraints>
             <connections>
+                <outlet property="audioMediaTypeIndicator" destination="aud-type-note" id="aud-note-outlet"/>
+                <outlet property="representedImageAspectRatioConstraint" destination="4aB-rs-m22" id="media-artwork-ratio-outlet"/>
                 <outlet property="playInstantlyButton" destination="NFZ-x0-t5c" id="suD-1u-UrY"/>
                 <outlet property="primaryTitleTextField" destination="xJW-ps-ycn" id="5Vl-3a-J2T"/>
                 <outlet property="representedImageView" destination="Ydb-7n-5Cd" id="qBu-r5-jIY"/>
