@@ -55,6 +55,7 @@
 
     NSMenuItem *_revealItem;
     NSMenuItem *_deleteItem;
+    NSMenuItem *_markUnplayedItem;
     NSMenuItem *_removeFromPlaylistItem;
     NSMenuItem *_informationItem;
     NSMenuItem *_renamePlaylistItem;
@@ -95,8 +96,8 @@
     _deleteItem = [[NSMenuItem alloc] initWithTitle:_NS("Move to Trash") action:@selector(moveToTrash:) keyEquivalent:@""];
     _deleteItem.target = self;
 
-    NSMenuItem *markUnseenItem = [[NSMenuItem alloc] initWithTitle:_NS("Mark as Unseen") action:@selector(markUnseen:) keyEquivalent:@""];
-    markUnseenItem.target = self;
+    _markUnplayedItem = [[NSMenuItem alloc] initWithTitle:_NS("Mark as Unplayed") action:@selector(markUnseen:) keyEquivalent:@""];
+    _markUnplayedItem.target = self;
 
     _informationItem = [[NSMenuItem alloc] initWithTitle:_NS("Information...") action:@selector(showInformation:) keyEquivalent:@""];
     _informationItem.target = self;
@@ -136,7 +137,7 @@
     [addToLibraryItem vlc_setActionImageWithSystemSymbolName:@"plus.rectangle.on.folder"];
     [_revealItem vlc_setActionImageWithSystemSymbolName:@"folder"];
     [_deleteItem vlc_setActionImageWithSystemSymbolName:@"trash"];
-    [markUnseenItem vlc_setActionImageWithSystemSymbolName:@"eye.slash"];
+    [_markUnplayedItem vlc_setActionImageWithSystemSymbolName:@"eye.slash"];
     [_informationItem vlc_setActionImageWithSystemSymbolName:@"info.circle"];
     [addItem vlc_setActionImageWithSystemSymbolName:@"folder.badge.plus"];
 
@@ -152,7 +153,7 @@
         _revealItem,
         _removeFromPlaylistItem,
         _deleteItem,
-        markUnseenItem,
+        _markUnplayedItem,
         _informationItem,
         [NSMenuItem separatorItem],
         addItem
@@ -168,7 +169,7 @@
     [_mediaItemRequiringMenuItems addObject:_informationItem];
 
     _playedMediaItemRequiringMenuItems = [NSHashTable weakObjectsHashTable];
-    [_playedMediaItemRequiringMenuItems addObject:markUnseenItem];
+    [_playedMediaItemRequiringMenuItems addObject:_markUnplayedItem];
 
     _inputItemRequiringMenuItems = [NSHashTable weakObjectsHashTable];
     [_inputItemRequiringMenuItems addObject:playItem];
@@ -261,6 +262,8 @@
         }
 
         BOOL anyUnplayed = NO;
+        BOOL allAudio = YES;
+        BOOL allVideo = YES;
         for (VLCLibraryRepresentedItem * const item in self.representedItems) {
             // Refresh playback metadata because library rows can retain an older snapshot.
             VLCMediaLibraryMediaItem * const currentItem =
@@ -271,6 +274,15 @@
                 anyUnplayed = YES;
                 break;
             }
+            allAudio &= currentItem.mediaType == VLC_ML_MEDIA_TYPE_AUDIO;
+            allVideo &= currentItem.mediaType == VLC_ML_MEDIA_TYPE_VIDEO;
+        }
+        if (allAudio) {
+            _markUnplayedItem.title = _NS("Mark as Unheard");
+        } else if (allVideo) {
+            _markUnplayedItem.title = _NS("Mark as Unseen");
+        } else {
+            _markUnplayedItem.title = _NS("Mark as Unplayed");
         }
         [self menuItems:_playedMediaItemRequiringMenuItems setHidden:anyUnplayed];
         
