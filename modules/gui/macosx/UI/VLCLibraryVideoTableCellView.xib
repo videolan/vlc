@@ -76,13 +76,26 @@
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
+                        <button hidden="YES" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="mark-unplayed-button">
+                            <rect key="frame" x="277" y="10" width="28" height="28"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="28" id="mark-unplayed-width"/>
+                                <constraint firstAttribute="height" constant="28" id="mark-unplayed-height"/>
+                            </constraints>
+                            <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="mark-unplayed-cell">
+                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                        </button>
                     </subviews>
                     <visibilityPriorities>
                         <integer value="1000"/>
                         <integer value="1000"/>
                         <integer value="1000"/>
+                        <integer value="1000"/>
                     </visibilityPriorities>
                     <customSpacing>
+                        <real value="3.4028234663852886e+38"/>
                         <real value="3.4028234663852886e+38"/>
                         <real value="3.4028234663852886e+38"/>
                         <real value="3.4028234663852886e+38"/>
@@ -148,6 +161,7 @@
             <connections>
                 <outlet property="audioMediaTypeIndicator" destination="aud-type-note" id="aud-note-outlet"/>
                 <outlet property="representedImageAspectRatioConstraint" destination="4aB-rs-m22" id="media-artwork-ratio-outlet"/>
+                <outlet property="markUnplayedButton" destination="mark-unplayed-button" id="mark-unplayed-outlet"/>
                 <outlet property="playInstantlyButton" destination="NFZ-x0-t5c" id="suD-1u-UrY"/>
                 <outlet property="primaryTitleTextField" destination="xJW-ps-ycn" id="5Vl-3a-J2T"/>
                 <outlet property="representedImageView" destination="Ydb-7n-5Cd" id="qBu-r5-jIY"/>

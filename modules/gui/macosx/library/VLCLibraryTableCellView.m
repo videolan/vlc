@@ -65,6 +65,11 @@ NSString * const VLCLibraryTableCellViewIdentifier = @"VLCLibraryTableCellViewId
         _representedImageAspectRatio = VLCLibraryTableCellImageAspectRatioVideo;
     }
     _mediaArtworkContentGravity = self.representedImageView.contentGravity;
+    self.markUnplayedButton.target = self;
+    self.markUnplayedButton.action = @selector(markAsUnplayed:);
+    self.markUnplayedButton.bordered = YES;
+    self.markUnplayedButton.bezelStyle = NSBezelStyleRecessed;
+    self.markUnplayedButton.showsBorderOnlyWhileMouseInside = YES;
     [self prepareForReuse];
 
     if (@available(macOS 26.0, *)) {
@@ -82,6 +87,12 @@ NSString * const VLCLibraryTableCellViewIdentifier = @"VLCLibraryTableCellViewId
 - (void)prepareForReuse
 {
     [super prepareForReuse];
+    _representedItem = nil;
+    _representedInputItem = nil;
+    self.showsMarkUnplayedButton = NO;
+    self.markUnplayedButton.image = nil;
+    self.markUnplayedButton.toolTip = nil;
+    self.markUnplayedButton.accessibilityLabel = nil;
     self.detailMode = VLCLibraryTableCellDetailModePrimaryDetail;
     if (self.audioMediaTypeIndicator == nil) {
         self.representedImageAspectRatio = VLCLibraryTableCellImageAspectRatioSquare;
@@ -143,6 +154,59 @@ NSString * const VLCLibraryTableCellViewIdentifier = @"VLCLibraryTableCellViewId
         : _mediaArtworkContentGravity;
 }
 
+- (void)setShowsMarkUnplayedButton:(BOOL)showsMarkUnplayedButton
+{
+    NSAssert(!showsMarkUnplayedButton || self.markUnplayedButton != nil,
+             @"Mark as Unplayed button must be connected when enabled");
+    _showsMarkUnplayedButton = showsMarkUnplayedButton;
+    [self updateMarkUnplayedButton];
+}
+
+- (void)updateMarkUnplayedButton
+{
+    self.markUnplayedButton.hidden = YES;
+    if (!self.showsMarkUnplayedButton ||
+        ![self.representedItem.item isKindOfClass:VLCMediaLibraryMediaItem.class]) {
+        return;
+    }
+
+    VLCMediaLibraryMediaItem * const currentItem =
+        [VLCMediaLibraryMediaItem mediaItemForLibraryID:self.representedItem.item.libraryID];
+    if (currentItem.lastPlayedDate <= 0) {
+        return;
+    }
+
+    NSString *actionTitle;
+    NSString *symbolName;
+    switch (currentItem.mediaType) {
+        case VLC_ML_MEDIA_TYPE_AUDIO:
+            actionTitle = _NS("Mark as Unheard");
+            if (@available(macOS 26.0, *)) {
+                symbolName = @"music.note.slash";
+            } else {
+                symbolName = @"speaker.slash";
+            }
+            break;
+        case VLC_ML_MEDIA_TYPE_VIDEO:
+            actionTitle = _NS("Mark as Unseen");
+            symbolName = @"eye.slash";
+            break;
+        default:
+            actionTitle = _NS("Mark as Unplayed");
+            symbolName = @"arrow.counterclockwise";
+            break;
+    }
+
+    NSImage *image = nil;
+    if (@available(macOS 11.0, *)) {
+        image = [NSImage imageWithSystemSymbolName:symbolName accessibilityDescription:actionTitle];
+    }
+    self.markUnplayedButton.image = image ?: [NSImage imageNamed:NSImageNameRefreshTemplate];
+    self.markUnplayedButton.toolTip = actionTitle;
+    self.markUnplayedButton.accessibilityLabel = actionTitle;
+    self.markUnplayedButton.hidden = NO;
+}
+
 - (void)setRepresentedItem:(VLCLibraryRepresentedItem *)representedItem
 {
     _representedItem = representedItem;
@@ -174,6 +238,7 @@ NSString * const VLCLibraryTableCellViewIdentifier = @"VLCLibraryTableCellViewId
         self.singlePrimaryTitleTextField.hidden = NO;
         self.singlePrimaryTitleTextField.stringValue = actualItem.displayString;
     }
+    [self updateMarkUnplayedButton];
 }
 
 - (void)setRepresentedInputItem:(VLCInputItem *)representedInputItem
@@ -181,6 +246,7 @@ NSString * const VLCLibraryTableCellViewIdentifier = @"VLCLibraryTableCellViewId
     _representedInputItem = representedInputItem;
     _representedItem = nil; // Reset and ensure the change is obvious
     self.audioArtworkLayout = NO;
+    [self updateMarkUnplayedButton];
 
     self.singlePrimaryTitleTextField.hidden = NO;
     self.singlePrimaryTitleTextField.stringValue = _representedInputItem.name;
@@ -241,6 +307,19 @@ NSString * const VLCLibraryTableCellViewIdentifier = @"VLCLibraryTableCellViewId
 - (void)playMediaItemInstantly:(id)sender
 {
     [self.representedItem play];
+}
+
+- (void)markAsUnplayed:(id)sender
+{
+    id<VLCMediaLibraryItemProtocol> const item = self.representedItem.item;
+    if (!self.showsMarkUnplayedButton || self.markUnplayedButton.hidden ||
+        ![item isKindOfClass:VLCMediaLibraryMediaItem.class]) {
+        return;
+    }
+
+    if ([(VLCMediaLibraryMediaItem *)item markAsUnplayed] == VLC_SUCCESS) {
+        self.markUnplayedButton.hidden = YES;
+    }
 }
 
 - (void)playInputItemInstantly:(id)sender

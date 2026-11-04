@@ -96,7 +96,7 @@
     _deleteItem = [[NSMenuItem alloc] initWithTitle:_NS("Move to Trash") action:@selector(moveToTrash:) keyEquivalent:@""];
     _deleteItem.target = self;
 
-    _markUnplayedItem = [[NSMenuItem alloc] initWithTitle:_NS("Mark as Unplayed") action:@selector(markUnseen:) keyEquivalent:@""];
+    _markUnplayedItem = [[NSMenuItem alloc] initWithTitle:_NS("Mark as Unplayed") action:@selector(markUnplayed:) keyEquivalent:@""];
     _markUnplayedItem.target = self;
 
     _informationItem = [[NSMenuItem alloc] initWithTitle:_NS("Information...") action:@selector(showInformation:) keyEquivalent:@""];
@@ -588,11 +588,12 @@
     [defaultCenter postNotificationName:VLCLibraryBookmarkedLocationsChanged object:inputItemMRL];
 }
 
-- (void)markUnseen:(id)sender
+- (void)markUnplayed:(id)sender
 {
-    vlc_medialibrary_t * const p_ml = vlc_ml_instance_get(getIntf());
     for (VLCLibraryRepresentedItem * const item in self.representedItems) {
-        vlc_ml_media_set_played(p_ml, item.item.libraryID, false);
+        if ([item.item isKindOfClass:VLCMediaLibraryMediaItem.class]) {
+            [(VLCMediaLibraryMediaItem *)item.item markAsUnplayed];
+        }
     }
 }
 

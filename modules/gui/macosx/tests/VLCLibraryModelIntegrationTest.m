@@ -2312,7 +2312,8 @@
     [self.model refreshCacheForGetter:@selector(cachedRecentAudioMedia)];
     [self waitForExpectations:@[ recentLoaded ] timeout:5.];
     XCTAssertEqualObjects([self libraryIDsForItems:self.model.listOfRecentAudioMedia], @[ @(audioID) ]);
-    XCTAssertGreaterThan([VLCMediaLibraryMediaItem mediaItemForLibraryID:audioID].lastPlayedDate, (time_t)0);
+    VLCMediaLibraryMediaItem * const audio = [VLCMediaLibraryMediaItem mediaItemForLibraryID:audioID];
+    XCTAssertGreaterThan(audio.lastPlayedDate, (time_t)0);
 
     NSArray<NSNumber *> * const remainingIDs = [self.expectedIDs subarrayWithRange:NSMakeRange(0, 2)];
     XCTestExpectation * const historyUpdated =
@@ -2329,8 +2330,10 @@
         XCTAssertTrue(NSThread.isMainThread);
         return self.model.listOfRecentAudioMedia.count == 0;
     }];
-    XCTAssertEqual(vlc_ml_media_set_played(VLCLibraryDataTypesIntegrationMediaLibrary(), audioID, false),
-                   VLC_SUCCESS);
+    XCTAssertEqual([audio markAsUnplayed], VLC_SUCCESS);
+    XCTAssertEqual(audio.lastPlayedDate, (time_t)0);
+    XCTAssertEqual(audio.playCount, (uint32_t)0);
+    XCTAssertEqual(audio.progress, -1.f);
     [self waitForExpectations:@[ historyUpdated, recentUpdated ] timeout:5.];
 
     XCTAssertEqualObjects([self libraryIDsForItems:self.model.listOfHistoryMedia], remainingIDs);
@@ -2338,6 +2341,8 @@
     VLCMediaLibraryMediaItem * const unseenAudio = [VLCMediaLibraryMediaItem mediaItemForLibraryID:audioID];
     XCTAssertNotNil(unseenAudio);
     XCTAssertEqual(unseenAudio.lastPlayedDate, (time_t)0);
+    XCTAssertEqual(unseenAudio.playCount, (uint32_t)0);
+    XCTAssertEqual(unseenAudio.progress, -1.f);
 }
 
 - (void)testPendingHistoryFetchCannotRestoreDeletedStream

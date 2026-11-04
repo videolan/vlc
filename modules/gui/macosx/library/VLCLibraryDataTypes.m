@@ -840,7 +840,8 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     // By default iterate album-by-album
     [self enumerateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * const item, BOOL * const __unused stop) {
         mediaItemBlock(item);
-    } orderedBy:VLC_ML_PARENT_ALBUM];
+    }
+                             orderedBy:VLC_ML_PARENT_ALBUM];
 }
 
 - (void)enumerateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem *item, BOOL *stop))mediaItemBlock
@@ -852,11 +853,12 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 {
     [self enumerateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * const item, BOOL * const __unused stop) {
         mediaItemBlock(item);
-    } orderedBy:mediaItemParentType];
+    }
+                             orderedBy:mediaItemParentType];
 }
 
 - (void)enumerateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem *item, BOOL *stop))mediaItemBlock
-                       orderedBy:(int)mediaItemParentType
+                           orderedBy:(int)mediaItemParentType
 {
     NSArray<id<VLCMediaLibraryItemProtocol>> *childItems;
     switch(mediaItemParentType) {
@@ -1102,8 +1104,8 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
                 // This is a file-based playlist, move the file to trash
                 NSError *error = nil;
                 [fileManager trashItemAtURL:URL
-                            resultingItemURL:nil
-                                        error:&error];
+                           resultingItemURL:nil
+                                      error:&error];
                 if (error) {
                     NSLog(@"Failed to move playlist file to trash: %@", error);
                 } else {
@@ -1920,6 +1922,21 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     return self.internalLabels;
 }
 
+- (int)markAsUnplayed
+{
+    if (_p_mediaLibrary == NULL) {
+        return VLC_EGENERIC;
+    }
+
+    const int result = vlc_ml_media_set_played(_p_mediaLibrary, self.libraryID, false);
+    if (result == VLC_SUCCESS) {
+        _lastPlayedDate = 0;
+        _playCount = 0;
+        _progress = -1.f;
+    }
+    return result;
+}
+
 - (int)setFavorite:(BOOL)favorite
 {
     const int res = setFavoriteForLibraryItem(vlc_ml_media_set_favorite, self.libraryID, favorite);
@@ -2088,14 +2105,14 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 }
 
 - (instancetype)initWithDisplayString:(NSString *)displayString
-                      withMediaItems:(NSArray<VLCMediaLibraryMediaItem *> *)mediaItems
+                       withMediaItems:(NSArray<VLCMediaLibraryMediaItem *> *)mediaItems
 {
 
     NSString * const detailString = _NPS("%lu item", "%lu items", (unsigned long)mediaItems.count);
 
     self = [self initWithDisplayString:displayString
                withPrimaryDetailString:detailString
-              withSecondaryDetailString:@""];
+             withSecondaryDetailString:@""];
     if (self) {
         _mediaItems = mediaItems;
         _firstMediaItem = mediaItems.firstObject;

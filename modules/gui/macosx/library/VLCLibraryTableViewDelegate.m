@@ -56,7 +56,9 @@
 
 - (void)configureCellView:(NSView<VLCLibraryTableCellViewProtocol> *)cellView
 {
-    // no-op
+    if ([cellView isKindOfClass:VLCLibraryTableCellView.class]) {
+        ((VLCLibraryTableCellView *)cellView).showsMarkUnplayedButton = self.showsMarkUnplayedButton;
+    }
 }
 
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row

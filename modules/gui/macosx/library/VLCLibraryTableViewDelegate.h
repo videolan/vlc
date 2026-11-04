@@ -29,6 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface VLCLibraryTableViewDelegate : NSObject <NSTableViewDelegate>
 
 @property (readwrite, assign) NSString *cellViewIdentifier;
+@property (readwrite) BOOL showsMarkUnplayedButton;
 
 - (NSView<VLCLibraryTableCellViewProtocol> *)makeCellView;
 - (void)configureCellView:(NSView<VLCLibraryTableCellViewProtocol> *)cellView;
