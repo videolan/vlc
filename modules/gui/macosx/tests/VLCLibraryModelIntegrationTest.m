@@ -2300,6 +2300,46 @@
     XCTAssertEqual(history.firstObject.playCount, previousAudio.playCount + 1);
 }
 
+- (void)testMarkingAudioUnseenRefreshesActiveHistoryAndRecentAudio
+{
+    [self observeNativeHistoryEvents];
+    XCTAssertEqualObjects([self libraryIDsForItems:[self loadHistory]], self.expectedIDs);
+    const int64_t audioID = VLCLibraryDataTypesIntegrationFactoryAudioMediaID();
+    XCTestExpectation * const recentLoaded =
+        [self expectationForNotification:VLCLibraryModelRecentAudioMediaListReset
+                                  object:self.model
+                                 handler:nil];
+    [self.model refreshCacheForGetter:@selector(cachedRecentAudioMedia)];
+    [self waitForExpectations:@[ recentLoaded ] timeout:5.];
+    XCTAssertEqualObjects([self libraryIDsForItems:self.model.listOfRecentAudioMedia], @[ @(audioID) ]);
+    XCTAssertGreaterThan([VLCMediaLibraryMediaItem mediaItemForLibraryID:audioID].lastPlayedDate, (time_t)0);
+
+    NSArray<NSNumber *> * const remainingIDs = [self.expectedIDs subarrayWithRange:NSMakeRange(0, 2)];
+    XCTestExpectation * const historyUpdated =
+        [self expectationForNotification:VLCLibraryModelHistoryMediaListReset
+                                  object:self.model
+                                 handler:^BOOL(NSNotification * __unused notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        return [[self libraryIDsForItems:self.model.listOfHistoryMedia] isEqualToArray:remainingIDs];
+    }];
+    XCTestExpectation * const recentUpdated =
+        [self expectationForNotification:VLCLibraryModelRecentAudioMediaListReset
+                                  object:self.model
+                                 handler:^BOOL(NSNotification * __unused notification) {
+        XCTAssertTrue(NSThread.isMainThread);
+        return self.model.listOfRecentAudioMedia.count == 0;
+    }];
+    XCTAssertEqual(vlc_ml_media_set_played(VLCLibraryDataTypesIntegrationMediaLibrary(), audioID, false),
+                   VLC_SUCCESS);
+    [self waitForExpectations:@[ historyUpdated, recentUpdated ] timeout:5.];
+
+    XCTAssertEqualObjects([self libraryIDsForItems:self.model.listOfHistoryMedia], remainingIDs);
+    XCTAssertEqual(self.model.numberOfRecentAudioMedia, (size_t)0);
+    VLCMediaLibraryMediaItem * const unseenAudio = [VLCMediaLibraryMediaItem mediaItemForLibraryID:audioID];
+    XCTAssertNotNil(unseenAudio);
+    XCTAssertEqual(unseenAudio.lastPlayedDate, (time_t)0);
+}
+
 - (void)testPendingHistoryFetchCannotRestoreDeletedStream
 {
     XCTestExpectation * const captured = [self expectationWithDescription:@"Old history snapshot captured"];

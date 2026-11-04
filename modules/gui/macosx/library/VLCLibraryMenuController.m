@@ -29,7 +29,6 @@
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryAddToPlaylistMenuController.h"
 #import "library/VLCLibraryController.h"
-#import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryRepresentedItem.h"
 #import "library/VLCLibrarySegment.h"
 #import "library/VLCLibraryWindow.h"
@@ -49,7 +48,7 @@
     VLCInformationWindowController *_informationWindowController;
 
     NSHashTable<NSMenuItem*> *_mediaItemRequiringMenuItems;
-    NSHashTable<NSMenuItem*> *_recentsMediaItemRequiringMenuItems;
+    NSHashTable<NSMenuItem*> *_playedMediaItemRequiringMenuItems;
     NSHashTable<NSMenuItem*> *_inputItemRequiringMenuItems;
     NSHashTable<NSMenuItem*> *_localInputItemRequiringMenuItems;
     NSHashTable<NSMenuItem*> *_folderInputItemRequiringMenuItems;
@@ -108,8 +107,8 @@
     bookmarkItem.target = self;
 
     NSMenuItem * const addToLibraryItem = [[NSMenuItem alloc] initWithTitle:_NS("Add to Media Library")
-                                                                      action:@selector(addToMediaLibrary:)
-                                                               keyEquivalent:@""];
+                                                                     action:@selector(addToMediaLibrary:)
+                                                              keyEquivalent:@""];
     addToLibraryItem.target = self;
 
     _favoriteItem = [[NSMenuItem alloc] initWithTitle:_NS("Toggle Favorite") action:@selector(toggleFavorite:) keyEquivalent:@""];
@@ -168,8 +167,8 @@
     [_mediaItemRequiringMenuItems addObject:_deleteItem];
     [_mediaItemRequiringMenuItems addObject:_informationItem];
 
-    _recentsMediaItemRequiringMenuItems = [NSHashTable weakObjectsHashTable];
-    [_recentsMediaItemRequiringMenuItems addObject:markUnseenItem];
+    _playedMediaItemRequiringMenuItems = [NSHashTable weakObjectsHashTable];
+    [_playedMediaItemRequiringMenuItems addObject:markUnseenItem];
 
     _inputItemRequiringMenuItems = [NSHashTable weakObjectsHashTable];
     [_inputItemRequiringMenuItems addObject:playItem];
@@ -218,20 +217,18 @@
 
 - (void)updateMenuItems
 {
-    VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
-    NSArray<VLCMediaLibraryMediaItem *> * const recents = libraryModel.listOfRecentMedia;
     const BOOL isFavoritesSegment =
         VLCMain.sharedInstance.libraryWindow.librarySegmentType == VLCLibraryFavoritesSegmentType;
 
     _removeFromPlaylistItem.hidden = YES;
     _renamePlaylistItem.hidden = YES;
+    [self menuItems:_playedMediaItemRequiringMenuItems setHidden:YES];
 
     /* no represented items (right-click on empty space) - media actions are disabled */
     if (self.representedItems.count == 0 && self.representedInputItems.count == 0) {
         [self menuItems:_inputItemRequiringMenuItems setHidden:YES];
         [self menuItems:_localInputItemRequiringMenuItems setHidden:YES];
         [self menuItems:_folderInputItemRequiringMenuItems setHidden:YES];
-        [self menuItems:_recentsMediaItemRequiringMenuItems setHidden:YES];
         [self menuItems:_mediaItemRequiringMenuItems setHidden:NO];
         _revealItem.hidden = NO;
         self.favoriteItem.hidden = isFavoritesSegment;
@@ -263,16 +260,19 @@
             _renamePlaylistItem.hidden = playlist.readOnly;
         }
 
-        BOOL anyNonRecent = NO;
+        BOOL anyUnplayed = NO;
         for (VLCLibraryRepresentedItem * const item in self.representedItems) {
-            if ([recents indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMediaItem * _Nonnull obj, NSUInteger __unused idx, BOOL * __unused stop) {
-                return obj.libraryID == item.item.libraryID;
-            }] == NSNotFound) {
-                anyNonRecent = YES;
+            // Refresh playback metadata because library rows can retain an older snapshot.
+            VLCMediaLibraryMediaItem * const currentItem =
+                [item.item isKindOfClass:VLCMediaLibraryMediaItem.class]
+                ? [VLCMediaLibraryMediaItem mediaItemForLibraryID:item.item.libraryID]
+                : nil;
+            if (currentItem.lastPlayedDate <= 0) {
+                anyUnplayed = YES;
                 break;
             }
         }
-        [self menuItems:_recentsMediaItemRequiringMenuItems setHidden:anyNonRecent];
+        [self menuItems:_playedMediaItemRequiringMenuItems setHidden:anyUnplayed];
         
         BOOL anyUnfavorited = NO;
         for (VLCLibraryRepresentedItem * const item in self.representedItems) {
@@ -372,8 +372,8 @@
 {
     NSParameterAssert(inputItem);
     [VLCMain.sharedInstance.playQueueController addInputItem:inputItem.vlcInputItem
-                                                 atPosition:-1
-                                              startPlayback:playImmediately];
+                                                  atPosition:-1
+                                               startPlayback:playImmediately];
 }
 
 - (void)play:(id)sender
