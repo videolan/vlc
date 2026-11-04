@@ -77,6 +77,7 @@ ToolTipExt {
                 //       may still be clamped due to screen geometry:
                 anchors.horizontalCenterOffset: (pointingTooltip._x - pointingTooltip.x)
                 anchors.verticalCenter: parent.top
+                anchors.alignWhenCentered: false
 
                 implicitWidth: VLCStyle.dp(10, VLCStyle.scale)
                 implicitHeight: VLCStyle.dp(10, VLCStyle.scale)
@@ -85,7 +86,7 @@ ToolTipExt {
 
                 color: pointingTooltip.colorContext.bg.primary
                 border.color: pointingTooltip.colorContext.border
-                border.pixelAligned: (radius < Number.EPSILON)
+                border.pixelAligned: false
             }
         }
     }
