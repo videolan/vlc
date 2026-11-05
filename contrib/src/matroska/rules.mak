@@ -18,6 +18,7 @@ $(TARBALLS)/libmatroska-$(MATROSKA_VERSION).tar.xz:
 
 matroska: libmatroska-$(MATROSKA_VERSION).tar.xz .sum-matroska
 	$(UNPACK)
+	$(APPLY) $(SRC)/matroska/0001-KaxBlock-throw-an-exception-when-encountering-a-larg.patch
 	$(call pkg_static,"libmatroska.pc.in")
 	$(MOVE)
 

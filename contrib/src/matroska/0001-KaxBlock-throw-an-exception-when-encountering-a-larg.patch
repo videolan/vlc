@@ -1,0 +1,31 @@
+From 8511b049d2f6a5382ba4132f8d9b75dd8dc6eb9f Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <slhomme@matroska.org>
+Date: Thu, 5 Nov 2026 11:05:17 +0100
+Subject: [PATCH] KaxBlock: throw an exception when encountering a large track
+ number
+
+This was already done in 4457e70466dcc77984202a05525428383cb74fe3 for SCOPE_ALL_DATA
+but the same should be done for SCOPE_PARTIAL_DATA.
+(maybe that common code should be factorized)
+
+Discovered by Anthropic's OSS Scanner, as vulnerability ANT-2026-82J8BC58.
+---
+ src/KaxBlock.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/KaxBlock.cpp b/src/KaxBlock.cpp
+index cf213c9..ce2ab71 100644
+--- a/src/KaxBlock.cpp
++++ b/src/KaxBlock.cpp
+@@ -618,7 +618,7 @@ filepos_t KaxInternalBlock::ReadData(IOCallback & input, ScopeMode ReadFully)
+         // there is extra data
+         if ((TrackNumber & 0x40) == 0) {
+           // We don't support track numbers that large !
+-          return Result;
++          throw SafeReadIOCallback::EndOfStreamX(0);
+         }
+         TrackNumber = (TrackNumber & 0x3F) << 8;
+         TrackNumber += *cursor++;
+-- 
+2.52.0.windows.1
+
