@@ -335,9 +335,16 @@
 - (void)libraryModelPlaylistDeleted:(NSNotification *)notification
 {
     NSParameterAssert(notification);
-    if (self.libraryWindow.librarySegmentType == VLCLibraryPlaylistsSegmentType &&
-        !self.libraryWindow.embeddedVideoPlaybackActive) {
-        [self updatePresentedView];
+    if (self.libraryWindow.librarySegmentType != VLCLibraryPlaylistsSegmentType ||
+        self.libraryWindow.embeddedVideoPlaybackActive ||
+        [self.dataSource.libraryModel numberOfPlaylistsOfType:self.dataSource.playlistType] > 0) {
+        return;
+    }
+
+    if (self.dataSource.libraryModel.filterString.length > 0) {
+        [self.libraryWindow displayNoResultsMessage];
+    } else {
+        [self presentPlaceholderPlaylistLibraryView];
     }
 }
 
