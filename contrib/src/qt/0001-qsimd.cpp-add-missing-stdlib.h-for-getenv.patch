@@ -1,0 +1,28 @@
+From e72d6e46282e476290e657a434ceeeaea40625f7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jean-Micha=C3=ABl=20Celerier?=
+ <jeanmichael.celerier@gmail.com>
+Date: Mon, 27 Oct 2025 01:28:27 -0400
+Subject: [PATCH] qsimd.cpp: add missing stdlib.h for getenv
+
+Pick-to: 6.11 6.10 6.8
+Change-Id: I6cc8da4261e67d72f32339987fbefed02d8e6384
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+---
+ src/corelib/global/qsimd.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/corelib/global/qsimd.cpp b/src/corelib/global/qsimd.cpp
+index 7858a80125f..b9c7bf58e5c 100644
+--- a/src/corelib/global/qsimd.cpp
++++ b/src/corelib/global/qsimd.cpp
+@@ -11,6 +11,7 @@
+ #include "qalgorithms.h"
+ 
+ #include <stdio.h>
++#include <stdlib.h>
+ #include <string.h>
+ 
+ #if defined(QT_NO_DEBUG) && !defined(NDEBUG)
+-- 
+2.53.0
+
