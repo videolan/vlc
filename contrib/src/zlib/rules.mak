@@ -1,5 +1,5 @@
 # ZLIB
-ZLIB_VERSION := 1.3.2
+ZLIB_VERSION := 1.4
 ZLIB_URL := $(GITHUB)/madler/zlib/releases/download/v$(ZLIB_VERSION)/zlib-$(ZLIB_VERSION).tar.xz
 
 PKGS += zlib
