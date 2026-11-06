@@ -88,7 +88,7 @@ pub trait TracerCapability: Sync {
 
 #[allow(non_camel_case_types)]
 pub type TracerCapabilityActivate =
-    unsafe extern "C" fn(
+    extern "C" fn(
         obj: &mut Object,
         opaque: &mut MaybeUninit<*mut c_void>,
     ) -> Option<&'static sys::vlc_tracer_operations>;
