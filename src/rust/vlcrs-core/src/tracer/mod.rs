@@ -93,38 +93,33 @@ pub type TracerCapabilityActivate =
         opaque: &mut MaybeUninit<*mut c_void>,
     ) -> Option<&'static sys::vlc_tracer_operations>;
 
-extern "C" fn tracer_trace(
+extern "C" fn tracer_trace<T: TracerCapability>(
     opaque: *const c_void,
     tick: sys::vlc_tick,
     trace: NonNull<sys::vlc_tracer_trace>,
 ) {
-    {
-        let tracer: &dyn TracerCapability =
-            unsafe { &**(opaque as *const Box<dyn TracerCapability>) };
-        let trace = Trace(trace);
-        tracer.trace(Tick(tick), &trace);
-    }
+    let tracer: &T = unsafe { &*(opaque as *const T) };
+    let trace = Trace(trace);
+    tracer.trace(Tick(tick), &trace);
 }
 
-extern "C" fn tracer_destroy(opaque: *mut c_void) {
-    let tracer: *mut Box<dyn TracerCapability> = opaque as *mut _;
-    let _ = unsafe { Box::from_raw(tracer) };
+extern "C" fn tracer_destroy<T>(opaque: *mut c_void) {
+    let _ = unsafe { Box::from_raw(opaque as *mut T) };
 }
-
-const TRACER_OPERATIONS: sys::vlc_tracer_operations = sys::vlc_tracer_operations {
-    trace: tracer_trace,
-    destroy: tracer_destroy,
-};
 
 extern "C" fn activate_tracer<T: TracerCapability>(
     obj: &mut Object,
     opaque: &mut MaybeUninit<*mut c_void>,
 ) -> Option<&'static sys::vlc_tracer_operations> {
     let instance = T::open(obj)?;
-    let wrapper: Box<dyn TracerCapability> = Box::try_new(instance).ok()?;
-    let sys = Box::into_raw(Box::try_new(wrapper).ok()?);
+    let sys = Box::into_raw(Box::try_new(instance).ok()?);
     opaque.write(sys as *mut _);
-    return Some(&TRACER_OPERATIONS);
+    Some(const {
+        &sys::vlc_tracer_operations {
+            trace: tracer_trace::<T>,
+            destroy: tracer_destroy::<T>,
+        }
+    })
 }
 
 ///
