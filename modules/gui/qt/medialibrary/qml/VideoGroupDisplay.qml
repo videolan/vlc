@@ -45,12 +45,10 @@ Widgets.PageExt {
         onGrouping: (grouping) => { MainCtx.grouping = grouping }
     }
 
-    VideoAll {
+    contentItem: VideoAll {
         id: videoAll
 
         // Aliases
-
-        anchors.fill: parent
 
         focus: true
 

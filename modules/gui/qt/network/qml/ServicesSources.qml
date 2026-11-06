@@ -42,11 +42,9 @@ Widgets.PageExt {
         grid.positionViewAtBeginningAnimated()
     }
 
-    Widgets.ExpandGridItemView {
+    contentItem: Widgets.ExpandGridItemView {
         //settings
         id: grid
-
-        anchors.fill: parent
 
         focus: true
 

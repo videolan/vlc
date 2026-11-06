@@ -29,9 +29,7 @@ Widgets.PageExt {
 
     title: qsTr("Albums")
 
-    MusicAlbums {
-        anchors.fill: parent
-
+    contentItem: MusicAlbums {
         focus: true
 
         searchPattern: root.search.pattern

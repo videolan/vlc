@@ -120,13 +120,8 @@ Widgets.PageExt {
         text: qsTr("No network shares found")
     }
 
-    Flickable {
+    contentItem: Flickable {
         id: flickable
-
-        anchors.fill: parent
-
-        anchors.leftMargin: root.leftPadding
-        anchors.rightMargin: root.rightPadding
 
         T.ScrollBar.vertical: Widgets.ScrollBarExt { }
 

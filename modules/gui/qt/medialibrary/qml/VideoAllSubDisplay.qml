@@ -70,10 +70,8 @@ Widgets.PageExt {
 
     title: qsTr("Videos")
 
-    VideoAll {
+    contentItem: VideoAll {
         id: videoAll
-
-        anchors.fill: parent
 
         focus: true
 

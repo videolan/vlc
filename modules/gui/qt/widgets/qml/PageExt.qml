@@ -30,16 +30,12 @@ T.Page {
     //path of the current page loader
     property var pagePrefix: []
 
-    //note that T.Page introduce an intermediate Item, so to access our delegate,
-    //we need to use contentChildren[0] rather than contentItem
-    readonly property Item _firstChild: contentChildren[0] ?? null
-
     //indicates whether the subview support grid/list mode
-    property bool hasGridListMode: _firstChild?.hasGridListMode ?? false
+    property bool hasGridListMode: contentItem?.hasGridListMode ?? false
 
-    property bool isSearchable: _firstChild?.isSearchable ?? false
+    property bool isSearchable: contentItem?.isSearchable ?? false
 
-    property var sortModel: _firstChild?.sortModel ?? null
+    property var sortModel: contentItem?.sortModel ?? null
 
     //property is *not* readOnly, a PageLoader may define a localMenuDelegate common for its subviews (music, video)
     property SortMenu sortMenu: null
@@ -91,15 +87,15 @@ T.Page {
         value: root.hasGridListMode
     }
 
-    on_FirstChildChanged: {
-        if (!_firstChild)
+    onContentItemChanged: {
+        if (!contentItem)
             return
-        _firstChild.Navigation.parentItem = root
-        _firstChild.Navigation.upItem = root.header
+        contentItem.Navigation.parentItem = root
+        contentItem.Navigation.upItem = root.header
     }
 
     function positionContentAtBeginning() {
-        _firstChild?.positionContentAtBeginning?.()
+        contentItem?.positionContentAtBeginning?.()
     }
 
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
@@ -124,10 +120,10 @@ T.Page {
         Navigation.downAction: function() {
             if (typeof root.setCurrentItemFocus === "function")
                 root.setCurrentItemFocus(Qt.TabFocusReason)
-            else if (typeof root._firstChild?.setCurrentItemFocus === "function")
-             root._firstChild.setCurrentItemFocus(Qt.TabFocusReason)
-            else if (root._firstChild)
-                root._firstChild.forceActiveFocus(Qt.TabFocusReason)
+            else if (typeof root.contentItem?.setCurrentItemFocus === "function")
+             root.contentItem.setCurrentItemFocus(Qt.TabFocusReason)
+            else if (root.contentItem)
+                root.contentItem.forceActiveFocus(Qt.TabFocusReason)
         }
     }
 

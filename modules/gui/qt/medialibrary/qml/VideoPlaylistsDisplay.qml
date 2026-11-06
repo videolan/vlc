@@ -59,10 +59,8 @@ Widgets.PageLoader {
 
             title: qsTr("Playlists")
 
-            PlaylistMediaList {
+            contentItem: PlaylistMediaList {
                 id: playlistView
-
-                anchors.fill: parent
 
                 focus: true
 

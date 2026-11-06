@@ -103,13 +103,11 @@ Widgets.PageLoader {
 
             title: folderModel.name
 
-            BrowseDeviceView {
+            contentItem: BrowseDeviceView {
                 property var sortModel: [
                     { text: qsTr("Alphabetic"), criteria: "name" },
                     { text: qsTr("Url"),        criteria: "mrl"  }
                 ]
-
-                anchors.fill: parent
 
                 displayMarginBeginning: root.displayMarginBeginning
                 displayMarginEnd: root.displayMarginEnd
@@ -148,10 +146,8 @@ Widgets.PageLoader {
                 { text: qsTr("Url"),        criteria: "mrl"  }
             ]
 
-            BrowseDeviceView {
+            contentItem: BrowseDeviceView {
                 id: viewDevice
-
-                anchors.fill: parent
 
                 displayMarginBeginning: root.displayMarginBeginning
                 displayMarginEnd: root.displayMarginEnd

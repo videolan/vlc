@@ -51,10 +51,8 @@ Widgets.PageLoader {
             title: qsTr("Genres")
 
             /* List View */
-            MusicGenres {
+            contentItem: MusicGenres {
                 id: genresView
-
-                anchors.fill: parent
 
                 focus: true
 
@@ -86,10 +84,8 @@ Widgets.PageLoader {
             title: qsTr("Genres - %1").arg(genreName)
 
             /* List View */
-            MusicAlbums {
+            contentItem: MusicAlbums {
                 id: albumsView
-
-                anchors.fill: parent
 
                 focus: true
 

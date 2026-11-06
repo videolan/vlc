@@ -29,7 +29,7 @@ Widgets.PageExt {
 
     title: qsTr("Install services")
 
-    Widgets.ListViewExt {
+    contentItem: Widgets.ListViewExt {
         id: servicesView
 
         // required by g_root to indicate view with 'grid' or 'list' mode
@@ -37,9 +37,6 @@ Widgets.PageExt {
         readonly property bool isSearchable: true
 
         property var pagePrefix: []
-
-        anchors.fill: parent
-
 
         model: ServicesDiscoveryModel {
             id: discoveryModel

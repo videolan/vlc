@@ -149,11 +149,7 @@ Widgets.PageExt {
         model: artistModel
     }
 
-    RowLayout {
-        anchors.fill: parent
-        anchors.leftMargin: root.leftPadding
-        anchors.rightMargin: root.rightPadding
-
+    contentItem: RowLayout {
         visible: artistModel.count > 0
 
         spacing: 0
@@ -322,6 +318,8 @@ Widgets.PageExt {
     }
 
     Widgets.EmptyLabelButton {
+        parent: root // Can't parent to layout content item due to anchoring
+        anchors.verticalCenterOffset: parent.header?.height ?? 0
         anchors.centerIn: parent
 
         visible: !artistModel.loading && (artistModel.count <= 0)

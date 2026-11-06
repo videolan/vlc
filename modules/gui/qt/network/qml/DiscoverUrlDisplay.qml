@@ -44,8 +44,7 @@ Widgets.PageExt {
         searchField.forceActiveFocus(reason);
     }
 
-    FocusScope {
-        anchors.fill: parent
+    contentItem: FocusScope {
         focus: true
 
         Column {

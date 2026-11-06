@@ -53,10 +53,8 @@ Widgets.PageLoader {
 
             title: qsTr("Artists")
 
-            MusicAllArtists {
+            contentItem: MusicAllArtists {
                 id: artistsView
-
-                anchors.fill: parent
 
                 focus: true
 
