@@ -49,7 +49,7 @@ pub struct Tick(pub i64);
 /// use vlcrs_core::tracer::{Tick, TracerCapability, Trace};
 /// struct Module { last_trace_tick: Cell<Tick>, }
 /// impl TracerCapability for Module {
-///     fn open(obj: &mut Object) -> Option<impl TracerCapability> {
+///     fn open(obj: &mut Object) -> Option<Self> {
 ///         Some(Self{ last_trace_tick: Cell::from(Tick(0)) })
 ///     }
 ///
@@ -79,7 +79,7 @@ pub struct Tick(pub i64);
 /// object so that it becomes Sync and can be used in the multiples threads.
 ///
 pub trait TracerCapability: Sync {
-    fn open(obj: &mut Object) -> Option<impl TracerCapability>
+    fn open(obj: &mut Object) -> Option<Self>
     where
         Self: Sized;
 
@@ -144,7 +144,7 @@ extern "C" fn activate_tracer<T: TracerCapability>(
 ///
 /// // Empty implementation
 /// impl TracerCapability for CustomTracer {
-///     fn open(obj: &mut Object) -> Option<impl TracerCapability> {
+///     fn open(obj: &mut Object) -> Option<Self> {
 ///         Some(Self{})
 ///     }
 ///     fn trace(&self, _tick: Tick, _trace: &Trace) {}
@@ -234,7 +234,7 @@ macro_rules! trace {
 /// # use vlcrs_core::object::Object;
 /// # struct MyTracer {}
 /// impl TracerCapability for MyTracer {
-///     # fn open(_: &mut Object) -> Option<impl TracerCapability> { Some(MyTracer{}) }
+///     # fn open(_: &mut Object) -> Option<Self> { Some(MyTracer{}) }
 ///     fn trace(&self, _: Tick, trace: &Trace) {
 ///         for entry in trace.entries() {
 ///             println!("{}", entry.key);

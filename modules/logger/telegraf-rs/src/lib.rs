@@ -38,7 +38,7 @@ struct TelegrafTracer {
 }
 
 impl TracerCapability for TelegrafTracer {
-    fn open(_obj: &mut vlcrs_core::object::Object) -> Option<impl TracerCapability>
+    fn open(_obj: &mut vlcrs_core::object::Object) -> Option<Self>
     where
         Self: Sized,
     {
