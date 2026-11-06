@@ -22,7 +22,7 @@
 #![allow(non_snake_case)]
 
 use std::{
-    ffi::{c_char, c_double, c_void},
+    ffi::{c_char, c_double},
     ptr::NonNull,
 };
 
@@ -70,10 +70,9 @@ pub struct vlc_tracer {
 }
 
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct vlc_tracer_operations {
-    pub trace: extern "C" fn(opaque: *const c_void, ts: vlc_tick, trace: NonNull<vlc_tracer_trace>),
-    pub destroy: extern "C" fn(*mut c_void),
+pub struct vlc_tracer_operations<T> {
+    pub trace: extern "C" fn(opaque: &T, ts: vlc_tick, trace: NonNull<vlc_tracer_trace>),
+    pub destroy: extern "C" fn(Box<T>),
 }
 
 extern "C" {

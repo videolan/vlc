@@ -17,7 +17,7 @@
 
 use std::{
     cell::UnsafeCell,
-    ffi::{c_char, c_void, CStr},
+    ffi::{c_char, CStr},
     mem::MaybeUninit,
     ptr::NonNull,
 };
@@ -87,33 +87,29 @@ pub trait TracerCapability: Sync {
 }
 
 #[allow(non_camel_case_types)]
-pub type TracerCapabilityActivate =
+pub type TracerCapabilityActivate<T> =
     extern "C" fn(
         obj: &mut Object,
-        opaque: &mut MaybeUninit<*mut c_void>,
-    ) -> Option<&'static sys::vlc_tracer_operations>;
+        opaque: &mut MaybeUninit<Box<T>>,
+    ) -> Option<&'static sys::vlc_tracer_operations<T>>;
 
 extern "C" fn tracer_trace<T: TracerCapability>(
-    opaque: *const c_void,
+    tracer: &T,
     tick: sys::vlc_tick,
     trace: NonNull<sys::vlc_tracer_trace>,
 ) {
-    let tracer: &T = unsafe { &*(opaque as *const T) };
     let trace = Trace(trace);
     tracer.trace(Tick(tick), &trace);
 }
 
-extern "C" fn tracer_destroy<T>(opaque: *mut c_void) {
-    let _ = unsafe { Box::from_raw(opaque as *mut T) };
-}
+extern "C" fn tracer_destroy<T>(_tracer: Box<T>) {}
 
 extern "C" fn activate_tracer<T: TracerCapability>(
     obj: &mut Object,
-    opaque: &mut MaybeUninit<*mut c_void>,
-) -> Option<&'static sys::vlc_tracer_operations> {
+    opaque: &mut MaybeUninit<Box<T>>,
+) -> Option<&'static sys::vlc_tracer_operations<T>> {
     let instance = T::open(obj)?;
-    let sys = Box::into_raw(Box::try_new(instance).ok()?);
-    opaque.write(sys as *mut _);
+    opaque.write(Box::try_new(instance).ok()?);
     Some(const {
         &sys::vlc_tracer_operations {
             trace: tracer_trace::<T>,
@@ -158,9 +154,9 @@ pub struct TracerModuleLoader;
 
 impl<T> ModuleProtocol<T> for TracerModuleLoader
 where
-    T: TracerCapability,
+    T: TracerCapability + 'static,
 {
-    type Activate = TracerCapabilityActivate;
+    type Activate = TracerCapabilityActivate<T>;
     fn activate_function() -> Self::Activate {
         activate_tracer::<T>
     }
