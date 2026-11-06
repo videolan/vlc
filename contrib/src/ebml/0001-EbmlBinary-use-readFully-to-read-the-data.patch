@@ -1,0 +1,35 @@
+From 25bf1456c2492174d2e1820eb6a09aa61413fb9a Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <slhomme@matroska.org>
+Date: Fri, 6 Nov 2026 11:59:12 +0100
+Subject: [PATCH] EbmlBinary: use readFully() to read the data
+
+We don't support truncated reading of elements. And it was the last
+class not to use readFully().
+
+This is also how the other EBML types are reading their full data.
+
+Reported-by: Judith Malshini (@JudithMalshini) , Chamod Anuradha (@Chamodanu)
+
+Fixes #360
+---
+ src/EbmlBinary.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/EbmlBinary.cpp b/src/EbmlBinary.cpp
+index a465c2f..0c0d832 100644
+--- a/src/EbmlBinary.cpp
++++ b/src/EbmlBinary.cpp
+@@ -100,8 +100,9 @@ filepos_t EbmlBinary::ReadData(IOCallback & input, ScopeMode ReadFully)
+   Data = (GetSize() < SIZE_MAX) ? static_cast<binary *>(malloc(GetSize())) : nullptr;
+   if (Data == nullptr)
+     throw CRTError(std::string("Error allocating data"));
++  input.readFully(Data, GetSize());
+   SetValueIsSet();
+-  return input.read(Data, GetSize());
++  return GetSize();
+ }
+ 
+ bool EbmlBinary::operator==(const EbmlBinary & ElementToCompare) const
+-- 
+2.52.0.windows.1
+
