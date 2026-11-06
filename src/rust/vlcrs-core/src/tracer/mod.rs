@@ -120,13 +120,11 @@ extern "C" fn activate_tracer<T: TracerCapability>(
     obj: &mut Object,
     opaque: &mut MaybeUninit<*mut c_void>,
 ) -> Option<&'static sys::vlc_tracer_operations> {
-    if let Some(instance) = T::open(obj) {
-        let wrapper: Box<dyn TracerCapability> = Box::try_new(instance).ok()?;
-        let sys = Box::into_raw(Box::try_new(wrapper).ok()?);
-        opaque.write(sys as *mut _);
-        return Some(&TRACER_OPERATIONS);
-    }
-    None
+    let instance = T::open(obj)?;
+    let wrapper: Box<dyn TracerCapability> = Box::try_new(instance).ok()?;
+    let sys = Box::into_raw(Box::try_new(wrapper).ok()?);
+    opaque.write(sys as *mut _);
+    return Some(&TRACER_OPERATIONS);
 }
 
 ///
