@@ -78,6 +78,7 @@ pub struct vlc_tracer_operations {
 
 extern "C" {
     pub fn vlc_tracer_Create(parent: &Object, name: *const c_char) -> Option<NonNull<vlc_tracer>>;
+    pub fn vlc_tracer_Destroy(tracer: NonNull<vlc_tracer>); 
     pub fn vlc_tracer_TraceWithTs(
         tracer: NonNull<vlc_tracer>,
         tick: vlc_tick,

@@ -214,6 +214,12 @@ impl Tracer {
     }
 }
 
+impl Drop for Tracer {
+    fn drop(&mut self) {
+        unsafe { sys::vlc_tracer_Destroy(*self.tracer.get()); }
+    }
+}
+
 #[macro_export]
 macro_rules! trace {
     ($tracer: ident, $ts: expr, $($key:ident = $value:expr)*) => {};
