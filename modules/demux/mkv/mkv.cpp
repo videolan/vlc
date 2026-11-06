@@ -70,9 +70,7 @@ vlc_module_begin ()
             N_("Preload MKV files in the same directory"),
             N_("Preload matroska files in the same directory to find linked segments (not good for broken files).") )
 
-    add_bool( "mkv-seek-percent", false,
-            N_("Seek based on percent not time"),
-            nullptr )
+    add_obsolete_bool( "mkv-seek-percent" ) // since 4.0.0
 
     add_bool( "mkv-use-dummy", false,
             N_("Dummy Elements"),
@@ -522,7 +520,7 @@ static int Seek( demux_t *p_demux, vlc_tick_t i_mk_date, double f_percent, bool 
     }
 
     /* seek without index or without date */
-    if( f_percent >= 0 && (var_InheritBool( p_demux, "mkv-seek-percent" ) || i_mk_date < 0 ))
+    if( f_percent >= 0 && i_mk_date < 0 )
     {
         i_mk_date = vlc_tick_t( f_percent * p_sys->i_duration );
     }
