@@ -26,6 +26,7 @@ use std::{
     ptr::NonNull,
 };
 
+use super::Trace;
 use crate::object::Object;
 
 pub type vlc_tick = i64;
@@ -71,7 +72,7 @@ pub struct vlc_tracer {
 
 #[repr(C)]
 pub struct vlc_tracer_operations<T> {
-    pub trace: extern "C" fn(opaque: &T, ts: vlc_tick, trace: NonNull<vlc_tracer_trace>),
+    pub trace: extern "C" fn(opaque: &T, ts: vlc_tick, trace: &Trace),
     pub destroy: extern "C" fn(Box<T>),
 }
 
@@ -81,6 +82,6 @@ extern "C" {
     pub fn vlc_tracer_TraceWithTs(
         tracer: NonNull<vlc_tracer>,
         tick: vlc_tick,
-        trace: NonNull<vlc_tracer_trace>,
+        trace: &Trace,
     );
 }

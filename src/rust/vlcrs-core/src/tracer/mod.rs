@@ -96,10 +96,9 @@ pub type TracerCapabilityActivate<T> =
 extern "C" fn tracer_trace<T: TracerCapability>(
     tracer: &T,
     tick: sys::vlc_tick,
-    trace: NonNull<sys::vlc_tracer_trace>,
+    trace: &Trace,
 ) {
-    let trace = Trace(trace);
-    tracer.trace(Tick(tick), &trace);
+    tracer.trace(Tick(tick), trace);
 }
 
 extern "C" fn tracer_destroy<T>(_tracer: Box<T>) {}
@@ -191,14 +190,14 @@ impl Tracer {
     ///
     /// Register the new point at time `tick` with the metadata `entries:.
     ///
-    pub fn trace(&self, tick: Tick, trace: Trace) {
+    pub fn trace(&self, tick: Tick, trace: &Trace) {
         unsafe {
             // SAFETY: TODO
             let tracer = *self.tracer.get();
 
             // SAFETY: the pointer `tracer` is guaranteed to be non-null and
             //         nobody else has reference to it.
-            sys::vlc_tracer_TraceWithTs(tracer, tick.0, trace.0);
+            sys::vlc_tracer_TraceWithTs(tracer, tick.0, trace);
         }
     }
 }
@@ -233,9 +232,8 @@ macro_rules! trace {
 ///     }
 /// }
 /// ```
-#[derive(PartialEq, Copy, Clone)]
 #[repr(transparent)]
-pub struct Trace(NonNull<sys::vlc_tracer_trace>);
+pub struct Trace(sys::vlc_tracer_trace);
 
 impl Trace {
     /// Get an iterator over the trace entries.
@@ -249,7 +247,7 @@ impl<'a> IntoIterator for &'a Trace {
     type IntoIter = TraceIterator<'a>;
     fn into_iter(self) -> Self::IntoIter {
         TraceIterator {
-            current_field: unsafe { self.0.read().entries },
+            current_field: self.0.entries,
             _plt: std::marker::PhantomData,
         }
     }
@@ -341,7 +339,7 @@ mod test {
             entries: NonNull::from(&entries[0]),
         };
 
-        let trace = Trace(NonNull::from(&trace));
+        let trace = Trace(trace);
 
         let mut iterator = trace.entries();
 
