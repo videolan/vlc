@@ -31,6 +31,7 @@
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryImageCache.h"
+#import "library/VLCLibraryMarkUnplayedButton.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryRepresentedItem.h"
 
@@ -67,9 +68,6 @@ NSString * const VLCLibraryTableCellViewIdentifier = @"VLCLibraryTableCellViewId
     _mediaArtworkContentGravity = self.representedImageView.contentGravity;
     self.markUnplayedButton.target = self;
     self.markUnplayedButton.action = @selector(markAsUnplayed:);
-    self.markUnplayedButton.bordered = YES;
-    self.markUnplayedButton.bezelStyle = NSBezelStyleRecessed;
-    self.markUnplayedButton.showsBorderOnlyWhileMouseInside = YES;
     [self prepareForReuse];
 
     if (@available(macOS 26.0, *)) {
@@ -176,34 +174,7 @@ NSString * const VLCLibraryTableCellViewIdentifier = @"VLCLibraryTableCellViewId
         return;
     }
 
-    NSString *actionTitle;
-    NSString *symbolName;
-    switch (currentItem.mediaType) {
-        case VLC_ML_MEDIA_TYPE_AUDIO:
-            actionTitle = _NS("Mark as Unheard");
-            if (@available(macOS 26.0, *)) {
-                symbolName = @"music.note.slash";
-            } else {
-                symbolName = @"speaker.slash";
-            }
-            break;
-        case VLC_ML_MEDIA_TYPE_VIDEO:
-            actionTitle = _NS("Mark as Unseen");
-            symbolName = @"eye.slash";
-            break;
-        default:
-            actionTitle = _NS("Mark as Unplayed");
-            symbolName = @"arrow.counterclockwise";
-            break;
-    }
-
-    NSImage *image = nil;
-    if (@available(macOS 11.0, *)) {
-        image = [NSImage imageWithSystemSymbolName:symbolName accessibilityDescription:actionTitle];
-    }
-    self.markUnplayedButton.image = image ?: [NSImage imageNamed:NSImageNameRefreshTemplate];
-    self.markUnplayedButton.toolTip = actionTitle;
-    self.markUnplayedButton.accessibilityLabel = actionTitle;
+    [self.markUnplayedButton configureForMediaType:currentItem.mediaType];
     self.markUnplayedButton.hidden = NO;
 }
 

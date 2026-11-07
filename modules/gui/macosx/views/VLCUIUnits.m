@@ -126,6 +126,11 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
     return 26.;
 }
 
++ (const CGFloat)smallIconButtonSize
+{
+    return 28.;
+}
+
 + (const CGFloat)largeIconContainerSize
 {
     return 40.;

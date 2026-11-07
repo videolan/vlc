@@ -281,6 +281,7 @@
 		7DFBDCA82269E77500B700A5 /* VLCLibraryController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DFBDCA72269E77500B700A5 /* VLCLibraryController.m */; };
 		7DFBDCAB2269E77F00B700A5 /* VLCLibraryModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DFBDCAA2269E77F00B700A5 /* VLCLibraryModel.m */; };
 		7DFBDCB1226A518400B700A5 /* VLCLibraryMenuController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DFBDCB0226A518400B700A5 /* VLCLibraryMenuController.m */; };
+		53A19D37000000000000000D /* VLCLibraryMarkUnplayedButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 53A19D37000000000000000C /* VLCLibraryMarkUnplayedButton.m */; };
 		7DFBDCB4226CD00900B700A5 /* VLCLibraryDataTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DFBDCB3226CD00900B700A5 /* VLCLibraryDataTypes.m */; };
 		7DFBDCB7226CDFD600B700A5 /* VLCImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DFBDCB6226CDFD600B700A5 /* VLCImageView.m */; };
 		7DFBDCBB226CED6300B700A5 /* VLCMediaSourceProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DFBDCBA226CED6300B700A5 /* VLCMediaSourceProvider.m */; };
@@ -977,6 +978,8 @@
 		7DFBDCAA2269E77F00B700A5 /* VLCLibraryModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryModel.m; sourceTree = "<group>"; };
 		7DFBDCAF226A518400B700A5 /* VLCLibraryMenuController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryMenuController.h; sourceTree = "<group>"; };
 		7DFBDCB0226A518400B700A5 /* VLCLibraryMenuController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryMenuController.m; sourceTree = "<group>"; };
+		53A19D37000000000000000B /* VLCLibraryMarkUnplayedButton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryMarkUnplayedButton.h; sourceTree = "<group>"; };
+		53A19D37000000000000000C /* VLCLibraryMarkUnplayedButton.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryMarkUnplayedButton.m; sourceTree = "<group>"; };
 		7DFBDCB2226CD00900B700A5 /* VLCLibraryDataTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryDataTypes.h; sourceTree = "<group>"; };
 		7DFBDCB3226CD00900B700A5 /* VLCLibraryDataTypes.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryDataTypes.m; sourceTree = "<group>"; };
 		7DFBDCB5226CDFD600B700A5 /* VLCImageView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCImageView.h; sourceTree = "<group>"; };
@@ -1580,6 +1583,8 @@
 				5360E9A42C5BE5550046BA8B /* VLCLibraryMasterDetailViewTableViewDelegate.m */,
 				7DFBDCAF226A518400B700A5 /* VLCLibraryMenuController.h */,
 				7DFBDCB0226A518400B700A5 /* VLCLibraryMenuController.m */,
+				53A19D37000000000000000B /* VLCLibraryMarkUnplayedButton.h */,
+				53A19D37000000000000000C /* VLCLibraryMarkUnplayedButton.m */,
 				53B447F0293BB47A00857588 /* VLCLibraryMediaGroupDescriptor.h */,
 				53B447F4293BB47A00857588 /* VLCLibraryMediaGroupDescriptor.m */,
 				7DFBDCA92269E77F00B700A5 /* VLCLibraryModel.h */,
@@ -2671,6 +2676,7 @@
 				53A19D370000000000000005 /* VLCLibraryHistoryDataSource.m in Sources */,
 				53A19D37000000000000000A /* VLCLibraryHistorySection.m in Sources */,
 				7DFBDCB1226A518400B700A5 /* VLCLibraryMenuController.m in Sources */,
+				53A19D37000000000000000D /* VLCLibraryMarkUnplayedButton.m in Sources */,
 				536283F8291146BC00640C15 /* VLCLibrarySongTableCellView.m in Sources */,
 				53A8F9D12A7E1E6300BC11BF /* VLCLibraryPlaylistViewController.m in Sources */,
 				1C3113D51E508C6900D4DD76 /* VLCTextfieldPanelController.m in Sources */,

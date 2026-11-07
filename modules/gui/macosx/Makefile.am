@@ -202,6 +202,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryItemInternalMediaItemsDataSource.h \
 	gui/macosx/library/VLCLibraryItemInternalMediaItemsDataSource.m \
 	gui/macosx/library/VLCLibraryItemPresentingCapable.h \
+	gui/macosx/library/VLCLibraryMarkUnplayedButton.h \
+	gui/macosx/library/VLCLibraryMarkUnplayedButton.m \
 	gui/macosx/library/VLCLibraryMasterDetailViewTableViewDataSource.h \
 	gui/macosx/library/VLCLibraryMasterDetailViewTableViewDelegate.h \
 	gui/macosx/library/VLCLibraryMasterDetailViewTableViewDelegate.m \

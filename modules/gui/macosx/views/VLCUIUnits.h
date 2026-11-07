@@ -76,6 +76,7 @@ extern NSString * const VLCLibraryCollectionViewItemAdjustmentKey;
 @property (class, readonly) const CGFloat smallIconSize;
 @property (class, readonly) const CGFloat mediumIconSize;
 @property (class, readonly) const CGFloat largeIconSize;
+@property (class, readonly) const CGFloat smallIconButtonSize;
 @property (class, readonly) const CGFloat largeIconContainerSize;
 @property (class, readonly) const CGFloat largeIllustrationSize;
 @property (class, readonly) const CGFloat largeActionButtonHeight;

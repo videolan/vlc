@@ -463,6 +463,7 @@ modules/gui/macosx/library/VLCLibraryDataTypes.m
 modules/gui/macosx/library/VLCLibraryImageCache.h
 modules/gui/macosx/library/VLCLibraryImageCache.m
 modules/gui/macosx/library/VLCLibraryMenuController.h
+modules/gui/macosx/library/VLCLibraryMarkUnplayedButton.m
 modules/gui/macosx/library/VLCLibraryMenuController.m
 modules/gui/macosx/library/VLCLibraryModel.h
 modules/gui/macosx/library/VLCLibraryModel.m

@@ -76,12 +76,8 @@
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
-                        <button hidden="YES" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="mark-unplayed-button">
+                        <button hidden="YES" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="mark-unplayed-button" customClass="VLCLibraryMarkUnplayedButton">
                             <rect key="frame" x="277" y="10" width="28" height="28"/>
-                            <constraints>
-                                <constraint firstAttribute="width" constant="28" id="mark-unplayed-width"/>
-                                <constraint firstAttribute="height" constant="28" id="mark-unplayed-height"/>
-                            </constraints>
                             <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="mark-unplayed-cell">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="system"/>
