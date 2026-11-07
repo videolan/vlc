@@ -86,8 +86,6 @@ typedef struct
 
     /* From uri */
     vlc_url_t url;
-    char    *psz_user_agent;
-    char    *psz_referrer;
     char    *psz_username;
     char    *psz_password;
     vlc_http_auth_t auth;
@@ -152,8 +150,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->psz_mime = NULL;
     p_sys->b_icecast = false;
     p_sys->psz_location = NULL;
-    p_sys->psz_user_agent = NULL;
-    p_sys->psz_referrer = NULL;
     p_sys->psz_username = NULL;
     p_sys->psz_password = NULL;
     p_sys->i_icy_meta = 0;
@@ -176,46 +172,6 @@ static int Open( vlc_object_t *p_this )
         p_sys->url.i_port = 80;
 
     vlc_credential_init( &credential, &p_sys->url );
-
-    /* Determine the HTTP user agent */
-    /* See RFC2616 §2.2 token and comment definition, and §3.8 and
-     * §14.43 user-agent header */
-    p_sys->psz_user_agent = var_InheritString( p_access, "http-user-agent" );
-    if (p_sys->psz_user_agent)
-    {
-        unsigned comment_level = 0;
-        for( char *p = p_sys->psz_user_agent; *p; p++ )
-        {
-            uint8_t c = *p;
-            if (comment_level == 0)
-            {
-                if( c < 32 || strchr( ")<>@,;:\\\"[]?={}", c ) )
-                    *p = '_'; /* remove potentially harmful characters */
-            }
-            else
-            {
-                if (c == ')')
-                    comment_level--;
-                else if( c < 32 && strchr( "\t\r\n", c ) == NULL)
-                    *p = '_'; /* remove potentially harmful characters */
-            }
-            if (c == '(')
-            {
-                if (comment_level == UINT_MAX)
-                    break;
-                comment_level++;
-            }
-        }
-        /* truncate evil unclosed comments */
-        if (comment_level > 0)
-        {
-            char *p = strchr(p_sys->psz_user_agent, '(');
-            *p = '\0';
-        }
-    }
-
-    /* HTTP referrer */
-    p_sys->psz_referrer = var_InheritString( p_access, "http-referrer" );
 
     /* Check proxy */
     msg_Dbg(p_access, "querying proxy for %s", psz_url);
@@ -352,8 +308,6 @@ error:
     free( p_sys->psz_proxy_passbuf );
     free( p_sys->psz_mime );
     free( p_sys->psz_location );
-    free( p_sys->psz_user_agent );
-    free( p_sys->psz_referrer );
     free( p_sys->psz_username );
     free( p_sys->psz_password );
 
@@ -379,8 +333,6 @@ static void Close( vlc_object_t *p_this )
     free( p_sys->psz_icy_genre );
     free( p_sys->psz_icy_title );
 
-    free( p_sys->psz_user_agent );
-    free( p_sys->psz_referrer );
     free( p_sys->psz_username );
     free( p_sys->psz_password );
 
@@ -662,11 +614,7 @@ static int Connect( stream_t *p_access )
 
     /* User Agent */
     vlc_memstream_printf( &stream, "User-Agent: %s\r\n",
-                          p_sys->psz_user_agent );
-    /* Referrer */
-    if (p_sys->psz_referrer)
-        vlc_memstream_printf( &stream, "Referer: %s\r\n",
-                              p_sys->psz_referrer );
+                          "VLC/"PACKAGE_VERSION" LibVLC/"PACKAGE_VERSION );
 
     /* Authentication */
     if( p_sys->url.psz_username != NULL && p_sys->url.psz_password != NULL )
