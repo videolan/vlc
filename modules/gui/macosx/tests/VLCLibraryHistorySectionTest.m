@@ -79,6 +79,7 @@
 - (void)testGroupsAtLocalMidnightAndOrdersNewestFirst
 {
     NSCalendar * const calendar = [self calendarWithTimeZone:@"Asia/Hong_Kong"];
+    calendar.firstWeekday = 2;
     NSArray * const items = @[
         [self itemWithID:1 date:@"2026-11-02T23:59:59+08:00"],
         [self itemWithID:2 date:@"2026-11-03T00:01:00+08:00"],
@@ -115,6 +116,54 @@
     ];
     NSArray * const sections = [VLCLibraryHistorySection sectionsForMediaItems:items calendar:calendar];
     XCTAssertEqualObjects([self IDsInSection:sections.firstObject], (@[@3, @1, @2]));
+}
+
+- (void)testWeekdayTitlesRespectCalendarWeekStart
+{
+    NSCalendar * const calendar = [self calendarWithTimeZone:@"Asia/Hong_Kong"];
+    NSArray * const items = @[
+        [self itemWithID:1 date:@"2026-11-02T12:00:00+08:00"],
+        [self itemWithID:2 date:@"2026-11-01T12:00:00+08:00"],
+    ];
+    NSArray<VLCLibraryHistorySection *> * const sections =
+        [VLCLibraryHistorySection sectionsForMediaItems:items calendar:calendar];
+    NSDate * const now = [self date:@"2026-11-04T12:00:00+08:00"];
+    NSDateFormatter * const formatter = NSDateFormatter.new;
+    formatter.calendar = calendar;
+    formatter.timeZone = calendar.timeZone;
+    formatter.dateStyle = NSDateFormatterFullStyle;
+    formatter.timeStyle = NSDateFormatterNoStyle;
+
+    calendar.firstWeekday = 1;
+    XCTAssertEqualObjects([sections[0] titleWithCalendar:calendar now:now], formatter.weekdaySymbols[1]);
+    XCTAssertEqualObjects([sections[1] titleWithCalendar:calendar now:now], formatter.weekdaySymbols[0]);
+
+    calendar.firstWeekday = 2;
+    XCTAssertEqualObjects([sections[0] titleWithCalendar:calendar now:now], formatter.weekdaySymbols[1]);
+    XCTAssertEqualObjects([sections[1] titleWithCalendar:calendar now:now],
+                          [formatter stringFromDate:sections[1].date]);
+}
+
+- (void)testWeekdayTitlesSpanTheCalendarYearBoundary
+{
+    NSCalendar * const calendar = [self calendarWithTimeZone:@"Asia/Hong_Kong"];
+    calendar.firstWeekday = 2;
+    calendar.minimumDaysInFirstWeek = 4;
+    NSArray * const items = @[
+        [self itemWithID:1 date:@"2026-12-28T12:00:00+08:00"],
+        [self itemWithID:2 date:@"2020-12-28T12:00:00+08:00"],
+    ];
+    NSArray<VLCLibraryHistorySection *> * const sections =
+        [VLCLibraryHistorySection sectionsForMediaItems:items calendar:calendar];
+    NSDate * const now = [self date:@"2027-01-01T12:00:00+08:00"];
+    NSDateFormatter * const formatter = NSDateFormatter.new;
+    formatter.calendar = calendar;
+    formatter.timeZone = calendar.timeZone;
+    formatter.dateStyle = NSDateFormatterFullStyle;
+    formatter.timeStyle = NSDateFormatterNoStyle;
+    XCTAssertEqualObjects([sections[0] titleWithCalendar:calendar now:now], formatter.weekdaySymbols[1]);
+    XCTAssertEqualObjects([sections[1] titleWithCalendar:calendar now:now],
+                          [formatter stringFromDate:sections[1].date]);
 }
 
 - (void)testTimeZoneChangesRegroupExistingItems
@@ -164,6 +213,7 @@
 - (void)testRelativeHeadersAdvanceAtMidnightWithoutPlaybackChanges
 {
     NSCalendar * const calendar = [self calendarWithTimeZone:@"Asia/Hong_Kong"];
+    calendar.firstWeekday = 2;
     NSArray<VLCLibraryHistorySection *> * const sections =
         [VLCLibraryHistorySection sectionsForMediaItems:@[[self itemWithID:1 date:@"2026-11-03T18:00:00+08:00"]]
                                                calendar:calendar];
@@ -172,6 +222,15 @@
                           _NS("Today"));
     XCTAssertEqualObjects([section titleWithCalendar:calendar now:[self date:@"2026-11-04T00:00:00+08:00"]],
                           _NS("Yesterday"));
+    XCTAssertEqualObjects([section titleWithCalendar:calendar now:[self date:@"2026-11-05T00:00:00+08:00"]],
+                          NSDateFormatter.new.weekdaySymbols[2]);
+    NSDateFormatter * const formatter = NSDateFormatter.new;
+    formatter.calendar = calendar;
+    formatter.timeZone = calendar.timeZone;
+    formatter.dateStyle = NSDateFormatterFullStyle;
+    formatter.timeStyle = NSDateFormatterNoStyle;
+    XCTAssertEqualObjects([section titleWithCalendar:calendar now:[self date:@"2026-11-09T00:00:00+08:00"]],
+                          [formatter stringFromDate:section.date]);
 }
 
 @end

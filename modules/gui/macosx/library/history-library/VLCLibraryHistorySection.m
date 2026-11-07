@@ -88,8 +88,12 @@
     NSDateFormatter * const formatter = NSDateFormatter.new;
     formatter.calendar = calendar;
     formatter.timeZone = calendar.timeZone;
-    formatter.dateStyle = NSDateFormatterFullStyle;
     formatter.timeStyle = NSDateFormatterNoStyle;
+    if ([calendar isDate:self.date equalToDate:now toUnitGranularity:NSCalendarUnitWeekOfYear]) {
+        [formatter setLocalizedDateFormatFromTemplate:@"EEEE"];
+    } else {
+        formatter.dateStyle = NSDateFormatterFullStyle;
+    }
     return [formatter stringFromDate:self.date];
 }
 
