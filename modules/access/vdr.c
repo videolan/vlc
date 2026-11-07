@@ -175,9 +175,9 @@ static int Open( vlc_object_t *p_this )
     if( b_strict )
     {
         char psz_extension[4];
-        int i_length = 0;
+        ptrdiff_t i_length = 0;
         const char *psz_name = BaseName( p_access->psz_filepath );
-        if( sscanf( psz_name, "%*u-%*u-%*u.%*u.%*u.%*u%*[-.]%*u.%3s%n",
+        if( sscanf( psz_name, "%*u-%*u-%*u.%*u.%*u.%*u%*[-.]%*u.%3s%tn",
             psz_extension, &i_length ) != 1 || strcasecmp( psz_extension, "rec" ) ||
             ( psz_name[i_length] != DIR_SEP_CHAR && psz_name[i_length] != '\0' ) )
             return VLC_EGENERIC;
