@@ -137,9 +137,9 @@ static int Open (vlc_object_t *p_this)
         if (likely(udd != NULL))
         {
             char *path;
-            int len;
+            ptrdiff_t len;
 
-            if (asprintf(&path, "%s/sound%ns/sf2/*.sf2", udd, &len) >= 0)
+            if (asprintf(&path, "%s/sound%tns/sf2/*.sf2", udd, &len) >= 0)
             {
                 glob(path, flags, NULL, &gl);
                 flags |= GLOB_APPEND;
