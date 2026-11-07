@@ -596,12 +596,13 @@ static int ParseVobSubIDX( demux_t *p_demux )
             /*
              * delay: [sign]hh:mm:ss:mss
              */
-            int h, m, s, ms, count = 0;
+            int h, m, s, ms;
+            ptrdiff_t count = 0;
             int i_sign = 1;
             vlc_tick_t i_gap = 0;
 
             if( p_sys->i_tracks > 0 &&
-                sscanf( line, "%*celay: %02d%n:%02d:%02d:%03d",
+                sscanf( line, "%*celay: %02d%tn:%02d:%02d:%03d",
                         &h, &count, &m, &s, &ms ) >= 4 )
             {
                 vobsub_track_t *current_tk = &p_sys->track[p_sys->i_tracks - 1];
