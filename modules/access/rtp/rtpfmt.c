@@ -260,11 +260,11 @@ int vlc_rtp_add_media_types(vlc_object_t *obj, rtp_session_t *session,
 
         } else if (strcmp(a->name, "fmtp") == 0) {
             unsigned char number;
-            int offset;
+            ptrdiff_t offset;
 
-            if (sscanf(a->value, "%hhu %n", &number, &offset) == 1
+            if (sscanf(a->value, "%hhu %tn", &number, &offset) == 1
              && number < ARRAY_SIZE(types))
-                types[number].parameters = a->value + offset;
+                types[number].parameters = a->value + (size_t)offset;
         }
     }
 

@@ -100,18 +100,19 @@ bad:
     c->addr[addrlen] = '\0';
 
     if (len >= 7 && memcmp(net_type, "IN ", 3) == 0) {
-        int offset = 0, val = -1;
+        ptrdiff_t offset = 0;
+        int val = -1;
 
         if (memcmp(addr_type, "IP4 ", 4) == 0) {
             /* IPv4 */
             c->family = 4;
-            val = sscanf(c->addr, "%*[^/]%n/%hhu/%hu", &offset, &c->ttl,
+            val = sscanf(c->addr, "%*[^/]%tn/%hhu/%hu", &offset, &c->ttl,
                          &c->addr_count);
 
         } else if (memcmp(addr_type, "IP6 ", 4) == 0) {
             /* IPv6 */
             c->family = 6;
-            val = sscanf(c->addr, "%*[^/]%n/%hu", &offset, &c->addr_count);
+            val = sscanf(c->addr, "%*[^/]%tn/%hu", &offset, &c->addr_count);
         }
 
         if (val >= 0)
