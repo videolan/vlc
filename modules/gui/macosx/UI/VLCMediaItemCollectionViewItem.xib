@@ -19,6 +19,8 @@
                 <outlet property="secondaryInfoTextField" destination="VAn-gF-QiZ" id="U8T-Cs-HaL"/>
                 <outlet property="trailingSecondaryTextToLeadingUnplayedIndicatorConstraint" destination="IXL-bv-5zP" id="V4J-bi-UQB"/>
                 <outlet property="trailingSecondaryTextToTrailingSuperviewConstraint" destination="Zci-25-m59" id="czo-El-QT8"/>
+                <outlet property="trailingTitleTextToTrailingSuperviewConstraint" destination="457-oy-EbD" id="title-trailing-outlet"/>
+                <outlet property="trailingUnplayedIndicatorToTrailingSuperviewConstraint" destination="Dd7-va-0UJ" id="unplayed-trailing-outlet"/>
                 <outlet property="unplayedIndicatorTextField" destination="u2r-zy-XEW" id="56s-K4-Kxr"/>
                 <outlet property="view" destination="Hz6-mo-xeY" id="0bl-1N-x8E"/>
             </connections>
@@ -151,7 +153,7 @@
                         </userDefinedRuntimeAttribute>
                     </userDefinedRuntimeAttributes>
                 </constraint>
-                <constraint firstAttribute="trailing" secondItem="VAn-gF-QiZ" secondAttribute="trailing" priority="750" id="Zci-25-m59"/>
+                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="VAn-gF-QiZ" secondAttribute="trailing" id="Zci-25-m59"/>
                 <constraint firstItem="S3I-5Z-qgS" firstAttribute="height" secondItem="Ubz-8I-W2F" secondAttribute="height" id="ebY-C1-rqR"/>
                 <constraint firstItem="tm2-NW-WsZ" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="4" id="fH0-Om-7gV" customClass="VLCSpacingConstraint">
                     <userDefinedRuntimeAttributes>

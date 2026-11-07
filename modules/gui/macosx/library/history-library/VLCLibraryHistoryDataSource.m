@@ -330,6 +330,7 @@
     id<VLCMediaLibraryItemProtocol> const item = [self libraryItemAtIndexPath:indexPath forCollectionView:collectionView];
     viewItem.representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:item
                                                                     parentType:VLCMediaLibraryParentGroupTypeUnknown];
+    viewItem.showsMarkUnplayedButton = YES;
     return viewItem;
 }
 

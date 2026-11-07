@@ -31,6 +31,7 @@ extern NSString *VLCLibraryCollectionViewItemIdentifier;
 @interface VLCLibraryCollectionViewItem : VLCMediaItemCollectionViewItem <VLCLibraryRepresentedItemCollectionViewItem>
 
 @property (readwrite, strong, nonatomic, nullable) VLCLibraryRepresentedItem *representedItem;
+@property (readwrite, nonatomic) BOOL showsMarkUnplayedButton;
 
 @end
 

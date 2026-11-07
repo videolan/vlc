@@ -30,6 +30,7 @@
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryImageCache.h"
+#import "library/VLCLibraryMarkUnplayedButton.h"
 #import "library/VLCLibraryMenuController.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryRepresentedItem.h"
@@ -38,6 +39,7 @@
 #import "views/VLCLinearProgressIndicator.h"
 #import "views/VLCMediaItemCollectionViewItem.h"
 #import "views/VLCTrackingView.h"
+#import "views/VLCUIUnits.h"
 
 NSString *VLCLibraryCollectionViewItemIdentifier = @"VLCLibraryCollectionViewItemIdentifier";
 
@@ -46,6 +48,9 @@ NSString *VLCLibraryCollectionViewItemIdentifier = @"VLCLibraryCollectionViewIte
     VLCLibraryMenuController *_menuController;
     NSLayoutConstraint *_videoImageViewAspectRatioConstraint;
 }
+
+@property (readwrite, strong, nonatomic) VLCLibraryMarkUnplayedButton *markUnplayedButton;
+
 @end
 
 @implementation VLCLibraryCollectionViewItem
@@ -76,10 +81,10 @@ NSString *VLCLibraryCollectionViewItemIdentifier = @"VLCLibraryCollectionViewIte
     _videoImageViewAspectRatioConstraint = [NSLayoutConstraint constraintWithItem:self.mediaImageView
                                                                         attribute:NSLayoutAttributeHeight
                                                                         relatedBy:NSLayoutRelationEqual
-                                                                        toItem:self.mediaImageView
+                                                                           toItem:self.mediaImageView
                                                                         attribute:NSLayoutAttributeWidth
                                                                        multiplier:VLCUIUnits.videoItemCollectionViewImageViewAspectRatioMultiplier
-                                                                        constant:1];
+                                                                         constant:1];
     _videoImageViewAspectRatioConstraint.priority = NSLayoutPriorityRequired;
     _videoImageViewAspectRatioConstraint.active = NO;
 
@@ -94,6 +99,8 @@ NSString *VLCLibraryCollectionViewItemIdentifier = @"VLCLibraryCollectionViewIte
 - (void)prepareForReuse
 {
     [super prepareForReuse];
+    _representedItem = nil;
+    self.showsMarkUnplayedButton = NO;
     self.secondaryInfoTextField.stringValue = [NSString stringWithTime:0];
     self.progressIndicator.hidden = YES;
     [self setUnplayedIndicatorHidden:YES];
@@ -105,7 +112,63 @@ NSString *VLCLibraryCollectionViewItemIdentifier = @"VLCLibraryCollectionViewIte
         return;
     }
     _representedItem = representedItem;
+    [self updateMarkUnplayedButton];
     [self updateRepresentation];
+}
+
+- (void)setShowsMarkUnplayedButton:(BOOL)showsMarkUnplayedButton
+{
+    _showsMarkUnplayedButton = showsMarkUnplayedButton;
+    [self updateMarkUnplayedButton];
+}
+
+- (void)updateMarkUnplayedButton
+{
+    if (!self.showsMarkUnplayedButton && self.markUnplayedButton == nil) {
+        return;
+    }
+
+    id<VLCMediaLibraryItemProtocol> const item = self.representedItem.item;
+    VLCMediaLibraryMediaItem * const mediaItem =
+        [item isKindOfClass:VLCMediaLibraryMediaItem.class] ? (VLCMediaLibraryMediaItem *)item : nil;
+    const BOOL showButton = self.showsMarkUnplayedButton && mediaItem.lastPlayedDate > 0;
+    if (showButton) {
+        if (self.markUnplayedButton == nil) {
+            [self addMarkUnplayedButton];
+        }
+        [self.markUnplayedButton configureForMediaType:mediaItem.mediaType];
+    }
+    if (self.markUnplayedButton == nil) {
+        return;
+    }
+
+    self.markUnplayedButton.hidden = !showButton;
+    const CGFloat textInset = showButton
+        ? VLCUIUnits.smallIconButtonSize + VLCUIUnits.smallSpacing
+        : 0.;
+    self.trailingTitleTextToTrailingSuperviewConstraint.constant = textInset;
+    self.trailingSecondaryTextToTrailingSuperviewConstraint.constant = textInset;
+    self.trailingUnplayedIndicatorToTrailingSuperviewConstraint.constant = textInset;
+}
+
+- (void)addMarkUnplayedButton
+{
+    NSAssert(self.trailingTitleTextToTrailingSuperviewConstraint != nil &&
+             self.trailingSecondaryTextToTrailingSuperviewConstraint != nil &&
+             self.trailingUnplayedIndicatorToTrailingSuperviewConstraint != nil,
+             @"Footer constraints must be connected when showing the Mark as Unplayed button");
+    VLCLibraryMarkUnplayedButton * const button = [[VLCLibraryMarkUnplayedButton alloc] initWithFrame:NSZeroRect];
+    button.translatesAutoresizingMaskIntoConstraints = NO;
+    button.target = self;
+    button.action = @selector(markAsUnplayed:);
+    [self.view addSubview:button];
+    [NSLayoutConstraint activateConstraints:@[
+        [button.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
+        [button.centerYAnchor constraintEqualToAnchor:self.mediaTitleTextField.bottomAnchor],
+        [button.widthAnchor constraintEqualToConstant:VLCUIUnits.smallIconButtonSize],
+        [button.heightAnchor constraintEqualToConstant:VLCUIUnits.smallIconButtonSize],
+    ]];
+    self.markUnplayedButton = button;
 }
 
 - (void)setSelected:(BOOL)selected
@@ -178,10 +241,9 @@ NSString *VLCLibraryCollectionViewItemIdentifier = @"VLCLibraryCollectionViewIte
             self.progressIndicator.hidden = NO;
         }
 
-        if (mediaItem.playCount == 0) {
-            [self setUnplayedIndicatorHidden:NO];
-        }
+        [self setUnplayedIndicatorHidden:mediaItem.playCount != 0];
     } else {
+        [self setUnplayedIndicatorHidden:YES];
         self.progressIndicator.hidden = YES;
         if (_videoImageViewAspectRatioConstraint.active) {
             _videoImageViewAspectRatioConstraint.active = NO;
@@ -192,15 +254,23 @@ NSString *VLCLibraryCollectionViewItemIdentifier = @"VLCLibraryCollectionViewIte
 
 - (void)setUnplayedIndicatorHidden:(BOOL)indicatorHidden
 {
-    if (self.unplayedIndicatorTextField.hidden == indicatorHidden) {
-        return;
-    }
     self.unplayedIndicatorTextField.hidden = indicatorHidden;
     self.trailingSecondaryTextToLeadingUnplayedIndicatorConstraint.active = !indicatorHidden;
     self.trailingSecondaryTextToTrailingSuperviewConstraint.active = indicatorHidden;
 }
 
 #pragma mark - actions
+
+- (IBAction)markAsUnplayed:(NSButton *)sender
+{
+    if (sender.hidden || !self.showsMarkUnplayedButton) {
+        return;
+    }
+    VLCMediaLibraryMediaItem * const mediaItem = (VLCMediaLibraryMediaItem *)self.representedItem.item;
+    if ([mediaItem markAsUnplayed] == VLC_SUCCESS) {
+        [self updateMarkUnplayedButton];
+    }
+}
 
 - (IBAction)playInstantly:(id)sender
 {

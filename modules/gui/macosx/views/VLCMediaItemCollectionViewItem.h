@@ -46,9 +46,11 @@ extern const CGFloat VLCMediaItemCollectionViewItemMaximumDisplayedProgress;
 @property (readwrite, weak) IBOutlet NSButton *addToPlayQueueButton;
 @property (readwrite, weak) IBOutlet VLCLinearProgressIndicator *progressIndicator;
 @property (readwrite, weak) IBOutlet NSBox *highlightBox;
-@property (readwrite, weak) IBOutlet NSLayoutConstraint *imageViewAspectRatioConstraint;
-@property (readwrite, weak) IBOutlet NSLayoutConstraint *trailingSecondaryTextToLeadingUnplayedIndicatorConstraint;
-@property (readwrite, weak) IBOutlet NSLayoutConstraint *trailingSecondaryTextToTrailingSuperviewConstraint;
+@property (readwrite, strong) IBOutlet NSLayoutConstraint *imageViewAspectRatioConstraint;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *trailingTitleTextToTrailingSuperviewConstraint;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *trailingUnplayedIndicatorToTrailingSuperviewConstraint;
+@property (readwrite, strong) IBOutlet NSLayoutConstraint *trailingSecondaryTextToLeadingUnplayedIndicatorConstraint;
+@property (readwrite, strong) IBOutlet NSLayoutConstraint *trailingSecondaryTextToTrailingSuperviewConstraint;
 
 @end
 
