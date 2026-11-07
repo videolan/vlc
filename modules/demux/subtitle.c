@@ -1146,18 +1146,18 @@ static int subtitle_ParseSubRipTimingValue(vlc_tick_t *timing_value,
                                            const char *s, size_t length)
 {
     int h1, m1, s1, d1 = 0;
+    ptrdiff_t count;
 
-    int count;
-    if (sscanf(s, "%d:%d:%d,%d%n", &h1, &m1, &s1, &d1, &count) == 4
+    if (sscanf(s, "%d:%d:%d,%d%tn", &h1, &m1, &s1, &d1, &count) == 4
         && (size_t)count <= length)
         goto success;
 
-    if (sscanf(s, "%d:%d:%d.%d%n", &h1, &m1, &s1, &d1, &count) == 4
+    if (sscanf(s, "%d:%d:%d.%d%tn", &h1, &m1, &s1, &d1, &count) == 4
         && (size_t)count <= length)
         goto success;
 
     d1 = 0;
-    if (sscanf(s, "%d:%d:%d%n", &h1, &m1, &s1, &count) == 3
+    if (sscanf(s, "%d:%d:%d%tn", &h1, &m1, &s1, &count) == 3
         && (size_t)count <= length)
         goto success;
 
