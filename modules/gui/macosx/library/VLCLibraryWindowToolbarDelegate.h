@@ -30,7 +30,8 @@ typedef NS_OPTIONS(NSUInteger, VLCLibraryWindowToolbarDisplayFlags) {
     VLCLibraryWindowToolbarDisplayFlagNavigationButtons = 1 << 0,
     VLCLibraryWindowToolbarDisplayFlagToggleViewModeSegmentButton = 1 << 1,
     VLCLibraryWindowToolbarDisplayFlagSortOrderButton = 1 << 2,
-    VLCLibraryWindowToolbarDisplayFlagLibrarySearchBar = 1 << 3
+    VLCLibraryWindowToolbarDisplayFlagLibrarySearchBar = 1 << 3,
+    VLCLibraryWindowToolbarDisplayFlagClearHistoryButton = 1 << 4
 };
 
 extern NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier;

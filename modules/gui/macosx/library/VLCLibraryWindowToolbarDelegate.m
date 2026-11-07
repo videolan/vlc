@@ -24,6 +24,7 @@
 
 #import "extensions/NSString+Helpers.h"
 
+#import "library/VLCLibraryController.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowSidebarRootViewController.h"
 #import "library/VLCLibraryWindowSplitViewController.h"
@@ -36,7 +37,13 @@
 NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier = 
     @"VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier";
 
+static NSString * const VLCLibraryWindowClearHistoryToolbarItemIdentifier =
+    @"VLCLibraryWindowClearHistoryToolbarItemIdentifier";
+
 @implementation VLCLibraryWindowToolbarDelegate
+{
+    NSToolbarItem *_clearHistoryToolbarItem;
+}
 
 #pragma mark - XIB handling
 
@@ -94,16 +101,73 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier =
      itemForItemIdentifier:(NSToolbarItemIdentifier)itemIdentifier
  willBeInsertedIntoToolbar:(BOOL)flag
 {
+    if ([itemIdentifier isEqualToString:VLCLibraryWindowClearHistoryToolbarItemIdentifier]) {
+        return [self clearHistoryToolbarItem];
+    }
     if ([itemIdentifier isEqualToString:VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier]) {
         if (@available(macOS 11.0, *)) {
             return [NSTrackingSeparatorToolbarItem
                     trackingSeparatorToolbarItemWithIdentifier:itemIdentifier
-                    splitView:self.libraryWindow.mainSplitView
-                    dividerIndex:VLCLibraryWindowNavigationSidebarSplitViewDividerIndex];
+                                                     splitView:self.libraryWindow.mainSplitView
+                                                  dividerIndex:VLCLibraryWindowNavigationSidebarSplitViewDividerIndex];
         }
     }
 
     return nil;
+}
+
+#pragma mark - clear history toolbar item handling
+
+- (NSToolbarItem *)clearHistoryToolbarItem
+{
+    if (_clearHistoryToolbarItem == nil) {
+        _clearHistoryToolbarItem =
+            [[NSToolbarItem alloc] initWithItemIdentifier:VLCLibraryWindowClearHistoryToolbarItemIdentifier];
+        _clearHistoryToolbarItem.label = _NS("Clear");
+        _clearHistoryToolbarItem.paletteLabel = _NS("Clear History");
+        if (@available(macOS 10.15, *)) {
+            _clearHistoryToolbarItem.title = _NS("Clear");
+            _clearHistoryToolbarItem.bordered = YES;
+        } else {
+            NSButton * const button = [NSButton buttonWithTitle:_NS("Clear") target:self action:@selector(clearHistory:)];
+            button.bezelStyle = NSBezelStyleTexturedRounded;
+            _clearHistoryToolbarItem.view = button;
+        }
+        _clearHistoryToolbarItem.target = self;
+        _clearHistoryToolbarItem.action = @selector(clearHistory:);
+        _clearHistoryToolbarItem.toolTip = _NS("Clear playback history");
+    }
+    return _clearHistoryToolbarItem;
+}
+
+- (void)clearHistory:(id)sender
+{
+    VLCLibraryWindow * const window = self.libraryWindow;
+    if (window.librarySegmentType != VLCLibraryHistorySegmentType || window.attachedSheet != nil) {
+        return;
+    }
+
+    NSAlert * const alert = NSAlert.new;
+    alert.messageText = _NS("Clear playback history?");
+    alert.informativeText = _NS("This will clear all playback history and reset saved playback positions.");
+    alert.alertStyle = NSAlertStyleWarning;
+    [alert addButtonWithTitle:_NS("Cancel")];
+    NSButton * const clearButton = [alert addButtonWithTitle:_NS("Clear")];
+    if (@available(macOS 11.0, *)) {
+        clearButton.hasDestructiveAction = YES;
+    }
+    [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse response) {
+        if (response != NSAlertSecondButtonReturn) {
+            return;
+        }
+        if ([VLCMain.sharedInstance.libraryController clearHistory] != VLC_SUCCESS) {
+            NSAlert * const errorAlert = NSAlert.new;
+            errorAlert.messageText = _NS("Could not clear playback history");
+            errorAlert.alertStyle = NSAlertStyleWarning;
+            [errorAlert addButtonWithTitle:_NS("OK")];
+            [errorAlert beginSheetModalForWindow:window completionHandler:nil];
+        }
+    }];
 }
 
 #pragma mark - renderers toolbar item handling
@@ -177,20 +241,20 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier =
     NSParameterAssert(items != nil);
     NSParameterAssert(toolbarItem.itemIdentifier.length > 0);
 
-    // Build toolbar item index map once to avoid double iteration
+    // Match identifiers because AppKit can copy standard items from their nib templates.
     NSArray<NSToolbarItem *> * const toolbarItems = self.toolbar.items;
-    NSMapTable * const itemIndexMap = [NSMapTable strongToStrongObjectsMapTable];
+    NSMapTable<NSToolbarItemIdentifier, NSNumber *> * const itemIndexMap = [NSMapTable strongToStrongObjectsMapTable];
     for (NSUInteger i = 0; i < toolbarItems.count; i++) {
-        [itemIndexMap setObject:@(i) forKey:toolbarItems[i]];
+        [itemIndexMap setObject:@(i) forKey:toolbarItems[i].itemIdentifier];
     }
 
-    NSNumber * const toolbarItemIndexNumber = [itemIndexMap objectForKey:toolbarItem];
+    NSNumber * const toolbarItemIndexNumber = [itemIndexMap objectForKey:toolbarItem.itemIdentifier];
     if (toolbarItemIndexNumber != nil) {
         return;
     }
 
     for (NSToolbarItem * const item in items) {
-        NSNumber * const itemIndexNumber = [itemIndexMap objectForKey:item];
+        NSNumber * const itemIndexNumber = [itemIndexMap objectForKey:item.itemIdentifier];
         if (itemIndexNumber != nil) {
             const NSInteger itemIndex = itemIndexNumber.integerValue;
             [self.toolbar insertItemWithItemIdentifier:toolbarItem.itemIdentifier
@@ -212,7 +276,7 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier =
         return;
     }
 
-    [self insertToolbarItem:self.backwardsToolbarItem 
+    [self insertToolbarItem:self.backwardsToolbarItem
                   inFrontOf:@[self.trackingSeparatorToolbarItem,
                               self.toggleNavSidebarToolbarItem,
                               self.vlcIconToolbarItem]];
@@ -275,12 +339,25 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier =
                               self.vlcIconToolbarItem]];
 }
 
+- (void)setClearHistoryToolbarItemVisible:(BOOL)visible
+{
+    NSToolbarItem * const item = [self clearHistoryToolbarItem];
+    if (!visible) {
+        [self hideToolbarItem:item];
+        return;
+    }
+
+    [self insertToolbarItem:item
+                  inFrontOf:@[self.flexibleSpaceToolbarItem]];
+}
+
 - (void)applyVisiblityFlags:(VLCLibraryWindowToolbarDisplayFlags)flags
 {
     [self setForwardsBackwardsToolbarItemsVisible:flags & VLCLibraryWindowToolbarDisplayFlagNavigationButtons];
     [self setSortOrderToolbarItemVisible:flags & VLCLibraryWindowToolbarDisplayFlagSortOrderButton];
     [self setLibrarySearchToolbarItemVisible:flags & VLCLibraryWindowToolbarDisplayFlagLibrarySearchBar];
     [self setViewModeToolbarItemVisible:flags & VLCLibraryWindowToolbarDisplayFlagToggleViewModeSegmentButton];
+    [self setClearHistoryToolbarItemVisible:flags & VLCLibraryWindowToolbarDisplayFlagClearHistoryButton];
 }
 
 @end

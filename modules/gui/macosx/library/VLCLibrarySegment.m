@@ -246,7 +246,8 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             VLCLibraryWindowPersistentPreferences.sharedInstance.historyLibraryViewMode = viewMode;
         };
         self.internalToolbarDisplayFlags = VLCLibraryWindowToolbarDisplayFlagToggleViewModeSegmentButton |
-                                           VLCLibraryWindowToolbarDisplayFlagLibrarySearchBar;
+                                           VLCLibraryWindowToolbarDisplayFlagLibrarySearchBar |
+                                           VLCLibraryWindowToolbarDisplayFlagClearHistoryButton;
     }
     return self;
 }
