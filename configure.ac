@@ -80,6 +80,15 @@ AC_PROG_CPP
 AC_PROG_OBJC
 AC_PROG_EGREP
 AC_PROG_MAKE_SET
+dnl Do we have to use make or gmake ?
+if make --version 2>&1|grep -q GNU
+then
+    # GNU make, all seems good
+    MAKE=make
+else
+    # Known GNU make alias (on BSD)
+    MAKE=gmake
+fi
 AC_PROG_INSTALL
 AM_PROG_AS
 AC_PROG_LEX([noyywrap])
@@ -4058,9 +4067,9 @@ AS_IF([test "${enable_qt}" != "no"], [
         echo "include ${ac_pwd}/modules/gui/qt/qmake-common.mk"  >> ${ac_pwd}/modules/gui/qt/qmake-qt
 
         AC_MSG_RESULT([yes])
-        QT_LIBS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-qt get_libs)
-        QT_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-qt get_cflags)
-        QT_LDFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-qt get_ldflags)
+        QT_LIBS=$(cd ${ac_pwd}/modules/gui/qt && ${MAKE} -s -f qmake-qt get_libs)
+        QT_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && ${MAKE} -s -f qmake-qt get_cflags)
+        QT_LDFLAGS=$(cd ${ac_pwd}/modules/gui/qt && ${MAKE} -s -f qmake-qt get_ldflags)
         AC_SUBST([QT_LIBS])
         AC_SUBST([QT_CFLAGS])
         AC_SUBST([QT_LDFLAGS])
@@ -4081,7 +4090,7 @@ AS_IF([test "${enable_qt}" != "no"], [
           echo "include ${ac_pwd}/modules/gui/qt/qmake-common.mk"        >> ${ac_pwd}/modules/gui/qt/qmake-private-gui
 
           AC_MSG_RESULT([yes])
-          QT_GUI_PRIVATE_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-gui get_cflags)
+          QT_GUI_PRIVATE_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && ${MAKE} -s -f qmake-private-gui get_cflags)
           AC_SUBST([QT_GUI_PRIVATE_CFLAGS])
           have_qt_gui_private="yes"
         ],[
@@ -4724,15 +4733,6 @@ AM_COND_IF([HAVE_DARWIN], [
 dnl Generate makefiles
 AC_OUTPUT
 
-dnl Do we have to use make or gmake ?
-if make --version 2>&1|grep -q GNU
-then
-    # GNU make, all seems good
-    MAKE=make
-else
-    # Known GNU make alias (on BSD)
-    MAKE=gmake
-fi
 dnl Shortcut to nice compile message
 if test -n $SHELL; then
   SHELL=${CONFIG_SHELL-/bin/sh}
