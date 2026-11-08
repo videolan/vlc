@@ -364,8 +364,10 @@ VLCMediaLibraryMediaItem *VLCLibraryModelTestMediaItem(vlc_ml_media_type_t type,
 }
 
 - (NSObject *)beginCacheUpdateForGetter:(SEL)getter
+                             generation:(NSUInteger *)generation
 {
-    NSObject * const token = [super beginCacheUpdateForGetter:getter];
+    NSObject * const token = [super beginCacheUpdateForGetter:getter
+                                                   generation:generation];
     @synchronized (self) {
         if (_pendingQueries == nil)
             _pendingQueries = NSMutableSet.set;

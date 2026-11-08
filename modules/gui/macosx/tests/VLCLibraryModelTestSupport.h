@@ -63,7 +63,8 @@
                    token:(NSObject *)token;
 - (NSArray *)readCacheOnQueue:(dispatch_queue_t)queue
                   withBlock:(NSArray *(^)(void))block;
-- (NSObject *)beginCacheUpdateForGetter:(SEL)getter;
+- (NSObject *)beginCacheUpdateForGetter:(SEL)getter
+                             generation:(NSUInteger *)generation;
 - (void)performCacheWriteForGeneration:(NSUInteger)generation
                                  token:(NSObject *)token
                                 getter:(SEL)getter

@@ -618,8 +618,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         });
         return;
     }
-    const NSUInteger generation = self.cacheGeneration;
-    NSObject * const token = [self beginCacheUpdateForGetter:@selector(cachedListOfShows)];
+    NSUInteger generation;
+    NSObject * const token = [self beginCacheUpdateForGetter:@selector(cachedListOfShows)
+                                                  generation:&generation];
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
         NSDictionary<NSNumber *, NSNumber *> * const showIDs = [self showIDsByEpisodeIDForShows:shows];
         if (showIDs == nil) {
@@ -733,9 +734,13 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 }
 
 - (NSObject *)beginCacheUpdateForGetter:(SEL)getter
+                             generation:(NSUInteger *)generation
 {
     NSObject * const token = NSObject.new;
     @synchronized (_cacheUpdateTokens) {
+        // A cache drop between reading the version and saving the token
+        // can cause both this query and its replacement to be discarded.
+        *generation = self.cacheGeneration;
         _cacheUpdateTokens[[NSValue valueWithPointer:getter]] = token;
         [_pendingCacheUpdates addObject:[NSValue valueWithPointer:getter]];
     }
@@ -831,8 +836,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
 - (void)resetCachedListOfAudioMedia
 {
-    const NSUInteger generation = self.cacheGeneration;
-    NSObject * const token = [self beginCacheUpdateForGetter:@selector(cachedAudioMedia)];
+    NSUInteger generation;
+    NSObject * const token = [self beginCacheUpdateForGetter:@selector(cachedAudioMedia)
+                                                  generation:&generation];
     NSString * const filterString = [self.filterString copy];
     const vlc_ml_query_params_t capturedParams = [self queryParams];
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
@@ -885,8 +891,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
 - (void)resetCachedListOfArtists
 {
-    const NSUInteger generation = self.cacheGeneration;
-    NSObject * const token = [self beginCacheUpdateForGetter:@selector(cachedArtists)];
+    NSUInteger generation;
+    NSObject * const token = [self beginCacheUpdateForGetter:@selector(cachedArtists)
+                                                  generation:&generation];
     NSString * const filterString = [self.filterString copy];
     const vlc_ml_query_params_t capturedParams = [self queryParams];
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
@@ -949,8 +956,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
 - (void)resetCachedListOfAlbums
 {
-    const NSUInteger generation = self.cacheGeneration;
-    NSObject * const token = [self beginCacheUpdateForGetter:@selector(cachedAlbums)];
+    NSUInteger generation;
+    NSObject * const token = [self beginCacheUpdateForGetter:@selector(cachedAlbums)
+                                                  generation:&generation];
     NSString * const filterString = [self.filterString copy];
     const vlc_ml_query_params_t capturedParams = [self queryParams];
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
@@ -1010,8 +1018,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
 - (void)resetCachedListOfGenres
 {
-    const NSUInteger generation = self.cacheGeneration;
-    NSObject * const token = [self beginCacheUpdateForGetter:@selector(cachedGenres)];
+    NSUInteger generation;
+    NSObject * const token = [self beginCacheUpdateForGetter:@selector(cachedGenres)
+                                                  generation:&generation];
     NSString * const filterString = [self.filterString copy];
     const vlc_ml_query_params_t capturedParams = [self queryParams];
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
@@ -1072,8 +1081,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
 - (void)resetCachedListOfVideoMedia
 {
-    const NSUInteger generation = self.cacheGeneration;
-    NSObject * const token = [self beginCacheUpdateForGetter:@selector(cachedVideoMedia)];
+    NSUInteger generation;
+    NSObject * const token = [self beginCacheUpdateForGetter:@selector(cachedVideoMedia)
+                                                  generation:&generation];
     NSString * const filterString = [self.filterString copy];
     const vlc_ml_query_params_t capturedParams = [self queryParams];
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
@@ -1230,8 +1240,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
 - (void)resetCachedListOfRecentMedia
 {
-    const NSUInteger generation = self.cacheGeneration;
-    NSObject * const token = [self beginCacheUpdateForGetter:@selector(cachedRecentMedia)];
+    NSUInteger generation;
+    NSObject * const token = [self beginCacheUpdateForGetter:@selector(cachedRecentMedia)
+                                                  generation:&generation];
     [self getListOfRecentMediaOfType:VLC_ML_MEDIA_TYPE_VIDEO
                       withCountLimit:_recentMediaLimit
                       withCompletion:^(NSArray * const mediaArray) {
@@ -1273,8 +1284,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
 - (void)resetCachedListOfRecentAudioMedia
 {
-    const NSUInteger generation = self.cacheGeneration;
-    NSObject * const token = [self beginCacheUpdateForGetter:@selector(cachedRecentAudioMedia)];
+    NSUInteger generation;
+    NSObject * const token = [self beginCacheUpdateForGetter:@selector(cachedRecentAudioMedia)
+                                                  generation:&generation];
     [self getListOfRecentMediaOfType:VLC_ML_MEDIA_TYPE_AUDIO
                       withCountLimit:_recentAudioMediaLimit
                       withCompletion:^(NSArray * const mediaArray) {
@@ -1333,8 +1345,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     NSNotificationName const notification = audio
         ? VLCLibraryModelRecentlyAddedAudioMediaListReset
         : VLCLibraryModelRecentlyAddedVideoMediaListReset;
-    const NSUInteger generation = self.cacheGeneration;
-    NSObject * const token = [self beginCacheUpdateForGetter:getter];
+    NSUInteger generation;
+    NSObject * const token = [self beginCacheUpdateForGetter:getter
+                                                  generation:&generation];
     NSString * const filterString = [self.filterString copy];
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
         vlc_ml_query_params_t queryParams = vlc_ml_query_params_create();
@@ -1400,8 +1413,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
 - (void)resetCachedListOfShows
 {
-    const NSUInteger generation = self.cacheGeneration;
-    NSObject * const token = [self beginCacheUpdateForGetter:@selector(cachedListOfShows)];
+    NSUInteger generation;
+    NSObject * const token = [self beginCacheUpdateForGetter:@selector(cachedListOfShows)
+                                                  generation:&generation];
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
         vlc_ml_show_list_t * const p_show_list = vlc_ml_list_shows(self->_p_mediaLibrary, NULL);
         if (p_show_list == NULL) {
@@ -1515,8 +1529,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
 - (void)resetCachedListOfMovies
 {
-    const NSUInteger generation = self.cacheGeneration;
-    NSObject * const token = [self beginCacheUpdateForGetter:@selector(cachedListOfMovies)];
+    NSUInteger generation;
+    NSObject * const token = [self beginCacheUpdateForGetter:@selector(cachedListOfMovies)
+                                                  generation:&generation];
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
         vlc_ml_media_list_t * const p_movie_list = vlc_ml_list_movies(self->_p_mediaLibrary, NULL);
         if (p_movie_list == NULL) {
@@ -1614,8 +1629,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
 - (void)resetCachedListOfGroups
 {
-    const NSUInteger generation = self.cacheGeneration;
-    NSObject * const token = [self beginCacheUpdateForGetter:@selector(cachedListOfGroups)];
+    NSUInteger generation;
+    NSObject * const token = [self beginCacheUpdateForGetter:@selector(cachedListOfGroups)
+                                                  generation:&generation];
     NSString * const filterString = [self.filterString copy];
     const vlc_ml_query_params_t capturedParams = [self queryParams];
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
@@ -1703,8 +1719,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
 - (void)resetCachedListOfMonitoredFolders
 {
-    const NSUInteger generation = self.cacheGeneration;
-    NSObject * const token = [self beginCacheUpdateForGetter:@selector(cachedListOfMonitoredFolders)];
+    NSUInteger generation;
+    NSObject * const token = [self beginCacheUpdateForGetter:@selector(cachedListOfMonitoredFolders)
+                                                  generation:&generation];
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
         vlc_ml_folder_list_t *pp_entrypoints = vlc_ml_list_entry_points(self->_p_mediaLibrary, NULL);
         if (pp_entrypoints == NULL) {
