@@ -361,11 +361,7 @@ static VLCMain *sharedInstance = nil;
 {
     _launched = YES;
 
-    if (_libraryWindowController == nil) {
-        _libraryWindowController = [[VLCLibraryWindowController alloc] initWithLibraryWindow];
-    }
-
-    [_libraryWindowController.window makeKeyAndOrderFront:nil];
+    [self.libraryWindow makeKeyAndOrderFront:nil];
 
     if (!_p_intf)
         return;
@@ -489,6 +485,11 @@ static VLCMain *sharedInstance = nil;
 
 - (VLCLibraryWindow *)libraryWindow
 {
+    // Video output can be enabled before applicationDidFinishLaunching:.
+    if (_libraryWindowController == nil) {
+        _libraryWindowController = [[VLCLibraryWindowController alloc] initWithLibraryWindow];
+    }
+
     return (VLCLibraryWindow *)_libraryWindowController.window;
 }
 
