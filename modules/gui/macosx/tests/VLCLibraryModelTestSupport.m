@@ -262,6 +262,10 @@ VLCMediaLibraryMediaItem *VLCLibraryModelTestMediaItem(vlc_ml_media_type_t type,
 @end
 
 @implementation VLCLibraryModelTestQueryGate {
+    dispatch_semaphore_t _updateRelease;
+    SEL _updateGetter;
+    dispatch_block_t _updateCaptured;
+    dispatch_block_t _updateProcessed;
     dispatch_semaphore_t _queryRelease;
     SEL _getter;
     NSObject *_heldToken;
@@ -350,6 +354,28 @@ VLCMediaLibraryMediaItem *VLCLibraryModelTestMediaItem(vlc_ml_media_type_t type,
     XCTAssertTrue(self.initialCountsLoaded);
 }
 
+- (void)holdNextCacheUpdateForGetter:(SEL)getter
+                             handler:(dispatch_block_t)handler
+                   completionHandler:(dispatch_block_t)completionHandler
+{
+    @synchronized (self) {
+        _updateRelease = dispatch_semaphore_create(0);
+        _updateGetter = getter;
+        _updateCaptured = [handler copy];
+        _updateProcessed = [completionHandler copy];
+    }
+}
+
+- (void)releaseCacheUpdate
+{
+    dispatch_semaphore_t release;
+    @synchronized (self) {
+        release = _updateRelease;
+    }
+    if (release != nil)
+        dispatch_semaphore_signal(release);
+}
+
 - (void)holdNextQueryResultForGetter:(SEL)getter
                              handler:(dispatch_block_t)handler
                    completionHandler:(dispatch_block_t)completionHandler
@@ -366,12 +392,35 @@ VLCMediaLibraryMediaItem *VLCLibraryModelTestMediaItem(vlc_ml_media_type_t type,
 - (NSObject *)beginCacheUpdateForGetter:(SEL)getter
                              generation:(NSUInteger *)generation
 {
+    dispatch_block_t captured = nil;
+    dispatch_block_t processed = nil;
+    dispatch_semaphore_t release = nil;
+    NSObject *pendingStart = nil;
+    @synchronized (self) {
+        if (_updateGetter == getter && _updateCaptured != nil) {
+            captured = _updateCaptured;
+            processed = _updateProcessed;
+            release = _updateRelease;
+            _updateCaptured = nil;
+            _updateProcessed = nil;
+            pendingStart = NSObject.new;
+            if (_pendingQueries == nil)
+                _pendingQueries = NSMutableSet.set;
+            [_pendingQueries addObject:pendingStart];
+        }
+    }
+    if (captured != nil) {
+        dispatch_async(dispatch_get_main_queue(), captured);
+        dispatch_semaphore_wait(release, dispatch_time(DISPATCH_TIME_NOW, 10 * NSEC_PER_SEC));
+    }
     NSObject * const token = [super beginCacheUpdateForGetter:getter
                                                    generation:generation];
     @synchronized (self) {
         if (_pendingQueries == nil)
             _pendingQueries = NSMutableSet.set;
         [_pendingQueries addObject:token];
+        if (pendingStart != nil)
+            [_pendingQueries removeObject:pendingStart];
         if (_queryCounts == nil)
             _queryCounts = NSMutableDictionary.dictionary;
         NSValue * const key = [NSValue valueWithPointer:getter];
@@ -386,6 +435,8 @@ VLCMediaLibraryMediaItem *VLCLibraryModelTestMediaItem(vlc_ml_media_type_t type,
             _writeToken = token;
         }
     }
+    if (processed != nil)
+        dispatch_async(dispatch_get_main_queue(), processed);
     return token;
 }
 

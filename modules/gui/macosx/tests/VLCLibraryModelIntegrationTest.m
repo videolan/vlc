@@ -1745,6 +1745,67 @@
                    @"Each monitored URL must have exactly one active observer");
 }
 
+- (void)testMonitoredFolderRefreshSurvivesFilterChangeBeforeTokenRegistration
+{
+    // Pause a background refresh, change the filter, and start a replacement
+    // before letting the background refresh mark itself as the latest request.
+    // Before the fix, the paused refresh had already read the old cache version.
+    // Its result was rejected as outdated, and the replacement's result was
+    // rejected because it was no longer the latest request. Neither filled the
+    // cache or notified. Force that order and require the folders and notification.
+    XCTestExpectation * const loaded = [self expectationForNotification:VLCLibraryModelListOfMonitoredFoldersUpdated
+                                                                 object:self.model
+                                                                handler:nil];
+    [self waitForExpectations:@[ loaded ] timeout:5.];
+    VLCLibraryModelTestQueryGate * const model = self.model;
+    [self stopModelCallback];
+    XCTestExpectation * const settled = [self expectationWithDescription:@"Initial folder queries finished"];
+    [model finishPendingQueriesWithCompletion:^{ [settled fulfill]; }];
+    [self waitForExpectations:@[ settled ] timeout:5.];
+    NSSet<NSString *> * const expectedMRLs =
+        [NSSet setWithArray:[model.cachedListOfMonitoredFolders valueForKey:@"MRL"]];
+    XCTAssertGreaterThan(expectedMRLs.count, (NSUInteger)0);
+
+    XCTestExpectation * const paused = [self expectationWithDescription:@"Background folder refresh paused before token registration"];
+    XCTestExpectation * const registered = [self expectationWithDescription:@"Background folder refresh token registered"];
+    [model holdNextCacheUpdateForGetter:@selector(cachedListOfMonitoredFolders)
+                                handler:^{ [paused fulfill]; }
+                      completionHandler:^{ [registered fulfill]; }];
+    [self addTeardownBlock:^{ [model releaseCacheUpdate]; }];
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0),
+                   ^{
+        [model resetCachedListOfMonitoredFolders];
+    });
+    [self waitForExpectations:@[ paused ] timeout:5.];
+
+    XCTestExpectation * const dropped = [self expectationForNotification:VLCLibraryModelAllCachesDropped
+                                                                  object:model
+                                                                 handler:nil];
+    model.filterString = @"Folder refresh overlap";
+    [self waitForExpectations:@[ dropped ] timeout:5.];
+    // Keep the replacement from writing its result before the paused refresh resumes.
+    XCTestExpectation * const captured = [self expectationWithDescription:@"New folder result held"];
+    XCTestExpectation * const processed = [self expectationWithDescription:@"New folder write processed"];
+    [model holdNextQueryResultForGetter:@selector(cachedListOfMonitoredFolders)
+                                handler:^{ [captured fulfill]; }
+                      completionHandler:^{ [processed fulfill]; }];
+    [self addTeardownBlock:^{ [model releaseQuery]; }];
+    XCTestExpectation * const reloaded = [self expectationForNotification:VLCLibraryModelListOfMonitoredFoldersUpdated
+                                                                   object:model
+                                                                  handler:nil];
+    (void)model.listOfMonitoredFolders;
+    [self waitForExpectations:@[ captured ] timeout:5.];
+    XCTAssertNil(model.cachedListOfMonitoredFolders);
+
+    [model releaseCacheUpdate];
+    [self waitForExpectations:@[ registered ] timeout:5.];
+    [model releaseQuery];
+    [self waitForExpectations:@[ processed, reloaded ] timeout:5.];
+    NSSet<NSString *> * const reloadedMRLs =
+        [NSSet setWithArray:[model.cachedListOfMonitoredFolders valueForKey:@"MRL"]];
+    XCTAssertEqualObjects(reloadedMRLs, expectedMRLs);
+}
+
 - (void)testDroppingCachesRejectsAPendingMonitoredFolderResult
 {
     [self assertDroppedMonitoredFoldersRejectsPendingWrite:NO];
