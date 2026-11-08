@@ -2267,18 +2267,10 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
         if (recentlyAddedVideoIndex != NSNotFound) {
             [recentlyAddedVideos removeObjectAtIndex:recentlyAddedVideoIndex];
-            [self performAfterCacheWritesOnQueue:self->_mediaItemCacheModificationQueue
-                                           block:^{
-                [self.changeDelegate notifyChange:VLCLibraryModelRecentlyAddedVideoMediaListReset withObject:self];
-            }];
             [self resetCachedListOfRecentlyAddedVideoMedia];
         }
         if (recentlyAddedAudioIndex != NSNotFound) {
             [recentlyAddedAudios removeObjectAtIndex:recentlyAddedAudioIndex];
-            [self performAfterCacheWritesOnQueue:self->_mediaItemCacheModificationQueue
-                                           block:^{
-                [self.changeDelegate notifyChange:VLCLibraryModelRecentlyAddedAudioMediaListReset withObject:self];
-            }];
             [self resetCachedListOfRecentlyAddedAudioMedia];
         }
 
