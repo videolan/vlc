@@ -230,12 +230,31 @@ NSString * const VLCLibraryFavoritesDataSourceDisplayedCollectionChangedNotifica
     [self reloadData];
 }
 
+- (void)libraryModelMediaItemUpdated:(NSNotification *)notification
+{
+    VLCMediaLibraryMediaItem * const mediaItem = notification.object;
+    for (NSArray<VLCMediaLibraryMediaItem *> * const items in @[
+        _allFavoritesArray ?: @[],
+        _favoriteAudioMediaArray ?: @[],
+        _favoriteVideoMediaArray ?: @[]
+    ]) {
+        const NSUInteger index = [self indexOfMediaItem:mediaItem.libraryID inArray:items];
+        if (index != NSNotFound) {
+            [items[index] updatePlaybackStateFromMediaItem:mediaItem];
+        }
+    }
+}
+
 #pragma mark - VLCLibraryDataSource
 
 - (void)connect
 {
     NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
 
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelMediaItemUpdated:)
+                               name:VLCLibraryModelMediaItemUpdated
+                             object:nil];
     [notificationCenter addObserver:self
                            selector:@selector(libraryModelFavoriteListReset:)
                                name:VLCLibraryModelFavoriteVideoMediaListReset
