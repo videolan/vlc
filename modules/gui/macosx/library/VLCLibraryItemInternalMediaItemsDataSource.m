@@ -24,6 +24,7 @@
 
 #import "extensions/NSPasteboardItem+VLCAdditions.h"
 #import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryModel.h"
 
 const CGFloat VLCLibraryInternalMediaItemRowHeight = 40.;
 
@@ -32,11 +33,39 @@ const CGFloat VLCLibraryInternalMediaItemRowHeight = 40.;
 @property (readwrite, atomic) id<VLCMediaLibraryItemProtocol> internalItem;
 @property (readwrite, atomic) NSArray<VLCMediaLibraryMediaItem*> *internalMediaItems;
 
+// Nil when there is no current track fetch. Each fetch creates a dictionary
+// to save child updates for its incoming rows, which may be different objects
+// from the displayed rows. Publishing the fetched rows or clearing the parent
+// sets this back to nil. A newer fetch replaces the dictionary so the older
+// result can be discarded.
+@property (nonatomic) NSMutableDictionary<NSNumber *, VLCMediaLibraryMediaItem *> *pendingMediaUpdates;
+
 @end
 
 @implementation VLCLibraryItemInternalMediaItemsDataSource
 
-// TODO: Connect to library model
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        [NSNotificationCenter.defaultCenter addObserver:self
+                                               selector:@selector(mediaItemUpdated:)
+                                                   name:VLCLibraryModelMediaItemUpdated
+                                                 object:nil];
+    }
+    return self;
+}
+
+- (void)mediaItemUpdated:(NSNotification *)notification
+{
+    VLCMediaLibraryMediaItem * const mediaItem = notification.object;
+    self.pendingMediaUpdates[@(mediaItem.libraryID)] = mediaItem;
+    for (VLCMediaLibraryMediaItem * const item in self.internalMediaItems) {
+        if (item.libraryID == mediaItem.libraryID) {
+            [item updatePlaybackStateFromMediaItem:mediaItem];
+        }
+    }
+}
 
 - (id<VLCMediaLibraryItemProtocol>)representedItem
 {
@@ -45,18 +74,38 @@ const CGFloat VLCLibraryInternalMediaItemRowHeight = 40.;
 
 - (void)setRepresentedItem:(id<VLCMediaLibraryItemProtocol>)representedItem
 {
+    if (representedItem == nil) {
+        self.pendingMediaUpdates = nil;
+        self.internalItem = nil;
+        self.internalMediaItems = nil;
+        return;
+    }
     [self setRepresentedItem:representedItem withCompletion:nil];
 }
 
 - (void)setRepresentedItem:(id<VLCMediaLibraryItemProtocol>)item
             withCompletion:(nullable void (^)(void))completionHandler
 {
-    self.internalItem = item;
+    NSAssert(NSThread.isMainThread, @"Track lists are presented on the main thread");
+    NSMutableDictionary<NSNumber *, VLCMediaLibraryMediaItem *> * const updates = NSMutableDictionary.dictionary;
+    self.pendingMediaUpdates = updates;
 
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
-        self.internalMediaItems = item.mediaItems;
+        NSArray<VLCMediaLibraryMediaItem *> * const mediaItems = item.mediaItems;
 
         dispatch_async(dispatch_get_main_queue(), ^{
+            if (self.pendingMediaUpdates != updates) {
+                return;
+            }
+            for (VLCMediaLibraryMediaItem * const mediaItem in mediaItems) {
+                VLCMediaLibraryMediaItem * const update = updates[@(mediaItem.libraryID)];
+                if (update != nil) {
+                    [mediaItem updatePlaybackStateFromMediaItem:update];
+                }
+            }
+            self.pendingMediaUpdates = nil;
+            self.internalItem = item;
+            self.internalMediaItems = mediaItems;
             if (completionHandler != nil) {
                 completionHandler();
             }
