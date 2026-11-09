@@ -59,6 +59,15 @@ int zlib_decompress_extra( demux_t * p_demux, mkv_track_t & tk )
     do
     {
         n++;
+        if (n*1024 > std::numeric_limits<decltype(tk.i_extra_data)>::max())
+        {
+            msg_Err( p_demux, "Decompressed data too large, ignore track %u",
+                      tk.i_number );
+            free(p_new_extra);
+            inflateEnd( &d_stream );
+            return 1;
+        }
+
         void *alloc = realloc(p_new_extra, n*1024);
         if( alloc == NULL )
         {
