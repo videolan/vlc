@@ -94,6 +94,7 @@ void fsEventCallback(ConstFSEventStreamRef streamRef,
 - (void)dealloc
 {
     FSEventStreamStop(_stream);
+    FSEventStreamInvalidate(_stream);
     FSEventStreamRelease(_stream);
     CFRelease(_urlPathRef);
     CFRelease(_pathsToWatch);
