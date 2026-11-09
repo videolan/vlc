@@ -20,6 +20,10 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+// available in C++26, we compile with C++17
+// so we use our helper rather than the toolchain header
+#include "../../compat/stdckdint/stdckdint.h"
+
 static inline void vobsub_palette_argb2ayvu( const uint32_t *src, uint32_t *dst )
 {
     int i;
@@ -78,8 +82,14 @@ static inline int vobsub_size_parse( const char *psz_buf,
 static inline void vobsub_extra_parse(vlc_object_t *o, subs_format_t *subs,
                                       const uint8_t *buf, size_t buf_size)
 {
+    size_t extra_nul;
+    if (ckd_add(&extra_nul, buf_size, 1))
+    {
+        msg_Warn( o, "VobSub extra data too large %zu", buf_size );
+        return;
+    }
     char *psz_start;
-    char *psz_buf = (char*)malloc( buf_size + 1);
+    char *psz_buf = (char*)malloc( extra_nul );
     if( unlikely( psz_buf == NULL ) )
         return;
 
