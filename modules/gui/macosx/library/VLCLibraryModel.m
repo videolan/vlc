@@ -65,6 +65,7 @@ NSString * const VLCLibraryModelGroupDeleted = @"VLCLibraryModelGroupDeleted";
 NSString * const VLCLibraryModelPlaylistDeleted = @"VLCLibraryModelPlaylistDeleted";
 NSString * const VLCLibraryModelShowDeleted = @"VLCLibraryModelShowDeleted";
 
+NSString * const VLCLibraryModelMediaItemUpdated = @"VLCLibraryModelMediaItemUpdated";
 NSString * const VLCLibraryModelAudioMediaItemUpdated = @"VLCLibraryModelAudioMediaItemUpdated";
 NSString * const VLCLibraryModelVideoMediaItemUpdated = @"VLCLibraryModelVideoMediaItemUpdated";
 NSString * const VLCLibraryModelRecentsMediaItemUpdated = @"VLCLibraryModelRecentsMediaItemUpdated";
@@ -2144,6 +2145,12 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         NSLog(@"Could not find a library media item with this ID. Can't handle update.");
         return;
     }
+
+    // Independently loaded views can hold this item even when the model's
+    // main and recent media caches do not contain it.
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.changeDelegate notifyChange:VLCLibraryModelMediaItemUpdated withObject:mediaItem];
+    });
 
     if (mediaItem.mediaSubType == VLC_ML_MEDIA_SUBTYPE_MOVIE) {
         [self resetCachedListOfMovies];
