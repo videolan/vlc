@@ -1312,6 +1312,14 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     return YES;
 }
 
+- (void)updatePlaybackStateFromMediaItem:(VLCMediaLibraryMediaItem *)mediaItem
+{
+    NSParameterAssert(self.libraryID == mediaItem.libraryID);
+    _playCount = mediaItem.playCount;
+    _lastPlayedDate = mediaItem.lastPlayedDate;
+    _progress = mediaItem.progress;
+}
+
 #pragma mark - initialization
 
 + (nullable instancetype)mediaItemForLibraryID:(int64_t)libraryID
