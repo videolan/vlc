@@ -22,7 +22,7 @@ default:
 variables:
     VLC_TEST_TIMEOUT: 60
     FF_DISABLE_UMASK_FOR_DOCKER_EXECUTOR: "true"
-    VLC_WIN64_IMAGE: registry.videolan.org/vlc-debian-win64-posix:20260611225331
+    VLC_WIN64_IMAGE: registry.videolan.org/vlc-debian-win64-posix:20261109074440
     VLC_WIN_LLVM_MSVCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-msvcrt:20260611225331
     VLC_WIN_LLVM_UCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-ucrt:20260611225331
     VLC_DEBIAN_IMAGE: registry.videolan.org/vlc-debian-unstable:20260611225331
