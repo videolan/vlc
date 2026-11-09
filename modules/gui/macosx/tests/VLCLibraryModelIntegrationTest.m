@@ -1550,6 +1550,46 @@
     [self assertNativeMediaUpdateForAudio:NO];
 }
 
+- (void)testNativePlaybackUpdatePublishesOutsideMainCache
+{
+    vlc_medialibrary_t * const library = VLCLibraryDataTypesIntegrationMediaLibrary();
+    const int64_t mediaID = VLCLibraryDataTypesIntegrationFactoryAudioMediaID();
+    const time_t previousPlayDate = 1000;
+    XCTAssertEqual(vlc_ml_media_set_favorite(library, mediaID, true), VLC_SUCCESS);
+    XCTAssertEqual(vlc_ml_media_set_played(library, mediaID, true), VLC_SUCCESS);
+    XCTAssertTrue(VLCLibraryDataTypesIntegrationSetMediaLastPlayedDate(
+        mediaID, [NSDate dateWithTimeIntervalSince1970:previousPlayDate]));
+    VLCMediaLibraryMediaItem * const favorite =
+        (VLCMediaLibraryMediaItem *)[self itemWithID:mediaID inItems:self.model.listOfFavoriteAudioMedia];
+    XCTAssertNotNil(favorite);
+    XCTAssertEqual(favorite.lastPlayedDate, previousPlayDate);
+    const int64_t playlistID = VLCLibraryDataTypesIntegrationCreatePlaylist();
+    VLCMediaLibraryPlaylist * const playlist = [VLCMediaLibraryPlaylist playlistForLibraryID:playlistID];
+    XCTAssertTrue([playlist appendMediaItems:@[favorite]]);
+    VLCMediaLibraryMediaItem * const member = playlist.mediaItems.firstObject;
+    XCTAssertNotNil(member);
+    XCTAssertEqual(member.lastPlayedDate, previousPlayDate);
+
+    XCTestExpectation * const updated =
+        [self expectationForNotification:VLCLibraryModelMediaItemUpdated
+                                  object:nil
+                                 handler:^BOOL(NSNotification *notification) {
+        VLCMediaLibraryMediaItem * const mediaItem = notification.object;
+        if (mediaItem.libraryID != mediaID || mediaItem.lastPlayedDate <= previousPlayDate) {
+            return NO;
+        }
+        XCTAssertTrue(NSThread.isMainThread);
+        [favorite updatePlaybackStateFromMediaItem:mediaItem];
+        [playlist updatePlaybackStateForCachedMediaItem:mediaItem];
+        return YES;
+    }];
+    XCTAssertEqual(vlc_ml_media_set_played(library, mediaID, true), VLC_SUCCESS);
+    [self waitForExpectations:@[updated] timeout:5.];
+    XCTAssertGreaterThan(favorite.lastPlayedDate, previousPlayDate);
+    XCTAssertEqual(member.lastPlayedDate, favorite.lastPlayedDate);
+    XCTAssertEqual(playlist.mediaItems.firstObject, member);
+}
+
 - (void)testNativeAudioDeletionPublishesRemovedCachedItem
 {
     [self assertNativeMediaDeletionForAudio:YES];

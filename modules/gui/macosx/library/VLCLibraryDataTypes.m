@@ -1045,35 +1045,30 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     return self;
 }
 
-- (void)fetchMediaItems
-{
-    NSMutableArray<VLCMediaLibraryMediaItem *> * const fetchedMediaItems = NSMutableArray.array;
-    vlc_ml_media_list_t * const p_media_list = vlc_ml_list_playlist_media(getMediaLibrary(), NULL, self.libraryID);
-
-    for (NSUInteger i = 0; i < p_media_list->i_nb_items; ++i) {
-        vlc_ml_media_t p_media_item = p_media_list->p_items[i];
-        VLCMediaLibraryMediaItem * const item = [[VLCMediaLibraryMediaItem alloc] initWithMediaItem:&p_media_item];
-        [fetchedMediaItems addObject:item];
-    }
-
-    vlc_ml_media_list_release(p_media_list);
-    _mediaItems = fetchedMediaItems.copy;
-}
-
 - (NSArray<VLCMediaLibraryMediaItem *> *)mediaItems
 {
-    if (_mediaItems == nil) {
-        [self fetchMediaItems];
+    @synchronized (self) {
+        if (_mediaItems == nil) {
+            _mediaItems = fetchMediaItemsForLibraryItem(vlc_ml_list_playlist_media, self.libraryID);
+        }
+        return _mediaItems ?: @[];
     }
-    return _mediaItems;
 }
 
 - (VLCMediaLibraryMediaItem *)firstMediaItem
 {
-    if (self.mediaItems == nil) {
-        [self fetchMediaItems];
-    }
     return self.mediaItems.firstObject;
+}
+
+- (void)updatePlaybackStateForCachedMediaItem:(VLCMediaLibraryMediaItem *)mediaItem
+{
+    @synchronized (self) {
+        for (VLCMediaLibraryMediaItem * const item in _mediaItems) {
+            if (item.libraryID == mediaItem.libraryID) {
+                [item updatePlaybackStateFromMediaItem:mediaItem];
+            }
+        }
+    }
 }
 
 - (BOOL)isFileBacked
@@ -1181,7 +1176,9 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     }
 
     // Drop the cached media list so the next -mediaItems access re-fetches.
-    _mediaItems = nil;
+    @synchronized (self) {
+        _mediaItems = nil;
+    }
 }
 
 - (void)revealInFinder
@@ -1260,7 +1257,9 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     }
 
     // Drop the cached media list so the next -mediaItems access re-fetches.
-    _mediaItems = nil;
+    @synchronized (self) {
+        _mediaItems = nil;
+    }
     return YES;
 }
 

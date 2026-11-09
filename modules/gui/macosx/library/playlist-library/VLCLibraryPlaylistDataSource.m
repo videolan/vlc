@@ -45,6 +45,7 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
 @interface VLCLibraryPlaylistDataSource () {
     dispatch_queue_t _playlistQueue;
     NSArray<VLCMediaLibraryPlaylist *> *_playlists;
+    BOOL _connected;
 }
 
 @end
@@ -66,6 +67,12 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
 {
     _playlistQueue = dispatch_queue_create("org.videolan.vlc.libraryplaylistdatasource.queue", DISPATCH_QUEUE_CONCURRENT);
     _libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
+    // Cached playlist members survive disconnecting the views.
+    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+    [notificationCenter addObserver:self
+                           selector:@selector(mediaItemUpdated:)
+                               name:VLCLibraryModelMediaItemUpdated
+                             object:nil];
     [self connect];
     [self reloadData];
 }
@@ -88,6 +95,10 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
 
 - (void)connect
 {
+    if (_connected) {
+        return;
+    }
+    _connected = YES;
     NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self
                            selector:@selector(playlistsReset:)
@@ -105,7 +116,19 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
 
 - (void)disconnect
 {
-    [NSNotificationCenter.defaultCenter removeObserver:self];
+    _connected = NO;
+    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+    [notificationCenter removeObserver:self name:VLCLibraryModelPlaylistAdded object:nil];
+    [notificationCenter removeObserver:self name:VLCLibraryModelPlaylistUpdated object:nil];
+    [notificationCenter removeObserver:self name:VLCLibraryModelPlaylistDeleted object:nil];
+}
+
+- (void)mediaItemUpdated:(NSNotification *)notification
+{
+    VLCMediaLibraryMediaItem * const mediaItem = notification.object;
+    for (VLCMediaLibraryPlaylist * const playlist in self.playlists) {
+        [playlist updatePlaybackStateForCachedMediaItem:mediaItem];
+    }
 }
 
 - (void)playlistsReset:(NSNotification *)notification

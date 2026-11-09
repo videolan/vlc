@@ -289,6 +289,7 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 
 - (void)removeMediaItemsAtPositions:(NSArray<NSNumber *> *)positions;
 - (BOOL)appendMediaItems:(NSArray<VLCMediaLibraryMediaItem *> *)mediaItems;
+- (void)updatePlaybackStateForCachedMediaItem:(VLCMediaLibraryMediaItem *)mediaItem;
 - (BOOL)renameTo:(NSString *)name;
 
 @end
