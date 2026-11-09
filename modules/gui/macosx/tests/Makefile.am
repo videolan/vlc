@@ -35,6 +35,7 @@ VLCMacOSXTests_SOURCES = \
 	gui/macosx/tests/VLCLibraryHomeTestSupport.m \
 	gui/macosx/tests/VLCLibraryHistorySectionTest.m \
 	gui/macosx/tests/VLCLibraryHistoryDataSourceTest.m \
+	gui/macosx/tests/VLCLibraryHistoryItemViewTest.m \
 	gui/macosx/tests/VLCLogMessageTest.m \
 	gui/macosx/tests/VLCLyricEntryTest.m \
 	gui/macosx/tests/VLCMacOSXTestDefaults.m \
@@ -76,8 +77,10 @@ VLCMacOSXTests_SOURCES = \
 	gui/macosx/library/home-library/VLCLibraryHomeViewBrowseCarouselItemView.m \
 	gui/macosx/library/home-library/VLCLibraryHomeViewVideoCarouselContainerView.m \
 	gui/macosx/library/media-source/VLCMediaSourceTableViewSorting.m \
+	gui/macosx/library/VLCLibraryMarkUnplayedButton.m \
 	gui/macosx/library/VLCLibraryModel.m \
 	gui/macosx/library/VLCLibraryModelChangeDelegate.m \
+	gui/macosx/library/VLCLibraryTableCellView.m \
 	gui/macosx/library/VLCMediaLibraryFolderObserver.m \
 	gui/macosx/windows/logging/VLCLogMessage.m \
 	gui/macosx/windows/video/VLCLyricEntry.m \
@@ -87,6 +90,7 @@ VLCMacOSXTests_SOURCES = \
 	gui/macosx/views/VLCStackView.m \
 	gui/macosx/views/VLCSubScrollView.m \
 	gui/macosx/views/VLCTimeFormatter.m \
+	gui/macosx/views/VLCTrackingView.m \
 	gui/macosx/views/VLCUIUnits.m \
 	gui/macosx/views/VLCVisualEffectView.m
 
@@ -140,7 +144,12 @@ VLCMacOSXTests_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(VLCMacOSXTests_OBJCFLAGS) $(OBJCFLAGS) \
 	$(VLCMacOSXTests_LDFLAGS) $(LDFLAGS) -o $@
 
-VLCMacOSXTests.xctest: VLCMacOSXTests$(EXEEXT) VLCLibraryFixtureSQL$(EXEEXT) $(srcdir)/gui/macosx/tests/VLCMacOSXTests-Info.plist gui/macosx/UI/VLCLibraryHeroView.nib
+macosx_gui_xctest_resources = \
+	gui/macosx/UI/VLCLibraryHeroView.nib \
+	gui/macosx/UI/VLCLibraryVideoTableCellView.nib \
+	$(srcdir)/gui/macosx/Resources/librarywindow/libraryPlay.png
+
+VLCMacOSXTests.xctest: VLCMacOSXTests$(EXEEXT) VLCLibraryFixtureSQL$(EXEEXT) $(srcdir)/gui/macosx/tests/VLCMacOSXTests-Info.plist $(macosx_gui_xctest_resources)
 	$(AM_V_GEN)rm -rf $@
 	$(AM_V_at)$(MKDIR_P) $@/Contents/MacOS
 	$(AM_V_at)$(MKDIR_P) $@/Contents/Resources
@@ -151,7 +160,7 @@ VLCMacOSXTests.xctest: VLCMacOSXTests$(EXEEXT) VLCLibraryFixtureSQL$(EXEEXT) $(s
 		$(INSTALL_PROGRAM) VLCLibraryFixtureSQL$(EXEEXT) \
 		$(abs_builddir)/$@/Contents/MacOS/VLCLibraryFixtureSQL
 	$(AM_V_at)$(INSTALL_DATA) $(srcdir)/gui/macosx/tests/VLCMacOSXTests-Info.plist $@/Contents/Info.plist
-	$(AM_V_at)$(INSTALL_DATA) gui/macosx/UI/VLCLibraryHeroView.nib $@/Contents/Resources/VLCLibraryHeroView.nib
+	$(AM_V_at)$(INSTALL_DATA) $(macosx_gui_xctest_resources) $@/Contents/Resources/
 
 EXTRA_DIST += gui/macosx/tests/VLCMacOSXTests-Info.plist
 

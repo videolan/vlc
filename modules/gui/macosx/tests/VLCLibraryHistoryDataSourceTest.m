@@ -23,6 +23,7 @@
 #import "VLCAppKitMockingTestCase.h"
 
 #import "extensions/NSString+Helpers.h"
+#import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryRepresentedItem.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
@@ -51,11 +52,11 @@ NSString *VLCLibrarySupplementaryElementViewIdentifier = @"VLCLibrarySupplementa
 // Keep selection and reload behavior deterministic without loading media nibs.
 @interface VLCLibraryHistoryDataSourceTestCollection : NSObject
 @property (weak) id dataSource;
+@property (strong) VLCLibraryCollectionViewFlowLayout *collectionViewLayout;
 @property (copy) NSSet<NSIndexPath *> *selectionIndexPaths;
 @property NSUInteger reloadCount;
 @end
 @implementation VLCLibraryHistoryDataSourceTestCollection
-- (id)collectionViewLayout { return nil; }
 - (void)reloadData { self.reloadCount++; }
 - (void)deselectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)paths
 {
@@ -140,6 +141,7 @@ NSString *VLCLibrarySupplementaryElementViewIdentifier = @"VLCLibrarySupplementa
 - (void)tearDown
 {
     [self.source disconnect];
+    [self.collection.collectionViewLayout resetLayout];
     self.source = nil;
     [super tearDown];
 }
@@ -280,6 +282,31 @@ NSString *VLCLibrarySupplementaryElementViewIdentifier = @"VLCLibrarySupplementa
     self.source.tableViewActive = NO;
     XCTAssertEqualObjects(self.collection.selectionIndexPaths,
                           [NSSet setWithObject:[NSIndexPath indexPathForItem:0 inSection:0]]);
+}
+
+- (void)testExpandedDetailFollowsMediaIDAfterReplayChangesDate
+{
+    // Use the real layout's expansion state without rendering the detail nib.
+    VLCLibraryCollectionViewFlowLayout * const layout = VLCLibraryCollectionViewFlowLayout.standardLayout;
+    self.collection.collectionViewLayout = layout;
+    VLCMediaLibraryMediaItem * const older = self.media[3];
+    [self selectCollectionItem:older];
+    NSIndexPath * const originalPath = self.collection.selectionIndexPaths.anyObject;
+    [layout expandDetailSectionAtIndex:originalPath];
+    XCTAssertEqualObjects(layout.selectedIndexPath, [NSIndexPath indexPathForItem:0 inSection:2]);
+
+    VLCLibraryHistoryDataSourceTestMedia * const replayed =
+        [self mediaWithID:older.libraryID
+                     type:older.mediaType
+                     date:[self.today dateByAddingTimeInterval:120]];
+    self.model.listOfHistoryMedia = @[self.media[0], self.media[1], self.media[2], replayed];
+    [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelHistoryMediaListReset object:self.model];
+
+    NSIndexPath * const newPath = [NSIndexPath indexPathForItem:0 inSection:0];
+    XCTAssertEqualObjects(self.collection.selectionIndexPaths, [NSSet setWithObject:newPath]);
+    XCTAssertEqualObjects(layout.selectedIndexPath, newPath);
+    XCTAssertEqual([self.source libraryItemAtIndexPath:newPath forCollectionView:(NSCollectionView *)self.collection],
+                   replayed);
 }
 
 - (void)testReloadDoesNotRestoreStaleHiddenTableSelection
