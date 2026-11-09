@@ -467,14 +467,18 @@ modules/gui/macosx/library/VLCLibraryMarkUnplayedButton.m
 modules/gui/macosx/library/VLCLibraryMenuController.m
 modules/gui/macosx/library/VLCLibraryModel.h
 modules/gui/macosx/library/VLCLibraryModel.m
+modules/gui/macosx/library/VLCLibrarySegment.m
 modules/gui/macosx/library/VLCLibrarySortingMenuController.h
 modules/gui/macosx/library/VLCLibrarySortingMenuController.m
 modules/gui/macosx/library/VLCLibraryTableCellView.h
 modules/gui/macosx/library/VLCLibraryTableCellView.m
+modules/gui/macosx/library/VLCLibraryTableViewDelegate.m
 modules/gui/macosx/library/audio-library/VLCLibraryAlbumTableCellView.h
 modules/gui/macosx/library/audio-library/VLCLibraryAlbumTableCellView.m
 modules/gui/macosx/library/audio-library/VLCLibraryAudioDataSource.h
 modules/gui/macosx/library/audio-library/VLCLibraryAudioDataSource.m
+modules/gui/macosx/library/history-library/VLCLibraryHistorySection.m
+modules/gui/macosx/library/history-library/VLCLibraryHistoryViewController.m
 modules/gui/macosx/library/home-library/VLCLibraryHomeViewSectionHeaderView.m
 modules/gui/macosx/library/media-source/VLCMediaSource.h
 modules/gui/macosx/library/media-source/VLCMediaSource.m
@@ -494,6 +498,7 @@ modules/gui/macosx/library/video-library/VLCLibraryVideoDataSource.h
 modules/gui/macosx/library/video-library/VLCLibraryVideoDataSource.m
 modules/gui/macosx/library/VLCLibraryWindow.h
 modules/gui/macosx/library/VLCLibraryWindow.m
+modules/gui/macosx/library/VLCLibraryWindowToolbarDelegate.m
 modules/gui/macosx/main/CompatibilityFixes.h
 modules/gui/macosx/main/CompatibilityFixes.m
 modules/gui/macosx/main/VLCApplication.h
