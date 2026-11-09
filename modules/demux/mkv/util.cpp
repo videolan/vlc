@@ -35,7 +35,7 @@ namespace mkv {
  *****************************************************************************/
 
 #ifdef HAVE_ZLIB
-int32_t zlib_decompress_extra( demux_t * p_demux, mkv_track_t & tk )
+int zlib_decompress_extra( demux_t * p_demux, mkv_track_t & tk )
 {
     int result;
     z_stream d_stream;

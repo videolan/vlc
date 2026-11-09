@@ -27,7 +27,7 @@
 namespace mkv {
 
 #ifdef HAVE_ZLIB_H
-int32_t zlib_decompress_extra( demux_t * p_demux, mkv_track_t & tk );
+int zlib_decompress_extra( demux_t * p_demux, mkv_track_t & tk );
 block_t *block_zlib_decompress( vlc_object_t *p_this, block_t *p_in_block );
 #endif
 bool lzo1x_decompress_extra( demux_t * p_demux, mkv_track_t & tk );
