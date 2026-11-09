@@ -2257,6 +2257,42 @@
     XCTAssertEqualObjects([self libraryIDsForItems:[self loadHistory]], self.expectedIDs);
 }
 
+- (void)testUnplayedMediaEventsDoNotReloadHistory
+{
+    NSArray<VLCMediaLibraryMediaItem *> * const before = [self loadHistory];
+    const NSUInteger queries = [self.model queryCountForGetter:@selector(cachedHistoryMedia)];
+    vlc_medialibrary_t * const library = VLCLibraryDataTypesIntegrationMediaLibrary();
+    vlc_ml_media_t * const stream = vlc_ml_new_stream(library, "https://example.invalid/unplayed-stream");
+    XCTAssertNotEqual(stream, (vlc_ml_media_t *)NULL);
+    const int64_t streamID = stream->i_id;
+    XCTAssertEqual(stream->i_last_played_date, (time_t)0);
+    const vlc_ml_event_t added = {
+        .i_type = VLC_ML_EVENT_MEDIA_ADDED,
+        .creation.p_media = stream,
+    };
+    [self.model handleMediaItemAddedEvent:&added];
+    vlc_ml_media_release(stream);
+
+    XCTAssertTrue(VLCLibraryDataTypesIntegrationRenameMedia(streamID, @"Unplayed stream title"));
+    const vlc_ml_event_t updated = {
+        .i_type = VLC_ML_EVENT_MEDIA_UPDATED,
+        .modification.i_entity_id = streamID,
+    };
+    [self.model handleMediaItemUpdateEvent:&updated];
+    XCTAssertEqual(vlc_ml_remove_stream(library, streamID), VLC_SUCCESS);
+    const vlc_ml_event_t deleted = {
+        .i_type = VLC_ML_EVENT_MEDIA_DELETED,
+        .deletion.i_entity_id = streamID,
+    };
+    [self.model handleMediaItemDeletionEvent:&deleted];
+
+    XCTestExpectation * const finished = [self expectationWithDescription:@"Unplayed media events processed"];
+    [self.model finishPendingQueriesWithCompletion:^{ [finished fulfill]; }];
+    [self waitForExpectations:@[ finished ] timeout:5.];
+    XCTAssertEqual([self.model queryCountForGetter:@selector(cachedHistoryMedia)], queries);
+    XCTAssertEqual(self.model.listOfHistoryMedia, before);
+}
+
 - (void)testHistoryRefreshesAfterNativeClear
 {
     [self observeNativeHistoryEvents];
