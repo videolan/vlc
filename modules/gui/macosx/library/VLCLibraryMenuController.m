@@ -29,6 +29,7 @@
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryAddToPlaylistMenuController.h"
 #import "library/VLCLibraryController.h"
+#import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryRepresentedItem.h"
 #import "library/VLCLibrarySegment.h"
 #import "library/VLCLibraryWindow.h"
@@ -261,24 +262,38 @@
             _renamePlaylistItem.hidden = playlist.readOnly;
         }
 
-        BOOL anyUnplayed = NO;
+        const BOOL isHistorySegment = segmentType == VLCLibraryHistorySegmentType;
+        NSArray<VLCMediaLibraryMediaItem *> *recentMedia = @[];
+        if (!isHistorySegment) {
+            VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
+            NSArray<VLCMediaLibraryMediaItem *> * const recentVideos = libraryModel.listOfRecentMedia ?: @[];
+            NSArray<VLCMediaLibraryMediaItem *> * const recentAudio = libraryModel.listOfRecentAudioMedia ?: @[];
+            recentMedia = [recentVideos arrayByAddingObjectsFromArray:recentAudio];
+        }
+
+        BOOL canMarkUnplayed = YES;
         BOOL allAudio = YES;
         BOOL allVideo = YES;
         for (VLCLibraryRepresentedItem * const item in self.representedItems) {
-            VLCMediaLibraryMediaItem *currentItem =
-                [item.item isKindOfClass:VLCMediaLibraryMediaItem.class]
-                ? (VLCMediaLibraryMediaItem *)item.item
-                : nil;
-            if (currentItem != nil && segmentType != VLCLibraryHistorySegmentType) {
-                // Favorites and playlist snapshots can outlive model playback updates.
-                currentItem = [VLCMediaLibraryMediaItem mediaItemForLibraryID:currentItem.libraryID];
-            }
-            if (currentItem.lastPlayedDate <= 0) {
-                anyUnplayed = YES;
+            if (![item.item isKindOfClass:VLCMediaLibraryMediaItem.class]) {
+                canMarkUnplayed = NO;
                 break;
             }
-            allAudio &= currentItem.mediaType == VLC_ML_MEDIA_TYPE_AUDIO;
-            allVideo &= currentItem.mediaType == VLC_ML_MEDIA_TYPE_VIDEO;
+            VLCMediaLibraryMediaItem * const mediaItem = (VLCMediaLibraryMediaItem *)item.item;
+            const BOOL played =
+                isHistorySegment
+                ? mediaItem.lastPlayedDate > 0
+                : [recentMedia indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMediaItem *recentItem,
+                                                               NSUInteger __unused index,
+                                                               BOOL * __unused stop) {
+                    return recentItem.libraryID == mediaItem.libraryID && recentItem.lastPlayedDate > 0;
+                }] != NSNotFound;
+            if (!played) {
+                canMarkUnplayed = NO;
+                break;
+            }
+            allAudio &= mediaItem.mediaType == VLC_ML_MEDIA_TYPE_AUDIO;
+            allVideo &= mediaItem.mediaType == VLC_ML_MEDIA_TYPE_VIDEO;
         }
         if (allAudio) {
             _markUnplayedItem.title = _NS("Mark as Unheard");
@@ -287,7 +302,7 @@
         } else {
             _markUnplayedItem.title = _NS("Mark as Unplayed");
         }
-        [self menuItems:_playedMediaItemRequiringMenuItems setHidden:anyUnplayed];
+        [self menuItems:_playedMediaItemRequiringMenuItems setHidden:!canMarkUnplayed];
         
         BOOL anyUnfavorited = NO;
         for (VLCLibraryRepresentedItem * const item in self.representedItems) {
