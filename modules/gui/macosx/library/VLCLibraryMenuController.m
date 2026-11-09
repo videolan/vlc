@@ -218,8 +218,8 @@
 
 - (void)updateMenuItems
 {
-    const BOOL isFavoritesSegment =
-        VLCMain.sharedInstance.libraryWindow.librarySegmentType == VLCLibraryFavoritesSegmentType;
+    const VLCLibrarySegmentType segmentType = VLCMain.sharedInstance.libraryWindow.librarySegmentType;
+    const BOOL isFavoritesSegment = segmentType == VLCLibraryFavoritesSegmentType;
 
     _removeFromPlaylistItem.hidden = YES;
     _renamePlaylistItem.hidden = YES;
@@ -265,11 +265,14 @@
         BOOL allAudio = YES;
         BOOL allVideo = YES;
         for (VLCLibraryRepresentedItem * const item in self.representedItems) {
-            // Refresh playback metadata because library rows can retain an older snapshot.
-            VLCMediaLibraryMediaItem * const currentItem =
+            VLCMediaLibraryMediaItem *currentItem =
                 [item.item isKindOfClass:VLCMediaLibraryMediaItem.class]
-                ? [VLCMediaLibraryMediaItem mediaItemForLibraryID:item.item.libraryID]
+                ? (VLCMediaLibraryMediaItem *)item.item
                 : nil;
+            if (currentItem != nil && segmentType != VLCLibraryHistorySegmentType) {
+                // Favorites and playlist snapshots can outlive model playback updates.
+                currentItem = [VLCMediaLibraryMediaItem mediaItemForLibraryID:currentItem.libraryID];
+            }
             if (currentItem.lastPlayedDate <= 0) {
                 anyUnplayed = YES;
                 break;
