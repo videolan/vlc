@@ -163,11 +163,17 @@
     NSAssert(tableView == nil || tableView.dataSource == self,
              @"Cannot reload a table view with a different data source");
 
+    VLCLibraryCollectionViewFlowLayout * const layout =
+        [collectionView.collectionViewLayout isKindOfClass:VLCLibraryCollectionViewFlowLayout.class]
+        ? (VLCLibraryCollectionViewFlowLayout *)collectionView.collectionViewLayout
+        : nil;
+    NSIndexPath * const expandedPath = layout.selectedIndexPath;
+    id<VLCMediaLibraryItemProtocol> const expandedItem = expandedPath != nil
+        ? [self libraryItemAtIndexPath:expandedPath forCollectionView:collectionView]
+        : nil;
     NSSet<NSNumber *> * const selectedIDs = [self selectedMediaIDs];
     [collectionView deselectItemsAtIndexPaths:collectionView.selectionIndexPaths];
-    if ([collectionView.collectionViewLayout isKindOfClass:VLCLibraryCollectionViewFlowLayout.class]) {
-        [(VLCLibraryCollectionViewFlowLayout *)collectionView.collectionViewLayout resetLayout];
-    }
+    [layout resetLayout];
 
     _calendar = NSCalendar.currentCalendar.copy;
     _now = NSDate.date;
@@ -186,6 +192,12 @@
     [collectionView reloadData];
     [tableView reloadData];
     [self restoreSelectionWithMediaIDs:selectedIDs];
+    if (!self.tableViewActive && expandedItem != nil) {
+        NSIndexPath * const restoredPath = [self indexPathForLibraryItem:expandedItem];
+        if (restoredPath != nil && [collectionView.selectionIndexPaths containsObject:restoredPath]) {
+            [layout expandDetailSectionAtIndex:restoredPath];
+        }
+    }
     if (self.dataChangedHandler != nil) {
         self.dataChangedHandler();
     }
