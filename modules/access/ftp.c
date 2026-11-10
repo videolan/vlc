@@ -1434,9 +1434,19 @@ static int ftp_StartStream( vlc_object_t *p_access, access_sys_t *p_sys,
     else
     {
         unsigned char a1, a2, a3, a4, p1, p2;
+        int fd = vlc_tls_GetFD( p_sys->cmd );
+        union {
+            struct sockaddr    sa;
+            struct sockaddr_in sin;
+        } su;
+        socklen_t salen = sizeof (su);
 
         if( sscanf( psz_parser, "(%hhu,%hhu,%hhu,%hhu,%hhu,%hhu",
-                    &a1, &a2, &a3, &a4, &p1, &p2 ) < 6 )
+                    &a1, &a2, &a3, &a4, &p1, &p2 ) < 6 ||
+            getsockname( fd, &su.sa, &salen ) < 0 ||
+            salen < sizeof (struct sockaddr_in) ||
+            su.sin.sin_family != AF_INET ||
+            su.sin.sin_addr.s_addr != htonl((a1<<24)|(a2<<16)|(a3<<8)|a4))
         {
             free( psz_arg );
             msg_Err( p_access, "cannot parse passive mode response" );
