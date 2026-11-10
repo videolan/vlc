@@ -1400,7 +1400,7 @@ static int Control( stream_t *p_access, int i_query, va_list args )
 static int ftp_StartStream( vlc_object_t *p_access, access_sys_t *p_sys,
                             uint64_t i_start, bool b_directory )
 {
-    char psz_ipv4[16], *psz_ip = p_sys->sz_epsv_ip;
+    char ipv4buf[16], *psz_ip = p_sys->sz_epsv_ip;
     int  i_answer;
     char *psz_arg, *psz_parser;
     int  i_port;
@@ -1433,19 +1433,19 @@ static int ftp_StartStream( vlc_object_t *p_access, access_sys_t *p_sys,
     }
     else
     {
-        unsigned a1, a2, a3, a4, p1, p2;
+        unsigned char a1, a2, a3, a4, p1, p2;
 
-        if( ( sscanf( psz_parser, "(%u,%u,%u,%u,%u,%u", &a1, &a2, &a3, &a4,
-                      &p1, &p2 ) < 6 ) || ( a1 > 255 ) || ( a2 > 255 )
-         || ( a3 > 255 ) || ( a4 > 255 ) || ( p1 > 255 ) || ( p2 > 255 ) )
+        if( sscanf( psz_parser, "(%hhu,%hhu,%hhu,%hhu,%hhu,%hhu",
+                    &a1, &a2, &a3, &a4, &p1, &p2 ) < 6 )
         {
             free( psz_arg );
             msg_Err( p_access, "cannot parse passive mode response" );
             return VLC_EGENERIC;
         }
 
-        snprintf( psz_ipv4, ARRAY_SIZE(psz_ipv4), "%u.%u.%u.%u", a1, a2, a3, a4 );
-        psz_ip = psz_ipv4;
+        snprintf( ipv4buf, sizeof (ipv4buf), "%hhu.%hhu.%hhu.%hhu",
+                  a1, a2, a3, a4 );
+        psz_ip = ipv4buf;
         i_port = (p1 << 8) | p2;
     }
     free( psz_arg );
