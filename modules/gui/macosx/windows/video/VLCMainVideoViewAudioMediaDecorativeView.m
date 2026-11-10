@@ -4,6 +4,7 @@
  * Copyright (C) 2023 VLC authors and VideoLAN
  *
  * Authors: Claudio Cambra <developer@claudiocambra.com>
+ *          Serhii Bykov <esphynox@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +22,7 @@
  *****************************************************************************/
 
 #import "VLCMainVideoViewAudioMediaDecorativeView.h"
+#import "VLCLyricEntry.h"
 
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSFont+VLCAdditions.h"
@@ -37,7 +39,7 @@
 
 @interface VLCMainVideoViewAudioMediaDecorativeView () <NSTableViewDataSource, NSTableViewDelegate>
 
-@property (readwrite) NSArray<NSDictionary<NSString *, id> *> *lyricsEntries;
+@property (readwrite) NSArray<VLCLyricEntry *> *lyricsEntries;
 @property (readwrite) NSInteger currentLyricIndex;
 
 @end
@@ -145,23 +147,7 @@
         return;
     }
 
-    NSMutableArray * const entries = [NSMutableArray array];
-    NSArray<NSString *> * const rawEntries = [syltData componentsSeparatedByString:@"\x1E"];
-    for (NSString * const rawEntry in rawEntries) {
-        if (rawEntry.length == 0) {
-            continue;
-        }
-        NSArray<NSString *> * const parts = [rawEntry componentsSeparatedByString:@"\x1F"];
-        if (parts.count >= 2) {
-            NSDictionary<NSString *, id> * const entry = @{
-                @"time": @([parts[0] longLongValue]),
-                @"text": parts[1]
-            };
-            [entries addObject:entry];
-        }
-    }
-
-    self.lyricsEntries = [entries copy];
+    self.lyricsEntries = [VLCLyricEntry entriesFromSYLTData:syltData];
     self.currentLyricIndex = -1;
     [self.lyricsTableView reloadData];
 
@@ -187,11 +173,11 @@
     // 1. Check if we are still on the same lyric (most frequent case)
     if (self.currentLyricIndex >= 0 && self.currentLyricIndex < lyricCount) {
         const long long startTime =
-            [self.lyricsEntries[self.currentLyricIndex][@"time"] longLongValue];
+            self.lyricsEntries[self.currentLyricIndex].timeMs;
         const BOOL isLast = (self.currentLyricIndex == lyricCount - 1);
         const long long nextStartTime = isLast
             ? LLONG_MAX
-            : [self.lyricsEntries[self.currentLyricIndex + 1][@"time"] longLongValue];
+            : self.lyricsEntries[self.currentLyricIndex + 1].timeMs;
 
         if (currentTimeMs >= startTime && currentTimeMs < nextStartTime) {
             return;
@@ -203,7 +189,7 @@
             const BOOL isNextLast = (nextIndex == lyricCount - 1);
             const long long nextNextStartTime = isNextLast
                 ? LLONG_MAX
-                : [self.lyricsEntries[nextIndex + 1][@"time"] longLongValue];
+                : self.lyricsEntries[nextIndex + 1].timeMs;
 
             if (currentTimeMs < nextNextStartTime) {
                 [self updateToLyricIndex:nextIndex];
@@ -215,7 +201,7 @@
     // 3. Fallback to search (for seeks, jumps, or initial playback)
     NSInteger foundIndex = -1;
     for (NSInteger i = 0; i < lyricCount; i++) {
-        if ([self.lyricsEntries[i][@"time"] longLongValue] <= currentTimeMs) {
+        if (self.lyricsEntries[i].timeMs <= currentTimeMs) {
             foundIndex = i;
         } else {
             break;
@@ -271,7 +257,7 @@
         return cellView;
     }
 
-    NSString * const text = self.lyricsEntries[row][@"text"];
+    NSString * const text = self.lyricsEntries[row].text;
     cellView.textField.stringValue = text;
 
     if (row == self.currentLyricIndex) {
@@ -297,7 +283,7 @@
         return;
     }
 
-    const long long lyricTimeMs = [self.lyricsEntries[clickedRow][@"time"] longLongValue];
+    const long long lyricTimeMs = self.lyricsEntries[clickedRow].timeMs;
     const vlc_tick_t vlcTime = VLC_TICK_FROM_MS(lyricTimeMs);
 
     VLCPlayerController * const playerController =

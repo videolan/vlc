@@ -587,6 +587,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/windows/video/VLCAspectRatioRetainingVideoWindow.m \
 	gui/macosx/windows/video/VLCFullVideoViewWindow.h \
 	gui/macosx/windows/video/VLCFullVideoViewWindow.m \
+	gui/macosx/windows/video/VLCLyricEntry.h \
+	gui/macosx/windows/video/VLCLyricEntry.m \
 	gui/macosx/windows/video/VLCMainVideoViewAudioMediaDecorativeView.h \
 	gui/macosx/windows/video/VLCMainVideoViewAudioMediaDecorativeView.m \
 	gui/macosx/windows/video/VLCMainVideoViewController.h \

@@ -34,6 +34,7 @@ VLCMacOSXTests_SOURCES = \
 	gui/macosx/tests/VLCLibraryHomeVideoDataSourceTest.m \
 	gui/macosx/tests/VLCLibraryHomeTestSupport.m \
 	gui/macosx/tests/VLCLogMessageTest.m \
+	gui/macosx/tests/VLCLyricEntryTest.m \
 	gui/macosx/tests/VLCMacOSXTestDefaults.m \
 	gui/macosx/tests/VLCPositionFormatterTest.m \
 	gui/macosx/tests/VLCTimeFormatterTest.m \
@@ -73,6 +74,7 @@ VLCMacOSXTests_SOURCES = \
 	gui/macosx/library/VLCLibraryModelChangeDelegate.m \
 	gui/macosx/library/VLCMediaLibraryFolderObserver.m \
 	gui/macosx/windows/logging/VLCLogMessage.m \
+	gui/macosx/windows/video/VLCLyricEntry.m \
 	gui/macosx/views/VLCCarouselView.m \
 	gui/macosx/views/VLCImageView.m \
 	gui/macosx/views/VLCSpacingConstraint.m \
