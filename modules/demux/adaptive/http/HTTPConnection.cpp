@@ -31,6 +31,7 @@
 #include <vlc_keystore.h>
 
 #include <new>
+#include <cstdlib>
 
 extern "C"
 {
