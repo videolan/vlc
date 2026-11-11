@@ -50,9 +50,8 @@
                                                 <rect key="frame" x="11" y="1" width="741" height="16"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Wdd-df-zUi">
-                                                        <rect key="frame" x="0.0" y="0.0" width="96" height="16"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                    <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="Wdd-df-zUi">
+                                                        <rect key="frame" x="0.0" y="0.0" width="741" height="16"/>
                                                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="deP-dG-o27">
                                                             <font key="font" metaFont="message"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -60,6 +59,11 @@
                                                         </textFieldCell>
                                                     </textField>
                                                 </subviews>
+                                                <constraints>
+                                                    <constraint firstItem="Wdd-df-zUi" firstAttribute="leading" secondItem="ZTp-fs-5fE" secondAttribute="leading" id="title-leading"/>
+                                                    <constraint firstAttribute="trailing" secondItem="Wdd-df-zUi" secondAttribute="trailing" id="title-trailing"/>
+                                                    <constraint firstItem="Wdd-df-zUi" firstAttribute="centerY" secondItem="ZTp-fs-5fE" secondAttribute="centerY" id="title-center-y"/>
+                                                </constraints>
                                                 <connections>
                                                     <outlet property="textField" destination="Wdd-df-zUi" id="61g-Ze-nvR"/>
                                                 </connections>
