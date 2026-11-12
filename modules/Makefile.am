@@ -32,7 +32,7 @@ RUSTFLAGS += --cfg vlc_static_plugins
 endif
 
 LIBTOOL_CARGO = \
-	TARGET_CC=$(CC) TARGET_AR=$(AR) \
+	TARGET_CC="$(CC)" TARGET_AR="$(AR)" \
 	TARGET_CFLAGS="$(CFLAGS)" \
 	RUSTTARGET="@RUST_TARGET@" \
 	RUSTFLAGS="${RUSTFLAGS}" \
