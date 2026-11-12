@@ -65,8 +65,6 @@ qt: qtbase-everywhere-src-$(QTBASE_VERSION_FULL).tar.xz .sum-qt
 
 ifdef HAVE_WIN32
 QTBASE_CONFIG += -DFEATURE_directwrite=ON -DFEATURE_directwrite3=ON
-else
-QTBASE_CONFIG += -DFEATURE_freetype=ON -DFEATURE_system_freetype=ON
 endif
 
 QTBASE_CONFIG += -DFEATURE_framework=OFF
@@ -104,7 +102,7 @@ QTBASE_CONFIG += -DFEATURE_ltcg=ON
 endif
 
 QTBASE_CONFIG += $(QTBASE_COMMON_CONFIG) \
-    -DFEATURE_gif=OFF \
+    -DFEATURE_gif=OFF -DFEATURE_freetype=ON -DFEATURE_system_freetype=ON \
 	-DFEATURE_harfbuzz=ON -DFEATURE_system_harfbuzz=ON -DFEATURE_jpeg=ON -DFEATURE_system_jpeg=ON \
 	-DFEATURE_png=ON -DFEATURE_system_png=ON -DFEATURE_zlib=ON -DFEATURE_system_zlib=ON \
 	-DFEATURE_movie=OFF -DFEATURE_whatsthis=OFF -DFEATURE_lcdnumber=OFF -DFEATURE_testlib=ON \
