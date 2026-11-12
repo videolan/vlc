@@ -457,6 +457,11 @@ static int vlc_UrlParseInner(vlc_url_t *restrict url, const char *str)
     if (next != NULL)
     {
         *(next++) = '\0';
+        if (!vlc_uri_component_validate(next, ":@/?"))
+        {
+            errno = EINVAL;
+            return -1;
+        }
         url->psz_option = next;
     }
 
