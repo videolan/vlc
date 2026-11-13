@@ -60,7 +60,7 @@ static void CloseDecoder(vlc_object_t *);
 vlc_module_begin ()
     set_shortname("dav1d")
     set_description(N_("Dav1d video decoder"))
-    set_capability("video decoder", 10000)
+    set_capability("video decoder", 200)
     set_callbacks(OpenDecoder, CloseDecoder)
     set_subcategory(SUBCAT_INPUT_VCODEC)
 
