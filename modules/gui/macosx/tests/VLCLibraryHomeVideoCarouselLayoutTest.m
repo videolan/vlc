@@ -264,15 +264,19 @@ static const CGFloat VLCHomeLayoutTestHeroWidth = 656.;
     XCTAssertTrue(_container.leftButton.hidden);
 }
 
-- (void)testHeroWithoutRecentVideosScrollsToBothEdgesInANarrowWindow
+- (void)assertHeroOnlyNavigationWithContentInsets:(NSEdgeInsets)insets
 {
     _itemCount = 0;
     [_window setContentSize:NSMakeSize(520., 450.)];
+    _container.scrollView.automaticallyAdjustsContentInsets = NO;
+    _container.scrollView.contentInsets = insets;
     [self configureTwoRowsWithHero:YES];
+    [_container.scrollView.contentView scrollToPoint:NSMakePoint(-insets.left, 0.)];
+    [_container.scrollView reflectScrolledClipView:_container.scrollView.contentView];
     [self disableNavigationAnimation];
     const CGFloat maximumOffset = NSMaxX(_container.collectionView.frame) -
-        NSWidth(_container.scrollView.documentVisibleRect);
-    XCTAssertGreaterThan(maximumOffset, 0.);
+        NSWidth(_container.scrollView.documentVisibleRect) + insets.right;
+    XCTAssertGreaterThan(maximumOffset, -insets.left);
     XCTAssertTrue(_container.leftButton.hidden);
     XCTAssertFalse(_container.rightButton.hidden);
 
@@ -281,9 +285,19 @@ static const CGFloat VLCHomeLayoutTestHeroWidth = 656.;
     XCTAssertFalse(_container.leftButton.hidden);
     XCTAssertTrue(_container.rightButton.hidden);
     [_container.collectionView scrollByOneItemForward:NO];
-    XCTAssertEqualWithAccuracy(NSMinX(_container.scrollView.documentVisibleRect), 0., .01);
+    XCTAssertEqualWithAccuracy(NSMinX(_container.scrollView.documentVisibleRect), -insets.left, .01);
     XCTAssertTrue(_container.leftButton.hidden);
     XCTAssertFalse(_container.rightButton.hidden);
+}
+
+- (void)testHeroWithoutRecentVideosScrollsToBothEdgesInANarrowWindow
+{
+    [self assertHeroOnlyNavigationWithContentInsets:NSEdgeInsetsMake(0., 0., 0., 0.)];
+}
+
+- (void)testHeroWithoutRecentVideosScrollsToBothEdgesWithHorizontalInsets
+{
+    [self assertHeroOnlyNavigationWithContentInsets:NSEdgeInsetsMake(0., 120., 0., 60.)];
 }
 
 @end

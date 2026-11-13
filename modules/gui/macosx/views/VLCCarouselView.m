@@ -117,12 +117,10 @@ static const CGFloat VLCCarouselScrollPositionTolerance = 1.;
         [self scrollToHorizontalOffset:targetOffset
                               animated:YES
                               duration:VLCCarouselItemScrollDuration];
-    } else {
+    } else if ([self canScrollInDirection:forward]) {
         // Supplementary views may extend beyond the first or last item, or be
         // the only content when there are no recent videos.
-        const CGFloat edgeOffset = forward
-            ? NSMaxX(self.frame) - NSWidth(scrollView.documentVisibleRect)
-            : NSMinX(self.frame);
+        const CGFloat edgeOffset = [self horizontalOffsetBeyondEdgeInScrollView:scrollView forward:forward];
         [self scrollToHorizontalOffset:edgeOffset
                               animated:YES
                               duration:VLCCarouselItemScrollDuration];
@@ -298,17 +296,6 @@ static const CGFloat VLCCarouselScrollPositionTolerance = 1.;
         return NO;
     }
 
-    BOOL hasItems = NO;
-    for (NSInteger section = 0; section < self.numberOfSections; ++section) {
-        if ([self numberOfItemsInSection:section] > 0) {
-            hasItems = YES;
-            break;
-        }
-    }
-    if (!hasItems) {
-        return NO;
-    }
-
     NSClipView * const clipView = scrollView.contentView;
     const NSRect bounds = clipView.bounds;
     if (NSWidth(bounds) <= 0.) {
@@ -316,11 +303,38 @@ static const CGFloat VLCCarouselScrollPositionTolerance = 1.;
     }
 
     NSRect proposedBounds = bounds;
-    proposedBounds.origin.x = forward ? NSMaxX(self.frame) + fabs(scrollView.contentInsets.right) :
-                                       NSMinX(self.frame) - NSWidth(bounds) - fabs(scrollView.contentInsets.left);
+    proposedBounds.origin.x = [self horizontalOffsetBeyondEdgeInScrollView:scrollView forward:forward];
     const CGFloat endpoint = NSMinX([clipView constrainBoundsRect:proposedBounds]);
     const CGFloat distance = forward ? endpoint - NSMinX(bounds) : NSMinX(bounds) - endpoint;
-    return distance > VLCCarouselScrollPositionTolerance;
+    return distance > VLCCarouselScrollPositionTolerance && [self hasItemsOrSupplementaryViews];
+}
+
+- (CGFloat)horizontalOffsetBeyondEdgeInScrollView:(NSScrollView *)scrollView
+                                          forward:(BOOL)forward
+{
+    return forward
+        ? NSMaxX(self.frame) + fabs(scrollView.contentInsets.right)
+        : NSMinX(self.frame) - NSWidth(scrollView.contentView.bounds) - fabs(scrollView.contentInsets.left);
+}
+
+- (BOOL)hasItemsOrSupplementaryViews
+{
+    for (NSInteger section = 0; section < self.numberOfSections; ++section) {
+        if ([self numberOfItemsInSection:section] > 0) {
+            return YES;
+        }
+    }
+
+    NSArray<NSCollectionViewLayoutAttributes *> * const attributes =
+        [self.collectionViewLayout layoutAttributesForElementsInRect:self.bounds];
+    for (NSCollectionViewLayoutAttributes * const element in attributes) {
+        if (element.representedElementCategory == NSCollectionElementCategorySupplementaryView &&
+            !element.hidden &&
+            !NSIsEmptyRect(element.frame)) {
+            return YES;
+        }
+    }
+    return NO;
 }
 
 - (void)scrollByHorizontalDelta:(CGFloat)delta
