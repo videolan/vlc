@@ -24,6 +24,7 @@ import VLC.MainInterface
 import VLC.Style
 import VLC.Widgets as Widgets
 import VLC.PlayerControls
+import VLC.Player
 
 FocusScope {
     id: playerControlLayout
