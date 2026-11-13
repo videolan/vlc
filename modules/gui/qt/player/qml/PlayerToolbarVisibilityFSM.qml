@@ -19,6 +19,7 @@ import QtQuick
 
 import VLC.MainInterface
 import VLC.Util
+import VLC.Player
 
 /**
  * player toolbars visibility state machine
