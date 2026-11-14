@@ -514,6 +514,28 @@ int SetupVideoES( demux_t *p_demux, const mp4_track_t *p_track, const MP4_Box_t 
         }
     }
 
+    const MP4_Box_t *p_SmDm = MP4_BoxGet( p_sample, "SmDm" );
+    if( !p_SmDm )
+        p_SmDm = MP4_BoxGet( p_sample, "mdcv" );
+    if( p_SmDm && BOXDATA(p_SmDm) )
+    {
+        memcpy( p_fmt->video.mastering.primaries,
+                BOXDATA(p_SmDm)->primaries, sizeof(p_fmt->video.mastering.primaries) );
+        memcpy( p_fmt->video.mastering.white_point,
+                BOXDATA(p_SmDm)->white_point, sizeof(p_fmt->video.mastering.white_point) );
+        p_fmt->video.mastering.max_luminance = BOXDATA(p_SmDm)->i_luminanceMax;
+        p_fmt->video.mastering.min_luminance = BOXDATA(p_SmDm)->i_luminanceMin;
+    }
+
+    const MP4_Box_t *p_CoLL = MP4_BoxGet( p_sample, "CoLL" );
+    if( !p_CoLL )
+        p_CoLL = MP4_BoxGet( p_sample, "clli" );
+    if( p_CoLL && BOXDATA(p_CoLL) )
+    {
+        p_fmt->video.lighting.MaxCLL = BOXDATA(p_CoLL)->i_maxCLL;
+        p_fmt->video.lighting.MaxFALL = BOXDATA(p_CoLL)->i_maxFALL;
+    }
+
     const MP4_Box_t *p_dvcC = MP4_BoxGet( p_sample, "dvcC" );
     if( !p_dvcC )
         p_dvcC = MP4_BoxGet( p_sample, "dvvC" );
@@ -762,28 +784,6 @@ int SetupVideoES( demux_t *p_demux, const mp4_track_t *p_track, const MP4_Box_t 
                 CopyExtradata( p_data->p_codec_init_data,
                                p_data->i_codec_init_datasize,
                                p_fmt );
-
-                const MP4_Box_t *p_SmDm = MP4_BoxGet( p_sample, "SmDm" );
-                if( !p_SmDm )
-                    p_SmDm = MP4_BoxGet( p_sample, "mdcv" );
-                if( p_SmDm && BOXDATA(p_SmDm) )
-                {
-                    memcpy( p_fmt->video.mastering.primaries,
-                            BOXDATA(p_SmDm)->primaries, sizeof(p_fmt->video.mastering.primaries) );
-                    memcpy( p_fmt->video.mastering.white_point,
-                            BOXDATA(p_SmDm)->white_point, sizeof(p_fmt->video.mastering.white_point) );
-                    p_fmt->video.mastering.max_luminance = BOXDATA(p_SmDm)->i_luminanceMax;
-                    p_fmt->video.mastering.min_luminance = BOXDATA(p_SmDm)->i_luminanceMin;
-                }
-
-                const MP4_Box_t *p_CoLL = MP4_BoxGet( p_sample, "CoLL" );
-                if( !p_CoLL )
-                    p_CoLL = MP4_BoxGet( p_sample, "clli" );
-                if( p_CoLL && BOXDATA(p_CoLL) )
-                {
-                    p_fmt->video.lighting.MaxCLL = BOXDATA(p_CoLL)->i_maxCLL;
-                    p_fmt->video.lighting.MaxFALL = BOXDATA(p_CoLL)->i_maxFALL;
-                }
             }
         }
         break;
