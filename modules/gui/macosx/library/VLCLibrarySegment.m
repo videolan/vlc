@@ -552,6 +552,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
     self = [super initWithSegmentType:VLCLibraryMusicSegmentType];
     if (self) {
         self.internalDisplayString = _NS("Music");
+        self.internalSearchFieldPlaceholder = _NS("Search your music");
         if (@available(macOS 11.0, *)) {
             self.internalDisplayImage = [NSImage imageWithSystemSymbolName:@"music.note"
                                                   accessibilityDescription:@"Music icon"];

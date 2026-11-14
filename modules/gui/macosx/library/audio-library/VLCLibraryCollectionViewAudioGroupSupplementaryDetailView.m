@@ -47,12 +47,11 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAudioGrou
 - (void)awakeFromNib
 {
     _audioGroupAlbumsDataSource = [[VLCLibraryAudioGroupDataSource alloc] init];
-    _audioGroupAlbumsDataSource.tableViews = @[_audioGroupAlbumsTableView];
-
     _audioGroupAlbumsTableViewDelegate = [[VLCLibraryAudioGroupTableViewDelegate alloc] init];
 
     _audioGroupAlbumsTableView.dataSource = _audioGroupAlbumsDataSource;
     _audioGroupAlbumsTableView.delegate = _audioGroupAlbumsTableViewDelegate;
+    _audioGroupAlbumsDataSource.tableViews = @[_audioGroupAlbumsTableView];
 
     _audioGroupNameTextField.font = NSFont.VLCLibrarySubsectionHeaderFont;
 

@@ -391,6 +391,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibrarySectionedTableViewDelegate.m \
 	gui/macosx/library/search-library/VLCLibrarySearchDataSource.h \
 	gui/macosx/library/search-library/VLCLibrarySearchDataSource.m \
+	gui/macosx/library/search-library/VLCLibrarySearchOverviewController.h \
+	gui/macosx/library/search-library/VLCLibrarySearchOverviewController.m \
 	gui/macosx/library/search-library/VLCLibrarySearchProvider.h \
 	gui/macosx/library/search-library/VLCLibrarySearchProvider.m \
 	gui/macosx/library/search-library/VLCLibrarySearchViewController.h \

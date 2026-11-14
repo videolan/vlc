@@ -20,11 +20,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "library/VLCLibraryAbstractMediaLibrarySegmentViewController.h"
+#import "library/search-library/VLCLibrarySearchOverviewController.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryMusicViewController : VLCLibraryAbstractMediaLibrarySegmentViewController
+@interface VLCLibraryMusicViewController : VLCLibrarySearchOverviewController
 
 - (void)presentMusicView;
 

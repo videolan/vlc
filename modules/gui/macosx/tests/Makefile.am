@@ -78,6 +78,7 @@ VLCMacOSXTests_SOURCES = \
 	gui/macosx/library/home-library/VLCLibraryHomeViewVideoCarouselContainerView.m \
 	gui/macosx/library/media-source/VLCMediaSourceTableViewSorting.m \
 	gui/macosx/library/VLCLibraryMarkUnplayedButton.m \
+	gui/macosx/library/search-library/VLCLibrarySearchProvider.m \
 	gui/macosx/library/VLCLibraryModel.m \
 	gui/macosx/library/VLCLibraryModelChangeDelegate.m \
 	gui/macosx/library/VLCLibraryTableCellView.m \

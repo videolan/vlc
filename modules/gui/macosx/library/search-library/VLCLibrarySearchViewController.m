@@ -58,7 +58,7 @@
 @property (readwrite) VLCLibraryCollectionViewFlowLayout *collectionViewLayout;
 @property (readwrite) VLCLibrarySectionedTableViewDelegate *tableViewDelegate;
 @property (readwrite) NSArray<NSLayoutConstraint *> *internalPlaceholderImageViewSizeConstraints;
-@property (readwrite, nullable) NSView *presentationContainer;
+@property (readwrite, weak, nullable) NSView *presentationContainer;
 @property (readwrite, copy, nullable) NSString *currentQuery;
 @property (readwrite) NSView *backgroundView;
 @property (readwrite, nullable) NSTimer *searchDebounceTimer;
@@ -69,9 +69,16 @@
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
 {
+    return [self initWithLibraryWindow:libraryWindow
+                             providers:VLCLibrarySearchProvider.defaultProviders];
+}
+
+- (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
+                            providers:(NSArray<VLCLibrarySearchProvider *> *)providers
+{
     self = [super initWithLibraryWindow:libraryWindow];
     if (self) {
-        _dataSource = [[VLCLibrarySearchDataSource alloc] init];
+        _dataSource = [[VLCLibrarySearchDataSource alloc] initWithProviders:providers];
         self.dataSource.viewMode = VLCLibrarySmallestSentinelViewModeSegment;
 
         [self setupBackgroundView];
@@ -275,10 +282,10 @@
             [self.tableViewScrollView applyConstraintsToFillSuperview];
         }
         self.dataSource.viewMode = viewMode;
-        [self updatePresentationForQuery:self.currentQuery ?: @""];
     }
 
     self.presentationContainer = container;
+    [self updatePresentationForQuery:self.currentQuery ?: @""];
 }
 
 - (void)dismissFromContainer
@@ -290,9 +297,8 @@
     [self.collectionViewScrollView removeFromSuperview];
     [self.tableViewScrollView removeFromSuperview];
     [self.statusLabel removeFromSuperview];
-    [self.searchDebounceTimer invalidate];
-    self.searchDebounceTimer = nil;
     self.presentationContainer = nil;
+    [self clearSearch];
 }
 
 - (void)updatePresentationForQuery:(NSString *)query
@@ -333,6 +339,9 @@
     NSParameterAssert(searchString);
     if (searchString.length == 0) {
         [self clearSearch];
+        return;
+    }
+    if ([searchString isEqualToString:self.currentQuery]) {
         return;
     }
 

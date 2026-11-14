@@ -29,6 +29,8 @@
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/audio-library/VLCLibraryMusicCarouselContainerView.h"
+#import "library/search-library/VLCLibrarySearchProvider.h"
+#import "library/search-library/VLCLibrarySearchViewController.h"
 
 #import "views/VLCUIUnits.h"
 
@@ -201,7 +203,13 @@
     if (!self.connected && !self.libraryWindow.embeddedVideoPlaybackActive) {
         [self connect];
     }
-    [self updatePresentedView];
+    [self presentOverview];
+}
+
+- (VLCLibrarySearchViewController *)newSearchViewController
+{
+    return [[VLCLibrarySearchViewController alloc] initWithLibraryWindow:self.libraryWindow
+                                                               providers:VLCLibrarySearchProvider.audioProviders];
 }
 
 - (void)connect
@@ -222,12 +230,14 @@
 
 - (void)carouselItemsChanged:(NSNotification *)notification
 {
-    if (self.libraryWindow.librarySegmentViewController == self && !self.libraryWindow.embeddedVideoPlaybackActive) {
-        [self updatePresentedView];
+    if (self.libraryWindow.librarySegmentViewController == self &&
+        !self.libraryWindow.embeddedVideoPlaybackActive &&
+        !self.isShowingSearchOverlay) {
+        [self presentOverviewContent];
     }
 }
 
-- (void)updatePresentedView
+- (void)presentOverviewContent
 {
     BOOL showPlaceholder = YES;
     for (VLCLibraryMusicCarouselContainerView * const carousel in _carousels) {

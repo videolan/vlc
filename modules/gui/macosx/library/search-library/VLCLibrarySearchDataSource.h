@@ -28,6 +28,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCLibrarySearchProvider;
+
 extern NSString * const VLCLibrarySearchDataSourceDidReloadNotification;
 
 @interface VLCLibrarySearchDataSource : NSObject <VLCLibraryCollectionViewDataSource, VLCLibrarySectionedTableViewDataSource>
@@ -36,6 +38,8 @@ extern NSString * const VLCLibrarySearchDataSourceDidReloadNotification;
 @property (readwrite, weak) NSTableView *tableView;
 @property (readwrite, nonatomic) VLCLibraryViewModeSegment viewMode;
 @property (readonly) BOOL searching;
+
+- (instancetype)initWithProviders:(NSArray<VLCLibrarySearchProvider *> *)providers;
 
 - (void)searchForString:(NSString *)string;
 - (void)clearSearch;

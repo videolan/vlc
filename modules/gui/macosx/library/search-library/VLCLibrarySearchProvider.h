@@ -45,6 +45,7 @@ typedef NSArray<id<VLCMediaLibraryItemProtocol>> * _Nonnull
                           fetchBlock:(VLCLibrarySearchProviderFetchBlock)fetchBlock;
 
 + (NSArray<VLCLibrarySearchProvider *> *)defaultProviders;
++ (NSArray<VLCLibrarySearchProvider *> *)audioProviders;
 
 - (void)searchForString:(NSString *)string;
 - (void)clearSearch;

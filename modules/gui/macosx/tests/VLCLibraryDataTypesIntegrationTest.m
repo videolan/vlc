@@ -17,6 +17,7 @@
 
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryDataTypes.h"
+#import "library/search-library/VLCLibrarySearchProvider.h"
 #import "tests/VLCLibraryDataTypesIntegrationTestSupport.h"
 #import "tests/VLCLibraryDataTypesTestSupport.h"
 #import "tests/VLCInputItemTestSupport.h"
@@ -197,6 +198,90 @@
 {
     VLCLibraryDataTypesTestResetTrashState();
     [super tearDown];
+}
+
+- (NSArray<id<VLCMediaLibraryItemProtocol>> *)searchResultsFromProviders:(NSArray<VLCLibrarySearchProvider *> *)providers
+                                                                 pattern:(NSString *)pattern
+{
+    NSMutableArray<XCTestExpectation *> * const expectations = [NSMutableArray arrayWithCapacity:providers.count];
+    for (VLCLibrarySearchProvider * const provider in providers) {
+        XCTestExpectation * const expectation = [self expectationForNotification:VLCLibrarySearchProviderResultsUpdated
+                                                                          object:provider
+                                                                         handler:nil];
+        [expectations addObject:expectation];
+        [provider searchForString:pattern];
+    }
+    [self waitForExpectations:expectations timeout:5.];
+
+    NSMutableArray<id<VLCMediaLibraryItemProtocol>> * const results = [NSMutableArray array];
+    for (VLCLibrarySearchProvider * const provider in providers) {
+        [results addObjectsFromArray:provider.results];
+    }
+    return results.copy;
+}
+
+- (int64_t)createSearchPlaylistWithName:(NSString *)name
+                               mediaIDs:(const int64_t *)mediaIDs
+                                  count:(size_t)count
+{
+    vlc_medialibrary_t * const library = VLCLibraryDataTypesIntegrationMediaLibrary();
+    vlc_ml_playlist_t * const playlist = vlc_ml_playlist_create(library, name.UTF8String);
+    if (playlist == NULL) {
+        return 0;
+    }
+    const int64_t playlistID = playlist->i_id;
+    vlc_ml_playlist_release(playlist);
+    [self addTeardownBlock:^{
+        vlc_ml_playlist_delete(library, playlistID);
+    }];
+    return vlc_ml_playlist_append(library, playlistID, mediaIDs, count) == VLC_SUCCESS ? playlistID : 0;
+}
+
+- (void)testAudioSearchExcludesVideoAndMixedPlaylists
+{
+    const int64_t audioID = self.factoryAudioTrack.libraryID;
+    const int64_t videoID = self.factoryVideoEpisode.libraryID;
+    const int64_t mixedItems[] = {audioID, videoID};
+    const int64_t audioPlaylistID = [self createSearchPlaylistWithName:@"Factory Audio Playlist"
+                                                              mediaIDs:&audioID
+                                                                 count:1];
+    const int64_t mixedPlaylistID = [self createSearchPlaylistWithName:@"Factory Mixed Playlist"
+                                                              mediaIDs:mixedItems
+                                                                 count:ARRAY_SIZE(mixedItems)];
+    XCTAssertGreaterThan(audioPlaylistID, (int64_t)0);
+    XCTAssertGreaterThan(mixedPlaylistID, (int64_t)0);
+
+    NSArray<id<VLCMediaLibraryItemProtocol>> * const audioResults =
+        [self searchResultsFromProviders:VLCLibrarySearchProvider.audioProviders pattern:@"Factory"];
+    NSSet<NSString *> * const audioTitles = [NSSet setWithArray:[audioResults valueForKey:@"displayString"]];
+    XCTAssertTrue([audioTitles containsObject:@"Factory Track"]);
+    XCTAssertTrue([audioTitles containsObject:@"Factory Album"]);
+    XCTAssertTrue([audioTitles containsObject:@"Factory Artist"]);
+    XCTAssertTrue([audioTitles containsObject:@"Factory Audio Playlist"]);
+    XCTAssertFalse([audioTitles containsObject:@"Factory Mixed Playlist"]);
+    for (id<VLCMediaLibraryItemProtocol> const item in audioResults) {
+        XCTAssertFalse([item isKindOfClass:VLCMediaLibraryGroup.class]);
+        if ([item isKindOfClass:VLCMediaLibraryMediaItem.class]) {
+            XCTAssertEqual(((VLCMediaLibraryMediaItem *)item).mediaType, VLC_ML_MEDIA_TYPE_AUDIO);
+        }
+    }
+
+    NSArray<id<VLCMediaLibraryItemProtocol>> * const genreResults =
+        [self searchResultsFromProviders:VLCLibrarySearchProvider.audioProviders pattern:@"Rock"];
+    XCTAssertTrue([[genreResults valueForKey:@"displayString"] containsObject:@"Rock"]);
+
+    NSArray<id<VLCMediaLibraryItemProtocol>> * const defaultResults =
+        [self searchResultsFromProviders:VLCLibrarySearchProvider.defaultProviders pattern:@"Factory"];
+    XCTAssertTrue([[defaultResults valueForKey:@"displayString"] containsObject:@"Factory Mixed Playlist"]);
+    const NSUInteger videoIndex = [defaultResults indexOfObjectPassingTest:^BOOL(
+        id<VLCMediaLibraryItemProtocol> item,
+        NSUInteger __unused index,
+        BOOL * __unused stop
+    ) {
+        return [item isKindOfClass:VLCMediaLibraryMediaItem.class] &&
+               ((VLCMediaLibraryMediaItem *)item).mediaType == VLC_ML_MEDIA_TYPE_VIDEO;
+    }];
+    XCTAssertNotEqual(videoIndex, NSNotFound);
 }
 
 - (void)testMediaItemFactoryResolvesPersistedExternalMedia

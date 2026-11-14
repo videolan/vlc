@@ -86,7 +86,8 @@ NSString * const VLCLibrarySearchDataSourceDidReloadNotification = @"VLCLibraryS
     NSArray<VLCLibrarySearchFlattenedRow *> *_flattenedRows;
     NSMutableDictionary<NSString *, VLCMediaLibraryDummyItem *> *_cachedProviderParentItems;
     NSUInteger _pendingProviderCount;
-    dispatch_queue_t _rebuildQueue;
+    BOOL _clearingSearch;
+    BOOL _connected;
 }
 @end
 
@@ -94,13 +95,17 @@ NSString * const VLCLibrarySearchDataSourceDidReloadNotification = @"VLCLibraryS
 
 - (instancetype)init
 {
+    return [self initWithProviders:[VLCLibrarySearchProvider defaultProviders]];
+}
+
+- (instancetype)initWithProviders:(NSArray<VLCLibrarySearchProvider *> *)providers
+{
     self = [super init];
     if (self) {
-        _providers = [VLCLibrarySearchProvider defaultProviders];
+        _providers = providers.copy;
         _visibleProviderIndices = @[];
         _flattenedRows = @[];
         _cachedProviderParentItems = [NSMutableDictionary dictionary];
-        _rebuildQueue = dispatch_queue_create("searchDataSourceQueue", DISPATCH_QUEUE_SERIAL);
         [self connect];
     }
     return self;
@@ -108,75 +113,36 @@ NSString * const VLCLibrarySearchDataSourceDidReloadNotification = @"VLCLibraryS
 
 - (void)connect
 {
-    [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(providerResultsUpdated:)
-                                               name:VLCLibrarySearchProviderResultsUpdated
-                                             object:nil];
+    if (_connected) {
+        return;
+    }
+    _connected = YES;
+    for (VLCLibrarySearchProvider * const provider in _providers) {
+        [NSNotificationCenter.defaultCenter addObserver:self
+                                               selector:@selector(providerResultsUpdated:)
+                                                   name:VLCLibrarySearchProviderResultsUpdated
+                                                 object:provider];
+    }
 }
 
 - (void)disconnect
 {
+    _connected = NO;
     [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 - (void)providerResultsUpdated:(NSNotification *)notification
 {
+    if (_clearingSearch) {
+        return;
+    }
     if (_pendingProviderCount > 0) {
         _pendingProviderCount--;
     }
     if (_pendingProviderCount == 0) {
         _searching = NO;
     }
-    if (self.viewMode == VLCLibraryGridViewModeSegment) {
-        [self scheduleRebuildVisibleIndices];
-    } else {
-        [self scheduleRebuildFlattenedRows];
-    }
-}
-
-- (void)scheduleRebuildVisibleIndices
-{
-    __weak typeof(self) weakSelf = self;
-    dispatch_async(self->_rebuildQueue, ^{
-        __strong typeof(weakSelf) strongSelf = weakSelf;
-        if (strongSelf == nil) {
-            return;
-        }
-        NSArray<NSNumber *> * const newVisibleIndices = [strongSelf visibleProviderIndices];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (strongSelf == nil) {
-                return;
-            }
-            strongSelf->_visibleProviderIndices = newVisibleIndices;
-            [strongSelf.collectionView reloadData];
-            [strongSelf postDidReloadNotification];
-        });
-    });
-}
-
-- (void)scheduleRebuildFlattenedRows
-{
-    __weak typeof(self) weakSelf = self;
-    dispatch_async(self->_rebuildQueue, ^{
-        __strong typeof(weakSelf) strongSelf = weakSelf;
-        if (strongSelf == nil) {
-            return;
-        }
-        NSArray<NSNumber *> * const newVisibleIndices = [strongSelf visibleProviderIndices];
-        NSArray<VLCLibrarySearchFlattenedRow *> * const newFlattenedRows =
-            [strongSelf flattenedRowsForVisibleIndices:newVisibleIndices];
-
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (strongSelf == nil) {
-                return;
-            }
-            strongSelf->_visibleProviderIndices = newVisibleIndices;
-            strongSelf->_flattenedRows = newFlattenedRows;
-            [strongSelf->_cachedProviderParentItems removeAllObjects];
-            [strongSelf.tableView reloadData];
-            [strongSelf postDidReloadNotification];
-        });
-    });
+    [self reloadData];
 }
 
 - (void)postDidReloadNotification
@@ -213,12 +179,19 @@ NSString * const VLCLibrarySearchDataSourceDidReloadNotification = @"VLCLibraryS
 
 - (void)reloadData
 {
+    // Keep the indices and the results they refer to on the same queue.
+    [(VLCLibraryCollectionViewFlowLayout *)self.collectionView.collectionViewLayout resetLayout];
+    self.collectionView.selectionIndexPaths = NSSet.set;
+    [self.tableView deselectAll:nil];
+    _visibleProviderIndices = [self visibleProviderIndices];
     [_cachedProviderParentItems removeAllObjects];
-    if (self.viewMode != VLCLibraryGridViewModeSegment) {
-        [self scheduleRebuildFlattenedRows];
+    if (self.viewMode == VLCLibraryGridViewModeSegment) {
+        [self.collectionView reloadData];
     } else {
-        [self scheduleRebuildVisibleIndices];
+        _flattenedRows = [self flattenedRowsForVisibleIndices:_visibleProviderIndices];
+        [self.tableView reloadData];
     }
+    [self postDidReloadNotification];
 }
 
 #pragma mark - Search
@@ -226,7 +199,7 @@ NSString * const VLCLibrarySearchDataSourceDidReloadNotification = @"VLCLibraryS
 - (void)searchForString:(NSString *)string
 {
     _pendingProviderCount = _providers.count;
-    _searching = YES;
+    _searching = _pendingProviderCount > 0;
     for (VLCLibrarySearchProvider * const provider in _providers) {
         [provider searchForString:string];
     }
@@ -236,9 +209,11 @@ NSString * const VLCLibrarySearchDataSourceDidReloadNotification = @"VLCLibraryS
 {
     _pendingProviderCount = 0;
     _searching = NO;
+    _clearingSearch = YES;
     for (VLCLibrarySearchProvider * const provider in _providers) {
         [provider clearSearch];
     }
+    _clearingSearch = NO;
     [self reloadData];
 }
 
@@ -248,11 +223,7 @@ NSString * const VLCLibrarySearchDataSourceDidReloadNotification = @"VLCLibraryS
         return;
     }
     _viewMode = viewMode;
-    if (viewMode == VLCLibraryGridViewModeSegment) {
-        [self scheduleRebuildVisibleIndices];
-    } else {
-        [self scheduleRebuildFlattenedRows];
-    }
+    [self reloadData];
 }
 
 #pragma mark - Data management
@@ -496,8 +467,13 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtIndexPath:(NSIndexPath *)indexPath
                                         forCollectionView:(NSCollectionView *)collectionView
 {
+    if (indexPath.section < 0 || (NSUInteger)indexPath.section >= _visibleProviderIndices.count) {
+        return nil;
+    }
     VLCLibrarySearchProvider * const provider = [self providerForVisibleSection:indexPath.section];
-    NSParameterAssert(provider != nil && indexPath.item >= 0 && (NSUInteger)indexPath.item < provider.results.count);
+    if (indexPath.item < 0 || (NSUInteger)indexPath.item >= provider.results.count) {
+        return nil;
+    }
     return provider.results[indexPath.item];
 }
 

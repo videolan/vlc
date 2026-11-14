@@ -26,6 +26,7 @@
 
 @class VLCLibraryCollectionView;
 @class VLCLibrarySearchDataSource;
+@class VLCLibrarySearchProvider;
 @class VLCLibraryTableView;
 @class VLCLibraryWindow;
 
@@ -41,6 +42,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) VLCLibraryTableView *tableView;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
+- (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
+                            providers:(NSArray<VLCLibrarySearchProvider *> *)providers;
 
 - (void)presentInContainer:(NSView *)container;
 - (void)dismissFromContainer;

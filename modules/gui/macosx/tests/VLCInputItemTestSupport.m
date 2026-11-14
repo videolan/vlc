@@ -141,6 +141,8 @@ BOOL VLCInputItemTestDidReload(void)
 }
 
 @interface NSImage (VLCInputItemTestSupport)
++ (NSImage * _Nonnull)VLCSidebarMovieImage;
++ (NSImage * _Nonnull)VLCSidebarMusicImage;
 + (void)quickLookPreviewForLocalPath:(NSString *)path
                              withSize:(NSSize)size
                     completionHandler:(void (^)(NSImage *image))completionHandler;
@@ -167,6 +169,16 @@ BOOL VLCInputItemTestDidReload(void)
 @end
 
 @implementation NSImage (VLCInputItemTestSupport)
+
++ (NSImage *)VLCSidebarMovieImage
+{
+    return [[NSImage alloc] initWithSize:NSMakeSize(16, 16)];
+}
+
++ (NSImage *)VLCSidebarMusicImage
+{
+    return [[NSImage alloc] initWithSize:NSMakeSize(16, 16)];
+}
 
 + (void)quickLookPreviewForLocalPath:(NSString * __unused)path
                              withSize:(NSSize __unused)size

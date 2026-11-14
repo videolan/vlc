@@ -79,6 +79,7 @@ FETCH_TYPED_LIST(fetchArtists, artist, Artist, vlc_ml_list_artists(p_ml, params,
 FETCH_TYPED_LIST(fetchGenres, genre, Genre, vlc_ml_list_genres(p_ml, params))
 FETCH_TYPED_LIST(fetchGroups, group, Group, vlc_ml_list_groups(p_ml, params))
 FETCH_TYPED_LIST(fetchPlaylists, playlist, Playlist, vlc_ml_list_playlists(p_ml, params, VLC_ML_PLAYLIST_TYPE_ALL))
+FETCH_TYPED_LIST(fetchAudioPlaylists, playlist, Playlist, vlc_ml_list_playlists(p_ml, params, VLC_ML_PLAYLIST_TYPE_AUDIO_ONLY))
 
 @implementation VLCLibrarySearchProvider
 {
@@ -110,16 +111,9 @@ FETCH_TYPED_LIST(fetchPlaylists, playlist, Playlist, vlc_ml_list_playlists(p_ml,
     return fallbackImage;
 }
 
-+ (NSArray<VLCLibrarySearchProvider *> *)defaultProviders
++ (NSArray<VLCLibrarySearchProvider *> *)audioItemProviders
 {
     return @[
-        [[VLCLibrarySearchProvider alloc]
-            initWithDisplayTitle:_NS("Videos")
-                    displayImage:[self imageWithSymbolName:@"film.stack"
-                                             fallbackImage:NSImage.VLCSidebarMovieImage]
-                      fetchBlock:^(const vlc_ml_query_params_t *params) {
-                          return fetchMediaList(vlc_ml_list_video_media, params);
-                      }],
         [[VLCLibrarySearchProvider alloc]
             initWithDisplayTitle:_NS("Audio")
                     displayImage:[self imageWithSymbolName:@"music.note"
@@ -148,21 +142,51 @@ FETCH_TYPED_LIST(fetchPlaylists, playlist, Playlist, vlc_ml_list_playlists(p_ml,
                       fetchBlock:^(const vlc_ml_query_params_t *params) {
                           return fetchGenres(params);
                       }],
-        [[VLCLibrarySearchProvider alloc]
-            initWithDisplayTitle:_NS("Groups")
-                    displayImage:[self imageWithSymbolName:@"rectangle.3.group"
-                                             fallbackImage:[NSImage imageNamed:NSImageNameTouchBarTagIconTemplate]]
-                      fetchBlock:^(const vlc_ml_query_params_t *params) {
-                          return fetchGroups(params);
-                      }],
-        [[VLCLibrarySearchProvider alloc]
-            initWithDisplayTitle:_NS("Playlists")
-                    displayImage:[self imageWithSymbolName:@"list.triangle"
-                                             fallbackImage:[NSImage imageNamed:NSImageNameListViewTemplate]]
-                      fetchBlock:^(const vlc_ml_query_params_t *params) {
-                          return fetchPlaylists(params);
-                      }],
     ];
+}
+
++ (VLCLibrarySearchProvider *)playlistProviderWithFetchBlock:(VLCLibrarySearchProviderFetchBlock)fetchBlock
+{
+    return [[VLCLibrarySearchProvider alloc]
+        initWithDisplayTitle:_NS("Playlists")
+                displayImage:[self imageWithSymbolName:@"list.triangle"
+                                         fallbackImage:[NSImage imageNamed:NSImageNameListViewTemplate]]
+                  fetchBlock:fetchBlock];
+}
+
++ (NSArray<VLCLibrarySearchProvider *> *)defaultProviders
+{
+    VLCLibrarySearchProvider * const videoProvider = [[VLCLibrarySearchProvider alloc]
+        initWithDisplayTitle:_NS("Videos")
+                displayImage:[self imageWithSymbolName:@"film.stack"
+                                         fallbackImage:NSImage.VLCSidebarMovieImage]
+                  fetchBlock:^(const vlc_ml_query_params_t *params) {
+                      return fetchMediaList(vlc_ml_list_video_media, params);
+                  }];
+    VLCLibrarySearchProvider * const groupProvider = [[VLCLibrarySearchProvider alloc]
+        initWithDisplayTitle:_NS("Groups")
+                displayImage:[self imageWithSymbolName:@"rectangle.3.group"
+                                         fallbackImage:[NSImage imageNamed:NSImageNameTouchBarTagIconTemplate]]
+                  fetchBlock:^(const vlc_ml_query_params_t *params) {
+                      return fetchGroups(params);
+                  }];
+    VLCLibrarySearchProvider * const playlistProvider = [self playlistProviderWithFetchBlock:^(const vlc_ml_query_params_t *params) {
+        return fetchPlaylists(params);
+    }];
+
+    NSMutableArray<VLCLibrarySearchProvider *> * const providers = [NSMutableArray arrayWithObject:videoProvider];
+    [providers addObjectsFromArray:[self audioItemProviders]];
+    [providers addObject:groupProvider];
+    [providers addObject:playlistProvider];
+    return providers.copy;
+}
+
++ (NSArray<VLCLibrarySearchProvider *> *)audioProviders
+{
+    VLCLibrarySearchProvider * const playlistProvider = [self playlistProviderWithFetchBlock:^(const vlc_ml_query_params_t *params) {
+        return fetchAudioPlaylists(params);
+    }];
+    return [[self audioItemProviders] arrayByAddingObject:playlistProvider];
 }
 
 - (void)searchForString:(NSString *)string
@@ -190,6 +214,7 @@ FETCH_TYPED_LIST(fetchPlaylists, playlist, Playlist, vlc_ml_list_playlists(p_ml,
 
 - (void)clearSearch
 {
+    ++_searchGeneration;
     _results = @[];
     [NSNotificationCenter.defaultCenter postNotificationName:VLCLibrarySearchProviderResultsUpdated
                                                       object:self];
