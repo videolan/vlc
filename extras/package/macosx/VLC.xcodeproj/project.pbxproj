@@ -103,6 +103,7 @@
 		5325C57D29302E6800B2B63A /* VLCLibraryAudioViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5325C57B29302E6800B2B63A /* VLCLibraryAudioViewController.m */; };
 		874195BBCE0F4F96993D9003 /* VLCLibraryMusicCarouselContainerView.m in Sources */ = {isa = PBXBuildFile; fileRef = B8CF8BC284CF4BB0A8444C3B /* VLCLibraryMusicCarouselContainerView.m */; };
 		9C25C316CD95484A93E4D5AB /* VLCLibraryMusicCarouselDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C25C316CD95484A93E4D5AA /* VLCLibraryMusicCarouselDataSource.m */; };
+		55C0F33A663345F693FA5DDD /* VLCLibraryMusicViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BE9F9D59464440AC84A5B1FB /* VLCLibraryMusicViewController.m */; };
 		533B5D2C29CF94C6003DE887 /* VLCBookmarksTableViewDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 533B5D2B29CF94C6003DE887 /* VLCBookmarksTableViewDataSource.m */; };
 		5341F14A2C9757EF003BDF0A /* VLCLibraryWindowChaptersSidebarViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5341F1492C9757EF003BDF0A /* VLCLibraryWindowChaptersSidebarViewController.m */; };
 		5341F14D2C981B7C003BDF0A /* VLCLibraryWindowAbstractSidebarViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5341F14C2C981B7C003BDF0A /* VLCLibraryWindowAbstractSidebarViewController.m */; };
@@ -403,6 +404,8 @@
 		B8CF8BC284CF4BB0A8444C3B /* VLCLibraryMusicCarouselContainerView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryMusicCarouselContainerView.m; sourceTree = "<group>"; };
 		9C25C316CD95484A93E4D5A9 /* VLCLibraryMusicCarouselDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryMusicCarouselDataSource.h; sourceTree = "<group>"; };
 		9C25C316CD95484A93E4D5AA /* VLCLibraryMusicCarouselDataSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryMusicCarouselDataSource.m; sourceTree = "<group>"; };
+		AA66B2D38ED047188191563B /* VLCLibraryMusicViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryMusicViewController.h; sourceTree = "<group>"; };
+		BE9F9D59464440AC84A5B1FB /* VLCLibraryMusicViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryMusicViewController.m; sourceTree = "<group>"; };
 		532CBCFD2C8E025F00899413 /* VLCLibraryDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryDataSource.h; sourceTree = "<group>"; };
 		533B5D2A29CF94C6003DE887 /* VLCBookmarksTableViewDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCBookmarksTableViewDataSource.h; sourceTree = "<group>"; };
 		533B5D2B29CF94C6003DE887 /* VLCBookmarksTableViewDataSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCBookmarksTableViewDataSource.m; sourceTree = "<group>"; };
@@ -1814,6 +1817,8 @@
 				B8CF8BC284CF4BB0A8444C3B /* VLCLibraryMusicCarouselContainerView.m */,
 				9C25C316CD95484A93E4D5A9 /* VLCLibraryMusicCarouselDataSource.h */,
 				9C25C316CD95484A93E4D5AA /* VLCLibraryMusicCarouselDataSource.m */,
+				AA66B2D38ED047188191563B /* VLCLibraryMusicViewController.h */,
+				BE9F9D59464440AC84A5B1FB /* VLCLibraryMusicViewController.m */,
 				536283DD291146BC00640C15 /* VLCLibrarySongTableCellView.h */,
 				536283EC291146BC00640C15 /* VLCLibrarySongTableCellView.m */,
 				53B447C82939823E00857588 /* VLCLibrarySongsTableViewSongPlayingTableCellView.h */,
@@ -2606,6 +2611,7 @@
 				5325C57D29302E6800B2B63A /* VLCLibraryAudioViewController.m in Sources */,
 				874195BBCE0F4F96993D9003 /* VLCLibraryMusicCarouselContainerView.m in Sources */,
 				9C25C316CD95484A93E4D5AB /* VLCLibraryMusicCarouselDataSource.m in Sources */,
+				55C0F33A663345F693FA5DDD /* VLCLibraryMusicViewController.m in Sources */,
 				1C3113981E508C6900D4DD76 /* VLCAudioEffectsWindowController.m in Sources */,
 				53ED472629C78FE700795DB1 /* VLCLibraryAudioGroupTableViewDelegate.m in Sources */,
 				5318F9332DBBB42D0008D9C8 /* VLCSnowShader.metal in Sources */,

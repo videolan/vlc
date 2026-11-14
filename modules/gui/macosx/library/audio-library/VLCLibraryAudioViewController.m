@@ -393,7 +393,6 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 - (VLCAudioLibrarySegment)currentLibrarySegmentToAudioLibrarySegment
 {
     switch (self.libraryWindow.librarySegmentType) {
-        case VLCLibraryMusicSegmentType:
         case VLCLibraryArtistsMusicSubSegmentType:
             return VLCAudioLibraryArtistsSegment;
         case VLCLibraryAlbumsMusicSubSegmentType:
@@ -555,18 +554,15 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
 - (void)libraryModelUpdated:(NSNotification *)aNotification
 {
+    if (self.libraryWindow.librarySegmentViewController != self || self.libraryWindow.embeddedVideoPlaybackActive) {
+        return;
+    }
+
     VLCLibraryModel * const model = VLCMain.sharedInstance.libraryController.libraryModel;
     const NSUInteger audioCount = model.numberOfAudioMedia;
-
-    if ((self.libraryWindow.librarySegmentType == VLCLibraryMusicSegmentType ||
-         self.libraryWindow.librarySegmentType == VLCLibrarySongsMusicSubSegmentType ||
-         self.libraryWindow.librarySegmentType == VLCLibraryArtistsMusicSubSegmentType ||
-         self.libraryWindow.librarySegmentType == VLCLibraryAlbumsMusicSubSegmentType ||
-         self.libraryWindow.librarySegmentType == VLCLibraryGenresMusicSubSegmentType) &&
-        ((audioCount == 0 && ![self.libraryTargetView.subviews containsObject:self.emptyLibraryView]) ||
-         (audioCount > 0 && ![self.libraryTargetView.subviews containsObject:_audioLibraryView])) &&
-        !self.libraryWindow.embeddedVideoPlaybackActive) {
-
+    const BOOL showingPlaceholder = [self.libraryTargetView.subviews containsObject:self.emptyLibraryView];
+    const BOOL showingAudioLibrary = [self.libraryTargetView.subviews containsObject:self.audioLibraryView];
+    if ((audioCount == 0 && !showingPlaceholder) || (audioCount > 0 && !showingAudioLibrary)) {
         [self updatePresentedView];
     }
 }

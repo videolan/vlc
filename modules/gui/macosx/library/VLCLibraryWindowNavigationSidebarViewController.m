@@ -318,11 +318,6 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
         return;
     }
 
-    // Music is a grouping node. Match sidebar clicks by presenting Artists.
-    if (segmentType == VLCLibraryMusicSegmentType) {
-        segmentType = VLCLibraryArtistsMusicSubSegmentType;
-    }
-
     VLCLibrarySegment * const segment = [VLCLibrarySegment segmentWithSegmentType:segmentType];
     if (segment.mediaLibraryRequired &&
         VLCMain.sharedInstance.libraryController.libraryModel == nil) {
@@ -414,14 +409,7 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
     NSObject * const representedObject = segment.representedObject;
     NSParameterAssert(representedObject != nil);
 
-    if (segment.segmentType == VLCLibraryMusicSegmentType) {
-        [self.outlineView expandItem:[self nodeForSegmentType:VLCLibraryMusicSegmentType]];
-        NSTreeNode * const artistsNode = [self nodeForSegmentType:VLCLibraryArtistsMusicSubSegmentType];
-        const NSInteger artistsIndex = [self.outlineView rowForItem:artistsNode];
-        [self.outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:artistsIndex]
-                      byExtendingSelection:NO];
-        return;
-    } else if ([representedObject isKindOfClass:NSNumber.class]) {
+    if ([representedObject isKindOfClass:NSNumber.class]) {
         self.libraryWindow.librarySegmentType = segment.segmentType;
     } else if ([representedObject isKindOfClass:VLCLibrarySegmentBookmarkedLocation.class]) {
         VLCLibrarySegmentBookmarkedLocation * const bookmarkedLocation =
