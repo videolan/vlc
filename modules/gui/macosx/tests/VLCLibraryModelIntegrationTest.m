@@ -958,6 +958,30 @@
     XCTAssertEqual([excluded setFavorite:NO], VLC_SUCCESS);
 }
 
+- (void)testFavoriteAudiosPlaybackGroupExcludesFavoriteVideo
+{
+    vlc_medialibrary_t * const library = VLCLibraryDataTypesIntegrationMediaLibrary();
+    const int64_t audioID = VLCLibraryDataTypesIntegrationFactoryAudioMediaID();
+    const int64_t videoID = VLCLibraryDataTypesIntegrationFactoryVideoMediaID();
+    const BOOL wasAudioFavorited = [VLCMediaLibraryMediaItem mediaItemForLibraryID:audioID].favorited;
+    const BOOL wasVideoFavorited = [VLCMediaLibraryMediaItem mediaItemForLibraryID:videoID].favorited;
+    [self addTeardownBlock:^{
+        vlc_ml_media_set_favorite(library, audioID, wasAudioFavorited);
+        vlc_ml_media_set_favorite(library, videoID, wasVideoFavorited);
+    }];
+    XCTAssertEqual(vlc_ml_media_set_favorite(library, audioID, true), VLC_SUCCESS);
+    XCTAssertEqual(vlc_ml_media_set_favorite(library, videoID, true), VLC_SUCCESS);
+
+    NSArray<VLCMediaLibraryMediaItem *> * const items =
+        [self.model listOfMediaItemsForParentType:VLCMediaLibraryParentGroupTypeFavoriteAudios];
+
+    XCTAssertTrue([[items valueForKey:@"libraryID"] containsObject:@(audioID)]);
+    for (VLCMediaLibraryMediaItem * const item in items) {
+        XCTAssertEqual(item.mediaType, VLC_ML_MEDIA_TYPE_AUDIO);
+        XCTAssertTrue(item.favorited);
+    }
+}
+
 - (void)testAudioLibraryParentQueryReturnsAudioMedia
 {
     NSArray<VLCMediaLibraryMediaItem *> * const media =
@@ -1645,6 +1669,9 @@
 {
     NSArray * const expected = [self prepareHistoryForAudio:YES];
     XCTAssertEqualObjects([self libraryIDsForItems:[self loadRecentHistoryForAudio:YES]], expected);
+    NSArray<VLCMediaLibraryMediaItem *> * const parentItems =
+        [self.model listOfMediaItemsForParentType:VLCMediaLibraryParentGroupTypeRecentAudios];
+    XCTAssertEqualObjects([self libraryIDsForItems:parentItems], expected);
 }
 
 - (void)testRecentVideoHistoryReturnsMostRecentlyPlayedFirst

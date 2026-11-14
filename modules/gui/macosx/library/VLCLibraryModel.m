@@ -1921,6 +1921,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 - (NSArray<id<VLCMediaLibraryItemProtocol>> *)listOfLibraryItemsOfParentType:(const VLCMediaLibraryParentGroupType)parentType
 {
     switch(parentType) {
+    case VLCMediaLibraryParentGroupTypeFavoriteAudios:
+        return self.listOfFavoriteAudioMedia;
     case VLCMediaLibraryParentGroupTypeAllFavorites:
     {
         const vlc_ml_query_params_t queryParams = [self queryParams];
@@ -1941,6 +1943,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         return self.listOfAudioMedia;
     case VLCMediaLibraryParentGroupTypeVideoLibrary:
         return self.listOfVideoMedia;
+    case VLCMediaLibraryParentGroupTypeRecentAudios:
+        return self.listOfRecentAudioMedia;
     case VLCMediaLibraryParentGroupTypeRecentVideos:
         return self.listOfRecentMedia;
     case VLCMediaLibraryParentGroupTypeRecentlyAddedVideos:
