@@ -1596,6 +1596,29 @@
     [self assertNativeMediaDeletionForAudio:YES];
 }
 
+- (void)testNativeMediaDeletionPublishesUncachedItemIDOnMainThread
+{
+    (void)self.model;
+    vlc_medialibrary_t * const library = VLCLibraryDataTypesIntegrationMediaLibrary();
+    const int64_t libraryID = VLCLibraryDataTypesIntegrationCreateExternalMediaOfType(
+        "https://example.invalid/native-deleted-uncached-audio.mp3",
+        VLC_ML_MEDIA_TYPE_AUDIO);
+    XCTAssertGreaterThan(libraryID, (int64_t)0);
+    XCTestExpectation * const deleted =
+        [self expectationForNotification:VLCLibraryModelMediaItemDeleted
+                                  object:nil
+                                 handler:^BOOL(NSNotification *notification) {
+        if (![notification.object isEqual:@(libraryID)]) {
+            return NO;
+        }
+        XCTAssertTrue(NSThread.isMainThread);
+        return YES;
+    }];
+
+    XCTAssertEqual(vlc_ml_remove_stream(library, libraryID), VLC_SUCCESS);
+    [self waitForExpectations:@[deleted] timeout:5.];
+}
+
 - (void)testNativeVideoDeletionPublishesRemovedCachedItem
 {
     [self assertNativeMediaDeletionForAudio:NO];

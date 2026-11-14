@@ -55,6 +55,7 @@ NSString * const VLCLibraryModelListOfGroupsReset = @"VLCLibraryModelListOfGroup
 
 NSString * const VLCLibraryModelPlaylistAdded = @"VLCLibraryModelPlaylistAdded";
 
+NSString * const VLCLibraryModelMediaItemDeleted = @"VLCLibraryModelMediaItemDeleted";
 NSString * const VLCLibraryModelAudioMediaItemDeleted = @"VLCLibraryModelAudioMediaItemDeleted";
 NSString * const VLCLibraryModelVideoMediaItemDeleted = @"VLCLibraryModelVideoMediaItemDeleted";
 NSString * const VLCLibraryModelRecentsMediaItemDeleted = @"VLCLibraryModelRecentsMediaItemDeleted";
@@ -2399,6 +2400,10 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
     const int64_t itemId = p_event->deletion.i_entity_id;
     [self refreshCachedHistoryMediaIfNeededForMediaID:@(itemId)];
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.changeDelegate notifyChange:VLCLibraryModelMediaItemDeleted withObject:@(itemId)];
+    });
 
     dispatch_barrier_async(_mediaItemCacheModificationQueue,
                            ^{

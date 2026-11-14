@@ -51,6 +51,7 @@ extern NSString * const VLCLibraryModelListOfShowsReset;
 extern NSString * const VLCLibraryModelListOfMoviesReset;
 extern NSString * const VLCLibraryModelListOfGroupsReset;
 
+extern NSString * const VLCLibraryModelMediaItemDeleted; // The notification object is the library ID as an NSNumber.
 extern NSString * const VLCLibraryModelAudioMediaItemDeleted;
 extern NSString * const VLCLibraryModelVideoMediaItemDeleted;
 extern NSString * const VLCLibraryModelRecentsMediaItemDeleted;
