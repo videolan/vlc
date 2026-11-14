@@ -215,6 +215,7 @@
 
     if (self.parentType == VLCMediaLibraryParentGroupTypeAllFavorites ||
         self.parentType == VLCMediaLibraryParentGroupTypeFavoriteAudios ||
+        self.parentType == VLCMediaLibraryParentGroupTypeMostPlayedAudios ||
         self.parentType == VLCMediaLibraryParentGroupTypeRecentlyAddedVideos ||
         self.parentType == VLCMediaLibraryParentGroupTypeRecentlyAddedAudios ||
         self.parentType == VLCMediaLibraryParentGroupTypeRecentAudios) {

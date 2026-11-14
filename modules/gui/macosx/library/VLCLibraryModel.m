@@ -1530,6 +1530,26 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     return cache;
 }
 
+- (NSArray<VLCMediaLibraryMediaItem *> *)listOfMostPlayedAudioMedia
+{
+    NSString * const filterString = self.filterString;
+    const vlc_ml_query_params_t queryParams = {
+        .psz_pattern = filterString.length > 0 ? filterString.UTF8String : NULL,
+        .i_sort = VLC_ML_SORTING_PLAYCOUNT,
+        // The media library sorts play counts highest first by default.
+        .b_desc = false,
+        .i_nbResults = 20,
+    };
+    vlc_ml_media_list_t * const mediaList = vlc_ml_list_audio_media(_p_mediaLibrary, &queryParams);
+    NSArray<VLCMediaLibraryMediaItem *> * const items = [NSArray arrayFromVlcMediaList:mediaList];
+    vlc_ml_media_list_release(mediaList);
+
+    NSPredicate * const played = [NSPredicate predicateWithBlock:^BOOL(VLCMediaLibraryMediaItem *item, NSDictionary * __unused bindings) {
+        return item.playCount > 0;
+    }];
+    return [items filteredArrayUsingPredicate:played] ?: @[];
+}
+
 - (void)resetCachedListOfShows
 {
     NSUInteger generation;
@@ -1951,6 +1971,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         return self.listOfRecentlyAddedVideoMedia;
     case VLCMediaLibraryParentGroupTypeRecentlyAddedAudios:
         return self.listOfRecentlyAddedAudioMedia;
+    case VLCMediaLibraryParentGroupTypeMostPlayedAudios:
+        return self.listOfMostPlayedAudioMedia;
     case VLCMediaLibraryParentGroupTypeUnknown:
     default:
         return nil;

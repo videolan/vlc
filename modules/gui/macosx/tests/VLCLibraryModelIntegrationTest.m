@@ -1674,6 +1674,54 @@
     XCTAssertEqualObjects([self libraryIDsForItems:parentItems], expected);
 }
 
+- (void)testMostPlayedAudioRanksOnlyPlayedTracksByPlayCount
+{
+    VLCLibraryModel * const model = self.model;
+    vlc_medialibrary_t * const library = VLCLibraryDataTypesIntegrationMediaLibrary();
+    const int64_t audioID = VLCLibraryDataTypesIntegrationFactoryAudioMediaID();
+    const int64_t otherAudioID = VLCLibraryDataTypesIntegrationSortingAudioAlphaMediaID();
+    const int64_t videoID = VLCLibraryDataTypesIntegrationFactoryVideoMediaID();
+    XCTAssertEqual(vlc_ml_clear_history(library, VLC_ML_HISTORY_TYPE_GLOBAL), VLC_SUCCESS);
+    XCTAssertEqual(model.listOfMostPlayedAudioMedia.count, (NSUInteger)0);
+
+    XCTAssertEqual(vlc_ml_media_set_played(library, audioID, true), VLC_SUCCESS);
+    XCTAssertEqual(vlc_ml_media_set_played(library, audioID, true), VLC_SUCCESS);
+    XCTAssertEqual(vlc_ml_media_set_played(library, otherAudioID, true), VLC_SUCCESS);
+    for (NSUInteger index = 0; index < 3; ++index) {
+        XCTAssertEqual(vlc_ml_media_set_played(library, videoID, true), VLC_SUCCESS);
+    }
+
+    NSArray<NSNumber *> * const expected = @[@(audioID), @(otherAudioID)];
+    XCTAssertEqualObjects([self libraryIDsForItems:model.listOfMostPlayedAudioMedia], expected);
+    NSArray<VLCMediaLibraryMediaItem *> * const parentItems =
+        [model listOfMediaItemsForParentType:VLCMediaLibraryParentGroupTypeMostPlayedAudios];
+    XCTAssertEqualObjects([self libraryIDsForItems:parentItems], expected);
+}
+
+- (void)testMostPlayedAudioReflectsPlaybackAndClearedHistory
+{
+    VLCLibraryModel * const model = self.model;
+    vlc_medialibrary_t * const library = VLCLibraryDataTypesIntegrationMediaLibrary();
+    const int64_t audioID = VLCLibraryDataTypesIntegrationFactoryAudioMediaID();
+    XCTestExpectation * const played =
+        [self expectationForNotification:VLCLibraryModelRecentAudioMediaListReset
+                                  object:model
+                                 handler:^BOOL(NSNotification * __unused notification) {
+            return model.listOfMostPlayedAudioMedia.firstObject.libraryID == audioID;
+        }];
+    XCTAssertEqual(vlc_ml_media_set_played(library, audioID, true), VLC_SUCCESS);
+    [self waitForExpectations:@[played] timeout:5.];
+
+    XCTestExpectation * const cleared =
+        [self expectationForNotification:VLCLibraryModelRecentAudioMediaListReset
+                                  object:model
+                                 handler:^BOOL(NSNotification * __unused notification) {
+            return model.listOfMostPlayedAudioMedia.count == 0;
+        }];
+    XCTAssertEqual(vlc_ml_clear_history_by_media_type(library, VLC_ML_MEDIA_TYPE_AUDIO), VLC_SUCCESS);
+    [self waitForExpectations:@[cleared] timeout:5.];
+}
+
 - (void)testRecentVideoHistoryReturnsMostRecentlyPlayedFirst
 {
     NSArray * const expected = [self prepareHistoryForAudio:NO];

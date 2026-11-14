@@ -103,6 +103,19 @@
                   VLCLibraryModelMediaItemDeleted,
               ]],
         [[VLCLibraryMusicCarouselContainerView alloc]
+                   initWithTitle:_NS("Most played")
+                      parentType:VLCMediaLibraryParentGroupTypeMostPlayedAudios
+                  librarySegment:VLCLibraryLowSentinelSegment
+                   itemsProvider:^NSArray<id<VLCMediaLibraryItemProtocol>> *(VLCLibraryModel *model) {
+                       return model.listOfMostPlayedAudioMedia;
+                   }
+              resetNotifications:@[
+                  VLCLibraryModelAudioMediaListReset,
+                  VLCLibraryModelRecentAudioMediaListReset,
+                  VLCLibraryModelMediaItemUpdated,
+                  VLCLibraryModelMediaItemDeleted,
+              ]],
+        [[VLCLibraryMusicCarouselContainerView alloc]
                    initWithTitle:_NS("Playlists")
                       parentType:VLCMediaLibraryParentGroupTypeUnknown
                   librarySegment:VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegmentType
