@@ -38,6 +38,13 @@ extern NSNotificationName const VLCLibraryMusicCarouselItemsChangedNotification;
                 itemsProvider:(VLCLibraryMusicCarouselItemsProvider)itemsProvider
            resetNotifications:(NSArray<NSNotificationName> *)resetNotifications;
 
+- (instancetype)initWithTitle:(NSString *)title
+                   parentType:(VLCMediaLibraryParentGroupType)parentType
+               librarySegment:(VLCLibrarySegmentType)librarySegment
+                itemsProvider:(VLCLibraryMusicCarouselItemsProvider)itemsProvider
+           resetNotifications:(NSArray<NSNotificationName> *)resetNotifications
+                 numberOfRows:(NSUInteger)numberOfRows;
+
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithFrame:(NSRect)frameRect NS_UNAVAILABLE;
 - (instancetype)initWithCoder:(NSCoder *)coder NS_UNAVAILABLE;

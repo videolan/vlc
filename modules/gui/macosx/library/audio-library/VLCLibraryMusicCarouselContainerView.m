@@ -61,6 +61,24 @@ NSNotificationName const VLCLibraryMusicCarouselItemsChangedNotification = @"VLC
     return self;
 }
 
+- (instancetype)initWithTitle:(NSString *)title
+                   parentType:(VLCMediaLibraryParentGroupType)parentType
+               librarySegment:(VLCLibrarySegmentType)librarySegment
+                itemsProvider:(VLCLibraryMusicCarouselItemsProvider)itemsProvider
+           resetNotifications:(NSArray<NSNotificationName> *)resetNotifications
+                 numberOfRows:(NSUInteger)numberOfRows
+{
+    self = [self initWithTitle:title
+                    parentType:parentType
+                librarySegment:librarySegment
+                 itemsProvider:itemsProvider
+            resetNotifications:resetNotifications];
+    if (self) {
+        self.numberOfRows = numberOfRows;
+    }
+    return self;
+}
+
 - (NSNotificationName)displayedCollectionChangedNotification
 {
     return VLCLibraryMusicCarouselDataSourceReloaded;
