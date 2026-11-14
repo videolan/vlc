@@ -89,6 +89,7 @@ static int HandleVTStatus(decoder_t *, OSStatus, enum vtsession_status *);
 static int DecodeBlock(decoder_t *, block_t *);
 static void RequestFlush(decoder_t *);
 static void Drain(decoder_t *p_dec, bool flush);
+static bool UpdateHDRMetadata(decoder_t *, const frame_info_t *);
 static void DecoderCallback(void *, void *, OSStatus, VTDecodeInfoFlags,
                             CVPixelBufferRef, CMTime, CMTime);
 static Boolean deviceSupportsHardwareDecode(CMVideoCodecType codec);
@@ -1037,6 +1038,32 @@ static void CleanAV1(void *codec_ctx)
     free(av1ctx);
 }
 
+static void ParseAV1HDRMetadata(decoder_t *dec, const uint8_t *p_obu,
+                                size_t i_obu, frame_info_t *p_info)
+{
+    av1_OBU_hdr_metadata_t meta;
+    if (!AV1_OBU_parse_hdr_metadata(p_obu, i_obu, &meta))
+        return;
+
+    const video_format_t *fmt = &dec->fmt_in->video;
+    if (meta.i_type == AV1_METADATA_TYPE_HDR_MDCV &&
+        !fmt->mastering.max_luminance)
+    {
+        for (size_t i = 0; i < ARRAY_SIZE(p_info->mastering.primaries); i++)
+            p_info->mastering.primaries[i] = meta.mastering.primaries[i];
+        for (size_t i = 0; i < ARRAY_SIZE(p_info->mastering.white_point); i++)
+            p_info->mastering.white_point[i] = meta.mastering.white_point[i];
+        p_info->mastering.max_luminance = meta.mastering.max_luminance;
+        p_info->mastering.min_luminance = meta.mastering.min_luminance;
+    }
+    else if (meta.i_type == AV1_METADATA_TYPE_HDR_CLL &&
+             !fmt->lighting.MaxCLL && !fmt->lighting.MaxFALL)
+    {
+        p_info->lighting.MaxCLL = meta.lighting.MaxCLL;
+        p_info->lighting.MaxFALL = meta.lighting.MaxFALL;
+    }
+}
+
 static bool InitAV1(decoder_t *dec)
 {
     decoder_sys_t *sys = dec->p_sys;
@@ -1051,13 +1078,25 @@ static bool InitAV1(decoder_t *dec)
         AV1_OBU_iterator_init(&ctx, (const uint8_t *)dec->fmt_in->p_extra + 4,
                               dec->fmt_in->i_extra - 4);
 
+        frame_info_t info = { 0 };
         const uint8_t *p_obu;
         size_t i_obu;
-        while (!av1ctx->seq && AV1_OBU_iterate_next(&ctx, &p_obu, &i_obu))
+        while (AV1_OBU_iterate_next(&ctx, &p_obu, &i_obu))
         {
-            if (AV1_OBUGetType(p_obu) == AV1_OBU_SEQUENCE_HEADER)
-                av1ctx->seq = AV1_OBU_parse_sequence_header(p_obu, i_obu);
+            switch (AV1_OBUGetType(p_obu))
+            {
+                case AV1_OBU_SEQUENCE_HEADER:
+                    if (!av1ctx->seq)
+                        av1ctx->seq = AV1_OBU_parse_sequence_header(p_obu, i_obu);
+                    break;
+                case AV1_OBU_METADATA:
+                    ParseAV1HDRMetadata(dec, p_obu, i_obu, &info);
+                    break;
+                default:
+                    break;
+            }
         }
+        UpdateHDRMetadata(dec, &info);
     }
 
     sys->p_codec_context = av1ctx;
@@ -1149,6 +1188,10 @@ static bool FillReorderInfoAV1(decoder_t *dec, const block_t *block,
                 AV1_release_frame_header(frame_header);
                 break;
             }
+
+            case AV1_OBU_METADATA:
+                ParseAV1HDRMetadata(dec, p_obu, i_obu, info);
+                break;
 
             default:
                 break;
