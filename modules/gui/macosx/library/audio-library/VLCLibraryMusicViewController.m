@@ -103,7 +103,9 @@
                   VLCLibraryModelFavoriteAudioMediaListReset,
                   VLCLibraryModelMediaItemUpdated,
                   VLCLibraryModelMediaItemDeleted,
-              ]],
+              ]
+                    numberOfRows:3
+                       itemStyle:VLCLibraryMusicCarouselItemStyleCompact],
         [[VLCLibraryMusicCarouselContainerView alloc]
                    initWithTitle:_NS("Most played")
                       parentType:VLCMediaLibraryParentGroupTypeMostPlayedAudios
@@ -140,7 +142,9 @@
                   VLCLibraryModelGenreListReset,
                   VLCLibraryModelGenreUpdated,
                   VLCLibraryModelGenreDeleted,
-              ]],
+              ]
+                    numberOfRows:3
+                       itemStyle:VLCLibraryMusicCarouselItemStyleCompact],
     ];
 
     for (VLCLibraryMusicCarouselContainerView * const carousel in _carousels) {
