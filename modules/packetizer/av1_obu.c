@@ -622,6 +622,46 @@ vlc_fourcc_t AV1_get_chroma(const av1_OBU_sequence_header_t *p_seq)
     }
 }
 
+bool AV1_OBU_parse_hdr_metadata(const uint8_t *p_data, size_t i_data,
+                                av1_OBU_hdr_metadata_t *p_meta)
+{
+    if(!AV1_OBUSkipHeader(&p_data, &i_data))
+        return false;
+
+    uint8_t i_len;
+    const uint64_t i_type = leb128(p_data, i_data, &i_len);
+    if(i_len == 0 || (i_type != AV1_METADATA_TYPE_HDR_MDCV &&
+                      i_type != AV1_METADATA_TYPE_HDR_CLL))
+        return false;
+    p_meta->i_type = i_type;
+
+    bs_t bs;
+    bs_init(&bs, p_data + i_len, i_data - i_len);
+    if(p_meta->i_type == AV1_METADATA_TYPE_HDR_CLL)
+    {
+        p_meta->lighting.MaxCLL = bs_read(&bs, 16);
+        p_meta->lighting.MaxFALL = bs_read(&bs, 16);
+    }
+    else
+    {
+        const uint8_t RGB2GBR[3] = {2, 0, 1};
+        for(int i = 0; i < 3; i++)
+        {
+            p_meta->mastering.primaries[RGB2GBR[i] * 2] =
+                    bs_read(&bs, 16) * 50000 >> 16;
+            p_meta->mastering.primaries[RGB2GBR[i] * 2 + 1] =
+                    bs_read(&bs, 16) * 50000 >> 16;
+        }
+        for(int i = 0; i < 2; i++)
+            p_meta->mastering.white_point[i] = bs_read(&bs, 16) * 50000 >> 16;
+        p_meta->mastering.max_luminance =
+                (uint64_t) bs_read(&bs, 32) * 10000 >> 8;
+        p_meta->mastering.min_luminance =
+                (uint64_t) bs_read(&bs, 32) * 10000 >> 14;
+    }
+    return !bs_error(&bs);
+}
+
 size_t AV1_create_DecoderConfigurationRecord(uint8_t **pp_buffer,
                                              const av1_OBU_sequence_header_t *p_seq,
                                              size_t i_obu, const uint8_t *p_obus[],

@@ -155,6 +155,27 @@ static inline enum av1_obu_metadata_type_e
     return (enum av1_obu_metadata_type_e) i_type;
 }
 
+typedef struct
+{
+    enum av1_obu_metadata_type_e i_type;
+    union
+    {
+        struct
+        {
+            uint16_t primaries[3*2]; /* G,B,R / x,y */
+            uint16_t white_point[2];
+            uint32_t max_luminance;
+            uint32_t min_luminance;
+        } mastering;
+        struct
+        {
+            uint16_t MaxCLL;
+            uint16_t MaxFALL;
+        } lighting;
+    };
+} av1_OBU_hdr_metadata_t;
+bool AV1_OBU_parse_hdr_metadata(const uint8_t *, size_t, av1_OBU_hdr_metadata_t *);
+
 
 
 /* SEQUENCE_HEADER properties */
