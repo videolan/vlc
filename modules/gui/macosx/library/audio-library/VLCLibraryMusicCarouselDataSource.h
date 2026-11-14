@@ -40,7 +40,8 @@ typedef NSArray<id<VLCMediaLibraryItemProtocol>> * _Nullable (^VLCLibraryMusicCa
 
 - (instancetype)initWithParentType:(VLCMediaLibraryParentGroupType)parentType
                      itemsProvider:(VLCLibraryMusicCarouselItemsProvider)itemsProvider
-                resetNotifications:(NSArray<NSNotificationName> *)resetNotifications;
+                resetNotifications:(NSArray<NSNotificationName> *)resetNotifications
+                    itemIdentifier:(NSString *)itemIdentifier;
 
 @end
 

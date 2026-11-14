@@ -340,6 +340,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/audio-library/VLCLibraryMusicCarouselContainerView.m \
 	gui/macosx/library/audio-library/VLCLibraryMusicCarouselDataSource.h \
 	gui/macosx/library/audio-library/VLCLibraryMusicCarouselDataSource.m \
+	gui/macosx/library/audio-library/VLCLibraryMusicCompactCarouselCollectionViewItem.h \
+	gui/macosx/library/audio-library/VLCLibraryMusicCompactCarouselCollectionViewItem.m \
 	gui/macosx/library/audio-library/VLCLibraryMusicViewController.h \
 	gui/macosx/library/audio-library/VLCLibraryMusicViewController.m \
 	gui/macosx/library/audio-library/VLCLibrarySongTableCellView.h \

@@ -28,6 +28,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 extern NSNotificationName const VLCLibraryMusicCarouselItemsChangedNotification;
 
+typedef NS_ENUM(NSUInteger, VLCLibraryMusicCarouselItemStyle) {
+    VLCLibraryMusicCarouselItemStyleArtwork,
+    VLCLibraryMusicCarouselItemStyleCompact,
+};
+
 @interface VLCLibraryMusicCarouselContainerView : VLCLibraryHomeViewBaseCarouselContainerView
 
 @property (readonly) BOOL hasLoadedItems;
@@ -44,6 +49,14 @@ extern NSNotificationName const VLCLibraryMusicCarouselItemsChangedNotification;
                 itemsProvider:(VLCLibraryMusicCarouselItemsProvider)itemsProvider
            resetNotifications:(NSArray<NSNotificationName> *)resetNotifications
                  numberOfRows:(NSUInteger)numberOfRows;
+
+- (instancetype)initWithTitle:(NSString *)title
+                   parentType:(VLCMediaLibraryParentGroupType)parentType
+               librarySegment:(VLCLibrarySegmentType)librarySegment
+                itemsProvider:(VLCLibraryMusicCarouselItemsProvider)itemsProvider
+           resetNotifications:(NSArray<NSNotificationName> *)resetNotifications
+                 numberOfRows:(NSUInteger)numberOfRows
+                    itemStyle:(VLCLibraryMusicCarouselItemStyle)itemStyle;
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithFrame:(NSRect)frameRect NS_UNAVAILABLE;

@@ -22,9 +22,12 @@
 
 #import "VLCLibraryMusicCarouselContainerView.h"
 
+#import "library/VLCLibraryCarouselCollectionViewItem.h"
+#import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowNavigationSidebarViewController.h"
 #import "library/VLCLibraryWindowSplitViewController.h"
+#import "library/audio-library/VLCLibraryMusicCompactCarouselCollectionViewItem.h"
 
 #import "main/VLCMain.h"
 
@@ -33,6 +36,7 @@ NSNotificationName const VLCLibraryMusicCarouselItemsChangedNotification = @"VLC
 @implementation VLCLibraryMusicCarouselContainerView
 {
     VLCLibrarySegmentType _librarySegment;
+    NSUInteger _maximumCompactRows;
 }
 
 @synthesize dataSource = _dataSource;
@@ -43,22 +47,12 @@ NSNotificationName const VLCLibraryMusicCarouselItemsChangedNotification = @"VLC
                 itemsProvider:(VLCLibraryMusicCarouselItemsProvider)itemsProvider
            resetNotifications:(NSArray<NSNotificationName> *)resetNotifications
 {
-    self = [super initWithFrame:NSZeroRect];
-    if (self) {
-        _librarySegment = librarySegment;
-        self.headerView.title = title;
-        self.headerView.navigable = librarySegment != VLCLibraryLowSentinelSegment;
-        self.hidden = YES;
-
-        VLCLibraryMusicCarouselDataSource * const dataSource = [[VLCLibraryMusicCarouselDataSource alloc]
-            initWithParentType:parentType
+    return [self initWithTitle:title
+                    parentType:parentType
+                librarySegment:librarySegment
                  itemsProvider:itemsProvider
-            resetNotifications:resetNotifications];
-        dataSource.collectionView = self.collectionView;
-        self.collectionView.dataSource = dataSource;
-        _dataSource = dataSource;
-    }
-    return self;
+            resetNotifications:resetNotifications
+                  numberOfRows:1];
 }
 
 - (instancetype)initWithTitle:(NSString *)title
@@ -68,13 +62,50 @@ NSNotificationName const VLCLibraryMusicCarouselItemsChangedNotification = @"VLC
            resetNotifications:(NSArray<NSNotificationName> *)resetNotifications
                  numberOfRows:(NSUInteger)numberOfRows
 {
-    self = [self initWithTitle:title
+    return [self initWithTitle:title
                     parentType:parentType
                 librarySegment:librarySegment
                  itemsProvider:itemsProvider
-            resetNotifications:resetNotifications];
+            resetNotifications:resetNotifications
+                  numberOfRows:numberOfRows
+                     itemStyle:VLCLibraryMusicCarouselItemStyleArtwork];
+}
+
+- (instancetype)initWithTitle:(NSString *)title
+                   parentType:(VLCMediaLibraryParentGroupType)parentType
+               librarySegment:(VLCLibrarySegmentType)librarySegment
+                itemsProvider:(VLCLibraryMusicCarouselItemsProvider)itemsProvider
+           resetNotifications:(NSArray<NSNotificationName> *)resetNotifications
+                 numberOfRows:(NSUInteger)numberOfRows
+                    itemStyle:(VLCLibraryMusicCarouselItemStyle)itemStyle
+{
+    self = [super initWithFrame:NSZeroRect];
     if (self) {
+        _librarySegment = librarySegment;
+        self.headerView.title = title;
+        self.headerView.navigable = librarySegment != VLCLibraryLowSentinelSegment;
+        self.hidden = YES;
+
         self.numberOfRows = numberOfRows;
+        NSString *itemIdentifier = VLCLibraryCarouselCollectionViewItemIdentifier;
+        if (itemStyle == VLCLibraryMusicCarouselItemStyleCompact) {
+            _maximumCompactRows = self.numberOfRows;
+            itemIdentifier = VLCLibraryMusicCompactCarouselCollectionViewItemIdentifier;
+            [self.collectionView registerClass:VLCLibraryMusicCompactCarouselCollectionViewItem.class
+                         forItemWithIdentifier:itemIdentifier];
+            const NSSize itemSize = VLCLibraryMusicCompactCarouselCollectionViewItem.itemSize;
+            self.collectionViewDelegate.staticItemSize = itemSize;
+            self.itemHeight = itemSize.height;
+        }
+
+        VLCLibraryMusicCarouselDataSource * const dataSource = [[VLCLibraryMusicCarouselDataSource alloc]
+            initWithParentType:parentType
+                 itemsProvider:itemsProvider
+            resetNotifications:resetNotifications
+                itemIdentifier:itemIdentifier];
+        dataSource.collectionView = self.collectionView;
+        self.collectionView.dataSource = dataSource;
+        _dataSource = dataSource;
     }
     return self;
 }
@@ -87,7 +118,14 @@ NSNotificationName const VLCLibraryMusicCarouselItemsChangedNotification = @"VLC
 - (void)displayedCollectionChanged:(NSNotification *)notification
 {
     [super displayedCollectionChanged:notification];
-    self.hidden = self.headerView.itemCount == 0;
+    const NSUInteger itemCount = self.headerView.itemCount;
+    if (_maximumCompactRows > 0) {
+        const NSUInteger numberOfRows = MAX(1, MIN(itemCount, _maximumCompactRows));
+        if (self.numberOfRows != numberOfRows) {
+            self.numberOfRows = numberOfRows;
+        }
+    }
+    self.hidden = itemCount == 0;
     if (notification != nil) {
         _hasLoadedItems = YES;
         [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryMusicCarouselItemsChangedNotification

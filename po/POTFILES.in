@@ -477,6 +477,7 @@ modules/gui/macosx/library/audio-library/VLCLibraryAlbumTableCellView.h
 modules/gui/macosx/library/audio-library/VLCLibraryAlbumTableCellView.m
 modules/gui/macosx/library/audio-library/VLCLibraryAudioDataSource.h
 modules/gui/macosx/library/audio-library/VLCLibraryAudioDataSource.m
+modules/gui/macosx/library/audio-library/VLCLibraryMusicCompactCarouselCollectionViewItem.m
 modules/gui/macosx/library/audio-library/VLCLibraryMusicViewController.m
 modules/gui/macosx/library/history-library/VLCLibraryHistorySection.m
 modules/gui/macosx/library/history-library/VLCLibraryHistoryViewController.m

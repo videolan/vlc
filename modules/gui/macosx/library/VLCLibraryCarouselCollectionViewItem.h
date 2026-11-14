@@ -42,6 +42,7 @@ extern NSString * const VLCLibraryCarouselCollectionViewItemIdentifier;
 
 @property (readwrite, strong, nonatomic, nullable) VLCLibraryRepresentedItem *representedItem;
 
+- (void)updateRepresentation;
 - (void)playRepresentedItem;
 - (void)openContextMenu:(NSEvent *)event;
 

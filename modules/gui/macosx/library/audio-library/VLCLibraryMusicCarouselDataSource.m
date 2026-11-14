@@ -36,6 +36,7 @@ NSNotificationName const VLCLibraryMusicCarouselDataSourceReloaded = @"VLCLibrar
     VLCMediaLibraryParentGroupType _parentType;
     VLCLibraryMusicCarouselItemsProvider _itemsProvider;
     NSArray<NSNotificationName> *_resetNotifications;
+    NSString *_itemIdentifier;
     NSArray<id<VLCMediaLibraryItemProtocol>> *_items;
     NSUInteger _reloadGeneration;
     BOOL _connected;
@@ -45,12 +46,14 @@ NSNotificationName const VLCLibraryMusicCarouselDataSourceReloaded = @"VLCLibrar
 - (instancetype)initWithParentType:(VLCMediaLibraryParentGroupType)parentType
                      itemsProvider:(VLCLibraryMusicCarouselItemsProvider)itemsProvider
                 resetNotifications:(NSArray<NSNotificationName> *)resetNotifications
+                    itemIdentifier:(NSString *)itemIdentifier
 {
     self = [super init];
     if (self) {
         _parentType = parentType;
         _itemsProvider = [itemsProvider copy];
         _resetNotifications = [resetNotifications arrayByAddingObject:VLCLibraryModelAllCachesDropped];
+        _itemIdentifier = itemIdentifier;
         _items = @[];
     }
     return self;
@@ -153,7 +156,7 @@ NSNotificationName const VLCLibraryMusicCarouselDataSourceReloaded = @"VLCLibrar
 {
     VLCLibraryCarouselCollectionViewItem * const viewItem =
         (VLCLibraryCarouselCollectionViewItem *)[collectionView
-            makeItemWithIdentifier:VLCLibraryCarouselCollectionViewItemIdentifier
+            makeItemWithIdentifier:_itemIdentifier
                       forIndexPath:indexPath];
     viewItem.representedItem = [self representedItemAtIndexPath:indexPath];
     return viewItem;
