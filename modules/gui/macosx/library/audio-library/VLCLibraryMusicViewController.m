@@ -76,7 +76,8 @@
                    itemsProvider:^NSArray<id<VLCMediaLibraryItemProtocol>> *(VLCLibraryModel *model) {
                        return model.listOfRecentlyAddedAudioMedia;
                    }
-              resetNotifications:@[VLCLibraryModelRecentlyAddedAudioMediaListReset]],
+              resetNotifications:@[VLCLibraryModelRecentlyAddedAudioMediaListReset]
+                    numberOfRows:2],
         [[VLCLibraryMusicCarouselContainerView alloc]
                    initWithTitle:_NS("Recently played")
                       parentType:VLCMediaLibraryParentGroupTypeRecentAudios
