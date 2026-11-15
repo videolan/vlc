@@ -24,9 +24,14 @@
 
 @implementation NSFont (VLCAdditions)
 
-+ (NSFont *)VLClibrarySectionHeaderFont
++ (NSFont *)VLCLibraryPageTitleFont
 {
     return [NSFont systemFontOfSize:24. weight:NSFontWeightBold];
+}
+
++ (NSFont *)VLClibrarySectionHeaderFont
+{
+    return [NSFont systemFontOfSize:20. weight:NSFontWeightBold];
 }
 
 + (NSFont *)VLCLibrarySubsectionHeaderFont

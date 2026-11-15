@@ -22,6 +22,7 @@
 
 #import "VLCLibraryMusicViewController.h"
 
+#import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSScrollView+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
@@ -164,6 +165,10 @@
     stackView.distribution = NSStackViewDistributionFill;
     stackView.detachesHiddenViews = YES;
     stackView.spacing = VLCUIUnits.largeSpacing;
+
+    NSTextField * const titleLabel = [NSTextField labelWithString:_NS("Music")];
+    titleLabel.font = NSFont.VLCLibraryPageTitleFont;
+    [stackView addArrangedSubview:titleLabel];
 
     NSView * const documentView = [[VLCLibraryMusicDocumentView alloc] init];
     documentView.translatesAutoresizingMaskIntoConstraints = NO;
