@@ -175,6 +175,7 @@ typedef struct
     };
 } av1_OBU_hdr_metadata_t;
 bool AV1_OBU_parse_hdr_metadata(const uint8_t *, size_t, av1_OBU_hdr_metadata_t *);
+bool AV1_OBU_get_itut_t35(const uint8_t *, size_t, uint8_t *, const uint8_t **, size_t *);
 
 
 

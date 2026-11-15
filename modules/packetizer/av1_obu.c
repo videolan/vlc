@@ -662,6 +662,34 @@ bool AV1_OBU_parse_hdr_metadata(const uint8_t *p_data, size_t i_data,
     return !bs_error(&bs);
 }
 
+bool AV1_OBU_get_itut_t35(const uint8_t *p_data, size_t i_data,
+                          uint8_t *pi_country_code,
+                          const uint8_t **pp_payload, size_t *pi_payload)
+{
+    if(!AV1_OBUSkipHeader(&p_data, &i_data))
+        return false;
+
+    uint8_t i_len;
+    if(leb128(p_data, i_data, &i_len) != AV1_METADATA_TYPE_ITUT_T35)
+        return false;
+    p_data += i_len;
+    i_data -= i_len;
+
+    while(i_data > 0 && p_data[i_data - 1] == 0)
+        i_data--;
+    if(i_data < 2)
+        return false;
+    i_data--;
+
+    const size_t i_header = p_data[0] == 0xFF ? 2 : 1;
+    if(i_data < i_header)
+        return false;
+    *pi_country_code = p_data[0];
+    *pp_payload = &p_data[i_header];
+    *pi_payload = i_data - i_header;
+    return true;
+}
+
 size_t AV1_create_DecoderConfigurationRecord(uint8_t **pp_buffer,
                                              const av1_OBU_sequence_header_t *p_seq,
                                              size_t i_obu, const uint8_t *p_obus[],

@@ -33,6 +33,7 @@
 #import <vlc_bits.h>
 #import <vlc_boxes.h>
 #import "../vt_utils.h"
+#import "../cc.h"
 #import "../../packetizer/h264_nal.h"
 #import "../../packetizer/h264_slice.h"
 #import "../../packetizer/hxxx_nal.h"
@@ -1028,6 +1029,7 @@ static bool ConfigureVoutVP9(decoder_t *p_dec)
 struct vt_av1_context
 {
     av1_OBU_sequence_header_t *seq;
+    cc_data_t cc;
 };
 
 static void CleanAV1(void *codec_ctx)
@@ -1064,6 +1066,45 @@ static void ParseAV1HDRMetadata(decoder_t *dec, const uint8_t *p_obu,
     }
 }
 
+static bool ExtractAV1Captions(struct vt_av1_context *av1ctx,
+                               const uint8_t *p_obu, size_t i_obu)
+{
+    uint8_t i_country_code;
+    const uint8_t *p_payload;
+    size_t i_payload;
+    if (!AV1_OBU_get_itut_t35(p_obu, i_obu, &i_country_code,
+                              &p_payload, &i_payload) ||
+        i_country_code != 0xb5 || i_payload <= 9 ||
+        memcmp(p_payload, "\x00\x31GA94\x03", 7))
+        return false;
+
+    cc_Extract(&av1ctx->cc, CC_PAYLOAD_GA94, true,
+               &p_payload[7], i_payload - 7);
+    return true;
+}
+
+static void QueueAV1Captions(decoder_t *dec, struct vt_av1_context *av1ctx,
+                             vlc_tick_t pts)
+{
+    cc_data_t *cc = &av1ctx->cc;
+    if (!cc->b_reorder && !cc->i_data)
+        return;
+
+    block_t *p_cc = block_Alloc(cc->i_data);
+    if (p_cc)
+    {
+        memcpy(p_cc->p_buffer, cc->p_data, cc->i_data);
+        p_cc->i_pts = p_cc->i_dts = pts;
+        decoder_cc_desc_t desc = {
+            .i_608_channels = cc->i_608channels,
+            .i_708_channels = cc->i_708channels,
+            .i_reorder_depth = 4,
+        };
+        decoder_QueueCc(dec, p_cc, &desc);
+    }
+    cc_Flush(cc);
+}
+
 static bool InitAV1(decoder_t *dec)
 {
     decoder_sys_t *sys = dec->p_sys;
@@ -1071,6 +1112,7 @@ static bool InitAV1(decoder_t *dec)
     struct vt_av1_context *av1ctx = calloc(1, sizeof(*av1ctx));
     if (!av1ctx)
         return false;
+    cc_Init(&av1ctx->cc);
 
     if (dec->fmt_in->i_extra > 4)
     {
@@ -1136,12 +1178,14 @@ static bool FillReorderInfoAV1(decoder_t *dec, const block_t *block,
 {
     decoder_sys_t *sys = dec->p_sys;
     struct vt_av1_context *av1ctx = sys->p_codec_context;
+    cc_Flush(&av1ctx->cc);
 
     AV1_OBU_iterator_ctx_t ctx;
     AV1_OBU_iterator_init(&ctx, block->p_buffer, block->i_buffer);
 
     const uint8_t *p_obu;
     size_t i_obu;
+    bool b_captions = false;
     bool b_first_frame = true;
 
     info->i_num_ts = 2;
@@ -1191,6 +1235,7 @@ static bool FillReorderInfoAV1(decoder_t *dec, const block_t *block,
 
             case AV1_OBU_METADATA:
                 ParseAV1HDRMetadata(dec, p_obu, i_obu, info);
+                b_captions |= ExtractAV1Captions(av1ctx, p_obu, i_obu);
                 break;
 
             default:
@@ -1198,6 +1243,8 @@ static bool FillReorderInfoAV1(decoder_t *dec, const block_t *block,
         }
     }
 
+    if (b_captions)
+        QueueAV1Captions(dec, av1ctx, block->i_pts);
     return true;
 }
 
