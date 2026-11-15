@@ -22,6 +22,7 @@ $(TARBALLS)/opencv-$(OPENCV4_VERSION).tar.gz:
 
 opencv4: opencv-$(OPENCV4_VERSION).tar.gz .sum-opencv4
 	$(UNPACK)
+	$(APPLY) $(SRC)/opencv4/0001-cmake-don-t-force-Werror.patch
 	# fix build with newer CMake
 	sed -i.orig 's,cmake_minimum_required(VERSION 2.8.12.2),cmake_minimum_required(VERSION 3.5),' $(UNPACK_DIR)/cmake/OpenCVGenPkgconfig.cmake
 	# enable pkg-config on all configurations
