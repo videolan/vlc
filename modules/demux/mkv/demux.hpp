@@ -228,12 +228,11 @@ private:
 
     demux_t      *p_demux;
 
-    std::atomic<bool> is_running;
+    std::atomic<bool> is_running; // thread is started and should keep running
     vlc_thread_t thread;
 
     vlc_mutex_t  lock;
     vlc_cond_t   wait;
-    bool         b_abort;
     bool         b_moved;
     bool         b_clicked;
     int          i_key_action;
