@@ -24,6 +24,7 @@
 
 #include <assert.h>
 #include <stdbool.h>
+#include <stdckdint.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -501,18 +502,20 @@ static void vlc_h2_parse_headers_start(struct vlc_h2_parser *p,
 static int vlc_h2_parse_headers_append(struct vlc_h2_parser *p,
                                        const uint8_t *data, size_t len)
 {
+    size_t newlen;
+
     assert(p->headers.sid != 0);
 
-    if (p->headers.len + len > 65536)
+    if (ckd_add(&newlen, p->headers.len, len) || newlen > 65536)
         return vlc_h2_parse_error(p, VLC_H2_INTERNAL_ERROR);
 
-    uint8_t *buf = realloc(p->headers.buf, p->headers.len + len);
+    uint8_t *buf = realloc(p->headers.buf, newlen ? newlen : 1);
     if (unlikely(buf == NULL))
         return vlc_h2_parse_error(p, VLC_H2_INTERNAL_ERROR);
 
     p->headers.buf = buf;
     memcpy(p->headers.buf + p->headers.len, data, len);
-    p->headers.len += len;
+    p->headers.len = newlen;
     return 0;
 }
 
