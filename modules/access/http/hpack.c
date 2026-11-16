@@ -576,6 +576,7 @@ static int hpack_decode_hdr(struct hpack_decoder *dec,
 int hpack_decode(struct hpack_decoder *dec, const uint8_t *data,
                  size_t length, char *headers[][2], unsigned max)
 {
+    size_t hlen = 0;
     unsigned count = 0;
 
     while (length > 0)
@@ -589,10 +590,11 @@ int hpack_decode(struct hpack_decoder *dec, const uint8_t *data,
         if (name == NULL)
             continue;
 
-        if (count < max)
+        if (hlen < max)
         {
-            headers[count][0] = name;
-            headers[count][1] = value;
+            headers[hlen][0] = name;
+            headers[hlen][1] = value;
+            hlen++;
         }
         else
         {
@@ -604,11 +606,11 @@ int hpack_decode(struct hpack_decoder *dec, const uint8_t *data,
     return count;
 
 error:
-    while (count > 0)
+    while (hlen > 0)
     {
-        count--;
-        free(headers[count][1]);
-        free(headers[count][0]);
+        hlen--;
+        free(headers[hlen][1]);
+        free(headers[hlen][0]);
     }
     return -1;
 }
