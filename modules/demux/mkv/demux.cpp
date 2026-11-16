@@ -160,7 +160,7 @@ void event_thread_t::SetPci(const uint8_t *data, size_t size)
         is_running = !vlc_clone( &thread, EventThread, this, VLC_THREAD_PRIORITY_LOW );
     }
 }
-void event_thread_t::ResetPci()
+void event_thread_t::ResetPci(bool join_thread)
 {
     if( !is_running.exchange(false) )
         return;
@@ -170,7 +170,8 @@ void event_thread_t::ResetPci()
     vlc_cond_signal( &wait );
     vlc_mutex_unlock( &lock );
 
-    vlc_join( thread, NULL );
+    if (join_thread) // otherwise let the thread finish its loop
+        vlc_join( thread, NULL );
 }
 int event_thread_t::EventMouse( vlc_object_t *p_this, char const *psz_var,
                                 vlc_value_t, vlc_value_t, void *p_data )

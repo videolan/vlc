@@ -216,7 +216,7 @@ public:
     virtual ~event_thread_t();
 
     void SetPci(const uint8_t *data, size_t);
-    void ResetPci();
+    void ResetPci(bool join_thread = true);
 
 private:
     void EventThread();
