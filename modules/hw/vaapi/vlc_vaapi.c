@@ -516,7 +516,7 @@ vlc_vaapi_PoolNew(vlc_object_t *o, vlc_video_context *vctx,
     picture_t *pics[count];
 
     VA_CALL(o, vaCreateSurfaces, dpy, va_rt_format,
-            fmt->i_visible_width, fmt->i_visible_height,
+            fmt->i_width, fmt->i_height,
             instance->render_targets, instance->num_render_targets,
             fourcc_attribs, 1);
 
