@@ -30,6 +30,8 @@
 #include "chapter_command.hpp"
 #include "virtual_segment.hpp"
 
+#include <atomic>
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*************************************
 *  taken from libdvdnav / libdvdread
@@ -226,7 +228,7 @@ private:
 
     demux_t      *p_demux;
 
-    bool         is_running;
+    std::atomic<bool> is_running;
     vlc_thread_t thread;
 
     vlc_mutex_t  lock;

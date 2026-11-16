@@ -162,7 +162,7 @@ void event_thread_t::SetPci(const uint8_t *data, size_t size)
 }
 void event_thread_t::ResetPci()
 {
-    if( !is_running )
+    if( !is_running.exchange(false) )
         return;
 
     vlc_mutex_lock( &lock );
@@ -171,7 +171,6 @@ void event_thread_t::ResetPci()
     vlc_mutex_unlock( &lock );
 
     vlc_join( thread, NULL );
-    is_running = false;
 }
 int event_thread_t::EventMouse( vlc_object_t *p_this, char const *psz_var,
                                 vlc_value_t, vlc_value_t, void *p_data )
