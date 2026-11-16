@@ -374,7 +374,7 @@ void event_thread_t::EventThread()
         }
 
         /* MOUSE part */
-        if( p_vout && ( b_moved || b_clicked ) )
+        if( p_vout && ( b_moved || b_clicked ) && !b_abort )
         {
             int x, y;
 
@@ -484,7 +484,7 @@ void event_thread_t::EventThread()
         vlc_mutex_unlock( &lock );
 
         /* Always check vout */
-        if( p_vout == NULL )
+        if( p_vout == NULL && !b_abort )
         {
             p_vout = (vlc_object_t*) input_GetVout(p_demux->p_input);
             if( p_vout)
