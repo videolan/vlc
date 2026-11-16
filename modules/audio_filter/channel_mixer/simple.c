@@ -251,7 +251,7 @@ static void DoWork_6_1_to_5_x( filter_t * p_filter,  block_t * p_in_buf, block_t
         *p_dest++ = p_src[5];
         if( out_lfe )
             *(p_dest++) = p_src[6]; // input always has LFE here
-        p_src += 6;
+        p_src += 7;
     }
 }
 
