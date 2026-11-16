@@ -1163,7 +1163,9 @@ bool matroska_segment_c::ESCreate()
 
 void matroska_segment_c::ESDestroy( )
 {
-    sys.p_ev->ResetPci();
+    // close the event thread. A new thread will be created if SetPci() is called
+    if (sys.p_ev)
+        sys.p_ev->ResetPci();
 
     for( tracks_map_t::iterator it = tracks.begin(); it != tracks.end(); ++it )
     {

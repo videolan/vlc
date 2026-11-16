@@ -267,6 +267,12 @@ static void Close( vlc_object_t *p_this )
 {
     demux_t     *p_demux = reinterpret_cast<demux_t*>( p_this );
     demux_sys_t *p_sys   = p_demux->p_sys;
+
+    /* a button command may still be running in the event thread, and it may
+     * be switching the current segment */
+    delete p_sys->p_ev;
+    p_sys->p_ev = nullptr;
+
     virtual_segment_c *p_vsegment = p_sys->p_current_vsegment;
     if( p_vsegment )
     {
