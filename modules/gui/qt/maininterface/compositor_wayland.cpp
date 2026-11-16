@@ -161,6 +161,11 @@ void CompositorWayland::unloadGUI()
     //needs to be released before the window
     m_interfaceWindowHandler.reset();
 
+#ifdef QT_WAYLAND_HAS_CUSTOM_MARGIN_SUPPORT
+    disconnect(m_qmlView.get(), &QWindow::widthChanged, this, &CompositorWayland::adjustQuickWindowMask);
+    disconnect(m_qmlView.get(), &QWindow::heightChanged, this, &CompositorWayland::adjustQuickWindowMask);
+#endif
+
     //at this point we need to unload the QML content but the window still need to
     //be valid as it may still be used by the vout window.
     //we cant' just delete the qmlEngine as the QmlView as the root item is parented to the QmlView
