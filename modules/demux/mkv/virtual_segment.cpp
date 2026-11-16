@@ -654,7 +654,6 @@ int virtual_edition_c::PublishChapters( input_title_t & title, int & i_user_chap
         i_level++;
 
         i_user_chapters++;
-        i_seekpoint_num = i_user_chapters;
     }
 
 //    if( chapters.size() > 1 )

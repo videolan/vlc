@@ -94,7 +94,6 @@ public:
     bool                b_ordered;
     vlc_tick_t          i_duration;
     chapter_edition_c   *p_edition;
-    int                 i_seekpoint_num;
 
 private:
     void retimeChapters();
