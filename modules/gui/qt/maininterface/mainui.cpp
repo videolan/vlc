@@ -86,6 +86,7 @@
 #include "mainctx_submodels.hpp"
 
 static bool g_qmlTypesAreRegistered = false;
+static bool g_qmlTypesClearPending = false;
 
 using  namespace vlc::playlist;
 
@@ -132,9 +133,10 @@ MainUI::~MainUI()
     }
     else
     {
-        // `QObject::destroyed()` is signalled just before the object dies, but subclass `QQmlEngine`
-        // itself should be dead at that point anyway. This should prevent undefined behavior.
-        connect(m_engineBound, &QObject::destroyed, &MainUI::clearQMLTypes);
+        // The engine is still alive, the types can't be cleared yet
+        // Qt 6.8 still references theses types when destroying the QQmlEngine (after the QObject::destroyed signal)
+        // we can clear them manually in qt.cpp after the compositor (and the engine) is destroyed
+        g_qmlTypesClearPending = true;
     }
 }
 
@@ -207,6 +209,8 @@ end:
 
 void MainUI::registerQMLTypes()
 {
+    // types of a previous instance whose engine is now destroyed
+    clearPendingQMLTypes();
     assert(!g_qmlTypesAreRegistered);
 
     {
@@ -487,4 +491,11 @@ void MainUI::clearQMLTypes()
 {
     qmlClearTypeRegistrations();
     g_qmlTypesAreRegistered = false;
+    g_qmlTypesClearPending = false;
+}
+
+void MainUI::clearPendingQMLTypes()
+{
+    if (g_qmlTypesClearPending)
+        clearQMLTypes();
 }
