@@ -335,10 +335,10 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     if( samples == 0 )
         goto skip;
 
+    if( decoder_UpdateAudioFormat( p_dec ) )
+        goto skip;
     if( p_sys->decode != NULL )
     {
-        if( decoder_UpdateAudioFormat( p_dec ) )
-            goto skip;
         block_t *p_out = decoder_NewAudioBuffer( p_dec, samples );
         if( p_out == NULL )
             goto skip;
@@ -350,8 +350,6 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     }
     else
     {
-        if( decoder_UpdateAudioFormat( p_dec ) )
-            goto skip;
         p_block->i_nb_samples = samples;
         p_block->i_buffer = samples * (p_sys->framebits / 8);
     }
