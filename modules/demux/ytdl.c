@@ -320,6 +320,53 @@ static const struct json_object *PickFormat(stream_t *s,
      return best_fmt;
 }
 
+static void SetHTTPHeader(vlc_object_t *obj, const struct json_object *headers,
+                          const char *name, const char *varname)
+{
+    const char *value = json_get_str(headers, name);
+
+    if (value != NULL) {
+        var_Create(obj, varname, VLC_VAR_STRING);
+        var_SetString(obj, varname, value);
+    }
+}
+
+/* Use the same HTTP headers as yt-dlp, as some servers reject requests
+ * with another User-Agent or without a Referer. */
+static void SetHTTPHeaders(vlc_object_t *obj, const struct json_object *fmt)
+{
+    const struct json_object *headers = json_get_object(fmt, "http_headers");
+
+    if (headers == NULL)
+        return;
+
+    SetHTTPHeader(obj, headers, "User-Agent", "http-user-agent");
+    SetHTTPHeader(obj, headers, "Referer", "http-referrer");
+}
+
+static void AddHTTPOption(input_item_t *item, const struct json_object *headers,
+                          const char *name, const char *varname)
+{
+    const char *value = json_get_str(headers, name);
+    char *option;
+
+    if (value != NULL && asprintf(&option, "%s=%s", varname, value) != -1) {
+        input_item_AddOption(item, option, VLC_INPUT_OPTION_UNIQUE);
+        free(option);
+    }
+}
+
+static void AddHTTPOptions(input_item_t *item, const struct json_object *fmt)
+{
+    const struct json_object *headers = json_get_object(fmt, "http_headers");
+
+    if (headers == NULL)
+        return;
+
+    AddHTTPOption(item, headers, "User-Agent", "http-user-agent");
+    AddHTTPOption(item, headers, "Referer", "http-referrer");
+}
+
 static bool LanguageMatch(const char *a, const char *b)
 {
     size_t len = strcspn(a, "-_");
@@ -457,6 +504,7 @@ static int ReadItem(stream_t *s, input_item_node_t *node,
 
     /* Don't care to lock, the item is still private. */
     GetMeta(item->p_meta, json);
+    AddHTTPOptions(item, fmt);
     input_item_node_AppendItem(node, item);
     input_item_Release(item);
 
@@ -635,6 +683,7 @@ static int OpenCommon(vlc_object_t *obj, const char *src_url)
                 msg_Dbg(s, "preferred audio language: %s", sys->esout.lang);
 
             var_Create(obj, "ytdl", VLC_VAR_BOOL);
+            SetHTTPHeaders(obj, fmt);
             demux = vlc_demux_NewURL(obj, url, &sys->esout.out);
 
             if (demux == NULL)
