@@ -33,7 +33,7 @@ Function AppExecAs
   ${If} ${AtLeastWinVista}
     Exec '"$WINDIR\explorer.exe" "$INSTDIR\vlc.exe"'
   ${Else}
-    Exec '$INSTDIR\vlc.exe'
+    Exec '"$INSTDIR\vlc.exe"'
   ${Endif}
 FunctionEnd
 
