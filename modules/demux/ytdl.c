@@ -159,22 +159,29 @@ static bool FormatHasTrack(const struct json_object *fmt, const char *codec)
     return str == NULL || strcmp(str, "none") != 0;
 }
 
+/* Prefer the highest resolution not above the preferred one, or else
+ * the lowest resolution (or the highest if there is no preference). */
 static int CompareHeight(double h_a, double h_b, double pref_height)
 {
-    if (islessequal(h_a, pref_height)) {
+    if (isnan(pref_height)) {
+        if (isgreater(h_a, h_b))
+            return +1;
+        if (isless(h_a, h_b))
+            return -1;
+    } else if (islessequal(h_a, pref_height)) {
         if (!islessequal(h_b, pref_height))
             return +1;
         if (h_a > h_b)
-            return -1;
-        if (h_a < h_b)
             return +1;
+        if (h_a < h_b)
+            return -1;
     } else {
         if (islessequal(h_b, pref_height))
             return -1;
         if (isless(h_a, h_b))
-            return -1;
-        if (isgreater(h_a, h_b))
             return +1;
+        if (isgreater(h_a, h_b))
+            return -1;
     }
 
     return 0;
