@@ -145,38 +145,17 @@ static const char *FormatURL(const struct json_object *fmt)
     return json_get_str(fmt, "url");
 }
 
-static int CompareFormats(const struct json_object *f_a,
-                          const struct json_object *f_b, double pref_height)
+/* yt-dlp sets the codec to "none" when a format has no such track.
+ * Treat unknown as a present track. */
+static bool FormatHasTrack(const struct json_object *fmt, const char *codec)
 {
-    double h_a = json_get_num(f_a, "height");
-    double abr_a = json_get_num(f_a, "abr");
-    double h_b = json_get_num(f_b, "height");
-    double abr_b = json_get_num(f_b, "abr");
+    const char *str = json_get_str(fmt, codec);
 
-    /* Prefer non-mute formats. Treat unknown as a non-mute format */
-    const char *acodec_a = json_get_str(f_a, "acodec");
-    const char *acodec_b = json_get_str(f_b, "acodec");
-    bool has_audio_a = acodec_a == NULL || strcmp(acodec_a, "none") != 0;
-    bool has_audio_b = acodec_b == NULL || strcmp(acodec_b, "none") != 0;
-    if (has_audio_a != has_audio_b)
-        return has_audio_a ? +1 : -1;
+    return str == NULL || strcmp(str, "none") != 0;
+}
 
-    /* Prefer non-blind formats. Treat unknown as a non-blind format */
-    const char *vcodec_a = json_get_str(f_a, "vcodec");
-    const char *vcodec_b = json_get_str(f_b, "vcodec");
-    bool has_video_a = vcodec_a == NULL || strcmp(vcodec_a, "none") != 0;
-    bool has_video_b = vcodec_b == NULL || strcmp(vcodec_b, "none") != 0;
-    if (has_video_a != has_video_b)
-        return has_video_a ? +1 : -1;
-
-    /* Prefer the original audio language over dubs */
-    double lang_a = json_get_num(f_a, "language_preference");
-    double lang_b = json_get_num(f_b, "language_preference");
-    if (isgreater(lang_a, lang_b))
-        return +1;
-    if (isgreater(lang_b, lang_a))
-        return -1;
-
+static int CompareHeight(double h_a, double h_b, double pref_height)
+{
     if (islessequal(h_a, pref_height)) {
         if (!islessequal(h_b, pref_height))
             return +1;
@@ -193,9 +172,97 @@ static int CompareFormats(const struct json_object *f_a,
             return +1;
     }
 
-    if (isgreater(abr_a, abr_b))
+    return 0;
+}
+
+/* What is played if a format is picked */
+struct ytdl_tracks {
+    bool manifest;
+    bool audio;
+    bool video;
+    double lang;
+    double height;
+    double abr;
+};
+
+static void AddFormatTracks(struct ytdl_tracks *t,
+                            const struct json_object *fmt, double pref_height)
+{
+    double lang = json_get_num(fmt, "language_preference");
+    double abr = json_get_num(fmt, "abr");
+
+    if (FormatHasTrack(fmt, "acodec"))
+        t->audio = true;
+
+    if (FormatHasTrack(fmt, "vcodec")) {
+        double height = json_get_num(fmt, "height");
+
+        if (isnan(t->height) || CompareHeight(height, t->height,
+                                              pref_height) > 0)
+            t->height = height;
+        t->video = true;
+    }
+
+    if (isnan(t->lang) || isgreater(lang, t->lang))
+        t->lang = lang;
+    if (isnan(t->abr) || isgreater(abr, t->abr))
+        t->abr = abr;
+}
+
+static void GetFormatTracks(struct ytdl_tracks *t,
+                            const struct json_array *fmts,
+                            const struct json_object *fmt, double pref_height)
+{
+    t->manifest = FormatHasManifest(fmt);
+    t->audio = t->video = false;
+    t->lang = t->height = t->abr = NAN;
+
+    if (!t->manifest) {
+        AddFormatTracks(t, fmt, pref_height);
+        return;
+    }
+
+    /* The manifest provides all the formats that it lists, not only the
+     * variant described by this format. */
+    const char *url = json_get_str(fmt, "manifest_url");
+
+    for (size_t i = 0; i < fmts->size; i++) {
+        const struct json_value *v = &fmts->entries[i];
+
+        if (v->type == JSON_OBJECT && FormatHasManifest(&v->object)
+         && strcmp(json_get_str(&v->object, "manifest_url"), url) == 0)
+            AddFormatTracks(t, &v->object, pref_height);
+    }
+}
+
+static int CompareTracks(const struct ytdl_tracks *a,
+                         const struct ytdl_tracks *b, double pref_height)
+{
+    /* Prefer non-mute formats */
+    if (a->audio != b->audio)
+        return a->audio ? +1 : -1;
+
+    /* Prefer non-blind formats */
+    if (a->video != b->video)
+        return a->video ? +1 : -1;
+
+    /* Prefer the original audio language over dubs */
+    if (isgreater(a->lang, b->lang))
         return +1;
-    if (isgreater(abr_b, abr_a))
+    if (isgreater(b->lang, a->lang))
+        return -1;
+
+    int val = CompareHeight(a->height, b->height, pref_height);
+    if (val != 0)
+        return val;
+
+    /* Prefer formats with manifests */
+    if (a->manifest != b->manifest)
+        return a->manifest ? +1 : -1;
+
+    if (isgreater(a->abr, b->abr))
+        return +1;
+    if (isgreater(b->abr, a->abr))
         return -1;
 
     return 0;
@@ -212,6 +279,7 @@ static const struct json_object *PickFormat(stream_t *s,
          return NULL;
 
      const struct json_object *best_fmt = NULL;
+     struct ytdl_tracks best = { 0 };
      double pref_height = var_InheritInteger(s, "preferred-resolution");
 
      if (isless(pref_height, 0.))
@@ -224,14 +292,17 @@ static const struct json_object *PickFormat(stream_t *s,
              continue;
 
          const struct json_object *fmt = &v->object;
+         struct ytdl_tracks tracks;
 
-         if (best_fmt == NULL) {
+         GetFormatTracks(&tracks, &fmts->array, fmt, pref_height);
+
+         /* On a tie, prefer the later format as yt-dlp sorts them from worst
+          * to best. */
+         if (best_fmt == NULL
+          || CompareTracks(&tracks, &best, pref_height) >= 0) {
              best_fmt = fmt;
-             continue;
+             best = tracks;
          }
-
-         if (CompareFormats(fmt, best_fmt, pref_height) > 0)
-              best_fmt = fmt;
      }
 
      return best_fmt;
