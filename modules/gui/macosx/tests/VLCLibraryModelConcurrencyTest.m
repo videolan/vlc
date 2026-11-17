@@ -58,6 +58,7 @@ typedef NS_ENUM(NSUInteger, VLCLibraryModelSupersedingAction) {
 {
     // XCTest runs the registered gate/observer teardown blocks first.
     if (self.fixture != nil) {
+        [self.fixture.model applicationWillTerminate:nil];
         XCTestExpectation * const finished = [self expectationWithDescription:@"Native reads finished before library shutdown"];
         [self.fixture.model finishPendingQueriesWithCompletion:^{
             [finished fulfill];

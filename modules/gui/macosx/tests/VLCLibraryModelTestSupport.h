@@ -66,6 +66,8 @@
                   withBlock:(NSArray *(^)(void))block;
 - (NSObject *)beginCacheUpdateForGetter:(SEL)getter
                              generation:(NSUInteger *)generation;
+- (void)cancelCacheUpdateForToken:(NSObject *)token
+                           getter:(SEL)getter;
 - (void)performCacheWriteForGeneration:(NSUInteger)generation
                                  token:(NSObject *)token
                                 getter:(SEL)getter

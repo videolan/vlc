@@ -440,6 +440,19 @@ VLCMediaLibraryMediaItem *VLCLibraryModelTestMediaItem(vlc_ml_media_type_t type,
     return token;
 }
 
+- (void)cancelCacheUpdateForToken:(NSObject *)token
+                           getter:(SEL)getter
+{
+    [super cancelCacheUpdateForToken:token getter:getter];
+    @synchronized (self) {
+        [_pendingQueries removeObject:token];
+        if (_pendingQueries.count == 0 && _queriesFinished != nil) {
+            dispatch_async(dispatch_get_main_queue(), _queriesFinished);
+            _queriesFinished = nil;
+        }
+    }
+}
+
 - (NSUInteger)queryCountForGetter:(SEL)getter
 {
     @synchronized (self) {
