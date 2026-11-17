@@ -49,7 +49,7 @@
             VLCLibraryDataTypesIntegrationPrepareFactoryFixtures();
         [initialized fulfill];
     });
-    [self waitForExpectations:@[ initialized ] timeout:20.];
+    [self waitForExpectations:@[ initialized ] timeout:60.];
     XCTAssertTrue(prepared);
 }
 

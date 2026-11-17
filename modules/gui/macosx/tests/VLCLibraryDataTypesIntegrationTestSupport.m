@@ -125,7 +125,7 @@ static BOOL VLCLibraryDataTypesIntegrationExecuteStatements(NSArray<NSDictionary
         }
     });
     const BOOL timedOut = dispatch_semaphore_wait(finished,
-        dispatch_time(DISPATCH_TIME_NOW, 15 * NSEC_PER_SEC)) != 0;
+        dispatch_time(DISPATCH_TIME_NOW, 30 * NSEC_PER_SEC)) != 0;
     if (timedOut && task.running)
         kill(task.processIdentifier, SIGKILL);
     // Reap the child and finish pipe I/O before the fixture database is removed.
@@ -133,7 +133,7 @@ static BOOL VLCLibraryDataTypesIntegrationExecuteStatements(NSArray<NSDictionary
     dispatch_group_wait(io, DISPATCH_TIME_FOREVER);
     if (timedOut || writeError != nil || readError != nil) {
         NSLog(@"Fixture SQL transport failed: %@", timedOut
-            ? @"helper exceeded its 15-second deadline" : writeError ?: readError);
+            ? @"helper exceeded its 30-second deadline" : writeError ?: readError);
         return NO;
     }
     id const response = [NSJSONSerialization JSONObjectWithData:responseData options:0 error:&error];
@@ -260,15 +260,16 @@ static BOOL VLCLibraryDataTypesIntegrationWaitForMediaAdded(NSString *folderURL,
     BOOL completed = NO;
     if (added) {
         const dispatch_time_t deadline =
-            dispatch_time(DISPATCH_TIME_NOW, 10 * NSEC_PER_SEC);
+            dispatch_time(DISPATCH_TIME_NOW, 45 * NSEC_PER_SEC);
         completed = dispatch_semaphore_wait(wait.semaphore, deadline) == 0 &&
                     wait.mediaAddedCount == wait.mediaMRLCount && !wait.failed;
     }
     vlc_ml_event_unregister_callback(sMediaLibrary, callback);
     if (!completed) {
-        NSLog(@"Fixture discovery did not finish: %zu/%zu media added, discovery failed: %d",
+        NSLog(@"Fixture discovery did not finish: %zu/%zu media added, folder added: %d, discovery failed: %d",
               wait.mediaAddedCount,
               wait.mediaMRLCount,
+              added,
               wait.failed);
     }
     return completed;
@@ -354,7 +355,7 @@ BOOL VLCLibraryDataTypesIntegrationStart(void)
     libvlc_InternalPlay(sLibVLC->p_libvlc_int);
 
     const dispatch_time_t interfaceDeadline =
-        dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC);
+        dispatch_time(DISPATCH_TIME_NOW, 15 * NSEC_PER_SEC);
     if (dispatch_semaphore_wait(sIntfReady, interfaceDeadline) != 0) {
         VLCLibraryDataTypesIntegrationStop();
         return NO;

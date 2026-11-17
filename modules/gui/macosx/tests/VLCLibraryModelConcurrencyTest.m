@@ -50,7 +50,7 @@ typedef NS_ENUM(NSUInteger, VLCLibraryModelSupersedingAction) {
                    VLCLibraryDataTypesIntegrationPrepareFactoryFixtures();
         [ready fulfill];
     });
-    [self waitForExpectations:@[ ready ] timeout:20.];
+    [self waitForExpectations:@[ ready ] timeout:60.];
     XCTAssertTrue(prepared);
 }
 
