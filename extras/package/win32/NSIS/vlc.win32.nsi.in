@@ -328,7 +328,7 @@ skip_uninstall32_cleanup:
 @BUILD_LUA_TRUE@     !insertmacro InstallFolder lua
 
   ; Generate the cache and add it to uninstall.log
-  nsExec::ExecToStack '"$INSTDIR\vlc-cache-gen.exe" $INSTDIR\plugins'
+  nsExec::ExecToStack '"$INSTDIR\vlc-cache-gen.exe" "$INSTDIR\plugins"'
   FindFirst $0 $1 "$INSTDIR\plugins\*.dat"
   FileWrite $UninstallLog "plugins\$1$\r$\n"
   FindClose $0
@@ -570,9 +570,9 @@ ${IfNot} ${AtLeastWin7}
     Goto WinTooOld
 ${Endif}
 
-ReadRegStr $INSTDIR HKLM "${PRODUCT_DIR_REGKEY}" "InstallDir"
-StrCmp $INSTDIR "" 0 WinOk
-StrCpy $INSTDIR "$@PROGRAMFILES@\${PRODUCT_PUBLISHER}\VLC"
+ReadRegStr "$INSTDIR" HKLM "${PRODUCT_DIR_REGKEY}" "InstallDir"
+StrCmp "$INSTDIR" "" 0 WinOk
+StrCpy "$INSTDIR" "$@PROGRAMFILES@\${PRODUCT_PUBLISHER}\VLC"
 Goto WinOk
 
 WinTooOld:
@@ -730,7 +730,7 @@ Function RunUninstaller
 
   IfFileExists "$INSTDIR\uninstall.exe" 0 no_remove_uninstaller
     Delete "$R1"
-    RMDir $INSTDIR
+    RMDir "$INSTDIR"
 
   no_remove_uninstaller:
 FunctionEnd
@@ -777,7 +777,7 @@ FunctionEnd
 ;; End function
 Section -Post
   WriteUninstaller "$INSTDIR\uninstall.exe"
-  WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "InstallDir" $INSTDIR
+  WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "InstallDir" "$INSTDIR"
   WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "Version" "${VERSION}"
   WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\vlc.exe"
 
