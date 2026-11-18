@@ -519,7 +519,12 @@ raspbian-arm:
         ./extras/package/macosx/build.sh $EXTRA_BUILD_FLAGS $NIGHTLY_EXTRA_BUILD_FLAGS -a $HOST_ARCH -x -j $NCPU
         # At least compile every targets
         make -j $NCPU check TESTS=
-        make -C modules -j $NCPU check-macosx
+        # only if modules/gui/macosx was modified
+        CHANGED_FILES_IN_PATH=$(git diff --name-only ${CI_MERGE_REQUEST_DIFF_BASE_SHA}..${CI_COMMIT_SHA} "modules/gui/macosx")
+        if [ -n "${CHANGED_FILES_IN_PATH}" ]; then
+            echo "Building and Running GUI tests"
+            make -C modules -j $NCPU check-macosx
+        fi
     after_script:
       - export PATH="${CI_PROJECT_DIR}/extras/tools/build/bin:$PATH"
       - !reference [.ccache-common-apple, after_script]
