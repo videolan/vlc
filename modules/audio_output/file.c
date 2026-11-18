@@ -55,19 +55,6 @@ typedef struct
 } aout_sys_t;
 
 #define CHANNELS_MAX 6
-static const int pi_channels_maps[CHANNELS_MAX+1] =
-{
-    0,
-    AOUT_CHAN_CENTER,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
-    AOUT_CHAN_CENTER | AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT
-     | AOUT_CHAN_REARRIGHT,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE
-};
 
 /*****************************************************************************
  * Local prototypes.
@@ -119,7 +106,7 @@ vlc_module_begin ()
         change_string_list( format_list, format_list )
     add_integer( "audiofile-channels", 0,
                  CHANNELS_TEXT, CHANNELS_LONGTEXT )
-        change_integer_range( 0, 6 )
+        change_integer_range( 0, CHANNELS_MAX )
     add_bool( "audiofile-wav", true, WAV_TEXT, WAV_LONGTEXT )
 
     set_capability( "audio output", 0 )
@@ -210,7 +197,7 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     i_channels = var_InheritInteger( p_aout, "audiofile-channels" );
     if( i_channels > 0 && i_channels <= CHANNELS_MAX )
     {
-        fmt->i_physical_channels = pi_channels_maps[i_channels];
+        fmt->i_physical_channels = vlc_chan_maps[i_channels];
     }
     fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
 
