@@ -437,7 +437,7 @@ static es_out_id_t *AddAudioTrack(struct vlc_input_es_out *out)
     fmt.i_id = 2;
     fmt.audio.i_format = VLC_CODEC_F32L;
     fmt.audio.i_rate = 44100;
-    fmt.audio.i_physical_channels = 2;
+    fmt.audio.i_physical_channels = AOUT_CHANS_STEREO;
     fmt.audio.i_channels = 2;
     es_out_id_t *track = es_out_Add(&out->out, &fmt);
     assert(track != NULL);
