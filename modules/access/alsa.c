@@ -333,12 +333,6 @@ static const uint8_t choices[] = {
     SND_PCM_FORMAT_U8,
 };
 
-static uint16_t channel_maps[] = {
-    AOUT_CHAN_CENTER, AOUT_CHANS_2_0, AOUT_CHANS_3_0 /* ? */,
-    AOUT_CHANS_4_0, AOUT_CHANS_5_0 /* ? */, AOUT_CHANS_5_1,
-    /* TODO: support 7-8 channels - need channels reodering */
-};
-
 static int Open (vlc_object_t *obj)
 {
     demux_t *demux = (demux_t *)obj;
@@ -436,9 +430,9 @@ static int Open (vlc_object_t *obj)
         goto error;
     }
     assert (param > 0);
-    assert (param < ARRAY_SIZE(channel_maps));
+    assert (param < 6); // previous channel_maps limitation
     fmt.audio.i_channels = param;
-    fmt.audio.i_physical_channels = channel_maps[param - 1];
+    fmt.audio.i_physical_channels = vlc_chan_maps[param];
 
     param = var_InheritInteger (demux, "alsa-samplerate");
     val = snd_pcm_hw_params_set_rate_max (pcm, hw, &param, NULL);
