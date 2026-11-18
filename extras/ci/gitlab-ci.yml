@@ -333,7 +333,7 @@ debian:
 #
 debian-meson:
     extends: .base-template
-    coverage: '/^coverage result: (\d+.\d+)$/'
+    coverage: '/^coverage result: \d+(?:\.\d+)?$/'
     image:
         name: $VLC_DEBIAN_IMAGE
     script:
