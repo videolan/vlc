@@ -38,7 +38,7 @@ struct flac_header_info
 {
     vlc_tick_t i_pts;
     unsigned i_rate;
-    unsigned i_channels;
+    uint16_t channel_mask;
     unsigned i_bits_per_sample;
     unsigned i_frame_length;
 };
@@ -209,13 +209,26 @@ static inline int FLAC_ParseSyncInfo(const uint8_t *p_buf, unsigned i_buf,
 
     /* Find channels */
     unsigned channels = p_buf[3] >> 4;
-    if (channels >= 8) {
-        if (channels >= 11) /* reserved */
-            return 0;
-        channels = 2;
-    } else
-        channels++;
-
+    static const uint16_t flac_channel_mask[16] = { // RFC9639 9.1.3
+        AOUT_CHAN_CENTER, // mono
+        AOUT_CHANS_2_0,
+        AOUT_CHANS_3_0,
+        AOUT_CHANS_4_0,
+        AOUT_CHANS_5_0,
+        AOUT_CHANS_5_1,
+        AOUT_CHANS_6_1_MIDDLE,
+        AOUT_CHANS_7_1,
+        AOUT_CHANS_2_0, // left-side stereo
+        AOUT_CHANS_2_0, // side-right stereo
+        AOUT_CHANS_2_0, // mid-side stereo
+        0, // Reserved
+        0, // Reserved
+        0, // Reserved
+        0, // Reserved
+        0, // Reserved
+    };
+    if (flac_channel_mask[channels] == 0)
+        return 0; // reserved
 
     /* Find bits per sample */
     static const int8_t flac_bits_per_sample[8] = {
@@ -306,7 +319,7 @@ static inline int FLAC_ParseSyncInfo(const uint8_t *p_buf, unsigned i_buf,
 
     h->i_bits_per_sample = bits_per_sample;
     h->i_rate = samplerate;
-    h->i_channels = channels;
+    h->channel_mask = flac_channel_mask[channels];
     h->i_frame_length = blocksize;
 
     return b_guessing ? -1 : 1;

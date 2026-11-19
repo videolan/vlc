@@ -37,6 +37,8 @@
 #include "packetizer_helper.h"
 #include "flac.h"
 
+#include <stdbit.h>
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -83,26 +85,6 @@ typedef struct
 
     int i_next_block_flags;
 } decoder_sys_t;
-
-static const int pi_channels_maps[9] =
-{
-    0,
-    AOUT_CHAN_CENTER,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
-    AOUT_CHAN_CENTER | AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT
-     | AOUT_CHAN_REARRIGHT,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_MIDDLELEFT
-     | AOUT_CHAN_MIDDLERIGHT,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER | AOUT_CHAN_REARLEFT
-     | AOUT_CHAN_REARRIGHT | AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT
-     | AOUT_CHAN_LFE
-};
 
 
 /*****************************************************************************
@@ -532,8 +514,8 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
 
     case STATE_SEND_DATA:
         p_dec->fmt_out.audio.i_rate = p_sys->headerinfo.i_rate;
-        p_dec->fmt_out.audio.i_channels = p_sys->headerinfo.i_channels;
-        p_dec->fmt_out.audio.i_physical_channels = pi_channels_maps[p_sys->stream_info.channels];
+        p_dec->fmt_out.audio.i_channels = stdc_count_ones(p_sys->headerinfo.channel_mask);
+        p_dec->fmt_out.audio.i_physical_channels = p_sys->headerinfo.channel_mask;
 
         if( p_sys->bytestream.p_block &&
             p_sys->bytestream.p_block->i_pts > date_Get( &p_sys->pts ) &&
