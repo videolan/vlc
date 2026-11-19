@@ -1,5 +1,5 @@
 # SMB2
-SMB2_VERSION := 6.3.1
+SMB2_VERSION := 7.0.0
 SMB2_URL := $(GITHUB)/sahlberg/libsmb2/archive/refs/tags/libsmb2-$(SMB2_VERSION).tar.gz
 
 ifdef BUILD_NETWORK
