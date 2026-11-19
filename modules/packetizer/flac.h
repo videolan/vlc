@@ -197,12 +197,12 @@ static inline int FLAC_ParseSyncInfo(const uint8_t *p_buf, unsigned i_buf,
     } else if (samplerate_hint == 15) {
         return 0; /* invalid */
     } else if (samplerate_hint < 12) {
-        static const int16_t flac_samplerate[12] = {
-            0,    8820, 17640, 19200,
-            800,  1600, 2205,  2400,
-            3200, 4410, 4800,  9600,
+        static const unsigned flac_samplerate[12] = {
+            0,    88200, 176400, 192000,
+            8000,  16000, 22050,  24000,
+            32000, 44100, 48000,  96000,
         };
-        samplerate = flac_samplerate[samplerate_hint] * 10;
+        samplerate = flac_samplerate[samplerate_hint];
     } else {
         samplerate = 0; /* at end of header */
     }
