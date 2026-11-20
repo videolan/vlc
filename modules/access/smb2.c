@@ -48,6 +48,11 @@
 #include <smb2/libsmb2.h>
 #include <smb2/libsmb2-raw.h>
 
+#if !defined(LIBSMB2_SRVSVC_V2)
+#define SMB2_SHARE_TYPE_HIDDEN    SHARE_TYPE_HIDDEN
+#define SMB2_SHARE_TYPE_DISKTREE  SHARE_TYPE_DISKTREE
+#endif
+
 #ifdef HAVE_DSM
 # include <bdsm/bdsm.h>
 
@@ -119,7 +124,9 @@ struct access_sys
     struct smb2_context *   smb2;
     struct smb2fh *         smb2fh;
     struct smb2dir *        smb2dir;
-#ifdef LIBSMB2_SHARE_ENUM_V2
+#if defined(LIBSMB2_SRVSVC_V2)
+    struct smb2_share_enum_reply *share_enum;
+#elif defined(LIBSMB2_SHARE_ENUM_V2)
     struct srvsvc_NetrShareEnum_rep *share_enum;
 #else
     struct srvsvc_netshareenumall_rep *share_enum;
@@ -492,7 +499,10 @@ ShareEnum(stream_t *access, input_item_node_t *p_node)
     struct vlc_readdir_helper rdh;
     vlc_readdir_helper_init(&rdh, access, p_node);
 
-#ifdef LIBSMB2_SHARE_ENUM_V2
+#if defined(LIBSMB2_SRVSVC_V2)
+    struct smb2_share_info_1 *ctr = sys->share_enum->share_info.info_1;
+    size_t ctr_count = sys->share_enum->entries_read;
+#elif defined(LIBSMB2_SHARE_ENUM_V2)
     struct srvsvc_SHARE_INFO_1_CONTAINER *ctr = &sys->share_enum->ses.ShareInfo.Level1;
     size_t ctr_count = ctr->EntriesRead;
 #else
@@ -503,7 +513,10 @@ ShareEnum(stream_t *access, input_item_node_t *p_node)
     for (uint32_t iinfo = 0;
          iinfo < ctr_count && ret == VLC_SUCCESS; ++iinfo)
     {
-#ifdef LIBSMB2_SHARE_ENUM_V2
+#if defined(LIBSMB2_SRVSVC_V2)
+        const char *name = ctr->netname;
+        uint32_t type = ctr->type;
+#elif defined(LIBSMB2_SHARE_ENUM_V2)
        struct srvsvc_SHARE_INFO_1 *info = &ctr->Buffer->share_info_1[iinfo];
        const char *name = info->netname.utf8;
        uint32_t type = info->type;
@@ -513,11 +526,11 @@ ShareEnum(stream_t *access, input_item_node_t *p_node)
        uint32_t type = info->type;
 #endif
 
-       if (type & SHARE_TYPE_HIDDEN)
+       if (type & SMB2_SHARE_TYPE_HIDDEN)
            continue;
        switch (type & 0x3)
        {
-           case SHARE_TYPE_DISKTREE:
+           case SMB2_SHARE_TYPE_DISKTREE:
                ret = AddItem(access, &rdh, name, ITEM_TYPE_DIRECTORY, NULL);
                break;
        }
@@ -611,7 +624,9 @@ vlc_smb2_open_share(stream_t *access, struct smb2_context **smb2p,
     int ret;
     if (do_enum)
     {
-#ifdef LIBSMB2_SHARE_ENUM_V2
+#if defined(LIBSMB2_SRVSVC_V2)
+        ret = smb2_share_enum_async(op.smb2, SMB2_SHARE_INFO_1, smb2_open_cb, &op);
+#elif defined(LIBSMB2_SHARE_ENUM_V2)
         ret = smb2_share_enum_async(op.smb2, SHARE_INFO_1, smb2_open_cb, &op);
 #else
         ret = smb2_share_enum_async(op.smb2, smb2_open_cb, &op);
@@ -862,6 +877,7 @@ vlc_smb2_resolve(stream_t *access, const char *host, unsigned port,
     return ret;
 #else
     (void) port;
+    (void) out_host;
     return -ENOENT;
 #endif
 }
