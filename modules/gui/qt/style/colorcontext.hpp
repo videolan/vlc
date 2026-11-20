@@ -178,7 +178,7 @@ public:
 
     bool hasExplicitPalette() const { return m_hasExplicitPalette; }
     bool hasExplicitColorSet() const { return m_hasExplicitColorSet; }
-    bool hasExplicitState() const { return m_hasExplicitColorSet; }
+    bool hasExplicitState() const { return m_hasExplicitState; }
     bool initialized() const { return m_initialized; }
 
 signals:
