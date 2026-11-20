@@ -38,7 +38,7 @@ Window {
     width: VLCStyle.appWidth * 0.75
     height: VLCStyle.appHeight * 0.85
 
-    color: theme.bg.primary
+    color: root.colorContext.bg.primary
 
     property alias contentComponent: loader.sourceComponent
     property alias standardButtons: buttonBox.standardButtons

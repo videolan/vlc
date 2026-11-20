@@ -39,6 +39,11 @@ Window {
 
     property bool _componentCompleted: false
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.View
+    }
+
     onVisibleChanged: {
         if (visible) {
             console.assert(transientParent)
@@ -69,7 +74,5 @@ Window {
         useAcrylic: false
         focus: true
         anchors.fill: parent
-
-        colorContext.palette: VLCStyle.palette
     }
 }
