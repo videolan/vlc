@@ -88,7 +88,7 @@ if host_system == 'darwin'
 endif
 
 # GnuTLS module
-gnutls_dep = dependency('gnutls', version: '>= 3.5.0', required: get_option('gnutls'))
+gnutls_dep = dependency('gnutls', version: '>= 3.7.0', required: get_option('gnutls'))
 if gnutls_dep.found()
 
     gnutls_darwin_deps = []

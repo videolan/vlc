@@ -20,7 +20,7 @@ PKGS += gnutls
 endif
 endif
 endif
-ifeq ($(call need_pkg,"gnutls >= 3.5.0"),)
+ifeq ($(call need_pkg,"gnutls >= 3.7.0"),)
 PKGS_FOUND += gnutls
 endif
 
