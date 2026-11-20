@@ -199,8 +199,20 @@ protected:
     void componentComplete() override;
 
 private:
+    /**
+     * Palette and color set are inherited across popups and windows, the state
+     * (enabled, hovered, pressed, ...) is not, as the popup or the window is not
+     * part of the item that opens it.
+     */
+    enum class StateInheritance {
+        Inherited,
+        //the parent context is outside of our popup or window
+        NotInherited,
+    };
+
     void onParentChanged();
-    void setParentContext(ColorContext* parentContext);
+    void setParentContext(ColorContext* parentContext,
+                          StateInheritance stateInheritance = StateInheritance::Inherited);
 
     void ensureExplicitState();
     void onInheritedStateChanged();
@@ -222,6 +234,7 @@ private:
     bool m_hasExplicitPalette = false;
     bool m_hasExplicitColorSet = false;
     bool m_hasExplicitState = false;
+    StateInheritance m_stateInheritance = StateInheritance::Inherited;
 };
 
 class ColorContextState : public QObject

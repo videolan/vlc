@@ -18,6 +18,8 @@
 #include "colorcontext.hpp"
 #include "systempalette.hpp"
 
+#include <QQuickWindow>
+
 ColorProperty::ColorProperty(const ColorContext* context, int section)
     : m_context(context)
     , m_section(section)
@@ -75,6 +77,129 @@ QColor ColorProperty::negative() const
 
 //ColorContext
 
+namespace {
+
+/*
+ * Popups (Popup, Dialog, Menu, ...) and windows are not items, we refer to
+ * them as surfaces.
+ *
+ * The visual root of a popup, the QQuickPopupItem, is reparented to the window
+ * overlay, so walking the parentItem() chain from within a popup leads to the
+ * overlay instead of the place where the popup is declared. The visual root of
+ * a window, its content item, has no parent item at all.
+ *
+ */
+
+bool isPopup(const QObject* object)
+{
+    return object && object->inherits("QQuickPopup");
+}
+
+bool isWindow(const QObject* object)
+{
+    return qobject_cast<const QQuickWindow*>(object);
+}
+
+bool isSurface(const QObject* object)
+{
+    return isPopup(object) || isWindow(object);
+}
+
+bool isPopupItem(const QQuickItem* item)
+{
+    return item->inherits("QQuickPopupItem") && isPopup(item->parent());
+}
+
+bool isWindowContentItem(const QQuickItem* item)
+{
+    const QQuickWindow* window = item->window();
+    return window && window->contentItem() == item;
+}
+
+bool isSurfaceRootItem(const QQuickItem* item)
+{
+    return isPopupItem(item) || isWindowContentItem(item);
+}
+
+QQuickItem* surfaceRootItem(const QObject* surface)
+{
+    assert(isSurface(surface));
+    if (auto window = qobject_cast<const QQuickWindow*>(surface))
+        return window->contentItem();
+
+    for (QObject* child : surface->children())
+    {
+        auto item = qobject_cast<QQuickItem*>(child);
+        if (item && isPopupItem(item))
+            return item;
+    }
+    return nullptr;
+}
+
+//returns true if obj is a valid holder for a ColorContext
+bool isContextHolder(const QObject* obj)
+{
+    return qobject_cast<const QQuickItem*>(obj) || isSurface(obj);
+}
+
+//returns the logical parent of an item or surface in the ColorContext hierarchy
+QObject* logicalParent(const QObject* obj)
+{
+    if (auto item = qobject_cast<const QQuickItem*>(obj))
+    {
+        if (isPopupItem(item))
+            return item->parent();
+        if (isWindowContentItem(item))
+            return item->window();
+        return item->parentItem();
+    }
+    else if (isSurface(obj))
+    {
+        QObject* parent = obj->parent();
+        return isContextHolder(parent) ? parent : nullptr;
+    }
+    return nullptr;
+}
+
+ColorContext* directColorContext(const QObject* obj)
+{
+    return obj->findChild<ColorContext*>({}, Qt::FindDirectChildrenOnly);
+}
+
+//call @a fn on the closest ColorContexts below @a obj, (@a obj own context excluded)
+void forEachChildContext(const QObject* obj, const std::function<void(ColorContext*)>& fn)
+{
+    const auto visit = [&fn](const QObject* child) {
+        if (ColorContext* ctx = directColorContext(child))
+            fn(ctx);
+        else
+            forEachChildContext(child, fn);
+    };
+
+    if (auto item = qobject_cast<const QQuickItem*>(obj))
+    {
+        for (const QQuickItem* child : item->childItems())
+        {
+            //surface root items are visited from their surface
+            if (!isSurfaceRootItem(child))
+                visit(child);
+        }
+
+        for (const QObject* child : item->children())
+        {
+            if (isSurface(child))
+                visit(child);
+        }
+    }
+    else if (isSurface(obj))
+    {
+        if (QQuickItem* rootItem = surfaceRootItem(obj))
+            visit(rootItem);
+    }
+}
+
+}
+
 ColorContext::ColorContext(QObject* parent)
     : QObject(parent)
 {
@@ -86,36 +211,23 @@ void ColorContext::classBegin()
 
 void ColorContext::componentComplete()
 {
-    QQuickItem* contextParent = qobject_cast<QQuickItem*>(QObject::parent());
-    if (!contextParent)
+    QObject* contextParent = QObject::parent();
+    if (!isContextHolder(contextParent))
         return;
 
     onParentChanged();
 
     //let our child contexts find us, they may have been completed before us
-    std::function<void (QQuickItem*)>  updateChildContexts;
-    updateChildContexts = [&](QQuickItem* item) -> void {
-        auto colorContext = item->findChild<ColorContext*>({}, Qt::FindDirectChildrenOnly);
-        if (colorContext)
-        {
-            colorContext->onParentChanged();
-            return;
-        }
-
-        for (QQuickItem* child: item->childItems())
-            updateChildContexts(child);
-    };
-
-
-    for (QQuickItem* child: contextParent->childItems())
-        updateChildContexts(child);
+    forEachChildContext(contextParent, [](ColorContext* child) {
+        child->onParentChanged();
+    });
 }
 
 
 void ColorContext::onParentChanged()
 {
-    QQuickItem* contextParent = qobject_cast<QQuickItem*>(QObject::parent());
-    if (! contextParent)
+    QObject* contextParent = QObject::parent();
+    if (!isContextHolder(contextParent))
         return;
 
     //reparenting any item between us and our parent context may change our
@@ -124,38 +236,45 @@ void ColorContext::onParentChanged()
         disconnect(conn);
     m_pathConnections.clear();
 
-    const auto trackParentChange = [this](QQuickItem* item) {
-        m_pathConnections.push_back(
-            connect(item, &QQuickItem::parentChanged, this, &ColorContext::onParentChanged));
+    const auto trackParentChange = [this](const QObject* obj) {
+        //surface root items are linked to their surface, not to their parent item
+        auto item = qobject_cast<const QQuickItem*>(obj);
+        if (item && !isSurfaceRootItem(item))
+            m_pathConnections.push_back(
+                connect(item, &QQuickItem::parentChanged, this, &ColorContext::onParentChanged));
     };
 
-    trackParentChange(contextParent);
-    for (
-        //start looking on our parent's parent, our parent's ColorContext is self
-        QQuickItem* parent = contextParent->parentItem();
-        parent != nullptr;
-        parent = parent->parentItem()
-    )
+    //start looking on our parent's parent, our parent's ColorContext is self
+    QObject* current = contextParent;
+    bool insideSurface = false;
+    trackParentChange(current);
+    while (QObject* parent = logicalParent(current))
     {
-        ColorContext* parentCtx = parent->findChild<ColorContext*>({}, Qt::FindDirectChildrenOnly);
+        //leaving a popup or a window for the object that declares it
+        insideSurface |= isSurface(current);
+
+        ColorContext* parentCtx = directColorContext(parent);
         if (parentCtx)
         {
-            setParentContext(parentCtx);
+            setParentContext(parentCtx, insideSurface ? StateInheritance::NotInherited
+                                                      : StateInheritance::Inherited);
             return;
         }
-        trackParentChange(parent);
+        current = parent;
+        trackParentChange(current);
     }
     //no parent context found, reset our inherited properties
     setParentContext(nullptr);
 }
 
-void ColorContext::setParentContext(ColorContext* parentContext)
+void ColorContext::setParentContext(ColorContext* parentContext, StateInheritance stateInheritance)
 {
     if (m_parentContext) {
         disconnect(m_parentContext, nullptr, this, nullptr);
     }
 
     m_parentContext = parentContext;
+    m_stateInheritance = stateInheritance;
 
     if (!m_hasExplicitPalette)
     {
@@ -181,7 +300,7 @@ void ColorContext::setParentContext(ColorContext* parentContext)
 
     if (!m_hasExplicitState)
     {
-        if (m_parentContext)
+        if (m_parentContext && m_stateInheritance == StateInheritance::Inherited)
         {
             connect(m_parentContext, &ColorContext::sharedStateChanged, this, &ColorContext::onInheritedStateChanged);
             setInheritedState(m_parentContext->m_state);
