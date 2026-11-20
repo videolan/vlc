@@ -123,8 +123,10 @@ public:
         Indicator = VQTC_NAME_INDICATOR
     };
 
-    Q_PROPERTY(SystemPalette* palette READ palette WRITE setPalette NOTIFY paletteChanged FINAL)
-    Q_PROPERTY(ColorSet colorSet READ colorSet WRITE setColorSet NOTIFY colorSetChanged FINAL)
+    // palette and color set are inherited from the parent context unless set,
+    // assigning undefined restores the inheritance
+    Q_PROPERTY(SystemPalette* palette READ palette WRITE setPalette RESET resetPalette NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(ColorSet colorSet READ colorSet WRITE setColorSet RESET resetColorSet NOTIFY colorSetChanged FINAL)
 
     // enabled/disabled buttons for instance, true by default
     // a context is disabled when its parent context is disabled
@@ -171,7 +173,9 @@ public:
     QColor accent() const;
 
     void setPalette(SystemPalette*);
+    void resetPalette();
     void setColorSet(ColorSet);
+    void resetColorSet();
 
     void setEnabled(bool);
     void setHovered(bool);

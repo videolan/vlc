@@ -359,15 +359,10 @@ bool ColorContext::setInheritedPalette(SystemPalette* palette)
         connect(m_palette, &SystemPalette::sourceChanged, this, &ColorContext::colorsChanged);
         connect(m_palette, &SystemPalette::paletteChanged, this, &ColorContext::colorsChanged);
         connect(m_palette, &SystemPalette::destroyed, this, [this](){
-            if (m_parentContext)
-            {
-                if (m_hasExplicitPalette)
-                    connect(m_parentContext, &ColorContext::paletteChanged, this, &ColorContext::setInheritedPalette);
-                setInheritedPalette(m_parentContext->m_palette);
-            }
+            if (m_hasExplicitPalette)
+                resetPalette();
             else
-                setInheritedPalette(nullptr);
-            m_hasExplicitPalette = false;
+                setInheritedPalette(m_parentContext ? m_parentContext->m_palette : nullptr);
         });
     }
     else if (m_initialized)
@@ -399,6 +394,21 @@ void ColorContext::setPalette(SystemPalette* palette)
 
     m_hasExplicitPalette = true;
     setInheritedPalette(palette);
+}
+
+void ColorContext::resetPalette()
+{
+    if (!m_hasExplicitPalette)
+        return;
+
+    m_hasExplicitPalette = false;
+    if (m_parentContext)
+    {
+        connect(m_parentContext, &ColorContext::paletteChanged, this, &ColorContext::setInheritedPalette);
+        setInheritedPalette(m_parentContext->m_palette);
+    }
+    else
+        setInheritedPalette(nullptr);
 }
 
 bool ColorContext::setInheritedColorSet(ColorSet colorSet)
@@ -437,6 +447,21 @@ void ColorContext::setColorSet(ColorSet colorSet)
 
     m_hasExplicitColorSet = true;
     setInheritedColorSet(colorSet);
+}
+
+void ColorContext::resetColorSet()
+{
+    if (!m_hasExplicitColorSet)
+        return;
+
+    m_hasExplicitColorSet = false;
+    if (m_parentContext)
+    {
+        connect(m_parentContext, &ColorContext::colorSetChanged, this, &ColorContext::setInheritedColorSet);
+        setInheritedColorSet(m_parentContext->m_colorSet);
+    }
+    else
+        setInheritedColorSet(ColorContext::ColorSetUndefined);
 }
 
 bool ColorContext::setInheritedState(std::shared_ptr<ColorContextState>& state)
