@@ -345,8 +345,11 @@ bool ColorContext::setInheritedPalette(SystemPalette* palette)
             m_hasExplicitPalette = false;
         });
     }
-    else
+    else if (m_initialized)
+    {
         m_initialized = false;
+        emit initializedChanged();
+    }
 
     if (m_initialized)
         emit colorsChanged();
@@ -380,8 +383,11 @@ bool ColorContext::setInheritedColorSet(ColorSet colorSet)
 
     m_colorSet = colorSet;
 
-    if (m_colorSet == ColorContext::ColorSetUndefined)
+    if (m_colorSet == ColorContext::ColorSetUndefined && m_initialized)
+    {
         m_initialized = false;
+        emit initializedChanged();
+    }
 
     if (m_initialized)
         emit colorsChanged();
