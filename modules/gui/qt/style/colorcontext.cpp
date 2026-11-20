@@ -90,27 +90,25 @@ void ColorContext::componentComplete()
     if (!contextParent)
         return;
 
-    connect(contextParent, &QQuickItem::parentChanged, this, &ColorContext::onParentChanged);
-
     onParentChanged();
 
-    //set ourself as the parent of our child contexts
-    std::function<void (QQuickItem*)>  setParentContextInChildrens;
-    setParentContextInChildrens = [&](QQuickItem* item) -> void {
+    //let our child contexts find us, they may have been completed before us
+    std::function<void (QQuickItem*)>  updateChildContexts;
+    updateChildContexts = [&](QQuickItem* item) -> void {
         auto colorContext = item->findChild<ColorContext*>({}, Qt::FindDirectChildrenOnly);
         if (colorContext)
         {
-            colorContext->setParentContext(this);
+            colorContext->onParentChanged();
             return;
         }
 
         for (QQuickItem* child: item->childItems())
-            setParentContextInChildrens(child);
+            updateChildContexts(child);
     };
 
 
     for (QQuickItem* child: contextParent->childItems())
-        setParentContextInChildrens(child);
+        updateChildContexts(child);
 }
 
 
@@ -120,6 +118,18 @@ void ColorContext::onParentChanged()
     if (! contextParent)
         return;
 
+    //reparenting any item between us and our parent context may change our
+    //parent context, track the path that leads to it
+    for (const QMetaObject::Connection& conn : m_pathConnections)
+        disconnect(conn);
+    m_pathConnections.clear();
+
+    const auto trackParentChange = [this](QQuickItem* item) {
+        m_pathConnections.push_back(
+            connect(item, &QQuickItem::parentChanged, this, &ColorContext::onParentChanged));
+    };
+
+    trackParentChange(contextParent);
     for (
         //start looking on our parent's parent, our parent's ColorContext is self
         QQuickItem* parent = contextParent->parentItem();
@@ -133,6 +143,7 @@ void ColorContext::onParentChanged()
             setParentContext(parentCtx);
             return;
         }
+        trackParentChange(parent);
     }
     //no parent context found, reset our inherited properties
     setParentContext(nullptr);

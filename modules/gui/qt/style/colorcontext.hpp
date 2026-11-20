@@ -19,6 +19,7 @@
 #define VLC_COLOR_CONTEXT_H
 
 #include <memory>
+#include <vector>
 
 #include <QObject>
 #include <QColor>
@@ -212,6 +213,8 @@ private:
     std::shared_ptr<ColorContextState> m_state;
 
     QPointer<ColorContext> m_parentContext;
+    //parentChanged connections of the items between us and our parent context
+    std::vector<QMetaObject::Connection> m_pathConnections;
 
     ColorSet m_colorSet = ColorSet::ColorSetUndefined;
 
