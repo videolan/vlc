@@ -41,8 +41,6 @@ PopupIconToolButton {
     AccessibleCompat.id: "teletextButton"
 
     popup.contentItem: TeletextWidget {
-        colorContext.palette: root.colorContext.palette
-
         Navigation.parentItem: root
         Navigation.downItem: root
     }

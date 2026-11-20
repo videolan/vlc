@@ -75,14 +75,6 @@ T.Popup {
         focus: true
         clip: true
 
-        //erf, popup are weird, content is not parented to the root
-        //so, duplicate the context here for the childrens
-        readonly property ColorContext colorContext: ColorContext {
-            id: theme
-            colorSet: popupTheme.colorSet
-            palette: popupTheme.palette
-        }
-
         initialItem: TracksListPage {
             trackMenuController: trackMenuController
         }

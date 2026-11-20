@@ -193,8 +193,6 @@ T.Pane {
                 }
 
                 Widgets.ToolTipExt {
-                    colorContext.palette: theme.palette
-
                     visible: mediaRemainingTimeHover.hovered && MainCtx.showRemainingTime && Player.rate !== 1
                     delay: VLCStyle.delayToolTipAppear
                     text: {

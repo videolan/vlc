@@ -71,8 +71,6 @@ Widgets.IconToolButton {
 
             focus: true
 
-            colorContext.palette: root.colorContext.palette
-
             onOpened: {
                 root.requestLockUnlockAutoHide(true)
                 root.menuOpened(menu)

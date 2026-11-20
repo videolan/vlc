@@ -38,8 +38,6 @@ PopupIconToolButton {
     AccessibleCompat.id: "playbackSpeedButton"
 
     popup.contentItem: PlaybackSpeed {
-        colorContext.palette: root.colorContext.palette
-
         Navigation.parentItem: root
 
         // NOTE: Mapping the right direction because the down action triggers the ComboBox.

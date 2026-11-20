@@ -160,8 +160,6 @@ FocusScope {
 
                 property bool _keyPressed: false
 
-                colorContext.palette: theme.palette
-
                 implicitWidth: VLCStyle.widthSearchInput
 
                 padding: VLCStyle.dp(6, VLCStyle.scale)
