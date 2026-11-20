@@ -288,15 +288,9 @@ Item {
         contentItem: GridLayout {
             columns: 2
 
-            readonly property ColorContext colorContext: ColorContext {
-                id: loginContentTheme
-                palette: VLCStyle.palette
-                colorSet: ColorContext.Window
-            }
-
             Text {
                 text: qsTr("User")
-                color: loginContentTheme.fg.primary
+                color: loginDialog.colorContext.fg.primary
                 font.pixelSize: VLCStyle.fontSize_normal
             }
 
@@ -315,7 +309,7 @@ Item {
 
             Text {
                 text: qsTr("Password")
-                color: loginContentTheme.fg.primary
+                color: loginDialog.colorContext.fg.primary
                 font.pixelSize: VLCStyle.fontSize_normal
             }
 
@@ -334,7 +328,7 @@ Item {
 
             Text {
                 text: qsTr("Save password")
-                color: loginContentTheme.fg.primary
+                color: loginDialog.colorContext.fg.primary
                 font.pixelSize: VLCStyle.fontSize_normal
             }
             Widgets.CheckBoxExt {
@@ -351,14 +345,8 @@ Item {
             id: loginButtons
             implicitHeight: VLCStyle.icon_normal
 
-            readonly property ColorContext colorContext: ColorContext {
-                id: loginFooterTheme
-                palette: VLCStyle.palette
-                colorSet: ColorContext.Window
-            }
-
             Rectangle {
-                color: loginFooterTheme.bg.primary
+                color: loginDialog.colorContext.bg.primary
                 anchors.fill: parent
 
                 RowLayout {
@@ -431,16 +419,10 @@ Item {
 
         contentItem:  ColumnLayout {
 
-            readonly property ColorContext colorContext: ColorContext {
-                id: progressContentTheme
-                palette: VLCStyle.palette
-                colorSet: ColorContext.Window
-            }
-
             Text {
                 focus: false
                 font.pixelSize: VLCStyle.fontSize_normal
-                color: progressContentTheme.fg.primary
+                color: progressDialog.colorContext.fg.primary
                 text: progressDialog.text
                 wrapMode: Text.WordWrap
             }
@@ -461,13 +443,8 @@ Item {
             focus: true
             implicitHeight: VLCStyle.icon_normal
 
-            readonly property ColorContext colorContext: ColorContext {
-                palette: VLCStyle.palette
-                colorSet: ColorContext.Window
-            }
-
             Rectangle {
-                color: questionDialog.colorContext.bg.primary
+                color: progressDialog.colorContext.bg.primary
                 anchors.fill: parent
                 anchors.leftMargin: VLCStyle.margin_xxsmall
                 anchors.rightMargin: VLCStyle.margin_xxsmall
@@ -514,11 +491,6 @@ Item {
             focus: true
             id: questionButtons
             implicitHeight: VLCStyle.icon_normal
-
-            readonly property ColorContext colorContext: ColorContext {
-                palette: VLCStyle.palette
-                colorSet: ColorContext.Window
-            }
 
             Rectangle {
                 color: questionDialog.colorContext.bg.primary

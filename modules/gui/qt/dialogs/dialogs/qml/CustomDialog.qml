@@ -77,14 +77,8 @@ ModalDialog {
         id: questionButtons
         implicitHeight: VLCStyle.icon_normal
 
-        readonly property ColorContext colorContext: ColorContext {
-            id: footerTheme
-            palette: root.colorContext.palette
-            colorSet: ColorContext.Window
-        }
-
         Rectangle {
-            color: footerTheme.bg.primary
+            color: root.colorContext.bg.primary
             anchors.fill: parent
             anchors.leftMargin: VLCStyle.margin_xxsmall
             anchors.rightMargin: VLCStyle.margin_xxsmall
