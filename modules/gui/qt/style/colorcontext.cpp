@@ -316,6 +316,31 @@ void ColorContext::setParentContext(ColorContext* parentContext, StateInheritanc
             setInheritedState(nullstate);
         }
     }
+
+    if (m_parentContext && m_stateInheritance == StateInheritance::Inherited)
+    {
+        connect(m_parentContext, &ColorContext::enabledChanged, this, [this]() {
+            setInheritedEnabled(m_parentContext->enabled());
+        });
+        setInheritedEnabled(m_parentContext->enabled());
+    }
+    else
+        setInheritedEnabled(true);
+}
+
+void ColorContext::setInheritedEnabled(bool inheritedEnabled)
+{
+    if (m_inheritedEnabled == inheritedEnabled)
+        return;
+
+    const bool wasEnabled = enabled();
+    m_inheritedEnabled = inheritedEnabled;
+    if (wasEnabled == enabled())
+        return;
+
+    emit enabledChanged();
+    if (m_initialized)
+        emit colorsChanged();
 }
 
 bool ColorContext::setInheritedPalette(SystemPalette* palette)
@@ -527,10 +552,16 @@ QColor ColorContext::getColor(ColorSection section, ColorName color) const
     if (!m_palette)
         return Qt::magenta;
 
-    return m_palette->getColor(m_colorSet, section,  color, m_state ? m_state->m_state : ColorContext::Normal);
+    ColorState state = ColorContext::Normal;
+    if (!m_inheritedEnabled)
+        state = ColorContext::Disabled;
+    else if (m_state)
+        state = m_state->m_state;
+
+    return m_palette->getColor(m_colorSet, section,  color, state);
 }
 
-bool ColorContext::enabled() const { return !m_state || m_state->m_enabled; }
+bool ColorContext::enabled() const { return m_inheritedEnabled && (!m_state || m_state->m_enabled); }
 
 bool ColorContext::focused() const { return m_state && m_state->m_focused; }
 

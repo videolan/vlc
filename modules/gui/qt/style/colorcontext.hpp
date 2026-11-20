@@ -127,6 +127,7 @@ public:
     Q_PROPERTY(ColorSet colorSet READ colorSet WRITE setColorSet NOTIFY colorSetChanged FINAL)
 
     // enabled/disabled buttons for instance, true by default
+    // a context is disabled when its parent context is disabled
     Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged FINAL)
     // mouse hover
     Q_PROPERTY(bool hovered READ hovered WRITE setHovered NOTIFY hoveredChanged FINAL)
@@ -216,6 +217,7 @@ private:
 
     void ensureExplicitState();
     void onInheritedStateChanged();
+    void setInheritedEnabled(bool);
 
     bool setInheritedPalette(SystemPalette*);
     bool setInheritedColorSet(ColorSet);
@@ -234,6 +236,8 @@ private:
     bool m_hasExplicitPalette = false;
     bool m_hasExplicitColorSet = false;
     bool m_hasExplicitState = false;
+    //whether the parent context is enabled, inherited even with an explicit state
+    bool m_inheritedEnabled = true;
     StateInheritance m_stateInheritance = StateInheritance::Inherited;
 };
 
