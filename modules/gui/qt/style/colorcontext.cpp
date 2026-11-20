@@ -269,6 +269,11 @@ void ColorContext::onParentChanged()
 
 void ColorContext::setParentContext(ColorContext* parentContext, StateInheritance stateInheritance)
 {
+    if (parentContext
+        && m_parentContext == parentContext
+        && m_stateInheritance == stateInheritance)
+        return;
+
     if (m_parentContext) {
         disconnect(m_parentContext, nullptr, this, nullptr);
     }
