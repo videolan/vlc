@@ -68,6 +68,14 @@
 #import <vlc_mouse.h>
 #import <vlc_window.h>
 
+#if (TARGET_OS_IOS && defined(__IPHONE_17_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_17_0) || \
+    (TARGET_OS_TV  && defined(__TVOS_17_0)   && __TV_OS_VERSION_MAX_ALLOWED  >= __TVOS_17_0) || \
+    (defined(TARGET_OS_VISION) && TARGET_OS_VISION)
+#define IS_TRAIT_REGISTRATION_API_AVAILABLE 1
+#else
+#define IS_TRAIT_REGISTRATION_API_AVAILABLE 0
+#endif
+
 @interface VLCVideoUIView : UIView {
     /* VLC window object, set to NULL under _mutex lock when closing. */
     vlc_window_t *_wnd;
@@ -136,7 +144,16 @@
             initWithTarget:self action:@selector(tapRecognized:)];
     }
 
+#if IS_TRAIT_REGISTRATION_API_AVAILABLE
+    if (@available(iOS 17.0, tvOS 17.0, visionOS 1.0, *))
+        [self registerForTraitChanges:@[[UITraitDisplayScale class]]
+                           withAction:@selector(displayScaleDidChange)];
+#endif
+
+    CGFloat scale = self.contentScaleFactor;
     CGSize size = self.viewContainerBounds.size;
+    size.width *= scale;
+    size.height *= scale;
     _width = size.width;
     _height = size.height;
     [self reportEvent:^{
@@ -336,10 +353,34 @@
 
 - (void)didMoveToWindow
 {
-    #if !defined(TARGET_OS_VISION) || !TARGET_OS_VISION
-        self.contentScaleFactor = self.window.screen.scale;
-    #endif
+    if (self.window != nil)
+        [self displayScaleDidChange];
 }
+
+- (void)displayScaleDidChange
+{
+    CGFloat scale = self.traitCollection.displayScale;
+    if (scale <= 0)
+        return;
+
+    self.contentScaleFactor = scale;
+    [self reshape];
+}
+
+#if !defined(TARGET_OS_VISION) || !TARGET_OS_VISION
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection
+{
+    [super traitCollectionDidChange:previousTraitCollection];
+
+#if IS_TRAIT_REGISTRATION_API_AVAILABLE
+    if (@available(iOS 17.0, tvOS 17.0, *))
+        return;
+#endif
+
+    if (previousTraitCollection.displayScale != self.traitCollection.displayScale)
+        [self displayScaleDidChange];
+}
+#endif
 
 - (void)layoutSubviews
 {
