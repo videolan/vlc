@@ -64,7 +64,10 @@ ChromecastCommunication::ChromecastCommunication( vlc_object_t* p_module,
 
     char psz_localIP[NI_MAXNUMERICHOST];
     if (net_GetSockAddress( vlc_tls_GetFD(m_tls), psz_localIP, NULL ))
+    {
+        disconnect();
         throw std::runtime_error( "Cannot get local IP address" );
+    }
 
     m_serverIp = psz_localIP;
 }
