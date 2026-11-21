@@ -115,6 +115,15 @@ typedef NS_ENUM(NSUInteger, VLCSampleBufferPixelFlip) {
         return NO;
     }
 
+    OSType poolFormat;
+    value = CFDictionaryGetValue(poolAttr, kCVPixelBufferPixelFormatTypeKey);
+    if (!value || CFGetTypeID(value) != CFNumberGetTypeID()
+        || !CFNumberGetValue(value, kCFNumberIntType, &poolFormat)
+        || poolFormat != CVPixelBufferGetPixelFormatType(pixelBuffer))
+    {
+        return NO;
+    }
+
     return YES;
 }
 
