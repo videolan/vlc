@@ -79,7 +79,6 @@ static void
 on_current_media_changed(vlc_player_t *player, input_item_t *new_media,
                          void *data)
 {
-    (void) player;
     libvlc_media_player_t *mp = data;
 
     libvlc_media_t *libmedia;
@@ -91,10 +90,19 @@ on_current_media_changed(vlc_player_t *player, input_item_t *new_media,
     else
         libmedia = NULL;
 
-    if (mp->cbs == NULL || mp->cbs->on_media_changed == NULL)
+    if (mp->cbs == NULL)
         return;
 
-    mp->cbs->on_media_changed(mp->cbs_opaque, libmedia);
+    if (mp->cbs->on_media_changed != NULL)
+        mp->cbs->on_media_changed(mp->cbs_opaque, libmedia);
+
+    if (new_media != NULL && mp->error_reported)
+    {
+        mp->error_reported = false;
+        enum vlc_player_state state = vlc_player_GetState(player);
+        mp->cbs->on_state_changed(mp->cbs_opaque,
+                                  libvlc_state_from_player(state));
+    }
 }
 
 static void
@@ -132,6 +140,7 @@ on_state_changed(vlc_player_t *player, enum vlc_player_state new_state,
     if (mp->cbs == NULL || mp->cbs->on_state_changed == NULL)
         return;
 
+    mp->error_reported = false;
     mp->cbs->on_state_changed(mp->cbs_opaque,
                               libvlc_state_from_player(new_state));
 }
@@ -175,6 +184,7 @@ on_error_changed(vlc_player_t *player, enum vlc_player_error error, void *data)
             vlc_assert_unreachable();
     }
 
+    mp->error_reported = error != VLC_PLAYER_ERROR_NONE;
     mp->cbs->on_state_changed(mp->cbs_opaque, state);
 }
 
@@ -678,6 +688,7 @@ libvlc_media_player_new( libvlc_instance_t *instance,
 
     mp->cbs = cbs;
     mp->cbs_opaque = cbs_opaque;
+    mp->error_reported = false;
 
     /* Input */
     var_Create (mp, "rate", VLC_VAR_FLOAT|VLC_VAR_DOINHERIT);

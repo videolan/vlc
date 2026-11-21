@@ -46,6 +46,7 @@ struct libvlc_media_player_t
     vlc_player_listener_id *listener;
     vlc_player_aout_listener_id *aout_listener;
     vlc_cond_t wait;
+    bool error_reported;
 
     struct libvlc_instance_t * p_libvlc_instance; /* Parent instance */
 
