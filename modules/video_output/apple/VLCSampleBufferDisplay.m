@@ -121,8 +121,10 @@ typedef NS_ENUM(NSUInteger, VLCSampleBufferPixelFlip) {
 - (CVPixelBufferRef)provideFromBuffer:(CVPixelBufferRef)pixelBuffer
                              rotation:(VLCSampleBufferPixelRotation)rotation
 {
-    if (![self _validateRotationPoolWithBuffer:pixelBuffer rotation:rotation])
+    if (![self _validateRotationPoolWithBuffer:pixelBuffer rotation:rotation]) {
         CVPixelBufferPoolRelease(_rotationPool);
+        _rotationPool = NULL;
+    }
 
     if (!_rotationPool) {
         bool rotated = rotation == kVLCSampleBufferPixelRotation_90CW || rotation == kVLCSampleBufferPixelRotation_90CCW;
