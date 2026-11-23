@@ -307,15 +307,6 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
     if (!p_sys->b_stream_info)
         ProcessHeader(p_dec);
 
-    if (p_sys->stream_info.channels > 8)
-    {
-        if(in)
-            block_Release(in);
-        msg_Err(p_dec, "This stream uses too many audio channels (%d > 8)",
-            p_sys->stream_info.channels);
-        return NULL;
-    }
-
     if ( in )
         block_BytestreamPush(&p_sys->bytestream, in);
 
