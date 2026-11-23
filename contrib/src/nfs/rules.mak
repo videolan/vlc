@@ -21,6 +21,8 @@ $(TARBALLS)/libnfs-$(NFS_VERSION).tar.gz:
 nfs: UNPACK_DIR=libnfs-libnfs-$(NFS_VERSION)
 nfs: libnfs-$(NFS_VERSION).tar.gz .sum-nfs
 	$(UNPACK)
+	$(APPLY) $(SRC)/nfs/0001-cmake-use-Requires.private-for-gnutls-in-the-pkg-con.patch
+	$(call pkg_static,"cmake/libnfs.pc.cmake")
 	$(MOVE)
 
 .nfs: nfs toolchain.cmake
