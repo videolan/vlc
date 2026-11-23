@@ -74,6 +74,9 @@ struct input_source_t
     /* Read-write protected by es_out.c lock */
     vlc_tick_t i_normal_time;
 
+    /* Last valid normal time reported by the input thread. */
+    vlc_tick_t reported_normal_time;
+
     bool       b_eof;   /* eof of demuxer */
 };
 
