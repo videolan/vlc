@@ -439,6 +439,8 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
                 if( likely( vars.tk->p_extra_data ) )
                     memcpy( vars.tk->p_extra_data, cpriv.GetBuffer(),
                             vars.tk->i_extra_data );
+                else
+                    throw std::bad_alloc{};
             }
             debug( vars, "Track CodecPrivate size=%" PRId64, cpriv.GetSize() );
         }
