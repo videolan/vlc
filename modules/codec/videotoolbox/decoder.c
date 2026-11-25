@@ -365,6 +365,8 @@ static block_t *ProcessBlockH264(decoder_t *p_dec, block_t *p_block, bool *pb_co
     struct vt_h264_context *h264ctx = p_sys->p_codec_context;
     p_block = hxxx_helper_process_block(&h264ctx->hh, p_block);
     *pb_config_changed = hxxx_helper_has_new_config(&h264ctx->hh);
+    if (*pb_config_changed)
+        h264ctx->b_extra_has_config = false;
     return p_block;
 }
 
@@ -879,7 +881,15 @@ static bool ConfigureVoutHEVC(decoder_t *p_dec)
     return true;
 }
 
-#define ProcessBlockHEVC ProcessBlockH264
+static block_t *ProcessBlockHEVC(decoder_t *p_dec, block_t *p_block, bool *pb_config_changed)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    struct vt_hevc_context *hevcctx = p_sys->p_codec_context;
+    p_block = hxxx_helper_process_block(&hevcctx->hh, p_block);
+    *pb_config_changed = hxxx_helper_has_new_config(&hevcctx->hh);
+    return p_block;
+}
+
 #define VideoToolboxNeedsToRestartHEVC VideoToolboxNeedsToRestartH264
 
 static CFDictionaryRef CopyDecoderExtradataMPEG4(decoder_t *p_dec)
