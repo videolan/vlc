@@ -489,18 +489,16 @@ static bool LateStartH264(decoder_t *p_dec)
     return !hxxx_helper_has_config(&h264ctx->hh);
 }
 
-static bool ConfigureVoutH264(decoder_t *p_dec)
+static bool ConfigureVoutHxxx(decoder_t *p_dec, const struct hxxx_helper *hh,
+                              bool b_extra_has_config)
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
-    struct vt_h264_context *h264ctx = p_sys->p_codec_context;
-
     if (p_dec->fmt_in->video.primaries == COLOR_PRIMARIES_UNDEF)
     {
         video_color_primaries_t primaries;
         video_transfer_func_t transfer;
         video_color_space_t colorspace;
         video_color_range_t full_range;
-        if (hxxx_helper_get_colorimetry(&h264ctx->hh,
+        if (hxxx_helper_get_colorimetry(hh,
                                         &primaries,
                                         &transfer,
                                         &colorspace,
@@ -513,11 +511,12 @@ static bool ConfigureVoutH264(decoder_t *p_dec)
         }
     }
 
-    if (!p_dec->fmt_in->video.i_visible_width || !p_dec->fmt_in->video.i_visible_height)
+    if (!b_extra_has_config ||
+        !p_dec->fmt_in->video.i_visible_width || !p_dec->fmt_in->video.i_visible_height)
     {
         unsigned i_offset_x, i_offset_y, i_width, i_height, i_vis_width, i_vis_height;
         if (VLC_SUCCESS ==
-           hxxx_helper_get_current_picture_size(&h264ctx->hh,
+           hxxx_helper_get_current_picture_size(hh,
                                                 &i_offset_x, &i_offset_y,
                                                 &i_width, &i_height,
                                                 &i_vis_width, &i_vis_height))
@@ -536,7 +535,7 @@ static bool ConfigureVoutH264(decoder_t *p_dec)
     {
         int i_sar_num, i_sar_den;
         if (VLC_SUCCESS ==
-            hxxx_helper_get_current_sar(&h264ctx->hh, &i_sar_num, &i_sar_den))
+            hxxx_helper_get_current_sar(hh, &i_sar_num, &i_sar_den))
         {
             p_dec->fmt_out.video.i_sar_num = i_sar_num;
             p_dec->fmt_out.video.i_sar_den = i_sar_den;
@@ -544,6 +543,13 @@ static bool ConfigureVoutH264(decoder_t *p_dec)
     }
 
     return true;
+}
+
+static bool ConfigureVoutH264(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    struct vt_h264_context *h264ctx = p_sys->p_codec_context;
+    return ConfigureVoutHxxx(p_dec, &h264ctx->hh, h264ctx->b_extra_has_config);
 }
 
 static bool VideoToolboxNeedsToRestartH264(decoder_t *p_dec,
@@ -867,7 +873,7 @@ static bool ConfigureVoutHEVC(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     struct vt_hevc_context *hevcctx = p_sys->p_codec_context;
-    if (!ConfigureVoutH264(p_dec))
+    if (!ConfigureVoutHxxx(p_dec, &hevcctx->hh, hevcctx->b_extra_has_config))
         return false;
 
     if (hevcctx->b_dovi)

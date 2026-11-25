@@ -324,6 +324,7 @@ hevc_helper_parse_nal(struct hxxx_helper *hh, const uint8_t *p_nal, size_t i_nal
                  hevc_sequence_parameter_set_t,
                  hevc_decode_sps,
                  hevc_rbsp_release_sps);
+        hh->hevc.i_current_sps = i_id;
         msg_Dbg(hh->p_obj, "new SPS parsed: %u", i_id);
     }
     else if (i_nal_type == HEVC_NAL_PPS)
