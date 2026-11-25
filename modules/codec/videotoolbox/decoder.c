@@ -565,6 +565,10 @@ static bool VideoToolboxNeedsToRestartH264(decoder_t *p_dec,
     if (hxxx_helper_get_current_picture_size(hh, &ox, &oy, &w, &h, &vw, &vh) != VLC_SUCCESS)
         return true;
 
+    if (vw != p_dec->fmt_out.video.i_visible_width ||
+        vh != p_dec->fmt_out.video.i_visible_height)
+        return true;
+
     if (hxxx_helper_get_current_sar(hh, &sarn, &sard) != VLC_SUCCESS)
         return true;
 
@@ -585,7 +589,13 @@ static bool VideoToolboxNeedsToRestartH264(decoder_t *p_dec,
         {
             b_ret = !VTDecompressionSessionCanAcceptFormatDescription(session,
                                                                       newvideoFormatDesc);
-            CFRelease(newvideoFormatDesc);
+            if (b_ret)
+                CFRelease(newvideoFormatDesc);
+            else
+            {
+                CFRelease(p_sys->videoFormatDescription);
+                p_sys->videoFormatDescription = newvideoFormatDesc;
+            }
         }
         CFRelease(decoderConfiguration);
     }
