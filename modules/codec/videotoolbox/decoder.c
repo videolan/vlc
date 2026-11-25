@@ -887,6 +887,8 @@ static block_t *ProcessBlockHEVC(decoder_t *p_dec, block_t *p_block, bool *pb_co
     struct vt_hevc_context *hevcctx = p_sys->p_codec_context;
     p_block = hxxx_helper_process_block(&hevcctx->hh, p_block);
     *pb_config_changed = hxxx_helper_has_new_config(&hevcctx->hh);
+    if (*pb_config_changed)
+        hevcctx->b_extra_has_config = false;
     return p_block;
 }
 
