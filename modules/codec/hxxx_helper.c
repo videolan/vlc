@@ -578,6 +578,11 @@ helper_process_block_xvcc2annexb(struct hxxx_helper *hh, block_t *p_block,
     assert(helper_nal_length_valid(hh));
     h264_AVC_to_AnnexB(p_block->p_buffer, p_block->i_buffer,
                        hh->i_nal_length_size);
+    /* Leave HEVC unparsed until #30451 is fixed: hevc_helper_parse_nal()
+     * drops valid slices of streams with several VPS or SPS. In-band HEVC
+     * parameter set changes are therefore not detected here. */
+    if (hh->i_codec == VLC_CODEC_HEVC)
+        return p_block;
     return helper_process_block_h264_annexb(hh, p_block, p_config_changed);
 }
 
