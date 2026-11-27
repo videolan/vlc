@@ -638,8 +638,7 @@ TestCase {
     function test_mixed_children() {
         fsmMixed.atob()
         tryCompare(mixedB, "active", true)
-        wait(30)
-        verify(mixedC.active, true)
+        tryCompare(mixedC, "active", true)
     }
 
 }
